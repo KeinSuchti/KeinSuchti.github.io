@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Serien & Film Tracker</title>
+  <style>
+    body { 
+      font-family: Arial, sans-serif; 
+      background: #121212; 
+      color: #fff; 
+      padding: 20px; 
+      margin: 0;
+    }
+    h1 { 
+      text-align: center; 
+      margin-bottom: 20px;
+    }
+    .container { 
+      max-width: 800px; 
+      margin: auto; 
+    }
+
+    .item { 
+      margin: 8px 0; 
+      padding: 10px; 
+      background: #1e1e1e; 
+      border-radius: 8px; 
+      position: relative;
+    }
+
+    .item-top { 
+      display: flex; 
+      align-items: center; 
+      justify-content: space-between; 
+    }
+    .left { 
+      display: flex; 
+      align-items: center; 
+    }
+
+    input[type="checkbox"] { 
+      margin-right: 10px; 
+      transform: scale(1.2); 
+    }
+
+    .actions { 
+      display: flex; 
+      gap: 8px; 
+    }
+
+    .btn-small {
+      position: relative;
+      background: #444;
+      padding: 6px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      user-select: none;
+      border: none;
+      color: white;
+    }
+
+    .btn-small.has-comment::after,
+    .btn-small.has-link::after {
+      content: "";
+      position: absolute;
+      top: 2px;
+      right: 2px;
+      width: 8px;
+      height: 8px;
+      background: red;
+      border-radius: 50%;
+    }
+
+    .comment,
+    .link-input {
+      margin-top: 8px;
+      padding: 6px;
+      border-radius: 6px;
+      border: none;
+      width: 100%;
+      display: none;
+      box-sizing: border-box;
+      background: #333;
+      color: white;
+    }
+
+    .comment.visible,
+    .link-input.visible {
+      display: block;
+    }
+
+    .progress { 
+      margin-top: 20px; 
+      text-align: center; 
+    }
+
+    button {
+      margin-top: 10px;
+      padding: 10px;
+      width: 100%;
+      border: none;
+      border-radius: 6px;
+      background: #ff4444;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .add-section { 
+      margin-top: 15px; 
+      display: flex; 
+      gap: 10px; 
+    }
+
+    .add-section input {
+      flex: 1;
+      padding: 10px;
+      border-radius: 6px;
+      border: none;
+      background: #333;
+      color: white;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 20px;
+      color: #aaa;
+    }
+
+    .error {
+      background: #ff4444;
+      padding: 10px;
+      border-radius: 6px;
+      margin: 10px 0;
+    }
+
+    .status {
+      padding: 10px;
+      border-radius: 6px;
+      margin: 10px 0;
+      text-align: center;
+    }
+
+    .status.success {
+      background: #44aa44;
+    }
+
+    .status.error {
+      background: #ff4444;
+    }
+
+    .status.loading {
+      background: #444;
+    }
+
+    .sync-indicator {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #444;
+    }
+
+    .sync-indicator.syncing {
+      background: #ffcc00;
+      box-shadow: 0 0 8px #ffcc00;
+    }
+
+    .sync-indicator.synced {
+      background: #44aa44;
+    }
+
+    .sync-indicator.sync-error {
+      background: #ff4444;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Serien & Film Tracker</h1>
+    
+    <div id="status-message" class="status loading">Daten werden geladen...</div>
+    
+    <div id="items-container" class="items-container">
+      <!-- Items werden hier dynamisch eingefügt -->
+    </div>
+    
+    <div class="add-section">
+      <input type="text" id="new-item-input" placeholder="Neue Serie/Film hinzufügen...">
+      <button id="add-item-btn">Hinzufügen</button>
+    </div>
+    
+    <div class="progress">
+      <span id="progress-text">Fortschritt: 0 / 0</span>
+    </div>
+    
+    <div class="sync-indicator" id="sync-indicator"></div>
+  </div>
+
+  <!-- Supabase Client Library -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/supabase.min.js"></script>
+  
+  <script>
+    // Konfiguration für Supabase
+    // !!! ÄNDERN SIE DIESE WERTE MIT IHREN EIGENEN SUPABASE-DETAILS !!!
+    const SUPABASE_URL = 'https://tqxyofqzlflnpfomslky.supabase.co'; // Ersetzen Sie dies mit Ihrer Supabase-URL
+    const SUPABASE_ANON_KEY = 'sb_publishable_Kw06uhbBIjKHx_C_KRhKiw_XNrYteHR'; // Ersetzen Sie dies mit Ihrem Supabase-Anon-Key
+    
+    // Supabase-Client initialisieren
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    
+    // Globale Variablen
+    let items = [];
+    let syncStatus = 'synced'; // 'synced', 'syncing', 'sync-error'
+    
+    // DOM-Elemente
+    const itemsContainer = document.getElementById('items-container');
+    const newItemInput = document.getElementById('new-item-input');
+    const addItemBtn = document.getElementById('add-item-btn');
+    const progressText = document.getElementById('progress-text');
+    const statusMessage = document.getElementById('status-message');
+    const syncIndicator = document.getElementById('sync-indicator');
+    
+    // Status-Indikator aktualisieren
+    function updateSyncIndicator() {
+      syncIndicator.className = 'sync-indicator';
+      syncIndicator.classList.add(syncStatus);
+    }
+    
+    // Statusmeldung anzeigen
+    function showStatus(message, type = 'loading') {
+      statusMessage.textContent = message;
+      statusMessage.className = `status ${type}`;
+    }
+    
+    // Fehlermeldung anzeigen
+    function showError(message) {
+      showStatus(message, 'error');
+    }
+    
+    // Sync-Status aktualisieren
+    function setSyncStatus(status) {
+      syncStatus = status;
+      updateSyncIndicator();
+    }
+    
+    // Daten aus Supabase laden
+    async function loadItems() {
+      try {
+        setSyncStatus('syncing');
+        showStatus('Daten werden geladen...', 'loading');
+        
+        const { data, error } = await supabase
+          .from('tracker_items')
+          .select('*')
+          .order('created_at', { ascending: true });
+        
+        if (error) {
+          throw new Error(`Fehler beim Laden: ${error.message}`);
+        }
+        
+        items = data;
+        renderItems();
+        setSyncStatus('synced');
+        showStatus('Daten erfolgreich geladen', 'success');
+      } catch (error) {
+        console.error('Fehler beim Laden der Daten:', error);
+        showError(`Fehler beim Laden der Daten: ${error.message}`);
+        setSyncStatus('sync-error');
+      }
+    }
+    
+    // Daten in Supabase speichern
+    async function saveItems() {
+      try {
+        setSyncStatus('syncing');
+        showStatus('Daten werden gespeichert...', 'loading');
+        
+        // Löschen aller alten Einträge
+        const { error: deleteError } = await supabase
+          .from('tracker_items')
+          .delete()
+          .eq('user_id', 'current_user');
+        
+        if (deleteError) {
+          throw new Error(`Fehler beim Löschen: ${deleteError.message}`);
+        }
+        
+        // Neue Einträge hinzufügen
+        const { error: insertError } = await supabase
+          .from('tracker_items')
+          .insert(items.map(item => ({
+            ...item,
+            user_id: 'current_user' // Dummy-User-ID für Beispiel
+          })));
+        
+        if (insertError) {
+          throw new Error(`Fehler beim Speichern: ${insertError.message}`);
+        }
+        
+        setSyncStatus('synced');
+        showStatus('Daten erfolgreich gespeichert', 'success');
+      } catch (error) {
+        console.error('Fehler beim Speichern der Daten:', error);
+        showError(`Fehler beim Speichern: ${error.message}`);
+        setSyncStatus('sync-error');
+      }
+    }
+    
+    // Eintrag hinzufügen
+    async function addItem() {
+      const value = newItemInput.value.trim();
+      if (!value) return;
+      
+      try {
+        const newItem = {
+          name: value,
+          comment: "",
+          link: "",
+          completed: false,
+          created_at: new Date().toISOString(),
+          user_id: 'current_user'
+        };
+        
+        items.push(newItem);
+        renderItems();
+        newItemInput.value = '';
+        
+        // Speichern in Supabase
+        await saveItems();
+      } catch (error) {
+        console.error('Fehler beim Hinzufügen:', error);
+        showError(`Fehler beim Hinzufügen: ${error.message}`);
+      }
+    }
+    
+    // Eintrag löschen
+    async function deleteItem(index) {
+      try {
+        items.splice(index, 1);
+        renderItems();
+        await saveItems();
+      } catch (error) {
+        console.error('Fehler beim Löschen:', error);
+        showError(`Fehler beim Löschen: ${error.message}`);
+      }
+    }
+    
+    // Eintrag aktualisieren
+    async function updateItem(index, field, value) {
+      try {
+        items[index][field] = value;
+        renderItems();
+        await saveItems();
+      } catch (error) {
+        console.error('Fehler beim Aktualisieren:', error);
+        showError(`Fehler beim Aktualisieren: ${error.message}`);
+      }
+    }
+    
+    // Eintrag als abgeschlossen markieren
+    async function toggleItemCompleted(index) {
+      try {
+        items[index].completed = !items[index].completed;
+        renderItems();
+        await saveItems();
+      } catch (error) {
+        console.error('Fehler beim Aktualisieren:', error);
+        showError(`Fehler beim Aktualisieren: ${error.message}`);
+      }
+    }
+    
+    // Render-Funktion für die Liste
+    function renderItems() {
+      itemsContainer.innerHTML = '';
+      
+      let checkedCount = 0;
+      
+      items.forEach((item, index) => {
+        if (item.completed) checkedCount++;
+        
+        const div = document.createElement("div");
+        div.className = "item";
+        
+        // Status-Indikator für das Element
+        const statusIndicator = document.createElement("div");
+        statusIndicator.className = "sync-indicator";
+        statusIndicator.classList.add(item.completed ? 'synced' : 'sync-error');
+        div.appendChild(statusIndicator);
+        
+        const top = document.createElement("div");
+        top.className = "item-top";
+        
+        const left = document.createElement("div");
+        left.className = "left";
+        
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.checked = item.completed || false;
+        
+        checkbox.addEventListener("change", () => {
+          toggleItemCompleted(index);
+        });
+        
+        const label = document.createElement("label");
+        label.textContent = item.name;
+        
+        left.appendChild(checkbox);
+        left.appendChild(label);
+        
+        const actions = document.createElement("div");
+        actions.className = "actions";
+        
+        const toggleBtn = document.createElement("button");
+        toggleBtn.className = "btn-small";
+        toggleBtn.textContent = "💬";
+        
+        const linkBtn = document.createElement("button");
+        linkBtn.className = "btn-small";
+        linkBtn.textContent = "🔗";
+        
+        const deleteBtn = document.createElement("button");
+        deleteBtn.textContent = "❌";
+        deleteBtn.className = "btn-small";
+        
+        actions.appendChild(toggleBtn);
+        actions.appendChild(linkBtn);
+        actions.appendChild(deleteBtn);
+        
+        top.appendChild(left);
+        top.appendChild(actions);
+        
+        const comment = document.createElement("input");
+        comment.className = "comment";
+        comment.placeholder = "Kommentar hinzufügen...";
+        comment.value = item.comment || "";
+        
+        const linkInput = document.createElement("input");
+        linkInput.className = "link-input";
+        linkInput.placeholder = "Link eingeben...";
+        linkInput.value = item.link || "";
+        
+        // Kommentar-Button
+        toggleBtn.onclick = () => {
+          comment.classList.toggle("visible");
+        };
+        
+        // Link-Button
+        linkBtn.onclick = () => {
+          linkInput.classList.toggle("visible");
+          if (linkInput.classList.contains("visible")) {
+            linkInput.focus();
+            linkInput.select();
+          }
+        };
+        
+        // Löschen-Button
+        deleteBtn.onclick = () => {
+          deleteItem(index);
+        };
+        
+        // Kommentar-Eingabe
+        comment.addEventListener("input", () => {
+          updateItem(index, 'comment', comment.value);
+        });
+        
+        // Link-Eingabe
+        linkInput.addEventListener("input", () => {
+          updateItem(index, 'link', linkInput.value);
+        });
+        
+        div.appendChild(comment);
+        div.appendChild(linkInput);
+        itemsContainer.appendChild(div);
+      });
+      
+      // Fortschritt aktualisieren
+      progressText.textContent = `Fortschritt: ${checkedCount} / ${items.length}`;
+    }
+    
+    // Initialisierung
+    document.addEventListener('DOMContentLoaded', async () => {
+      // Event-Listener für das Hinzufügen eines neuen Eintrags
+      addItemBtn.addEventListener('click', addItem);
+      newItemInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') addItem();
+      });
+      
+      // Initialer Ladevorgang
+      await loadItems();
+      
+      // Automatisches Speichern alle 30 Sekunden (optional)
+      setInterval(async () => {
+        if (syncStatus === 'synced') {
+          await saveItems();
+        }
+      }, 30000);
+    });
+  </script>
+</body>
+</html>
