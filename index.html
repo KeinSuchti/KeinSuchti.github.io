@@ -127,6 +127,11 @@ textarea {
 
 /* Serien & Filme */
 
+.random-movie-button {
+  margin-top: 0;
+  margin-bottom: 10px;
+}
+
 .movie-item {
   margin: 8px 0;
   padding: 10px;
@@ -472,6 +477,10 @@ input[type="checkbox"] {
     <div id="moviesApp" class="app-panel" style="display:none;">
       <h2>🎬 Serien & Film Tracker</h2>
 
+      <button class="random-movie-button" onclick="openRandomUncheckedMovie()">
+        🎲 Was gucken wir?
+      </button>
+
       <div id="movieList"></div>
 
       <div class="movie-add-section">
@@ -607,6 +616,29 @@ function debounce(callback, delay = 700) {
       callback(...args);
     }, delay);
   };
+}
+
+function openUrlAndRefocus(url) {
+  const openedWindow = window.open(url, "_blank");
+
+  if (!openedWindow) {
+    showRandomPopup(
+      "Der Link konnte nicht automatisch geöffnet werden. Bitte Pop-ups für diese Seite erlauben."
+    );
+    return false;
+  }
+
+  window.focus();
+
+  setTimeout(() => {
+    window.focus();
+  }, 100);
+
+  setTimeout(() => {
+    window.focus();
+  }, 300);
+
+  return true;
 }
 
 /* Popup */
@@ -945,6 +977,39 @@ function renderMovieItems() {
 
   document.getElementById("movieProgressText").textContent =
     `Fortschritt: ${checkedCount} / ${movieItems.length}`;
+}
+
+function openRandomUncheckedMovie() {
+  if (!Array.isArray(movieItems)) {
+    showRandomPopup("Die Liste wurde noch nicht geladen.");
+    return;
+  }
+
+  const candidates = movieItems.filter(function(item) {
+    const isUnchecked =
+      item.checked === null ||
+      item.checked === undefined ||
+      item.checked === false;
+
+    return isUnchecked;
+  });
+
+  if (candidates.length === 0) {
+    showRandomPopup("Es gibt keinen offenen Serien- oder Film-Eintrag mehr.");
+    return;
+  }
+
+  const randomIndex = Math.floor(Math.random() * candidates.length);
+  const selectedItem = candidates[randomIndex];
+
+  const selectedName = selectedItem.name || "etwas Unbekanntes";
+
+  if (selectedItem.link && selectedItem.link.trim() !== "") {
+    const selectedUrl = normalize(selectedItem.link.trim());
+    openUrlAndRefocus(selectedUrl);
+  }
+
+  showRandomPopup("Wir schauen " + selectedName + "!");
 }
 
 async function addMovieItem() {
@@ -1396,7 +1461,7 @@ function openRandomUnratedLink() {
   const selectedName = selectedItem.name || "etwas Unbekanntes";
   const selectedUrl = normalize(selectedItem.url.trim());
 
-  window.open(selectedUrl, "_blank");
+  openUrlAndRefocus(selectedUrl);
 
   showRandomPopup("Wir fressen " + selectedName + "!");
 }
