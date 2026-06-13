@@ -231,7 +231,7 @@ input[type="checkbox"] {
   text-align: center;
 }
 
-/* Link Tracker */
+/* Feast Table */
 
 .random-link-button {
   margin-top: 0;
@@ -398,7 +398,12 @@ input[type="checkbox"] {
   margin: 0 0 20px 0;
 }
 
-.popup-box button {
+.popup-actions {
+  display: grid;
+  gap: 10px;
+}
+
+.popup-actions button {
   margin-top: 0;
 }
 
@@ -469,7 +474,7 @@ input[type="checkbox"] {
 
       <div class="menu-grid">
         <button onclick="showMoviesApp()">🎬 Serien & Filme</button>
-        <button onclick="showLinksApp()">🔗 Link Tracker</button>
+        <button onclick="showLinksApp()">🔗 Feast Table</button>
       </div>
     </div>
 
@@ -478,7 +483,7 @@ input[type="checkbox"] {
       <h2>🎬 Serien & Film Tracker</h2>
 
       <button class="random-movie-button" onclick="openRandomUncheckedMovie()">
-        🎲 Was gucken wir?
+        🎲 Zufälligen offenen Film / offene Serie wählen
       </button>
 
       <div id="movieList"></div>
@@ -498,12 +503,12 @@ input[type="checkbox"] {
       </div>
     </div>
 
-    <!-- Link Tracker -->
+    <!-- Feast Table -->
     <div id="linksApp" class="app-panel" style="display:none;">
-      <h2>🔗 Link Tracker</h2>
+      <h2>🔗 Feast Table</h2>
 
       <button class="random-link-button" onclick="openRandomUnratedLink()">
-        🎲 Zufälligen unbewerteten Link öffnen
+        🎲 Was fressen wir?
       </button>
 
       <div class="link-controls">
@@ -545,7 +550,18 @@ input[type="checkbox"] {
 >
   <div class="popup-box">
     <p id="randomPopupText"></p>
-    <button onclick="closeRandomPopup()">OK</button>
+
+    <div class="popup-actions">
+      <button
+        id="randomPopupOpenBtn"
+        onclick="openPendingRandomUrl()"
+        style="display: none;"
+      >
+        Link öffnen
+      </button>
+
+      <button onclick="closeRandomPopup()">OK</button>
+    </div>
   </div>
 </div>
 
@@ -565,6 +581,7 @@ const LINK_TABLE = "feast_items";
 let currentUser = null;
 let movieItems = [];
 let linkItems = [];
+let pendingRandomUrl = "";
 
 const loginBox = document.getElementById("loginBox");
 const appShell = document.getElementById("appShell");
@@ -618,33 +635,21 @@ function debounce(callback, delay = 700) {
   };
 }
 
-function openUrlAndRefocus(url) {
-  const openedWindow = window.open(url, "_blank");
-
-  if (!openedWindow) {
-    showRandomPopup(
-      "Der Link konnte nicht automatisch geöffnet werden. Bitte Pop-ups für diese Seite erlauben."
-    );
-    return false;
-  }
-
-  window.focus();
-
-  setTimeout(() => {
-    window.focus();
-  }, 100);
-
-  setTimeout(() => {
-    window.focus();
-  }, 300);
-
-  return true;
-}
-
 /* Popup */
 
-function showRandomPopup(message) {
+function showRandomPopup(message, url = "") {
+  pendingRandomUrl = url || "";
+
   document.getElementById("randomPopupText").textContent = message;
+
+  const openButton = document.getElementById("randomPopupOpenBtn");
+
+  if (pendingRandomUrl) {
+    openButton.style.display = "block";
+  } else {
+    openButton.style.display = "none";
+  }
+
   document.getElementById("randomPopup").style.display = "flex";
 }
 
@@ -658,12 +663,19 @@ function closeRandomPopupOnOverlay(event) {
   }
 }
 
+function openPendingRandomUrl() {
+  if (!pendingRandomUrl) return;
+
+  window.open(pendingRandomUrl, "_blank", "noopener,noreferrer");
+}
+
 /* Auth */
 
 function showLogin() {
   currentUser = null;
   movieItems = [];
   linkItems = [];
+  pendingRandomUrl = "";
 
   loginBox.style.display = "block";
   appShell.style.display = "none";
@@ -673,6 +685,7 @@ function showLogin() {
   loginError.textContent = "";
   userInfo.textContent = "";
   setStatus("");
+  closeRandomPopup();
 }
 
 function showAppShell() {
@@ -986,12 +999,11 @@ function openRandomUncheckedMovie() {
   }
 
   const candidates = movieItems.filter(function(item) {
-    const isUnchecked =
+    return (
       item.checked === null ||
       item.checked === undefined ||
-      item.checked === false;
-
-    return isUnchecked;
+      item.checked === false
+    );
   });
 
   if (candidates.length === 0) {
@@ -1004,12 +1016,12 @@ function openRandomUncheckedMovie() {
 
   const selectedName = selectedItem.name || "etwas Unbekanntes";
 
-  if (selectedItem.link && selectedItem.link.trim() !== "") {
-    const selectedUrl = normalize(selectedItem.link.trim());
-    openUrlAndRefocus(selectedUrl);
-  }
+  const selectedUrl =
+    selectedItem.link && selectedItem.link.trim() !== ""
+      ? normalize(selectedItem.link.trim())
+      : "";
 
-  showRandomPopup("Wir schauen " + selectedName + "!");
+  showRandomPopup("Wir schauen " + selectedName + "!", selectedUrl);
 }
 
 async function addMovieItem() {
@@ -1081,7 +1093,7 @@ async function resetMovieChecks() {
   await loadMovieItems();
 }
 
-/* Link Tracker */
+/* Feast Table */
 
 async function loadLinkItems() {
   if (!currentUser) {
@@ -1089,7 +1101,7 @@ async function loadLinkItems() {
     return;
   }
 
-  setStatus("Lade Link Tracker...");
+  setStatus("Lade Feast Table...");
 
   const { data, error } = await supabaseClient
     .from(LINK_TABLE)
@@ -1097,8 +1109,8 @@ async function loadLinkItems() {
     .order("created_at", { ascending: false });
 
   if (error) {
-    setStatus("Fehler beim Laden des Link Trackers.", true);
-    showSupabaseError("Fehler beim Laden des Link Trackers", error);
+    setStatus("Fehler beim Laden des Feast Tables.", true);
+    showSupabaseError("Fehler beim Laden des Feast Tables", error);
     return;
   }
 
@@ -1461,9 +1473,7 @@ function openRandomUnratedLink() {
   const selectedName = selectedItem.name || "etwas Unbekanntes";
   const selectedUrl = normalize(selectedItem.url.trim());
 
-  openUrlAndRefocus(selectedUrl);
-
-  showRandomPopup("Wir fressen " + selectedName + "!");
+  showRandomPopup("Wir fressen " + selectedName + "!", selectedUrl);
 }
 
 async function addLinkItem() {
