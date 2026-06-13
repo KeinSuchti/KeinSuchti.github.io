@@ -451,7 +451,10 @@ input[type="checkbox"] {
 
     <!-- Feast Table -->
     <div id="linksApp" class="app-panel" style="display:none;">
-      <h2>🔗 Feast Table</h2>
+      <h2>🔗 Feast Table</h2>	  
+	  <button onclick="openRandomUnratedLink()">
+  🎲 Was fressen wir?
+</button>
 
       <div class="link-controls">
         <select id="linkSort" onchange="renderLinkItems()">
@@ -482,7 +485,36 @@ input[type="checkbox"] {
     </div>
   </div>
 </div>
+function openRandomUnratedLink() {
+  const candidates = linkItems.filter(item => {
+    const hasNoRating =
+      item.rating === null ||
+      item.rating === undefined ||
+      Number(item.rating) === 0;
 
+    const hasValidUrl =
+      item.url &&
+      item.url.trim() !== "";
+
+    return hasNoRating && hasValidUrl;
+  });
+
+  if (candidates.length === 0) {
+    alert("Es gibt keinen unbewerteten Eintrag mit hinterlegtem Link.");
+    return;
+  }
+
+  const randomIndex =
+    Math.floor(Math.random() * candidates.length);
+
+  const selectedItem =
+    candidates[randomIndex];
+
+  const url =
+    normalize(selectedItem.url.trim());
+
+  window.open(url, "_blank", "noopener,noreferrer");
+}
 <script>
 const supabaseUrl = "https://tqxyofqzlflnpfomslky.supabase.co";
 
