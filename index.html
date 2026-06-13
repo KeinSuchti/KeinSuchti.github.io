@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Serien Tracker</title>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: #121212;
+    color: #fff;
+    padding: 20px;
+}
+
+h1 {
+    text-align: center;
+}
+
+.container {
+    max-width: 700px;
+    margin: auto;
+}
+
+.item {
+    margin: 8px 0;
+    padding: 10px;
+    background: #1e1e1e;
+    border-radius: 8px;
+}
+
+.item-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.left {
+    display: flex;
+    align-items: center;
+}
+
+input[type="checkbox"] {
+    margin-right: 10px;
+    transform: scale(1.2);
+}
+
+.actions {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-small {
+    position: relative;
+    background: #444;
+    padding: 6px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.btn-small.has-comment::after,
+.btn-small.has-link::after {
+    content: "";
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 8px;
+    height: 8px;
+    background: red;
+    border-radius: 50%;
+}
+
+.comment,
+.link-input {
+    display: none;
+    width: 100%;
+    margin-top: 8px;
+    padding: 8px;
+    border-radius: 6px;
+    border: none;
+    box-sizing: border-box;
+}
+
+.comment.visible,
+.link-input.visible {
+    display: block;
+}
+
+.progress {
+    text-align: center;
+    margin-top: 20px;
+}
+
+button {
+    margin-top: 10px;
+    padding: 10px;
+    width: 100%;
+    border: none;
+    border-radius: 6px;
+    background: #ff4444;
+    color: white;
+    cursor: pointer;
+}
+
+.add-section {
+    margin-top: 15px;
+    display: flex;
+    gap: 10px;
+}
+
+.add-section input {
+    flex: 1;
+    padding: 10px;
+    border-radius: 6px;
+    border: none;
+}
+
+.status {
+    text-align: center;
+    margin-bottom: 15px;
+}
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+</head>
+<body>
+
+<div class="container">
+
+    <h1>🎬 Serien & Film Tracker</h1>
+
+    <div class="status" id="status">
+        Verbinde mit Datenbank...
+    </div>
+
+    <div id="list"></div>
+
+    <div class="add-section">
+        <input
+            type="text"
+            id="newItem"
+            placeholder="Neues hinzufügen..."
+        >
+        <button onclick="addItem()">+</button>
+    </div>
+
+    <div class="progress">
+        <p id="progressText"></p>
+        <button onclick="resetAll()">
+            Alle Haken entfernen
+        </button>
+    </div>
+
+</div>
+
+<script>
+
+const supabaseUrl =
+"https://tqxyofqzlflnpfomslky.supabase.co";
+
+const supabaseKey =
+"sb_publishable_Kw06uhbBIjKHx_C_KRhKiw_XNrYteHR";
+
+const supabaseClient =
+supabase.createClient(
+    supabaseUrl,
+    supabaseKey
+);
+
+let items = [];
+
+const listContainer =
+document.getElementById("list");
+
+function normalize(url) {
+    if (!url) return "";
+    return url.startsWith("http")
+        ? url
+        : "https://" + url;
+}
+
+async function loadItems() {
+
+    document.getElementById("status").innerText =
+        "Lade Daten...";
+
+    const { data, error } =
+        await supabaseClient
+            .from("items")
+            .select("*")
+            .order("name");
+
+    if (error) {
+
+        console.error(error);
+
+        document.getElementById("status").innerText =
+            "Fehler beim Laden";
+
+        return;
+    }
+
+    items = data || [];
+
+    document.getElementById("status").innerText =
+        "";
+
+    render();
+}
+
+function render() {
+
+    listContainer.innerHTML = "";
+
+    let checkedCount = 0;
+
+    items.forEach((item) => {
+
+        const div =
+            document.createElement("div");
+
+        div.className = "item";
+
+        const top =
+            document.createElement("div");
+
+        top.className = "item-top";
+
+        const left =
+            document.createElement("div");
+
+        left.className = "left";
+
+        const checkbox =
+            document.createElement("input");
+
+        checkbox.type = "checkbox";
+        checkbox.checked =
+            item.checked || false;
+
+        if (checkbox.checked)
+            checkedCount++;
+
+        checkbox.addEventListener(
+            "change",
+            async () => {
+
+                await supabaseClient
+                    .from("items")
+                    .update({
+                        checked:
+                        checkbox.checked
+                    })
+                    .eq("id", item.id);
+
+                item.checked =
+                    checkbox.checked;
+
+                render();
+            }
+        );
+
+        const label =
+            document.createElement("label");
+
+        label.textContent =
+            item.name || "Unbenannt";
+
+        left.appendChild(checkbox);
+        left.appendChild(label);
+
+        const actions =
+            document.createElement("div");
+
+        actions.className =
+            "actions";
+
+        const commentBtn =
+            document.createElement("div");
+
+        commentBtn.className =
+            "btn-small";
+
+        commentBtn.textContent =
+            "💬";
+
+        const linkBtn =
+            document.createElement("div");
+
+        linkBtn.className =
+            "btn-small";
+
+        linkBtn.textContent =
+            "🔗";
+
+        const deleteBtn =
+            document.createElement("div");
+
+        deleteBtn.className =
+            "btn-small";
+
+        deleteBtn.textContent =
+            "❌";
+
+        if (item.comment?.trim()) {
+            commentBtn.classList.add(
+                "has-comment"
+            );
+        }
+
+        if (item.link?.trim()) {
+            linkBtn.classList.add(
+                "has-link"
+            );
+        }
+
+        actions.appendChild(commentBtn);
+        actions.appendChild(linkBtn);
+        actions.appendChild(deleteBtn);
+
+        top.appendChild(left);
+        top.appendChild(actions);
+
+        const comment =
+            document.createElement("input");
+
+        comment.className =
+            "comment";
+
+        comment.placeholder =
+            "Kommentar";
+
+        comment.value =
+            item.comment || "";
+
+        const linkInput =
+            document.createElement("input");
+
+        linkInput.className =
+            "link-input";
+
+        linkInput.placeholder =
+            "Link";
+
+        linkInput.value =
+            item.link || "";
+
+        commentBtn.onclick = () => {
+            comment.classList.toggle(
+                "visible"
+            );
+        };
+
+        linkBtn.onclick = () => {
+            linkInput.classList.toggle(
+                "visible"
+            );
+        };
+
+        comment.addEventListener(
+            "change",
+            async () => {
+
+                await supabaseClient
+                    .from("items")
+                    .update({
+                        comment:
+                        comment.value
+                    })
+                    .eq("id", item.id);
+
+                item.comment =
+                    comment.value;
+
+                if (comment.value.trim()) {
+                    commentBtn.classList.add(
+                        "has-comment"
+                    );
+                } else {
+                    commentBtn.classList.remove(
+                        "has-comment"
+                    );
+                }
+            }
+        );
+
+        linkInput.addEventListener(
+            "change",
+            async () => {
+
+                const value =
+                    normalize(
+                        linkInput.value
+                    );
+
+                await supabaseClient
+                    .from("items")
+                    .update({
+                        link: value
+                    })
+                    .eq("id", item.id);
+
+                item.link = value;
+
+                if (value.trim()) {
+                    linkBtn.classList.add(
+                        "has-link"
+                    );
+                } else {
+                    linkBtn.classList.remove(
+                        "has-link"
+                    );
+                }
+            }
+        );
+
+        deleteBtn.onclick =
+        async () => {
+
+            if (
+                !confirm(
+                    `"${item.name}" löschen?`
+                )
+            ) return;
+
+            await supabaseClient
+                .from("items")
+                .delete()
+                .eq("id", item.id);
+
+            await loadItems();
+        };
+
+        div.appendChild(top);
+        div.appendChild(comment);
+        div.appendChild(linkInput);
+
+        listContainer.appendChild(div);
+
+    });
+
+    document.getElementById(
+        "progressText"
+    ).textContent =
+        `Fortschritt: ${checkedCount} / ${items.length}`;
+}
+
+async function addItem() {
+
+    const input =
+        document.getElementById(
+            "newItem"
+        );
+
+    const value =
+        input.value.trim();
+
+    if (!value)
+        return;
+
+    const { error } =
+        await supabaseClient
+            .from("items")
+            .insert({
+                name: value,
+                comment: "",
+                link: "",
+                checked: false
+            });
+
+    if (error) {
+        console.error(error);
+        alert(
+            "Fehler beim Speichern"
+        );
+        return;
+    }
+
+    input.value = "";
+
+    await loadItems();
+}
+
+async function resetAll() {
+
+    if (
+        !confirm(
+            "Alle Haken entfernen?"
+        )
+    ) return;
+
+    await supabaseClient
+        .from("items")
+        .update({
+            checked: false
+        })
+        .not(
+            "id",
+            "is",
+            null
+        );
+
+    await loadItems();
+}
+
+loadItems();
+
+</script>
+
+</body>
+</html>
