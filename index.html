@@ -18,9 +18,46 @@
       text-align: center;
     }
 
+    h2 {
+      margin-top: 0;
+    }
+
     .container {
       max-width: 700px;
       margin: auto;
+    }
+
+    #loginBox {
+      background: #1e1e1e;
+      padding: 20px;
+      border-radius: 8px;
+      margin-top: 20px;
+    }
+
+    #loginBox input {
+      display: block;
+      width: 100%;
+      box-sizing: border-box;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 6px;
+      border: none;
+      font-size: 16px;
+    }
+
+    #loginError {
+      color: #ff7777;
+      white-space: pre-wrap;
+      margin-top: 12px;
+    }
+
+    .logout-button {
+      background: #444;
+      margin-bottom: 15px;
+    }
+
+    .logout-button:hover {
+      background: #555;
     }
 
     .item {
@@ -94,6 +131,7 @@
       width: 100%;
       display: none;
       box-sizing: border-box;
+      font-size: 15px;
     }
 
     .comment.visible,
@@ -133,6 +171,7 @@
       padding: 10px;
       border-radius: 6px;
       border: none;
+      font-size: 16px;
     }
 
     .add-section button {
@@ -145,6 +184,7 @@
       text-align: center;
       margin: 12px 0;
       color: #aaa;
+      white-space: pre-wrap;
     }
 
     .status:empty {
@@ -153,7 +193,14 @@
 
     .error {
       color: #ff7777;
-      white-space: pre-wrap;
+    }
+
+    .user-info {
+      color: #aaa;
+      text-align: center;
+      font-size: 14px;
+      margin-bottom: 10px;
+      word-break: break-word;
     }
   </style>
 
@@ -165,22 +212,56 @@
 <div class="container">
   <h1>🎬 Serien & Film Tracker</h1>
 
-  <div id="status" class="status">Verbinde mit Datenbank...</div>
+  <!-- Login-Bereich -->
+  <div id="loginBox">
+    <h2>Login</h2>
 
-  <div id="list"></div>
-
-  <div class="add-section">
     <input
-      type="text"
-      id="newItem"
-      placeholder="Neues hinzufügen..."
+      type="email"
+      id="email"
+      placeholder="E-Mail"
+      autocomplete="email"
     >
-    <button onclick="addItem()">+</button>
+
+    <input
+      type="password"
+      id="password"
+      placeholder="Passwort"
+      autocomplete="current-password"
+    >
+
+    <button onclick="login()">Einloggen</button>
+
+    <p id="loginError"></p>
   </div>
 
-  <div class="progress">
-    <p id="progressText"></p>
-    <button onclick="resetAll()">Alle Haken entfernen</button>
+  <!-- Geschützter App-Bereich -->
+  <div id="appBox" style="display: none;">
+    <div id="userInfo" class="user-info"></div>
+
+    <button class="logout-button" onclick="logout()">
+      Logout
+    </button>
+
+    <div id="status" class="status">
+      Verbinde mit Datenbank...
+    </div>
+
+    <div id="list"></div>
+
+    <div class="add-section">
+      <input
+        type="text"
+        id="newItem"
+        placeholder="Neues hinzufügen..."
+      >
+      <button onclick="addItem()">+</button>
+    </div>
+
+    <div class="progress">
+      <p id="progressText"></p>
+      <button onclick="resetAll()">Alle Haken entfernen</button>
+    </div>
   </div>
 </div>
 
@@ -193,13 +274,19 @@
     supabaseUrl,
     supabaseKey
   );
-  const APP_USER_ID = "public";
 
+  let currentUser = null;
   let items = [];
 
+  const loginBox = document.getElementById("loginBox");
+  const appBox = document.getElementById("appBox");
+  const emailInput = document.getElementById("email");
+  const passwordInput = document.getElementById("password");
+  const loginError = document.getElementById("loginError");
   const listContainer = document.getElementById("list");
   const statusElement = document.getElementById("status");
   const newItemInput = document.getElementById("newItem");
+  const userInfo = document.getElementById("userInfo");
 
   function setStatus(message, isError = false) {
     statusElement.textContent = message || "";
@@ -238,12 +325,93 @@
     };
   }
 
+  function showLogin() {
+    currentUser = null;
+    items = [];
+
+    loginBox.style.display = "block";
+    appBox.style.display = "none";
+
+    listContainer.innerHTML = "";
+    document.getElementById("progressText").textContent = "";
+    setStatus("");
+    userInfo.textContent = "";
+  }
+
+  function showApp() {
+    loginBox.style.display = "none";
+    appBox.style.display = "block";
+
+    if (currentUser && currentUser.email) {
+      userInfo.textContent = "Eingeloggt als: " + currentUser.email;
+    }
+  }
+
+  async function initAuth() {
+    const { data, error } = await supabaseClient.auth.getSession();
+
+    if (error) {
+      console.error(error);
+      showLogin();
+      return;
+    }
+
+    if (data.session && data.session.user) {
+      currentUser = data.session.user;
+      showApp();
+      await loadItems();
+    } else {
+      showLogin();
+    }
+  }
+
+  async function login() {
+    const email = emailInput.value.trim();
+    const password = passwordInput.value;
+
+    loginError.textContent = "";
+
+    if (!email || !password) {
+      loginError.textContent = "Bitte E-Mail und Passwort eingeben.";
+      return;
+    }
+
+    const { data, error } = await supabaseClient.auth.signInWithPassword({
+      email: email,
+      password: password
+    });
+
+    if (error) {
+      loginError.textContent =
+        "Login fehlgeschlagen:\n" + error.message;
+      return;
+    }
+
+    currentUser = data.user;
+
+    emailInput.value = "";
+    passwordInput.value = "";
+
+    showApp();
+    await loadItems();
+  }
+
+  async function logout() {
+    await supabaseClient.auth.signOut();
+    showLogin();
+  }
+
   async function loadItems() {
+    if (!currentUser) {
+      showLogin();
+      return;
+    }
+
     setStatus("Lade Daten...");
 
     const { data, error } = await supabaseClient
       .from("items")
-      .select("id, name, comment, link, checked, created_at")
+      .select("id, name, comment, link, checked, created_at, user_id")
       .order("name", { ascending: true });
 
     if (error) {
@@ -455,6 +623,11 @@
   }
 
   async function addItem() {
+    if (!currentUser) {
+      showLogin();
+      return;
+    }
+
     const value = newItemInput.value.trim();
 
     if (!value) {
@@ -463,18 +636,18 @@
     }
 
     const newItem = {
-  id: crypto.randomUUID(),
-  name: value,
-  comment: "",
-  link: "",
-  checked: false,
-  user_id: APP_USER_ID
-};
+      id: crypto.randomUUID(),
+      name: value,
+      comment: "",
+      link: "",
+      checked: false,
+      user_id: currentUser.id
+    };
 
     const { data, error } = await supabaseClient
       .from("items")
       .insert(newItem)
-      .select("id, name, comment, link, checked, created_at")
+      .select("id, name, comment, link, checked, created_at, user_id")
       .single();
 
     if (error) {
@@ -486,9 +659,11 @@
 
     if (data) {
       items.push(data);
+
       items.sort((a, b) => {
         return (a.name || "").localeCompare(b.name || "", "de");
       });
+
       render();
     } else {
       await loadItems();
@@ -496,6 +671,11 @@
   }
 
   async function resetAll() {
+    if (!currentUser) {
+      showLogin();
+      return;
+    }
+
     const confirmed = confirm("Alle Haken entfernen?");
 
     if (!confirmed) return;
@@ -515,13 +695,25 @@
     await loadItems();
   }
 
+  passwordInput.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      login();
+    }
+  });
+
+  emailInput.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      passwordInput.focus();
+    }
+  });
+
   newItemInput.addEventListener("keydown", (event) => {
     if (event.key === "Enter") {
       addItem();
     }
   });
 
-  loadItems();
+  initAuth();
 </script>
 
 </body>
