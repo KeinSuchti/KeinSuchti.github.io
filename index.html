@@ -617,17 +617,19 @@ input[type="checkbox"] {
       <div class="card-controls">
         <select id="beerSort" onchange="renderCardItems('beer')">
           <option value="none">Sortierung</option>
-          <option value="high">Bewertung ↓</option>
-          <option value="low">Bewertung ↑</option>
+          <option value="best">Beste Note zuerst</option>
+          <option value="worst">Schlechteste Note zuerst</option>
         </select>
 
         <select id="beerFilter" onchange="renderCardItems('beer')">
-          <option value="0">Alle Bewertungen</option>
-          <option value="1">⭐ 1+</option>
-          <option value="2">⭐ 2+</option>
-          <option value="3">⭐ 3+</option>
-          <option value="4">⭐ 4+</option>
-          <option value="5">⭐ 5</option>
+          <option value="all">Alle Bewertungen</option>
+          <option value="unrated">Noch nicht bewertet</option>
+          <option value="1">Note 1,x</option>
+          <option value="2">Note 2,x</option>
+          <option value="3">Note 3,x</option>
+          <option value="4">Note 4,x</option>
+          <option value="5">Note 5,x</option>
+          <option value="6">Note 6,0</option>
         </select>
       </div>
 
