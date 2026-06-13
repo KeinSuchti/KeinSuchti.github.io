@@ -271,15 +271,24 @@ input[type="checkbox"] {
 
 .image-wrapper {
   width: 180px;
+  aspect-ratio: 16 / 9;
   flex-shrink: 0;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #111;
 }
 
 .image {
+  display: block;
   width: 100%;
-  height: 100px;
+  height: 100%;
   object-fit: cover;
-  border-radius: 12px;
+  border-radius: 0;
   cursor: pointer;
+}
+
+.image.no-url {
+  cursor: zoom-in;
 }
 
 .card-title {
@@ -467,10 +476,11 @@ input[type="checkbox"] {
 
   .image-wrapper {
     width: 100%;
+    aspect-ratio: 16 / 9;
   }
 
   .image {
-    height: 160px;
+    height: 100%;
   }
 }
 </style>
@@ -1368,17 +1378,42 @@ function compressImage(input, callback) {
 
 function resizeImage(img, callback) {
   const canvas = document.createElement("canvas");
-  const max = 800;
-  const scale = Math.min(max / img.width, 1);
+  const targetWidth = 800;
+  const targetHeight = 450;
+  const targetRatio = targetWidth / targetHeight;
+  const sourceRatio = img.width / img.height;
 
-  canvas.width = img.width * scale;
-  canvas.height = img.height * scale;
+  let sourceX = 0;
+  let sourceY = 0;
+  let sourceWidth = img.width;
+  let sourceHeight = img.height;
+
+  if (sourceRatio > targetRatio) {
+    sourceWidth = img.height * targetRatio;
+    sourceX = (img.width - sourceWidth) / 2;
+  } else if (sourceRatio < targetRatio) {
+    sourceHeight = img.width / targetRatio;
+    sourceY = (img.height - sourceHeight) / 2;
+  }
+
+  canvas.width = targetWidth;
+  canvas.height = targetHeight;
 
   canvas
     .getContext("2d")
-    .drawImage(img, 0, 0, canvas.width, canvas.height);
+    .drawImage(
+      img,
+      sourceX,
+      sourceY,
+      sourceWidth,
+      sourceHeight,
+      0,
+      0,
+      targetWidth,
+      targetHeight
+    );
 
-  callback(canvas.toDataURL("image/jpeg", 0.7));
+  callback(canvas.toDataURL("image/jpeg", 0.75));
 }
 
 function autoImage(type, url, itemId) {
@@ -1498,11 +1533,14 @@ function renderCardItems(type) {
 
       const img = document.createElement("img");
       img.src = item.image;
-      img.className = "image";
+      img.className = item.url ? "image" : "image no-url";
+      img.alt = item.name ? "Vorschaubild von " + item.name : "Vorschaubild";
 
       img.onclick = () => {
         if (item.url) {
           window.open(item.url, "_blank");
+        } else if (item.image) {
+          window.open(item.image, "_blank");
         }
       };
 
