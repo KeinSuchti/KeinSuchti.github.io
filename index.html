@@ -226,7 +226,7 @@ input[type="checkbox"] {
   text-align: center;
 }
 
-/* Link Tracker */
+/* Feast Table */
 
 .link-controls {
   display: flex;
@@ -424,7 +424,7 @@ input[type="checkbox"] {
 
       <div class="menu-grid">
         <button onclick="showMoviesApp()">🎬 Serien & Filme</button>
-        <button onclick="showLinksApp()">🔗 Link Tracker</button>
+        <button onclick="showLinksApp()">🔗 Feast Table</button>
       </div>
     </div>
 
@@ -449,9 +449,9 @@ input[type="checkbox"] {
       </div>
     </div>
 
-    <!-- Link Tracker -->
+    <!-- Feast Table -->
     <div id="linksApp" class="app-panel" style="display:none;">
-      <h2>🔗 Link Tracker</h2>
+      <h2>🔗 Feast Table</h2>
 
       <div class="link-controls">
         <select id="linkSort" onchange="renderLinkItems()">
@@ -942,7 +942,7 @@ async function resetMovieChecks() {
   await loadMovieItems();
 }
 
-/* Link Tracker */
+/* Feast Table */
 
 async function loadLinkItems() {
   if (!currentUser) {
@@ -950,7 +950,7 @@ async function loadLinkItems() {
     return;
   }
 
-  setStatus("Lade Link Tracker...");
+  setStatus("Lade Feast Table...");
 
   const { data, error } = await supabaseClient
     .from(LINK_TABLE)
@@ -958,8 +958,8 @@ async function loadLinkItems() {
     .order("created_at", { ascending: false });
 
   if (error) {
-    setStatus("Fehler beim Laden des Link Trackers.", true);
-    showSupabaseError("Fehler beim Laden des Link Trackers", error);
+    setStatus("Fehler beim Laden des Feast Tables.", true);
+    showSupabaseError("Fehler beim Laden des Feast Tables", error);
     return;
   }
 
