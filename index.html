@@ -1,218 +1,390 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Serien Tracker</title>
+<title>Tracker Sammlung</title>
 
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #121212;
-      color: #fff;
-      padding: 20px;
-    }
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #121212;
+  color: #fff;
+  padding: 20px;
+}
 
-    h1 {
-      text-align: center;
-    }
+.container {
+  max-width: 850px;
+  margin: auto;
+}
 
-    h2 {
-      margin-top: 0;
-    }
+h1,
+h2 {
+  text-align: center;
+}
 
-    .container {
-      max-width: 700px;
-      margin: auto;
-    }
+button,
+select,
+input,
+textarea {
+  font-family: inherit;
+}
 
-    #loginBox {
-      background: #1e1e1e;
-      padding: 20px;
-      border-radius: 8px;
-      margin-top: 20px;
-    }
+button {
+  margin-top: 10px;
+  padding: 10px;
+  width: 100%;
+  border: none;
+  border-radius: 10px;
+  background: #ff4444;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+}
 
-    #loginBox input {
-      display: block;
-      width: 100%;
-      box-sizing: border-box;
-      padding: 10px;
-      margin-top: 10px;
-      border-radius: 6px;
-      border: none;
-      font-size: 16px;
-    }
+button:hover {
+  background: #ff6666;
+}
 
-    #loginError {
-      color: #ff7777;
-      white-space: pre-wrap;
-      margin-top: 12px;
-    }
+input,
+select,
+textarea {
+  border: none;
+  border-radius: 10px;
+  padding: 10px;
+  box-sizing: border-box;
+}
 
-    .logout-button {
-      background: #444;
-      margin-bottom: 15px;
-    }
+#loginBox,
+#menuBox,
+.app-panel {
+  background: #1e1e1e;
+  padding: 20px;
+  border-radius: 16px;
+  margin-top: 20px;
+}
 
-    .logout-button:hover {
-      background: #555;
-    }
+#loginBox input {
+  display: block;
+  width: 100%;
+  margin-top: 10px;
+  font-size: 16px;
+}
 
-    .item {
-      margin: 8px 0;
-      padding: 10px;
-      background: #1e1e1e;
-      border-radius: 8px;
-    }
+#loginError {
+  color: #ff7777;
+  white-space: pre-wrap;
+}
 
-    .item-top {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-    }
+.user-info,
+.status {
+  color: #aaa;
+  text-align: center;
+  margin: 12px 0;
+  word-break: break-word;
+  white-space: pre-wrap;
+}
 
-    .left {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      min-width: 0;
-    }
+.status:empty {
+  display: none;
+}
 
-    .left label {
-      word-break: break-word;
-    }
+.error {
+  color: #ff7777;
+}
 
-    input[type="checkbox"] {
-      transform: scale(1.2);
-      cursor: pointer;
-    }
+.top-actions {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
 
-    .actions {
-      display: flex;
-      gap: 8px;
-      flex-shrink: 0;
-    }
+.top-actions button {
+  margin-top: 0;
+}
 
-    .btn-small {
-      position: relative;
-      background: #444;
-      padding: 6px 10px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 14px;
-      user-select: none;
-    }
+.back-button,
+.logout-button {
+  background: #444;
+}
 
-    .btn-small:hover {
-      background: #555;
-    }
+.back-button:hover,
+.logout-button:hover {
+  background: #555;
+}
 
-    .btn-small.has-comment::after,
-    .btn-small.has-link::after {
-      content: "";
-      position: absolute;
-      top: 2px;
-      right: 2px;
-      width: 8px;
-      height: 8px;
-      background: red;
-      border-radius: 50%;
-    }
+.menu-grid {
+  display: grid;
+  gap: 15px;
+  margin-top: 20px;
+}
 
-    .comment,
-    .link-input {
-      margin-top: 8px;
-      padding: 8px;
-      border-radius: 6px;
-      border: none;
-      width: 100%;
-      display: none;
-      box-sizing: border-box;
-      font-size: 15px;
-    }
+.menu-grid button {
+  font-size: 20px;
+  padding: 18px;
+}
 
-    .comment.visible,
-    .link-input.visible {
-      display: block;
-    }
+/* Serien & Filme */
 
-    .progress {
-      margin-top: 20px;
-      text-align: center;
-    }
+.movie-item {
+  margin: 8px 0;
+  padding: 10px;
+  background: #2a2a2a;
+  border-radius: 8px;
+}
 
-    button {
-      margin-top: 10px;
-      padding: 10px;
-      width: 100%;
-      border: none;
-      border-radius: 6px;
-      background: #ff4444;
-      color: white;
-      font-size: 16px;
-      cursor: pointer;
-    }
+.movie-item-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
 
-    button:hover {
-      background: #ff6666;
-    }
+.movie-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
 
-    .add-section {
-      margin-top: 15px;
-      display: flex;
-      gap: 10px;
-    }
+.movie-left label {
+  word-break: break-word;
+}
 
-    .add-section input {
-      flex: 1;
-      padding: 10px;
-      border-radius: 6px;
-      border: none;
-      font-size: 16px;
-    }
+input[type="checkbox"] {
+  transform: scale(1.2);
+  cursor: pointer;
+}
 
-    .add-section button {
-      width: auto;
-      min-width: 48px;
-      margin-top: 0;
-    }
+.movie-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
 
-    .status {
-      text-align: center;
-      margin: 12px 0;
-      color: #aaa;
-      white-space: pre-wrap;
-    }
+.btn-small {
+  position: relative;
+  background: #444;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  user-select: none;
+}
 
-    .status:empty {
-      display: none;
-    }
+.btn-small:hover {
+  background: #555;
+}
 
-    .error {
-      color: #ff7777;
-    }
+.btn-small.has-comment::after,
+.btn-small.has-link::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 8px;
+  height: 8px;
+  background: red;
+  border-radius: 50%;
+}
 
-    .user-info {
-      color: #aaa;
-      text-align: center;
-      font-size: 14px;
-      margin-bottom: 10px;
-      word-break: break-word;
-    }
-  </style>
+.movie-comment,
+.movie-link-input {
+  margin-top: 8px;
+  padding: 8px;
+  border-radius: 6px;
+  border: none;
+  width: 100%;
+  display: none;
+  box-sizing: border-box;
+}
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+.movie-comment.visible,
+.movie-link-input.visible {
+  display: block;
+}
+
+.movie-add-section {
+  margin-top: 15px;
+  display: flex;
+  gap: 10px;
+}
+
+.movie-add-section input {
+  flex: 1;
+}
+
+.movie-add-section button {
+  width: auto;
+  min-width: 48px;
+  margin-top: 0;
+}
+
+.progress {
+  margin-top: 20px;
+  text-align: center;
+}
+
+/* Link Tracker */
+
+.link-controls {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 15px;
+}
+
+.link-controls select {
+  flex: 1;
+  min-width: 180px;
+}
+
+.link-item {
+  background: #2a2a2a;
+  padding: 15px;
+  border-radius: 16px;
+  margin-bottom: 15px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+}
+
+.link-item-header {
+  display: flex;
+  gap: 15px;
+  align-items: stretch;
+}
+
+.link-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.image-wrapper {
+  width: 180px;
+  flex-shrink: 0;
+}
+
+.image {
+  width: 100%;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.link-title {
+  font-size: 22px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-bottom: 10px;
+  word-break: break-word;
+}
+
+.link-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.btn-link { background: #2c2c2c; }
+.btn-img { background: #1f3b5c; }
+.btn-note { background: #4a3b1f; }
+.btn-del { background: #5c1f1f; }
+
+.btn:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.2);
+}
+
+.btn:active {
+  transform: scale(0.95);
+}
+
+.link-comment,
+.link-url-input {
+  display: none;
+  width: 100%;
+  margin-top: 10px;
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  background: #333;
+  color: white;
+  box-sizing: border-box;
+}
+
+.link-comment {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.link-comment.visible,
+.link-url-input.visible {
+  display: block;
+}
+
+.star {
+  opacity: 0.3;
+  cursor: pointer;
+  font-size: 22px;
+}
+
+.star.active {
+  opacity: 1;
+}
+
+.link-add-form {
+  margin-top: 15px;
+  display: grid;
+  gap: 10px;
+}
+
+.link-add-form input {
+  width: 100%;
+}
+
+@media (max-width: 650px) {
+  .top-actions {
+    flex-direction: column;
+  }
+
+  .link-item-header {
+    flex-direction: column;
+  }
+
+  .image-wrapper {
+    width: 100%;
+  }
+
+  .image {
+    height: 160px;
+  }
+}
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 
 <body>
 
 <div class="container">
-  <h1>🎬 Serien & Film Tracker</h1>
+  <h1>📚 Tracker Sammlung</h1>
 
-  <!-- Login-Bereich -->
+  <!-- Login -->
   <div id="loginBox">
     <h2>Login</h2>
 
@@ -235,485 +407,997 @@
     <p id="loginError"></p>
   </div>
 
-  <!-- Geschützter App-Bereich -->
-  <div id="appBox" style="display: none;">
+  <!-- App -->
+  <div id="appShell" style="display:none;">
     <div id="userInfo" class="user-info"></div>
 
-    <button class="logout-button" onclick="logout()">
-      Logout
-    </button>
-
-    <div id="status" class="status">
-      Verbinde mit Datenbank...
+    <div class="top-actions">
+      <button class="back-button" onclick="showMenu()">🏠 Menü</button>
+      <button class="logout-button" onclick="logout()">Logout</button>
     </div>
 
-    <div id="list"></div>
+    <div id="globalStatus" class="status"></div>
 
-    <div class="add-section">
-      <input
-        type="text"
-        id="newItem"
-        placeholder="Neues hinzufügen..."
-      >
-      <button onclick="addItem()">+</button>
+    <!-- Menü -->
+    <div id="menuBox">
+      <h2>Welche Liste möchtest du öffnen?</h2>
+
+      <div class="menu-grid">
+        <button onclick="showMoviesApp()">🎬 Serien & Filme</button>
+        <button onclick="showLinksApp()">🔗 Link Tracker</button>
+      </div>
     </div>
 
-    <div class="progress">
-      <p id="progressText"></p>
-      <button onclick="resetAll()">Alle Haken entfernen</button>
+    <!-- Serien & Filme -->
+    <div id="moviesApp" class="app-panel" style="display:none;">
+      <h2>🎬 Serien & Film Tracker</h2>
+
+      <div id="movieList"></div>
+
+      <div class="movie-add-section">
+        <input
+          type="text"
+          id="newMovieItem"
+          placeholder="Neues hinzufügen..."
+        >
+        <button onclick="addMovieItem()">+</button>
+      </div>
+
+      <div class="progress">
+        <p id="movieProgressText"></p>
+        <button onclick="resetMovieChecks()">Alle Haken entfernen</button>
+      </div>
+    </div>
+
+    <!-- Link Tracker -->
+    <div id="linksApp" class="app-panel" style="display:none;">
+      <h2>🔗 Link Tracker</h2>
+
+      <div class="link-controls">
+        <select id="linkSort" onchange="renderLinkItems()">
+          <option value="none">Sortierung</option>
+          <option value="high">Bewertung ↓</option>
+          <option value="low">Bewertung ↑</option>
+        </select>
+
+        <select id="linkFilter" onchange="renderLinkItems()">
+          <option value="0">Alle Bewertungen</option>
+          <option value="1">⭐ 1+</option>
+          <option value="2">⭐ 2+</option>
+          <option value="3">⭐ 3+</option>
+          <option value="4">⭐ 4+</option>
+          <option value="5">⭐ 5</option>
+        </select>
+      </div>
+
+      <div id="linkList"></div>
+
+      <div class="link-add-form">
+        <input id="newLinkName" placeholder="Name">
+        <input id="newLinkUrl" placeholder="Link">
+
+        <button onclick="addLinkItem()">➕ Hinzufügen</button>
+        <button onclick="deleteAllLinkItems()">🗑️ Alles löschen</button>
+      </div>
     </div>
   </div>
 </div>
 
 <script>
-  const supabaseUrl = "https://tqxyofqzlflnpfomslky.supabase.co";
+const supabaseUrl = "https://tqxyofqzlflnpfomslky.supabase.co";
 
-  const supabaseKey = "sb_publishable_Kw06uhbBIjKHx_C_KRhKiw_XNrYteHR";
+const supabaseKey = "sb_publishable_Kw06uhbBIjKHx_C_KRhKiw_XNrYteHR";
 
-  const supabaseClient = supabase.createClient(
-    supabaseUrl,
-    supabaseKey
+const supabaseClient = supabase.createClient(
+  supabaseUrl,
+  supabaseKey
+);
+
+const MOVIE_TABLE = "items";
+const LINK_TABLE = "feast_items";
+
+let currentUser = null;
+let movieItems = [];
+let linkItems = [];
+
+const loginBox = document.getElementById("loginBox");
+const appShell = document.getElementById("appShell");
+const menuBox = document.getElementById("menuBox");
+const moviesApp = document.getElementById("moviesApp");
+const linksApp = document.getElementById("linksApp");
+
+const emailInput = document.getElementById("email");
+const passwordInput = document.getElementById("password");
+const loginError = document.getElementById("loginError");
+const userInfo = document.getElementById("userInfo");
+const globalStatus = document.getElementById("globalStatus");
+
+const movieList = document.getElementById("movieList");
+const newMovieItemInput = document.getElementById("newMovieItem");
+
+const linkList = document.getElementById("linkList");
+const newLinkNameInput = document.getElementById("newLinkName");
+const newLinkUrlInput = document.getElementById("newLinkUrl");
+
+function setStatus(message, isError = false) {
+  globalStatus.textContent = message || "";
+  globalStatus.className = isError ? "status error" : "status";
+}
+
+function showSupabaseError(title, error) {
+  console.error(title, error);
+
+  alert(
+    title +
+    "\n\nMeldung: " + (error.message || "Unbekannter Fehler") +
+    "\nCode: " + (error.code || "kein Code") +
+    "\nDetails: " + (error.details || "keine Details")
   );
+}
 
-  let currentUser = null;
-  let items = [];
+function normalize(url) {
+  if (!url) return "";
+  return url.startsWith("http") ? url : "https://" + url;
+}
 
-  const loginBox = document.getElementById("loginBox");
-  const appBox = document.getElementById("appBox");
-  const emailInput = document.getElementById("email");
-  const passwordInput = document.getElementById("password");
-  const loginError = document.getElementById("loginError");
-  const listContainer = document.getElementById("list");
-  const statusElement = document.getElementById("status");
-  const newItemInput = document.getElementById("newItem");
-  const userInfo = document.getElementById("userInfo");
+function debounce(callback, delay = 700) {
+  let timeout;
 
-  function setStatus(message, isError = false) {
-    statusElement.textContent = message || "";
-    statusElement.className = isError ? "status error" : "status";
+  return function (...args) {
+    clearTimeout(timeout);
+
+    timeout = setTimeout(() => {
+      callback(...args);
+    }, delay);
+  };
+}
+
+/* Auth */
+
+function showLogin() {
+  currentUser = null;
+  movieItems = [];
+  linkItems = [];
+
+  loginBox.style.display = "block";
+  appShell.style.display = "none";
+
+  movieList.innerHTML = "";
+  linkList.innerHTML = "";
+  loginError.textContent = "";
+  userInfo.textContent = "";
+  setStatus("");
+}
+
+function showAppShell() {
+  loginBox.style.display = "none";
+  appShell.style.display = "block";
+
+  if (currentUser && currentUser.email) {
+    userInfo.textContent = "Eingeloggt als: " + currentUser.email;
   }
 
-  function showSupabaseError(title, error) {
-    console.error(title, error);
+  showMenu();
+}
 
-    const message =
-      title +
-      "\n\n" +
-      "Meldung: " + (error.message || "Unbekannter Fehler") +
-      "\n" +
-      "Code: " + (error.code || "kein Code") +
-      "\n" +
-      "Details: " + (error.details || "keine Details");
+async function initAuth() {
+  const { data, error } = await supabaseClient.auth.getSession();
 
-    alert(message);
+  if (error) {
+    console.error(error);
+    showLogin();
+    return;
   }
 
-  function normalize(url) {
-    if (!url) return "";
-    return url.startsWith("http") ? url : "https://" + url;
-  }
-
-  function debounce(callback, delay = 700) {
-    let timeout;
-
-    return function (...args) {
-      clearTimeout(timeout);
-
-      timeout = setTimeout(() => {
-        callback(...args);
-      }, delay);
-    };
-  }
-
-  function showLogin() {
-    currentUser = null;
-    items = [];
-
-    loginBox.style.display = "block";
-    appBox.style.display = "none";
-
-    listContainer.innerHTML = "";
-    document.getElementById("progressText").textContent = "";
-    setStatus("");
-    userInfo.textContent = "";
-  }
-
-  function showApp() {
-    loginBox.style.display = "none";
-    appBox.style.display = "block";
-
-    if (currentUser && currentUser.email) {
-      userInfo.textContent = "Eingeloggt als: " + currentUser.email;
-    }
-  }
-
-  async function initAuth() {
-    const { data, error } = await supabaseClient.auth.getSession();
-
-    if (error) {
-      console.error(error);
-      showLogin();
-      return;
-    }
-
-    if (data.session && data.session.user) {
-      currentUser = data.session.user;
-      showApp();
-      await loadItems();
-    } else {
-      showLogin();
-    }
-  }
-
-  async function login() {
-    const email = emailInput.value.trim();
-    const password = passwordInput.value;
-
-    loginError.textContent = "";
-
-    if (!email || !password) {
-      loginError.textContent = "Bitte E-Mail und Passwort eingeben.";
-      return;
-    }
-
-    const { data, error } = await supabaseClient.auth.signInWithPassword({
-      email: email,
-      password: password
-    });
-
-    if (error) {
-      loginError.textContent =
-        "Login fehlgeschlagen:\n" + error.message;
-      return;
-    }
-
-    currentUser = data.user;
-
-    emailInput.value = "";
-    passwordInput.value = "";
-
-    showApp();
-    await loadItems();
-  }
-
-  async function logout() {
-    await supabaseClient.auth.signOut();
+  if (data.session && data.session.user) {
+    currentUser = data.session.user;
+    showAppShell();
+  } else {
     showLogin();
   }
+}
 
-  async function loadItems() {
-    if (!currentUser) {
-      showLogin();
-      return;
-    }
+async function login() {
+  const email = emailInput.value.trim();
+  const password = passwordInput.value;
 
-    setStatus("Lade Daten...");
+  loginError.textContent = "";
 
-    const { data, error } = await supabaseClient
-      .from("items")
-      .select("id, name, comment, link, checked, created_at, user_id")
-      .order("name", { ascending: true });
-
-    if (error) {
-      setStatus("Fehler beim Laden der Daten.", true);
-      showSupabaseError("Fehler beim Laden", error);
-      return;
-    }
-
-    items = data || [];
-
-    setStatus("");
-    render();
+  if (!email || !password) {
+    loginError.textContent = "Bitte E-Mail und Passwort eingeben.";
+    return;
   }
 
-  function render() {
-    listContainer.innerHTML = "";
+  const { data, error } = await supabaseClient.auth.signInWithPassword({
+    email,
+    password
+  });
 
-    let checkedCount = 0;
+  if (error) {
+    loginError.textContent =
+      "Login fehlgeschlagen:\n" + error.message;
+    return;
+  }
 
-    items.forEach((item) => {
-      const div = document.createElement("div");
-      div.className = "item";
+  currentUser = data.user;
 
-      const top = document.createElement("div");
-      top.className = "item-top";
+  emailInput.value = "";
+  passwordInput.value = "";
 
-      const left = document.createElement("div");
-      left.className = "left";
+  showAppShell();
+}
 
-      const checkbox = document.createElement("input");
-      checkbox.type = "checkbox";
-      checkbox.checked = item.checked === true;
+async function logout() {
+  await supabaseClient.auth.signOut();
+  showLogin();
+}
 
-      if (checkbox.checked) {
-        checkedCount++;
+/* Navigation */
+
+function hideAllPanels() {
+  menuBox.style.display = "none";
+  moviesApp.style.display = "none";
+  linksApp.style.display = "none";
+  setStatus("");
+}
+
+function showMenu() {
+  hideAllPanels();
+  menuBox.style.display = "block";
+}
+
+async function showMoviesApp() {
+  hideAllPanels();
+  moviesApp.style.display = "block";
+  await loadMovieItems();
+}
+
+async function showLinksApp() {
+  hideAllPanels();
+  linksApp.style.display = "block";
+  await loadLinkItems();
+}
+
+/* Serien & Filme */
+
+async function loadMovieItems() {
+  if (!currentUser) {
+    showLogin();
+    return;
+  }
+
+  setStatus("Lade Serien & Filme...");
+
+  const { data, error } = await supabaseClient
+    .from(MOVIE_TABLE)
+    .select("id, name, comment, link, checked, created_at, user_id")
+    .order("name", { ascending: true });
+
+  if (error) {
+    setStatus("Fehler beim Laden der Serien & Filme.", true);
+    showSupabaseError("Fehler beim Laden der Serien & Filme", error);
+    return;
+  }
+
+  movieItems = data || [];
+
+  setStatus("");
+  renderMovieItems();
+}
+
+function renderMovieItems() {
+  movieList.innerHTML = "";
+
+  let checkedCount = 0;
+
+  movieItems.forEach((item) => {
+    const div = document.createElement("div");
+    div.className = "movie-item";
+
+    const top = document.createElement("div");
+    top.className = "movie-item-top";
+
+    const left = document.createElement("div");
+    left.className = "movie-left";
+
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.checked = item.checked === true;
+
+    if (checkbox.checked) {
+      checkedCount++;
+    }
+
+    checkbox.addEventListener("change", async () => {
+      const newValue = checkbox.checked;
+
+      const { error } = await supabaseClient
+        .from(MOVIE_TABLE)
+        .update({ checked: newValue })
+        .eq("id", item.id);
+
+      if (error) {
+        checkbox.checked = item.checked === true;
+        showSupabaseError("Fehler beim Speichern des Hakens", error);
+        return;
       }
 
-      checkbox.addEventListener("change", async () => {
-        const newValue = checkbox.checked;
-
-        const { error } = await supabaseClient
-          .from("items")
-          .update({
-            checked: newValue
-          })
-          .eq("id", item.id);
-
-        if (error) {
-          checkbox.checked = item.checked === true;
-          showSupabaseError("Fehler beim Speichern des Hakens", error);
-          return;
-        }
-
-        item.checked = newValue;
-        render();
-      });
-
-      const label = document.createElement("label");
-      label.textContent = item.name || "Unbenannt";
-
-      left.appendChild(checkbox);
-      left.appendChild(label);
-
-      const actions = document.createElement("div");
-      actions.className = "actions";
-
-      const commentBtn = document.createElement("div");
-      commentBtn.className = "btn-small";
-      commentBtn.textContent = "💬";
-      commentBtn.title = "Kommentar anzeigen/bearbeiten";
-
-      const linkBtn = document.createElement("div");
-      linkBtn.className = "btn-small";
-      linkBtn.textContent = "🔗";
-      linkBtn.title = "Link anzeigen/bearbeiten";
-
-      const deleteBtn = document.createElement("div");
-      deleteBtn.className = "btn-small";
-      deleteBtn.textContent = "❌";
-      deleteBtn.title = "Eintrag löschen";
-
-      function updateCommentIcon() {
-        if (item.comment && item.comment.trim() !== "") {
-          commentBtn.classList.add("has-comment");
-        } else {
-          commentBtn.classList.remove("has-comment");
-        }
-      }
-
-      function updateLinkIcon() {
-        if (item.link && item.link.trim() !== "") {
-          linkBtn.classList.add("has-link");
-        } else {
-          linkBtn.classList.remove("has-link");
-        }
-      }
-
-      updateCommentIcon();
-      updateLinkIcon();
-
-      actions.appendChild(commentBtn);
-      actions.appendChild(linkBtn);
-      actions.appendChild(deleteBtn);
-
-      top.appendChild(left);
-      top.appendChild(actions);
-
-      const comment = document.createElement("input");
-      comment.className = "comment";
-      comment.placeholder = "Kommentar hinzufügen...";
-      comment.value = item.comment || "";
-
-      const linkInput = document.createElement("input");
-      linkInput.className = "link-input";
-      linkInput.placeholder = "Link eingeben...";
-      linkInput.value = item.link || "";
-
-      commentBtn.onclick = () => {
-        comment.classList.toggle("visible");
-
-        if (comment.classList.contains("visible")) {
-          comment.focus();
-        }
-      };
-
-      linkBtn.onclick = () => {
-        linkInput.classList.toggle("visible");
-
-        if (linkInput.classList.contains("visible")) {
-          linkInput.focus();
-          linkInput.select();
-        }
-      };
-
-      const saveCommentDebounced = debounce(async (value) => {
-        const { error } = await supabaseClient
-          .from("items")
-          .update({
-            comment: value
-          })
-          .eq("id", item.id);
-
-        if (error) {
-          showSupabaseError("Fehler beim Speichern des Kommentars", error);
-        }
-      });
-
-      comment.addEventListener("input", () => {
-        item.comment = comment.value;
-        updateCommentIcon();
-        saveCommentDebounced(comment.value);
-      });
-
-      const saveLinkDebounced = debounce(async (value) => {
-        const normalizedValue = normalize(value.trim());
-
-        const { error } = await supabaseClient
-          .from("items")
-          .update({
-            link: normalizedValue
-          })
-          .eq("id", item.id);
-
-        if (error) {
-          showSupabaseError("Fehler beim Speichern des Links", error);
-          return;
-        }
-
-        item.link = normalizedValue;
-        linkInput.value = normalizedValue;
-        updateLinkIcon();
-      });
-
-      linkInput.addEventListener("input", () => {
-        item.link = linkInput.value;
-        updateLinkIcon();
-        saveLinkDebounced(linkInput.value);
-      });
-
-      deleteBtn.onclick = async () => {
-        const confirmed = confirm(
-          `"${item.name || "Unbenannt"}" wirklich löschen?`
-        );
-
-        if (!confirmed) return;
-
-        const { error } = await supabaseClient
-          .from("items")
-          .delete()
-          .eq("id", item.id);
-
-        if (error) {
-          showSupabaseError("Fehler beim Löschen", error);
-          return;
-        }
-
-        await loadItems();
-      };
-
-      div.appendChild(top);
-      div.appendChild(comment);
-      div.appendChild(linkInput);
-
-      listContainer.appendChild(div);
+      item.checked = newValue;
+      renderMovieItems();
     });
 
-    document.getElementById("progressText").textContent =
-      `Fortschritt: ${checkedCount} / ${items.length}`;
-  }
+    const label = document.createElement("label");
+    label.textContent = item.name || "Unbenannt";
 
-  async function addItem() {
-    if (!currentUser) {
-      showLogin();
-      return;
+    left.appendChild(checkbox);
+    left.appendChild(label);
+
+    const actions = document.createElement("div");
+    actions.className = "movie-actions";
+
+    const commentBtn = document.createElement("div");
+    commentBtn.className = "btn-small";
+    commentBtn.textContent = "💬";
+
+    const linkBtn = document.createElement("div");
+    linkBtn.className = "btn-small";
+    linkBtn.textContent = "🔗";
+
+    const deleteBtn = document.createElement("div");
+    deleteBtn.className = "btn-small";
+    deleteBtn.textContent = "❌";
+
+    function updateCommentIcon() {
+      if (item.comment && item.comment.trim() !== "") {
+        commentBtn.classList.add("has-comment");
+      } else {
+        commentBtn.classList.remove("has-comment");
+      }
     }
 
-    const value = newItemInput.value.trim();
-
-    if (!value) {
-      alert("Bitte einen Namen eingeben.");
-      return;
+    function updateLinkIcon() {
+      if (item.link && item.link.trim() !== "") {
+        linkBtn.classList.add("has-link");
+      } else {
+        linkBtn.classList.remove("has-link");
+      }
     }
 
-    const newItem = {
-      id: crypto.randomUUID(),
-      name: value,
-      comment: "",
-      link: "",
-      checked: false,
-      user_id: currentUser.id
+    updateCommentIcon();
+    updateLinkIcon();
+
+    actions.appendChild(commentBtn);
+    actions.appendChild(linkBtn);
+    actions.appendChild(deleteBtn);
+
+    top.appendChild(left);
+    top.appendChild(actions);
+
+    const comment = document.createElement("input");
+    comment.className = "movie-comment";
+    comment.placeholder = "Kommentar hinzufügen...";
+    comment.value = item.comment || "";
+
+    const linkInput = document.createElement("input");
+    linkInput.className = "movie-link-input";
+    linkInput.placeholder = "Link eingeben...";
+    linkInput.value = item.link || "";
+
+    commentBtn.onclick = () => {
+      comment.classList.toggle("visible");
+
+      if (comment.classList.contains("visible")) {
+        comment.focus();
+      }
     };
 
-    const { data, error } = await supabaseClient
-      .from("items")
-      .insert(newItem)
-      .select("id, name, comment, link, checked, created_at, user_id")
-      .single();
+    linkBtn.onclick = () => {
+      linkInput.classList.toggle("visible");
 
-    if (error) {
-      showSupabaseError("Fehler beim Speichern", error);
-      return;
-    }
+      if (linkInput.classList.contains("visible")) {
+        linkInput.focus();
+        linkInput.select();
+      }
+    };
 
-    newItemInput.value = "";
+    const saveCommentDebounced = debounce(async (value) => {
+      const { error } = await supabaseClient
+        .from(MOVIE_TABLE)
+        .update({ comment: value })
+        .eq("id", item.id);
 
-    if (data) {
-      items.push(data);
+      if (error) {
+        showSupabaseError("Fehler beim Speichern des Kommentars", error);
+      }
+    });
 
-      items.sort((a, b) => {
-        return (a.name || "").localeCompare(b.name || "", "de");
+    comment.addEventListener("input", () => {
+      item.comment = comment.value;
+      updateCommentIcon();
+      saveCommentDebounced(comment.value);
+    });
+
+    const saveLinkDebounced = debounce(async (value) => {
+      const normalizedValue = normalize(value.trim());
+
+      const { error } = await supabaseClient
+        .from(MOVIE_TABLE)
+        .update({ link: normalizedValue })
+        .eq("id", item.id);
+
+      if (error) {
+        showSupabaseError("Fehler beim Speichern des Links", error);
+        return;
+      }
+
+      item.link = normalizedValue;
+      linkInput.value = normalizedValue;
+      updateLinkIcon();
+    });
+
+    linkInput.addEventListener("input", () => {
+      item.link = linkInput.value;
+      updateLinkIcon();
+      saveLinkDebounced(linkInput.value);
+    });
+
+    deleteBtn.onclick = async () => {
+      const confirmed = confirm(
+        `"${item.name || "Unbenannt"}" wirklich löschen?`
+      );
+
+      if (!confirmed) return;
+
+      const { error } = await supabaseClient
+        .from(MOVIE_TABLE)
+        .delete()
+        .eq("id", item.id);
+
+      if (error) {
+        showSupabaseError("Fehler beim Löschen", error);
+        return;
+      }
+
+      movieItems = movieItems.filter(entry => entry.id !== item.id);
+      renderMovieItems();
+    };
+
+    div.appendChild(top);
+    div.appendChild(comment);
+    div.appendChild(linkInput);
+
+    movieList.appendChild(div);
+  });
+
+  document.getElementById("movieProgressText").textContent =
+    `Fortschritt: ${checkedCount} / ${movieItems.length}`;
+}
+
+async function addMovieItem() {
+  if (!currentUser) {
+    showLogin();
+    return;
+  }
+
+  const value = newMovieItemInput.value.trim();
+
+  if (!value) {
+    alert("Bitte einen Namen eingeben.");
+    return;
+  }
+
+  const newItem = {
+    id: crypto.randomUUID(),
+    name: value,
+    comment: "",
+    link: "",
+    checked: false,
+    user_id: currentUser.id
+  };
+
+  const { data, error } = await supabaseClient
+    .from(MOVIE_TABLE)
+    .insert(newItem)
+    .select("id, name, comment, link, checked, created_at, user_id")
+    .single();
+
+  if (error) {
+    showSupabaseError("Fehler beim Hinzufügen", error);
+    return;
+  }
+
+  newMovieItemInput.value = "";
+
+  if (data) {
+    movieItems.push(data);
+    movieItems.sort((a, b) => {
+      return (a.name || "").localeCompare(b.name || "", "de");
+    });
+    renderMovieItems();
+  } else {
+    await loadMovieItems();
+  }
+}
+
+async function resetMovieChecks() {
+  if (!currentUser) {
+    showLogin();
+    return;
+  }
+
+  const confirmed = confirm("Alle Haken entfernen?");
+
+  if (!confirmed) return;
+
+  const { error } = await supabaseClient
+    .from(MOVIE_TABLE)
+    .update({ checked: false })
+    .not("id", "is", null);
+
+  if (error) {
+    showSupabaseError("Fehler beim Zurücksetzen", error);
+    return;
+  }
+
+  await loadMovieItems();
+}
+
+/* Link Tracker */
+
+async function loadLinkItems() {
+  if (!currentUser) {
+    showLogin();
+    return;
+  }
+
+  setStatus("Lade Link Tracker...");
+
+  const { data, error } = await supabaseClient
+    .from(LINK_TABLE)
+    .select("id, name, url, rating, image, comment, user_id, created_at")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    setStatus("Fehler beim Laden des Link Trackers.", true);
+    showSupabaseError("Fehler beim Laden des Link Trackers", error);
+    return;
+  }
+
+  linkItems = data || [];
+
+  setStatus("");
+  renderLinkItems();
+}
+
+async function updateLinkItem(id, changes, errorTitle = "Fehler beim Speichern") {
+  const { error } = await supabaseClient
+    .from(LINK_TABLE)
+    .update(changes)
+    .eq("id", id);
+
+  if (error) {
+    showSupabaseError(errorTitle, error);
+    return false;
+  }
+
+  return true;
+}
+
+function compressImage(input, callback) {
+  if (typeof input === "string") {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+
+    img.onload = () => {
+      resizeImage(img, callback);
+    };
+
+    img.onerror = () => {
+      callback("");
+    };
+
+    img.src = input;
+  } else {
+    const reader = new FileReader();
+
+    reader.onload = event => {
+      const img = new Image();
+
+      img.onload = () => {
+        resizeImage(img, callback);
+      };
+
+      img.onerror = () => {
+        callback("");
+      };
+
+      img.src = event.target.result;
+    };
+
+    reader.readAsDataURL(input);
+  }
+}
+
+function resizeImage(img, callback) {
+  const canvas = document.createElement("canvas");
+  const max = 800;
+  const scale = Math.min(max / img.width, 1);
+
+  canvas.width = img.width * scale;
+  canvas.height = img.height * scale;
+
+  canvas
+    .getContext("2d")
+    .drawImage(img, 0, 0, canvas.width, canvas.height);
+
+  callback(canvas.toDataURL("image/jpeg", 0.7));
+}
+
+function autoImage(url, itemId) {
+  if (!url) return;
+
+  const api =
+    "https://api.microlink.io/?url=" + encodeURIComponent(url);
+
+  fetch(api)
+    .then(response => response.json())
+    .then(data => {
+      const imageUrl =
+        data?.data?.image?.url ||
+        new URL(url).origin + "/favicon.ico";
+
+      compressImage(imageUrl, async compressed => {
+        if (!compressed) return;
+
+        const item = linkItems.find(entry => entry.id === itemId);
+
+        if (!item || item.image) return;
+
+        item.image = compressed;
+
+        const success = await updateLinkItem(
+          item.id,
+          { image: compressed },
+          "Fehler beim Speichern des Vorschaubilds"
+        );
+
+        if (success) {
+          renderLinkItems();
+        }
       });
+    })
+    .catch(error => {
+      console.warn("Automatisches Bild konnte nicht geladen werden:", error);
+    });
+}
 
-      render();
-    } else {
-      await loadItems();
-    }
+function renderLinkItems() {
+  linkList.innerHTML = "";
+
+  let data = [...linkItems];
+
+  const sort = document.getElementById("linkSort").value;
+  const filter = Number(document.getElementById("linkFilter").value);
+
+  data = data.filter(item => (item.rating || 0) >= filter);
+
+  if (sort === "high") {
+    data.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+  } else if (sort === "low") {
+    data.sort((a, b) => (a.rating || 0) - (b.rating || 0));
   }
 
-  async function resetAll() {
-    if (!currentUser) {
-      showLogin();
-      return;
+  data.forEach(item => {
+    const div = document.createElement("div");
+    div.className = "link-item";
+
+    const header = document.createElement("div");
+    header.className = "link-item-header";
+
+    if (item.image) {
+      const imgWrap = document.createElement("div");
+      imgWrap.className = "image-wrapper";
+
+      const img = document.createElement("img");
+      img.src = item.image;
+      img.className = "image";
+
+      img.onclick = () => {
+        if (item.url) {
+          window.open(item.url, "_blank");
+        }
+      };
+
+      imgWrap.appendChild(img);
+      header.appendChild(imgWrap);
     }
 
-    const confirmed = confirm("Alle Haken entfernen?");
+    const content = document.createElement("div");
+    content.className = "link-content";
 
-    if (!confirmed) return;
+    const title = document.createElement("div");
+    title.className = "link-title";
+    title.textContent = item.name || "Unbenannt";
 
-    const { error } = await supabaseClient
-      .from("items")
-      .update({
-        checked: false
-      })
-      .not("id", "is", null);
+    title.onclick = () => {
+      if (item.url) {
+        window.open(item.url, "_blank");
+      }
+    };
 
-    if (error) {
-      showSupabaseError("Fehler beim Zurücksetzen", error);
-      return;
+    const linkInput = document.createElement("input");
+    linkInput.className = "link-url-input";
+    linkInput.value = item.url || "";
+    linkInput.placeholder = "Link bearbeiten...";
+
+    const saveLinkDebounced = debounce(async value => {
+      const normalizedUrl = normalize(value.trim());
+
+      item.url = normalizedUrl;
+
+      const success = await updateLinkItem(
+        item.id,
+        { url: normalizedUrl },
+        "Fehler beim Speichern des Links"
+      );
+
+      if (success) {
+        linkInput.value = normalizedUrl;
+      }
+    });
+
+    linkInput.addEventListener("input", () => {
+      saveLinkDebounced(linkInput.value);
+    });
+
+    const actions = document.createElement("div");
+    actions.className = "link-actions";
+
+    const linkBtn = createLinkButton("🔗", "btn btn-link");
+    const imgBtn = createLinkButton("🖼️", "btn btn-img");
+    const noteBtn = createLinkButton("📝", "btn btn-note");
+    const delBtn = createLinkButton("❌", "btn btn-del");
+
+    linkBtn.onclick = () => {
+      linkInput.classList.toggle("visible");
+
+      if (linkInput.classList.contains("visible")) {
+        linkInput.focus();
+        linkInput.select();
+      }
+    };
+
+    const comment = document.createElement("textarea");
+    comment.className = "link-comment";
+    comment.value = item.comment || "";
+    comment.placeholder = "Kommentar hinzufügen...";
+
+    noteBtn.onclick = () => {
+      comment.classList.toggle("visible");
+
+      if (comment.classList.contains("visible")) {
+        comment.focus();
+      }
+    };
+
+    const saveCommentDebounced = debounce(async value => {
+      item.comment = value;
+
+      await updateLinkItem(
+        item.id,
+        { comment: value },
+        "Fehler beim Speichern des Kommentars"
+      );
+    });
+
+    comment.addEventListener("input", () => {
+      saveCommentDebounced(comment.value);
+    });
+
+    imgBtn.onclick = () => {
+      const file = document.createElement("input");
+      file.type = "file";
+      file.accept = "image/*";
+
+      file.onchange = event => {
+        const selected = event.target.files[0];
+
+        if (!selected) return;
+
+        compressImage(selected, async compressed => {
+          if (!compressed) {
+            alert("Bild konnte nicht verarbeitet werden.");
+            return;
+          }
+
+          item.image = compressed;
+
+          const success = await updateLinkItem(
+            item.id,
+            { image: compressed },
+            "Fehler beim Speichern des Bildes"
+          );
+
+          if (success) {
+            renderLinkItems();
+          }
+        });
+      };
+
+      file.click();
+    };
+
+    delBtn.onclick = async () => {
+      if (!confirm("Eintrag löschen?")) return;
+
+      const { error } = await supabaseClient
+        .from(LINK_TABLE)
+        .delete()
+        .eq("id", item.id);
+
+      if (error) {
+        showSupabaseError("Fehler beim Löschen", error);
+        return;
+      }
+
+      linkItems = linkItems.filter(entry => entry.id !== item.id);
+      renderLinkItems();
+    };
+
+    const stars = document.createElement("div");
+
+    for (let s = 1; s <= 5; s++) {
+      const star = document.createElement("span");
+      star.textContent = "⭐";
+      star.className = "star";
+
+      if ((item.rating || 0) >= s) {
+        star.classList.add("active");
+      }
+
+      star.onclick = async () => {
+        item.rating = s;
+
+        const success = await updateLinkItem(
+          item.id,
+          { rating: s },
+          "Fehler beim Speichern der Bewertung"
+        );
+
+        if (success) {
+          renderLinkItems();
+        }
+      };
+
+      stars.appendChild(star);
     }
 
-    await loadItems();
+    actions.append(linkBtn, imgBtn, noteBtn, delBtn);
+
+    content.appendChild(title);
+    content.appendChild(actions);
+    content.appendChild(stars);
+    content.appendChild(linkInput);
+    content.appendChild(comment);
+
+    header.appendChild(content);
+    div.appendChild(header);
+
+    linkList.appendChild(div);
+  });
+}
+
+function createLinkButton(text, className) {
+  const btn = document.createElement("div");
+  btn.className = className;
+  btn.textContent = text;
+  return btn;
+}
+
+async function addLinkItem() {
+  if (!currentUser) {
+    showLogin();
+    return;
   }
 
-  passwordInput.addEventListener("keydown", (event) => {
-    if (event.key === "Enter") {
-      login();
-    }
-  });
+  const name = newLinkNameInput.value.trim();
+  const url = normalize(newLinkUrlInput.value.trim());
 
-  emailInput.addEventListener("keydown", (event) => {
-    if (event.key === "Enter") {
-      passwordInput.focus();
-    }
-  });
+  if (!name) {
+    alert("Bitte einen Namen eingeben.");
+    return;
+  }
 
-  newItemInput.addEventListener("keydown", (event) => {
-    if (event.key === "Enter") {
-      addItem();
-    }
-  });
+  const newItem = {
+    name,
+    url,
+    rating: 0,
+    image: "",
+    comment: "",
+    user_id: currentUser.id
+  };
 
-  initAuth();
+  const { data, error } = await supabaseClient
+    .from(LINK_TABLE)
+    .insert(newItem)
+    .select("id, name, url, rating, image, comment, user_id, created_at")
+    .single();
+
+  if (error) {
+    showSupabaseError("Fehler beim Hinzufügen", error);
+    return;
+  }
+
+  newLinkNameInput.value = "";
+  newLinkUrlInput.value = "";
+
+  if (data) {
+    linkItems.unshift(data);
+    renderLinkItems();
+
+    if (url) {
+      autoImage(url, data.id);
+    }
+  } else {
+    await loadLinkItems();
+  }
+}
+
+async function deleteAllLinkItems() {
+  if (!currentUser) {
+    showLogin();
+    return;
+  }
+
+  if (!confirm("Wirklich alle Link-Tracker-Einträge löschen?")) return;
+
+  const { error } = await supabaseClient
+    .from(LINK_TABLE)
+    .delete()
+    .not("id", "is", null);
+
+  if (error) {
+    showSupabaseError("Fehler beim Löschen aller Einträge", error);
+    return;
+  }
+
+  linkItems = [];
+  renderLinkItems();
+}
+
+/* Tastatursteuerung */
+
+passwordInput.addEventListener("keydown", event => {
+  if (event.key === "Enter") {
+    login();
+  }
+});
+
+emailInput.addEventListener("keydown", event => {
+  if (event.key === "Enter") {
+    passwordInput.focus();
+  }
+});
+
+newMovieItemInput.addEventListener("keydown", event => {
+  if (event.key === "Enter") {
+    addMovieItem();
+  }
+});
+
+newLinkNameInput.addEventListener("keydown", event => {
+  if (event.key === "Enter") {
+    newLinkUrlInput.focus();
+  }
+});
+
+newLinkUrlInput.addEventListener("keydown", event => {
+  if (event.key === "Enter") {
+    addLinkItem();
+  }
+});
+
+initAuth();
 </script>
 
 </body>
