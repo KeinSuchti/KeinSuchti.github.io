@@ -357,7 +357,22 @@ input[type="checkbox"] {
   opacity: 1;
 }
 
+.card-add-form {
+  margin-top: 15px;
+  display: grid;
+  gap: 10px;
+}
+
+.card-add-form input {
+  width: 100%;
+}
+
+
 /* Bier-Notenskala */
+
+.beer-add-rating-input {
+  width: 100%;
+}
 
 .beer-grade-wrapper {
   margin-top: 14px;
@@ -370,26 +385,25 @@ input[type="checkbox"] {
   font-weight: bold;
   margin-bottom: 10px;
   text-align: center;
-  color: #ddd;
 }
 
 .beer-grade-inputs {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr 92px;
   gap: 10px;
   align-items: center;
 }
 
 .beer-grade-slider {
-  flex: 1;
+  width: 100%;
   accent-color: #272EF5;
-  cursor: pointer;
 }
 
 .beer-grade-number {
-  width: 90px;
+  width: 100%;
   text-align: center;
-  background: #fff;
-  color: #000;
+  background: #333;
+  color: white;
 }
 
 .beer-grade-scale-labels {
@@ -400,17 +414,6 @@ input[type="checkbox"] {
   font-size: 11px;
   color: #bbb;
   text-align: center;
-}
-
-
-.card-add-form {
-  margin-top: 15px;
-  display: grid;
-  gap: 10px;
-}
-
-.card-add-form input {
-  width: 100%;
 }
 
 /* Zufalls-Popup */
@@ -543,8 +546,6 @@ input[type="checkbox"] {
         🎲 Zufälligen offenen Film / offene Serie wählen
       </button>
 
-      <div id="movieList"></div>
-
       <div class="movie-add-section">
         <input
           type="text"
@@ -553,6 +554,8 @@ input[type="checkbox"] {
         >
         <button onclick="addMovieItem()">+</button>
       </div>
+
+      <div id="movieList"></div>
 
       <div class="progress">
         <p id="movieProgressText"></p>
@@ -585,15 +588,16 @@ input[type="checkbox"] {
         </select>
       </div>
 
-      <div id="feastList"></div>
-
       <div class="card-add-form">
         <input id="newFeastName" placeholder="Name">
         <input id="newFeastUrl" placeholder="Link">
 
         <button onclick="addCardItem('feast')">➕ Hinzufügen</button>
-        <button onclick="deleteAllCardItems('feast')">🗑️ Alles löschen</button>
       </div>
+
+      <div id="feastList"></div>
+
+      <button onclick="deleteAllCardItems('feast')">🗑️ Alles löschen</button>
     </div>
 
     <!-- Bier -->
@@ -603,31 +607,35 @@ input[type="checkbox"] {
       <div class="card-controls">
         <select id="beerSort" onchange="renderCardItems('beer')">
           <option value="none">Sortierung</option>
-          <option value="best">Beste Note zuerst</option>
-          <option value="worst">Schlechteste Note zuerst</option>
+          <option value="high">Bewertung ↓</option>
+          <option value="low">Bewertung ↑</option>
         </select>
 
         <select id="beerFilter" onchange="renderCardItems('beer')">
-          <option value="all">Alle Bewertungen</option>
-          <option value="unrated">Noch nicht bewertet</option>
-          <option value="1">Note 1,x</option>
-          <option value="2">Note 2,x</option>
-          <option value="3">Note 3,x</option>
-          <option value="4">Note 4,x</option>
-          <option value="5">Note 5,x</option>
-          <option value="6">Note 6,0</option>
+          <option value="0">Alle Bewertungen</option>
+          <option value="1">⭐ 1+</option>
+          <option value="2">⭐ 2+</option>
+          <option value="3">⭐ 3+</option>
+          <option value="4">⭐ 4+</option>
+          <option value="5">⭐ 5</option>
         </select>
+      </div>
+
+      <div class="card-add-form">
+        <input id="newBeerName" placeholder="Name">
+        <input
+          id="newBeerRating"
+          class="beer-add-rating-input"
+          placeholder="Bewertung optional, z. B. 2,6"
+          inputmode="decimal"
+        >
+
+        <button onclick="addCardItem('beer')">➕ Hinzufügen</button>
       </div>
 
       <div id="beerList"></div>
 
-      <div class="card-add-form">
-        <input id="newBeerName" placeholder="Name">
-        <input id="newBeerUrl" placeholder="Link">
-
-        <button onclick="addCardItem('beer')">➕ Hinzufügen</button>
-        <button onclick="deleteAllCardItems('beer')">🗑️ Alles löschen</button>
-      </div>
+      <button onclick="deleteAllCardItems('beer')">🗑️ Alles löschen</button>
     </div>
 
     <!-- Cocktail -->
@@ -655,15 +663,16 @@ input[type="checkbox"] {
         </select>
       </div>
 
-      <div id="cocktailList"></div>
-
       <div class="card-add-form">
         <input id="newCocktailName" placeholder="Name">
         <input id="newCocktailUrl" placeholder="Link">
 
         <button onclick="addCardItem('cocktail')">➕ Hinzufügen</button>
-        <button onclick="deleteAllCardItems('cocktail')">🗑️ Alles löschen</button>
       </div>
+
+      <div id="cocktailList"></div>
+
+      <button onclick="deleteAllCardItems('cocktail')">🗑️ Alles löschen</button>
     </div>
   </div>
 </div>
@@ -746,7 +755,8 @@ const cardLists = {
     sortElement: document.getElementById("beerSort"),
     filterElement: document.getElementById("beerFilter"),
     nameInput: document.getElementById("newBeerName"),
-    urlInput: document.getElementById("newBeerUrl"),
+    urlInput: null,
+    ratingInput: document.getElementById("newBeerRating"),
     randomTextPrefix: "Wir trinken"
   },
   cocktail: {
@@ -1418,7 +1428,6 @@ function renderCardItems(type) {
   config.listElement.innerHTML = "";
 
   let data = [...config.items];
-
   const sort = config.sortElement.value;
 
   if (type === "beer") {
@@ -1543,19 +1552,24 @@ function renderCardItems(type) {
     const actions = document.createElement("div");
     actions.className = "card-actions";
 
-    const linkBtn = createCardButton("🔗", "btn btn-link");
     const imgBtn = createCardButton("🖼️", "btn btn-img");
     const noteBtn = createCardButton("📝", "btn btn-note");
     const delBtn = createCardButton("❌", "btn btn-del");
 
-    linkBtn.onclick = () => {
-      linkInput.classList.toggle("visible");
+    if (type !== "beer") {
+      const linkBtn = createCardButton("🔗", "btn btn-link");
 
-      if (linkInput.classList.contains("visible")) {
-        linkInput.focus();
-        linkInput.select();
-      }
-    };
+      linkBtn.onclick = () => {
+        linkInput.classList.toggle("visible");
+
+        if (linkInput.classList.contains("visible")) {
+          linkInput.focus();
+          linkInput.select();
+        }
+      };
+
+      actions.appendChild(linkBtn);
+    }
 
     const comment = document.createElement("textarea");
     comment.className = "card-comment";
@@ -1636,7 +1650,7 @@ function renderCardItems(type) {
       renderCardItems(type);
     };
 
-    actions.append(linkBtn, imgBtn, noteBtn, delBtn);
+    actions.append(imgBtn, noteBtn, delBtn);
 
     content.appendChild(title);
     content.appendChild(actions);
@@ -1676,7 +1690,10 @@ function renderCardItems(type) {
       content.appendChild(stars);
     }
 
-    content.appendChild(linkInput);
+    if (type !== "beer") {
+      content.appendChild(linkInput);
+    }
+
     content.appendChild(comment);
 
     header.appendChild(content);
@@ -1684,6 +1701,28 @@ function renderCardItems(type) {
 
     config.listElement.appendChild(div);
   });
+}
+
+function parseBeerRatingInput(value) {
+  const cleaned = String(value || "").trim();
+
+  if (!cleaned) {
+    return 0;
+  }
+
+  const rating = Number(cleaned.replace(",", "."));
+
+  if (!Number.isFinite(rating)) {
+    return null;
+  }
+
+  const roundedRating = Math.round(rating * 10) / 10;
+
+  if (roundedRating < 1 || roundedRating > 6) {
+    return null;
+  }
+
+  return roundedRating;
 }
 
 function formatBeerGrade(value) {
@@ -1726,10 +1765,8 @@ function createBeerGradeSlider(item, type) {
   slider.className = "beer-grade-slider";
 
   const numberInput = document.createElement("input");
-  numberInput.type = "number";
-  numberInput.min = "1";
-  numberInput.max = "6";
-  numberInput.step = "0.1";
+  numberInput.type = "text";
+  numberInput.inputMode = "decimal";
   numberInput.className = "beer-grade-number";
   numberInput.placeholder = "Note";
 
@@ -1744,7 +1781,6 @@ function createBeerGradeSlider(item, type) {
     <span>6,0<br>Nein</span>
   `;
 
-
   function updateDisplay(value) {
     const rating = Number(value || 0);
 
@@ -1755,7 +1791,7 @@ function createBeerGradeSlider(item, type) {
         " – " +
         getBeerGradeText(rating);
 
-      numberInput.value = rating.toFixed(1);
+      numberInput.value = formatBeerGrade(rating);
       slider.value = rating;
     } else {
       label.textContent = "Noch nicht bewertet";
@@ -1774,14 +1810,11 @@ function createBeerGradeSlider(item, type) {
   }, 500);
 
   function setRating(rawValue, shouldSave = true) {
-    let rating = Number(String(rawValue).replace(",", "."));
+    const rating = parseBeerRatingInput(rawValue);
 
-    if (!Number.isFinite(rating)) {
+    if (rating === null || rating === 0) {
       return;
     }
-
-    rating = Math.min(6, Math.max(1, rating));
-    rating = Math.round(rating * 10) / 10;
 
     item.rating = rating;
     updateDisplay(rating);
@@ -1799,7 +1832,6 @@ function createBeerGradeSlider(item, type) {
     setRating(numberInput.value);
   });
 
-
   const currentRating = Number(item.rating || 0);
   updateDisplay(currentRating);
 
@@ -1812,6 +1844,7 @@ function createBeerGradeSlider(item, type) {
 
   return wrapper;
 }
+
 
 function createCardButton(text, className) {
   const btn = document.createElement("div");
@@ -1860,19 +1893,31 @@ async function addCardItem(type) {
   }
 
   const config = cardLists[type];
-
   const name = config.nameInput.value.trim();
-  const url = normalize(config.urlInput.value.trim());
 
   if (!name) {
     alert("Bitte einen Namen eingeben.");
     return;
   }
 
+  let url = "";
+  let rating = 0;
+
+  if (type === "beer") {
+    rating = parseBeerRatingInput(config.ratingInput.value);
+
+    if (rating === null) {
+      alert("Bitte eine gültige Bier-Bewertung zwischen 1,0 und 6,0 eingeben oder das Feld leer lassen.");
+      return;
+    }
+  } else {
+    url = normalize(config.urlInput.value.trim());
+  }
+
   const newItem = {
     name,
     url,
-    rating: 0,
+    rating,
     image: "",
     comment: "",
     user_id: currentUser.id
@@ -1890,7 +1935,12 @@ async function addCardItem(type) {
   }
 
   config.nameInput.value = "";
-  config.urlInput.value = "";
+
+  if (type === "beer") {
+    config.ratingInput.value = "";
+  } else {
+    config.urlInput.value = "";
+  }
 
   if (data) {
     config.items.unshift(data);
@@ -1903,6 +1953,7 @@ async function addCardItem(type) {
     await loadCardItems(type);
   }
 }
+
 
 async function deleteAllCardItems(type) {
   if (!currentUser) {
@@ -1962,11 +2013,11 @@ cardLists.feast.urlInput.addEventListener("keydown", event => {
 
 cardLists.beer.nameInput.addEventListener("keydown", event => {
   if (event.key === "Enter") {
-    cardLists.beer.urlInput.focus();
+    cardLists.beer.ratingInput.focus();
   }
 });
 
-cardLists.beer.urlInput.addEventListener("keydown", event => {
+cardLists.beer.ratingInput.addEventListener("keydown", event => {
   if (event.key === "Enter") {
     addCardItem("beer");
   }
