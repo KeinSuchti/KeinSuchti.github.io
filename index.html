@@ -192,15 +192,18 @@ async function loadItems() {
             .select("*")
             .order("name");
 
-    if (error) {
+   if (error) {
+    console.error(error);
 
-        console.error(error);
+    alert(
+        "Supabase Fehler:\n\n" +
+        error.message +
+        "\n\nCode: " +
+        (error.code || "kein Code")
+    );
 
-        document.getElementById("status").innerText =
-            "Fehler beim Laden";
-
-        return;
-    }
+    return;
+}
 
     items = data || [];
 
@@ -457,10 +460,12 @@ async function addItem() {
     const value =
         input.value.trim();
 
-    if (!value)
+    if (!value) {
+        alert("Bitte einen Namen eingeben.");
         return;
+    }
 
-    const { error } =
+    const { data, error } =
         await supabaseClient
             .from("items")
             .insert({
@@ -468,15 +473,24 @@ async function addItem() {
                 comment: "",
                 link: "",
                 checked: false
-            });
+            })
+            .select();
 
     if (error) {
+
         console.error(error);
+
         alert(
-            "Fehler beim Speichern"
+            "Supabase Fehler:\n\n" +
+            error.message +
+            "\n\nCode: " +
+            (error.code || "kein Code")
         );
+
         return;
     }
+
+    console.log("Gespeichert:", data);
 
     input.value = "";
 
