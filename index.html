@@ -231,26 +231,26 @@ input[type="checkbox"] {
   text-align: center;
 }
 
-/* Feast Table */
+/* Kartenlisten: Feast Table, Bier, Cocktail */
 
-.random-link-button {
+.random-card-button {
   margin-top: 0;
   margin-bottom: 10px;
 }
 
-.link-controls {
+.card-controls {
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
   margin-bottom: 15px;
 }
 
-.link-controls select {
+.card-controls select {
   flex: 1;
   min-width: 180px;
 }
 
-.link-item {
+.card-item {
   background: #2a2a2a;
   padding: 15px;
   border-radius: 16px;
@@ -258,13 +258,13 @@ input[type="checkbox"] {
   box-shadow: 0 6px 20px rgba(0,0,0,0.4);
 }
 
-.link-item-header {
+.card-item-header {
   display: flex;
   gap: 15px;
   align-items: stretch;
 }
 
-.link-content {
+.card-content {
   flex: 1;
   min-width: 0;
 }
@@ -282,7 +282,7 @@ input[type="checkbox"] {
   cursor: pointer;
 }
 
-.link-title {
+.card-title {
   font-size: 22px;
   font-weight: bold;
   cursor: pointer;
@@ -290,7 +290,7 @@ input[type="checkbox"] {
   word-break: break-word;
 }
 
-.link-actions {
+.card-actions {
   display: flex;
   gap: 10px;
   margin-top: 12px;
@@ -324,8 +324,8 @@ input[type="checkbox"] {
   transform: scale(0.95);
 }
 
-.link-comment,
-.link-url-input {
+.card-comment,
+.card-url-input {
   display: none;
   width: 100%;
   margin-top: 10px;
@@ -337,13 +337,13 @@ input[type="checkbox"] {
   box-sizing: border-box;
 }
 
-.link-comment {
+.card-comment {
   resize: vertical;
   min-height: 100px;
 }
 
-.link-comment.visible,
-.link-url-input.visible {
+.card-comment.visible,
+.card-url-input.visible {
   display: block;
 }
 
@@ -357,13 +357,13 @@ input[type="checkbox"] {
   opacity: 1;
 }
 
-.link-add-form {
+.card-add-form {
   margin-top: 15px;
   display: grid;
   gap: 10px;
 }
 
-.link-add-form input {
+.card-add-form input {
   width: 100%;
 }
 
@@ -412,7 +412,7 @@ input[type="checkbox"] {
     flex-direction: column;
   }
 
-  .link-item-header {
+  .card-item-header {
     flex-direction: column;
   }
 
@@ -468,13 +468,24 @@ input[type="checkbox"] {
 
     <div id="globalStatus" class="status"></div>
 
-    <!-- Menü -->
+    <!-- Hauptmenü -->
     <div id="menuBox">
       <h2>Welche Liste möchtest du öffnen?</h2>
 
       <div class="menu-grid">
         <button onclick="showMoviesApp()">🎬 Serien & Filme</button>
-        <button onclick="showLinksApp()">🔗 Feast Table</button>
+        <button onclick="showFeastApp()">🔗 Feast Table</button>
+        <button onclick="showSaufiMenu()">🍻 Saufi?</button>
+      </div>
+    </div>
+
+    <!-- Saufi-Menü -->
+    <div id="saufiMenuBox" class="app-panel" style="display:none;">
+      <h2>🍻 Saufi?</h2>
+
+      <div class="menu-grid">
+        <button onclick="showBeerApp()">🍺 Bier</button>
+        <button onclick="showCocktailApp()">🍸 Cocktail</button>
       </div>
     </div>
 
@@ -504,21 +515,21 @@ input[type="checkbox"] {
     </div>
 
     <!-- Feast Table -->
-    <div id="linksApp" class="app-panel" style="display:none;">
+    <div id="feastApp" class="app-panel" style="display:none;">
       <h2>🔗 Feast Table</h2>
 
-      <button class="random-link-button" onclick="openRandomUnratedLink()">
+      <button class="random-card-button" onclick="openRandomUnratedCard('feast')">
         🎲 Was fressen wir?
       </button>
 
-      <div class="link-controls">
-        <select id="linkSort" onchange="renderLinkItems()">
+      <div class="card-controls">
+        <select id="feastSort" onchange="renderCardItems('feast')">
           <option value="none">Sortierung</option>
           <option value="high">Bewertung ↓</option>
           <option value="low">Bewertung ↑</option>
         </select>
 
-        <select id="linkFilter" onchange="renderLinkItems()">
+        <select id="feastFilter" onchange="renderCardItems('feast')">
           <option value="0">Alle Bewertungen</option>
           <option value="1">⭐ 1+</option>
           <option value="2">⭐ 2+</option>
@@ -528,14 +539,82 @@ input[type="checkbox"] {
         </select>
       </div>
 
-      <div id="linkList"></div>
+      <div id="feastList"></div>
 
-      <div class="link-add-form">
-        <input id="newLinkName" placeholder="Name">
-        <input id="newLinkUrl" placeholder="Link">
+      <div class="card-add-form">
+        <input id="newFeastName" placeholder="Name">
+        <input id="newFeastUrl" placeholder="Link">
 
-        <button onclick="addLinkItem()">➕ Hinzufügen</button>
-        <button onclick="deleteAllLinkItems()">🗑️ Alles löschen</button>
+        <button onclick="addCardItem('feast')">➕ Hinzufügen</button>
+        <button onclick="deleteAllCardItems('feast')">🗑️ Alles löschen</button>
+      </div>
+    </div>
+
+    <!-- Bier -->
+    <div id="beerApp" class="app-panel" style="display:none;">
+      <h2>🍺 Bier</h2>
+
+      <div class="card-controls">
+        <select id="beerSort" onchange="renderCardItems('beer')">
+          <option value="none">Sortierung</option>
+          <option value="high">Bewertung ↓</option>
+          <option value="low">Bewertung ↑</option>
+        </select>
+
+        <select id="beerFilter" onchange="renderCardItems('beer')">
+          <option value="0">Alle Bewertungen</option>
+          <option value="1">⭐ 1+</option>
+          <option value="2">⭐ 2+</option>
+          <option value="3">⭐ 3+</option>
+          <option value="4">⭐ 4+</option>
+          <option value="5">⭐ 5</option>
+        </select>
+      </div>
+
+      <div id="beerList"></div>
+
+      <div class="card-add-form">
+        <input id="newBeerName" placeholder="Name">
+        <input id="newBeerUrl" placeholder="Link">
+
+        <button onclick="addCardItem('beer')">➕ Hinzufügen</button>
+        <button onclick="deleteAllCardItems('beer')">🗑️ Alles löschen</button>
+      </div>
+    </div>
+
+    <!-- Cocktail -->
+    <div id="cocktailApp" class="app-panel" style="display:none;">
+      <h2>🍸 Cocktail</h2>
+
+      <button class="random-card-button" onclick="openRandomUnratedCard('cocktail')">
+        🎲 Was trinken wir?
+      </button>
+
+      <div class="card-controls">
+        <select id="cocktailSort" onchange="renderCardItems('cocktail')">
+          <option value="none">Sortierung</option>
+          <option value="high">Bewertung ↓</option>
+          <option value="low">Bewertung ↑</option>
+        </select>
+
+        <select id="cocktailFilter" onchange="renderCardItems('cocktail')">
+          <option value="0">Alle Bewertungen</option>
+          <option value="1">⭐ 1+</option>
+          <option value="2">⭐ 2+</option>
+          <option value="3">⭐ 3+</option>
+          <option value="4">⭐ 4+</option>
+          <option value="5">⭐ 5</option>
+        </select>
+      </div>
+
+      <div id="cocktailList"></div>
+
+      <div class="card-add-form">
+        <input id="newCocktailName" placeholder="Name">
+        <input id="newCocktailUrl" placeholder="Link">
+
+        <button onclick="addCardItem('cocktail')">➕ Hinzufügen</button>
+        <button onclick="deleteAllCardItems('cocktail')">🗑️ Alles löschen</button>
       </div>
     </div>
   </div>
@@ -576,18 +655,19 @@ const supabaseClient = supabase.createClient(
 );
 
 const MOVIE_TABLE = "items";
-const LINK_TABLE = "feast_items";
 
 let currentUser = null;
 let movieItems = [];
-let linkItems = [];
 let pendingRandomUrl = "";
 
 const loginBox = document.getElementById("loginBox");
 const appShell = document.getElementById("appShell");
 const menuBox = document.getElementById("menuBox");
+const saufiMenuBox = document.getElementById("saufiMenuBox");
 const moviesApp = document.getElementById("moviesApp");
-const linksApp = document.getElementById("linksApp");
+const feastApp = document.getElementById("feastApp");
+const beerApp = document.getElementById("beerApp");
+const cocktailApp = document.getElementById("cocktailApp");
 
 const emailInput = document.getElementById("email");
 const passwordInput = document.getElementById("password");
@@ -598,9 +678,41 @@ const globalStatus = document.getElementById("globalStatus");
 const movieList = document.getElementById("movieList");
 const newMovieItemInput = document.getElementById("newMovieItem");
 
-const linkList = document.getElementById("linkList");
-const newLinkNameInput = document.getElementById("newLinkName");
-const newLinkUrlInput = document.getElementById("newLinkUrl");
+const cardLists = {
+  feast: {
+    title: "Feast Table",
+    table: "feast_items",
+    items: [],
+    listElement: document.getElementById("feastList"),
+    sortElement: document.getElementById("feastSort"),
+    filterElement: document.getElementById("feastFilter"),
+    nameInput: document.getElementById("newFeastName"),
+    urlInput: document.getElementById("newFeastUrl"),
+    randomTextPrefix: "Wir fressen"
+  },
+  beer: {
+    title: "Bier",
+    table: "beer_items",
+    items: [],
+    listElement: document.getElementById("beerList"),
+    sortElement: document.getElementById("beerSort"),
+    filterElement: document.getElementById("beerFilter"),
+    nameInput: document.getElementById("newBeerName"),
+    urlInput: document.getElementById("newBeerUrl"),
+    randomTextPrefix: "Wir trinken"
+  },
+  cocktail: {
+    title: "Cocktail",
+    table: "cocktail_items",
+    items: [],
+    listElement: document.getElementById("cocktailList"),
+    sortElement: document.getElementById("cocktailSort"),
+    filterElement: document.getElementById("cocktailFilter"),
+    nameInput: document.getElementById("newCocktailName"),
+    urlInput: document.getElementById("newCocktailUrl"),
+    randomTextPrefix: "Wir trinken"
+  }
+};
 
 function setStatus(message, isError = false) {
   globalStatus.textContent = message || "";
@@ -674,14 +786,17 @@ function openPendingRandomUrl() {
 function showLogin() {
   currentUser = null;
   movieItems = [];
-  linkItems = [];
   pendingRandomUrl = "";
+
+  Object.keys(cardLists).forEach(type => {
+    cardLists[type].items = [];
+    cardLists[type].listElement.innerHTML = "";
+  });
 
   loginBox.style.display = "block";
   appShell.style.display = "none";
 
   movieList.innerHTML = "";
-  linkList.innerHTML = "";
   loginError.textContent = "";
   userInfo.textContent = "";
   setStatus("");
@@ -755,8 +870,11 @@ async function logout() {
 
 function hideAllPanels() {
   menuBox.style.display = "none";
+  saufiMenuBox.style.display = "none";
   moviesApp.style.display = "none";
-  linksApp.style.display = "none";
+  feastApp.style.display = "none";
+  beerApp.style.display = "none";
+  cocktailApp.style.display = "none";
   setStatus("");
 }
 
@@ -765,16 +883,33 @@ function showMenu() {
   menuBox.style.display = "block";
 }
 
+function showSaufiMenu() {
+  hideAllPanels();
+  saufiMenuBox.style.display = "block";
+}
+
 async function showMoviesApp() {
   hideAllPanels();
   moviesApp.style.display = "block";
   await loadMovieItems();
 }
 
-async function showLinksApp() {
+async function showFeastApp() {
   hideAllPanels();
-  linksApp.style.display = "block";
-  await loadLinkItems();
+  feastApp.style.display = "block";
+  await loadCardItems("feast");
+}
+
+async function showBeerApp() {
+  hideAllPanels();
+  beerApp.style.display = "block";
+  await loadCardItems("beer");
+}
+
+async function showCocktailApp() {
+  hideAllPanels();
+  cocktailApp.style.display = "block";
+  await loadCardItems("cocktail");
 }
 
 /* Serien & Filme */
@@ -1093,36 +1228,40 @@ async function resetMovieChecks() {
   await loadMovieItems();
 }
 
-/* Feast Table */
+/* Kartenlisten: Feast Table, Bier, Cocktail */
 
-async function loadLinkItems() {
+async function loadCardItems(type) {
   if (!currentUser) {
     showLogin();
     return;
   }
 
-  setStatus("Lade Feast Table...");
+  const config = cardLists[type];
+
+  setStatus("Lade " + config.title + "...");
 
   const { data, error } = await supabaseClient
-    .from(LINK_TABLE)
+    .from(config.table)
     .select("id, name, url, rating, image, comment, user_id, created_at")
     .order("created_at", { ascending: false });
 
   if (error) {
-    setStatus("Fehler beim Laden des Feast Tables.", true);
-    showSupabaseError("Fehler beim Laden des Feast Tables", error);
+    setStatus("Fehler beim Laden von " + config.title + ".", true);
+    showSupabaseError("Fehler beim Laden von " + config.title, error);
     return;
   }
 
-  linkItems = data || [];
+  config.items = data || [];
 
   setStatus("");
-  renderLinkItems();
+  renderCardItems(type);
 }
 
-async function updateLinkItem(id, changes, errorTitle = "Fehler beim Speichern") {
+async function updateCardItem(type, id, changes, errorTitle = "Fehler beim Speichern") {
+  const config = cardLists[type];
+
   const { error } = await supabaseClient
-    .from(LINK_TABLE)
+    .from(config.table)
     .update(changes)
     .eq("id", id);
 
@@ -1184,8 +1323,10 @@ function resizeImage(img, callback) {
   callback(canvas.toDataURL("image/jpeg", 0.7));
 }
 
-function autoImage(url, itemId) {
+function autoImage(type, url, itemId) {
   if (!url) return;
+
+  const config = cardLists[type];
 
   const api =
     "https://api.microlink.io/?url=" + encodeURIComponent(url);
@@ -1200,20 +1341,21 @@ function autoImage(url, itemId) {
       compressImage(imageUrl, async compressed => {
         if (!compressed) return;
 
-        const item = linkItems.find(entry => entry.id === itemId);
+        const item = config.items.find(entry => entry.id === itemId);
 
         if (!item || item.image) return;
 
         item.image = compressed;
 
-        const success = await updateLinkItem(
+        const success = await updateCardItem(
+          type,
           item.id,
           { image: compressed },
           "Fehler beim Speichern des Vorschaubilds"
         );
 
         if (success) {
-          renderLinkItems();
+          renderCardItems(type);
         }
       });
     })
@@ -1222,13 +1364,15 @@ function autoImage(url, itemId) {
     });
 }
 
-function renderLinkItems() {
-  linkList.innerHTML = "";
+function renderCardItems(type) {
+  const config = cardLists[type];
 
-  let data = [...linkItems];
+  config.listElement.innerHTML = "";
 
-  const sort = document.getElementById("linkSort").value;
-  const filter = Number(document.getElementById("linkFilter").value);
+  let data = [...config.items];
+
+  const sort = config.sortElement.value;
+  const filter = Number(config.filterElement.value);
 
   data = data.filter(item => (item.rating || 0) >= filter);
 
@@ -1240,10 +1384,10 @@ function renderLinkItems() {
 
   data.forEach(item => {
     const div = document.createElement("div");
-    div.className = "link-item";
+    div.className = "card-item";
 
     const header = document.createElement("div");
-    header.className = "link-item-header";
+    header.className = "card-item-header";
 
     if (item.image) {
       const imgWrap = document.createElement("div");
@@ -1264,10 +1408,10 @@ function renderLinkItems() {
     }
 
     const content = document.createElement("div");
-    content.className = "link-content";
+    content.className = "card-content";
 
     const title = document.createElement("div");
-    title.className = "link-title";
+    title.className = "card-title";
     title.textContent = item.name || "Unbenannt";
 
     title.onclick = () => {
@@ -1277,7 +1421,7 @@ function renderLinkItems() {
     };
 
     const linkInput = document.createElement("input");
-    linkInput.className = "link-url-input";
+    linkInput.className = "card-url-input";
     linkInput.value = item.url || "";
     linkInput.placeholder = "Link bearbeiten...";
 
@@ -1286,7 +1430,8 @@ function renderLinkItems() {
 
       item.url = normalizedUrl;
 
-      const success = await updateLinkItem(
+      const success = await updateCardItem(
+        type,
         item.id,
         { url: normalizedUrl },
         "Fehler beim Speichern des Links"
@@ -1302,12 +1447,12 @@ function renderLinkItems() {
     });
 
     const actions = document.createElement("div");
-    actions.className = "link-actions";
+    actions.className = "card-actions";
 
-    const linkBtn = createLinkButton("🔗", "btn btn-link");
-    const imgBtn = createLinkButton("🖼️", "btn btn-img");
-    const noteBtn = createLinkButton("📝", "btn btn-note");
-    const delBtn = createLinkButton("❌", "btn btn-del");
+    const linkBtn = createCardButton("🔗", "btn btn-link");
+    const imgBtn = createCardButton("🖼️", "btn btn-img");
+    const noteBtn = createCardButton("📝", "btn btn-note");
+    const delBtn = createCardButton("❌", "btn btn-del");
 
     linkBtn.onclick = () => {
       linkInput.classList.toggle("visible");
@@ -1319,7 +1464,7 @@ function renderLinkItems() {
     };
 
     const comment = document.createElement("textarea");
-    comment.className = "link-comment";
+    comment.className = "card-comment";
     comment.value = item.comment || "";
     comment.placeholder = "Kommentar hinzufügen...";
 
@@ -1334,7 +1479,8 @@ function renderLinkItems() {
     const saveCommentDebounced = debounce(async value => {
       item.comment = value;
 
-      await updateLinkItem(
+      await updateCardItem(
+        type,
         item.id,
         { comment: value },
         "Fehler beim Speichern des Kommentars"
@@ -1363,14 +1509,15 @@ function renderLinkItems() {
 
           item.image = compressed;
 
-          const success = await updateLinkItem(
+          const success = await updateCardItem(
+            type,
             item.id,
             { image: compressed },
             "Fehler beim Speichern des Bildes"
           );
 
           if (success) {
-            renderLinkItems();
+            renderCardItems(type);
           }
         });
       };
@@ -1382,7 +1529,7 @@ function renderLinkItems() {
       if (!confirm("Eintrag löschen?")) return;
 
       const { error } = await supabaseClient
-        .from(LINK_TABLE)
+        .from(config.table)
         .delete()
         .eq("id", item.id);
 
@@ -1391,8 +1538,8 @@ function renderLinkItems() {
         return;
       }
 
-      linkItems = linkItems.filter(entry => entry.id !== item.id);
-      renderLinkItems();
+      config.items = config.items.filter(entry => entry.id !== item.id);
+      renderCardItems(type);
     };
 
     const stars = document.createElement("div");
@@ -1409,14 +1556,15 @@ function renderLinkItems() {
       star.onclick = async () => {
         item.rating = s;
 
-        const success = await updateLinkItem(
+        const success = await updateCardItem(
+          type,
           item.id,
           { rating: s },
           "Fehler beim Speichern der Bewertung"
         );
 
         if (success) {
-          renderLinkItems();
+          renderCardItems(type);
         }
       };
 
@@ -1434,24 +1582,26 @@ function renderLinkItems() {
     header.appendChild(content);
     div.appendChild(header);
 
-    linkList.appendChild(div);
+    config.listElement.appendChild(div);
   });
 }
 
-function createLinkButton(text, className) {
+function createCardButton(text, className) {
   const btn = document.createElement("div");
   btn.className = className;
   btn.textContent = text;
   return btn;
 }
 
-function openRandomUnratedLink() {
-  if (!Array.isArray(linkItems)) {
+function openRandomUnratedCard(type) {
+  const config = cardLists[type];
+
+  if (!config || !Array.isArray(config.items)) {
     showRandomPopup("Die Liste wurde noch nicht geladen.");
     return;
   }
 
-  const candidates = linkItems.filter(function(item) {
+  const candidates = config.items.filter(function(item) {
     const rating = Number(item.rating || 0);
     const hasNoRating = rating === 0;
 
@@ -1473,17 +1623,19 @@ function openRandomUnratedLink() {
   const selectedName = selectedItem.name || "etwas Unbekanntes";
   const selectedUrl = normalize(selectedItem.url.trim());
 
-  showRandomPopup("Wir fressen " + selectedName + "!", selectedUrl);
+  showRandomPopup(config.randomTextPrefix + " " + selectedName + "!", selectedUrl);
 }
 
-async function addLinkItem() {
+async function addCardItem(type) {
   if (!currentUser) {
     showLogin();
     return;
   }
 
-  const name = newLinkNameInput.value.trim();
-  const url = normalize(newLinkUrlInput.value.trim());
+  const config = cardLists[type];
+
+  const name = config.nameInput.value.trim();
+  const url = normalize(config.urlInput.value.trim());
 
   if (!name) {
     alert("Bitte einen Namen eingeben.");
@@ -1500,7 +1652,7 @@ async function addLinkItem() {
   };
 
   const { data, error } = await supabaseClient
-    .from(LINK_TABLE)
+    .from(config.table)
     .insert(newItem)
     .select("id, name, url, rating, image, comment, user_id, created_at")
     .single();
@@ -1510,31 +1662,33 @@ async function addLinkItem() {
     return;
   }
 
-  newLinkNameInput.value = "";
-  newLinkUrlInput.value = "";
+  config.nameInput.value = "";
+  config.urlInput.value = "";
 
   if (data) {
-    linkItems.unshift(data);
-    renderLinkItems();
+    config.items.unshift(data);
+    renderCardItems(type);
 
     if (url) {
-      autoImage(url, data.id);
+      autoImage(type, url, data.id);
     }
   } else {
-    await loadLinkItems();
+    await loadCardItems(type);
   }
 }
 
-async function deleteAllLinkItems() {
+async function deleteAllCardItems(type) {
   if (!currentUser) {
     showLogin();
     return;
   }
 
-  if (!confirm("Wirklich alle Link-Tracker-Einträge löschen?")) return;
+  const config = cardLists[type];
+
+  if (!confirm("Wirklich alle Einträge in \"" + config.title + "\" löschen?")) return;
 
   const { error } = await supabaseClient
-    .from(LINK_TABLE)
+    .from(config.table)
     .delete()
     .not("id", "is", null);
 
@@ -1543,8 +1697,8 @@ async function deleteAllLinkItems() {
     return;
   }
 
-  linkItems = [];
-  renderLinkItems();
+  config.items = [];
+  renderCardItems(type);
 }
 
 /* Tastatursteuerung */
@@ -1567,15 +1721,39 @@ newMovieItemInput.addEventListener("keydown", event => {
   }
 });
 
-newLinkNameInput.addEventListener("keydown", event => {
+cardLists.feast.nameInput.addEventListener("keydown", event => {
   if (event.key === "Enter") {
-    newLinkUrlInput.focus();
+    cardLists.feast.urlInput.focus();
   }
 });
 
-newLinkUrlInput.addEventListener("keydown", event => {
+cardLists.feast.urlInput.addEventListener("keydown", event => {
   if (event.key === "Enter") {
-    addLinkItem();
+    addCardItem("feast");
+  }
+});
+
+cardLists.beer.nameInput.addEventListener("keydown", event => {
+  if (event.key === "Enter") {
+    cardLists.beer.urlInput.focus();
+  }
+});
+
+cardLists.beer.urlInput.addEventListener("keydown", event => {
+  if (event.key === "Enter") {
+    addCardItem("beer");
+  }
+});
+
+cardLists.cocktail.nameInput.addEventListener("keydown", event => {
+  if (event.key === "Enter") {
+    cardLists.cocktail.urlInput.focus();
+  }
+});
+
+cardLists.cocktail.urlInput.addEventListener("keydown", event => {
+  if (event.key === "Enter") {
+    addCardItem("cocktail");
   }
 });
 
