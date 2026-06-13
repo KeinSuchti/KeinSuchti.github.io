@@ -511,10 +511,16 @@ function openRandomUnratedLink() {
   const selectedItem =
     candidates[randomIndex];
 
+  const name =
+    selectedItem.name || "etwas Unbekanntes";
+
   const url =
     normalize(selectedItem.url.trim());
 
+  alert("Wir fressen " + name + "!");
+
   window.open(url, "_blank", "noopener,noreferrer");
+}
 }
 </script>
 <script>
