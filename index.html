@@ -193,6 +193,7 @@
     supabaseUrl,
     supabaseKey
   );
+  const APP_USER_ID = "public";
 
   let items = [];
 
@@ -462,12 +463,13 @@
     }
 
     const newItem = {
-      id: crypto.randomUUID(),
-      name: value,
-      comment: "",
-      link: "",
-      checked: false
-    };
+  id: crypto.randomUUID(),
+  name: value,
+  comment: "",
+  link: "",
+  checked: false,
+  user_id: APP_USER_ID
+};
 
     const { data, error } = await supabaseClient
       .from("items")
