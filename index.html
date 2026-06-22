@@ -579,7 +579,14 @@ input[type="checkbox"] {
 
 .game-column-title {
   font-weight: bold;
-  word-break: break-word;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 160px;
+}
+
+.games-table th {
+  white-space: nowrap;
 }
 
 .game-row-delete,
