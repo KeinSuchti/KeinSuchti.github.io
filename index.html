@@ -126,6 +126,7 @@ textarea {
 }
 
 
+
 /* Serien & Filme */
 
 .random-movie-button {
@@ -540,14 +541,31 @@ input[type="checkbox"] {
   flex-wrap: wrap;
 }
 
-.game-column-title {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.game-column-header {
+  display: grid;
   gap: 8px;
+  justify-items: center;
 }
 
-.game-column-delete,
+.game-column-title {
+  font-weight: bold;
+  word-break: break-word;
+}
+
+.game-column-actions,
+.games-column-toolbar {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.games-column-toolbar {
+  margin-top: 10px;
+}
+
+.game-column-move,
+.game-column-sort,
 .game-row-delete,
 .game-row-link {
   width: auto;
@@ -557,22 +575,30 @@ input[type="checkbox"] {
   font-size: 13px;
 }
 
-.game-column-delete,
-.game-row-delete {
-  background: #5c1f1f;
-}
-
-.game-column-delete:hover,
-.game-row-delete:hover {
-  background: #7a2929;
-}
-
+.game-column-move,
+.game-column-sort,
 .game-row-link {
   background: #2c2c2c;
 }
 
+.game-column-move:hover,
+.game-column-sort:hover,
 .game-row-link:hover {
   background: #444;
+}
+
+.game-column-move:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  filter: none;
+}
+
+.game-row-delete {
+  background: #5c1f1f;
+}
+
+.game-row-delete:hover {
+  background: #7a2929;
 }
 
 .game-check {
@@ -720,6 +746,11 @@ input[type="checkbox"] {
           placeholder="Neue Spalte hinzufügen, z. B. Peter, Anna oder Koop"
         >
         <button onclick="addGameColumn()">➕ Spalte hinzufügen</button>
+
+        <div class="games-column-toolbar">
+          <button class="game-column-sort" onclick="sortGameColumns('az')">A–Z sortieren</button>
+          <button class="game-column-sort" onclick="sortGameColumns('za')">Z–A sortieren</button>
+        </div>
       </div>
 
       <div class="games-add-form">
@@ -1183,11 +1214,6 @@ async function showCocktailApp() {
 }
 
 
-async function showGamesApp() {
-  hideAllPanels();
-  gamesApp.style.display = "block";
-  await loadGamesData();
-}
 
 /* Serien & Filme */
 
@@ -2312,25 +2338,42 @@ function renderGamesTable() {
   gameHead.textContent = "Spiel";
   headRow.appendChild(gameHead);
 
-  gameColumns.forEach(column => {
+  gameColumns.forEach((column, columnIndex) => {
     const th = document.createElement("th");
 
-    const titleWrap = document.createElement("div");
-    titleWrap.className = "game-column-title";
+    const headerWrap = document.createElement("div");
+    headerWrap.className = "game-column-header";
 
-    const span = document.createElement("span");
-    span.textContent = column.name || "Spalte";
+    const title = document.createElement("div");
+    title.className = "game-column-title";
+    title.textContent = column.name || "Spalte";
 
-    const deleteButton = document.createElement("button");
-    deleteButton.className = "game-column-delete";
-    deleteButton.type = "button";
-    deleteButton.textContent = "❌";
-    deleteButton.title = "Spalte löschen";
-    deleteButton.onclick = () => deleteGameColumn(column.id, column.name || "Spalte");
+    const actions = document.createElement("div");
+    actions.className = "game-column-actions";
 
-    titleWrap.appendChild(span);
-    titleWrap.appendChild(deleteButton);
-    th.appendChild(titleWrap);
+    const moveLeftButton = document.createElement("button");
+    moveLeftButton.className = "game-column-move";
+    moveLeftButton.type = "button";
+    moveLeftButton.textContent = "⬅️";
+    moveLeftButton.title = "Spalte nach links verschieben";
+    moveLeftButton.disabled = columnIndex === 0;
+    moveLeftButton.onclick = () => moveGameColumn(column.id, -1);
+
+    const moveRightButton = document.createElement("button");
+    moveRightButton.className = "game-column-move";
+    moveRightButton.type = "button";
+    moveRightButton.textContent = "➡️";
+    moveRightButton.title = "Spalte nach rechts verschieben";
+    moveRightButton.disabled = columnIndex === gameColumns.length - 1;
+    moveRightButton.onclick = () => moveGameColumn(column.id, 1);
+
+    actions.appendChild(moveLeftButton);
+    actions.appendChild(moveRightButton);
+
+    headerWrap.appendChild(title);
+    headerWrap.appendChild(actions);
+
+    th.appendChild(headerWrap);
     headRow.appendChild(th);
   });
 
@@ -2501,31 +2544,83 @@ async function addGameColumn() {
   }
 }
 
-async function deleteGameColumn(columnId, columnName) {
-  if (!confirm('Spalte "' + columnName + '" wirklich löschen? Die Haken in dieser Spalte werden ebenfalls gelöscht.')) {
+async function saveGameColumnPositions() {
+  const updates = gameColumns.map((column, index) => {
+    const newPosition = index + 1;
+    column.position = newPosition;
+
+    return supabaseClient
+      .from("game_columns")
+      .update({ position: newPosition })
+      .eq("id", column.id);
+  });
+
+  const results = await Promise.all(updates);
+  const failedResult = results.find(result => result.error);
+
+  if (failedResult) {
+    showSupabaseError("Fehler beim Speichern der Spalten-Reihenfolge", failedResult.error);
+    await loadGamesData();
+    return false;
+  }
+
+  return true;
+}
+
+async function moveGameColumn(columnId, direction) {
+  const currentIndex = gameColumns.findIndex(column => column.id === columnId);
+  const targetIndex = currentIndex + direction;
+
+  if (
+    currentIndex < 0 ||
+    targetIndex < 0 ||
+    targetIndex >= gameColumns.length
+  ) {
     return;
   }
 
-  const { error } = await supabaseClient
-    .from("game_columns")
-    .delete()
-    .eq("id", columnId);
+  const previousColumns = [...gameColumns];
 
-  if (error) {
-    showSupabaseError("Fehler beim Löschen der Spalte", error);
-    return;
+  const movedColumn = gameColumns[currentIndex];
+  gameColumns[currentIndex] = gameColumns[targetIndex];
+  gameColumns[targetIndex] = movedColumn;
+
+  renderGamesTable();
+
+  const success = await saveGameColumnPositions();
+
+  if (!success) {
+    gameColumns = previousColumns;
+    renderGamesTable();
   }
+}
 
-  gameColumns = gameColumns.filter(column => column.id !== columnId);
+async function sortGameColumns(direction) {
+  if (gameColumns.length < 2) return;
 
-  Object.keys(gameChecks).forEach(key => {
-    if (key.endsWith("|" + columnId)) {
-      delete gameChecks[key];
-    }
+  const previousColumns = [...gameColumns];
+
+  gameColumns.sort((a, b) => {
+    const nameA = a.name || "";
+    const nameB = b.name || "";
+    const result = nameA.localeCompare(nameB, "de", {
+      numeric: true,
+      sensitivity: "base"
+    });
+
+    return direction === "za" ? -result : result;
   });
 
   renderGamesTable();
+
+  const success = await saveGameColumnPositions();
+
+  if (!success) {
+    gameColumns = previousColumns;
+    renderGamesTable();
+  }
 }
+
 
 async function addGameItem() {
   if (!currentUser) {
@@ -2756,6 +2851,12 @@ cardLists.cocktail.urlInput.addEventListener("keydown", event => {
   }
 });
 
+
+newGameColumnNameInput.addEventListener("keydown", event => {
+  if (event.key === "Enter") {
+    addGameColumn();
+  }
+});
 
 newGameNameInput.addEventListener("keydown", event => {
   if (event.key === "Enter") {
