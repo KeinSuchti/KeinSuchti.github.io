@@ -1213,6 +1213,12 @@ async function showCocktailApp() {
   await loadCardItems("cocktail");
 }
 
+async function showGamesApp() {
+  hideAllPanels();
+  gamesApp.style.display = "block";
+  await loadGamesData();
+}
+
 
 
 /* Serien & Filme */
