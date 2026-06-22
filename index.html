@@ -125,6 +125,7 @@ textarea {
   padding: 18px;
 }
 
+
 /* Serien & Filme */
 
 .random-movie-button {
@@ -425,6 +426,165 @@ input[type="checkbox"] {
   text-align: center;
 }
 
+
+/* Spiele */
+
+.games-column-form,
+.games-add-form {
+  margin-top: 15px;
+  display: grid;
+  gap: 10px;
+}
+
+.games-column-form input,
+.games-add-form input {
+  width: 100%;
+}
+
+.games-table-wrapper {
+  margin-top: 18px;
+  overflow-x: auto;
+  border-radius: 16px;
+}
+
+.games-table {
+  width: 100%;
+  min-width: 720px;
+  border-collapse: separate;
+  border-spacing: 0 8px;
+}
+
+.games-table th,
+.games-table td {
+  background: #2a2a2a;
+  padding: 10px;
+  vertical-align: middle;
+  text-align: center;
+}
+
+.games-table th:first-child,
+.games-table td:first-child {
+  text-align: left;
+  min-width: 280px;
+}
+
+.games-table th:first-child {
+  border-radius: 12px 0 0 12px;
+}
+
+.games-table th:last-child {
+  border-radius: 0 12px 12px 0;
+}
+
+.games-table tbody tr td:first-child {
+  border-radius: 12px 0 0 12px;
+}
+
+.games-table tbody tr td:last-child {
+  border-radius: 0 12px 12px 0;
+}
+
+.game-row-main {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.game-image-wrapper {
+  width: 130px;
+  aspect-ratio: 16 / 9;
+  flex-shrink: 0;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #111;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.game-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  cursor: pointer;
+}
+
+.game-image-placeholder {
+  color: #777;
+  font-size: 28px;
+}
+
+.game-info {
+  min-width: 0;
+}
+
+.game-name {
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  word-break: break-word;
+}
+
+.game-url {
+  margin-top: 4px;
+  font-size: 12px;
+  color: #bbb;
+  word-break: break-all;
+}
+
+.game-row-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+
+.game-column-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.game-column-delete,
+.game-row-delete,
+.game-row-link {
+  width: auto;
+  margin-top: 0;
+  padding: 6px 9px;
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.game-column-delete,
+.game-row-delete {
+  background: #5c1f1f;
+}
+
+.game-column-delete:hover,
+.game-row-delete:hover {
+  background: #7a2929;
+}
+
+.game-row-link {
+  background: #2c2c2c;
+}
+
+.game-row-link:hover {
+  background: #444;
+}
+
+.game-check {
+  transform: scale(1.35);
+}
+
+.games-empty {
+  color: #bbb;
+  text-align: center;
+  padding: 16px;
+}
+
 /* Zufalls-Popup */
 
 .popup-overlay {
@@ -535,6 +695,7 @@ input[type="checkbox"] {
         <button onclick="showMoviesApp()">🎬 Serien & Filme</button>
         <button onclick="showFeastApp()">🔗 Feast Table</button>
         <button onclick="showSaufiMenu()">🍻 Saufi?</button>
+        <button onclick="showGamesApp()">🎮 Spiele</button>
       </div>
     </div>
 
@@ -546,6 +707,30 @@ input[type="checkbox"] {
         <button onclick="showBeerApp()">🍺 Bier</button>
         <button onclick="showCocktailApp()">🍸 Cocktail</button>
       </div>
+    </div>
+
+
+    <!-- Spiele -->
+    <div id="gamesApp" class="app-panel" style="display:none;">
+      <h2>🎮 Spiele</h2>
+
+      <div class="games-column-form">
+        <input
+          id="newGameColumnName"
+          placeholder="Neue Spalte hinzufügen, z. B. Peter, Anna oder Koop"
+        >
+        <button onclick="addGameColumn()">➕ Spalte hinzufügen</button>
+      </div>
+
+      <div class="games-add-form">
+        <input id="newGameName" placeholder="Name">
+        <input id="newGameUrl" placeholder="Link">
+        <button onclick="addGameItem()">➕ Spiel hinzufügen</button>
+      </div>
+
+      <div id="gamesTableWrapper" class="games-table-wrapper"></div>
+
+      <button onclick="deleteAllGameItems()">🗑️ Alle Spiele löschen</button>
     </div>
 
     <!-- Serien & Filme -->
@@ -737,6 +922,7 @@ const moviesApp = document.getElementById("moviesApp");
 const feastApp = document.getElementById("feastApp");
 const beerApp = document.getElementById("beerApp");
 const cocktailApp = document.getElementById("cocktailApp");
+const gamesApp = document.getElementById("gamesApp");
 
 const emailInput = document.getElementById("email");
 const passwordInput = document.getElementById("password");
@@ -746,6 +932,15 @@ const globalStatus = document.getElementById("globalStatus");
 
 const movieList = document.getElementById("movieList");
 const newMovieItemInput = document.getElementById("newMovieItem");
+
+const gamesTableWrapper = document.getElementById("gamesTableWrapper");
+const newGameColumnNameInput = document.getElementById("newGameColumnName");
+const newGameNameInput = document.getElementById("newGameName");
+const newGameUrlInput = document.getElementById("newGameUrl");
+
+let gameItems = [];
+let gameColumns = [];
+let gameChecks = {};
 
 const cardLists = {
   feast: {
@@ -856,6 +1051,9 @@ function openPendingRandomUrl() {
 function showLogin() {
   currentUser = null;
   movieItems = [];
+  gameItems = [];
+  gameColumns = [];
+  gameChecks = {};
   pendingRandomUrl = "";
 
   Object.keys(cardLists).forEach(type => {
@@ -867,6 +1065,7 @@ function showLogin() {
   appShell.style.display = "none";
 
   movieList.innerHTML = "";
+  gamesTableWrapper.innerHTML = "";
   loginError.textContent = "";
   userInfo.textContent = "";
   setStatus("");
@@ -945,6 +1144,7 @@ function hideAllPanels() {
   feastApp.style.display = "none";
   beerApp.style.display = "none";
   cocktailApp.style.display = "none";
+  gamesApp.style.display = "none";
   setStatus("");
 }
 
@@ -980,6 +1180,13 @@ async function showCocktailApp() {
   hideAllPanels();
   cocktailApp.style.display = "block";
   await loadCardItems("cocktail");
+}
+
+
+async function showGamesApp() {
+  hideAllPanels();
+  gamesApp.style.display = "block";
+  await loadGamesData();
 }
 
 /* Serien & Filme */
@@ -2019,6 +2226,480 @@ async function deleteAllCardItems(type) {
   renderCardItems(type);
 }
 
+
+/* Spiele */
+
+function getGameCheckKey(gameId, columnId) {
+  return gameId + "|" + columnId;
+}
+
+async function loadGamesData() {
+  if (!currentUser) {
+    showLogin();
+    return;
+  }
+
+  setStatus("Lade Spiele...");
+
+  const [itemsResult, columnsResult, checksResult] = await Promise.all([
+    supabaseClient
+      .from("game_items")
+      .select("id, name, url, image, user_id, created_at")
+      .order("created_at", { ascending: false }),
+
+    supabaseClient
+      .from("game_columns")
+      .select("id, name, position, user_id, created_at")
+      .order("position", { ascending: true })
+      .order("created_at", { ascending: true }),
+
+    supabaseClient
+      .from("game_checks")
+      .select("id, game_id, column_id, checked, user_id, created_at")
+  ]);
+
+  if (itemsResult.error) {
+    setStatus("Fehler beim Laden der Spiele.", true);
+    showSupabaseError("Fehler beim Laden der Spiele", itemsResult.error);
+    return;
+  }
+
+  if (columnsResult.error) {
+    setStatus("Fehler beim Laden der Spiele-Spalten.", true);
+    showSupabaseError("Fehler beim Laden der Spiele-Spalten", columnsResult.error);
+    return;
+  }
+
+  if (checksResult.error) {
+    setStatus("Fehler beim Laden der Spiele-Haken.", true);
+    showSupabaseError("Fehler beim Laden der Spiele-Haken", checksResult.error);
+    return;
+  }
+
+  gameItems = itemsResult.data || [];
+  gameColumns = columnsResult.data || [];
+  gameChecks = {};
+
+  (checksResult.data || []).forEach(check => {
+    gameChecks[getGameCheckKey(check.game_id, check.column_id)] = {
+      id: check.id,
+      checked: check.checked === true
+    };
+  });
+
+  setStatus("");
+  renderGamesTable();
+}
+
+function renderGamesTable() {
+  gamesTableWrapper.innerHTML = "";
+
+  if (gameItems.length === 0 && gameColumns.length === 0) {
+    const empty = document.createElement("div");
+    empty.className = "games-empty";
+    empty.textContent = "Noch keine Spiele und noch keine Spalten vorhanden.";
+    gamesTableWrapper.appendChild(empty);
+    return;
+  }
+
+  const table = document.createElement("table");
+  table.className = "games-table";
+
+  const thead = document.createElement("thead");
+  const headRow = document.createElement("tr");
+
+  const gameHead = document.createElement("th");
+  gameHead.textContent = "Spiel";
+  headRow.appendChild(gameHead);
+
+  gameColumns.forEach(column => {
+    const th = document.createElement("th");
+
+    const titleWrap = document.createElement("div");
+    titleWrap.className = "game-column-title";
+
+    const span = document.createElement("span");
+    span.textContent = column.name || "Spalte";
+
+    const deleteButton = document.createElement("button");
+    deleteButton.className = "game-column-delete";
+    deleteButton.type = "button";
+    deleteButton.textContent = "❌";
+    deleteButton.title = "Spalte löschen";
+    deleteButton.onclick = () => deleteGameColumn(column.id, column.name || "Spalte");
+
+    titleWrap.appendChild(span);
+    titleWrap.appendChild(deleteButton);
+    th.appendChild(titleWrap);
+    headRow.appendChild(th);
+  });
+
+  thead.appendChild(headRow);
+  table.appendChild(thead);
+
+  const tbody = document.createElement("tbody");
+
+  if (gameItems.length === 0) {
+    const row = document.createElement("tr");
+    const cell = document.createElement("td");
+    cell.colSpan = Math.max(1, gameColumns.length + 1);
+    cell.className = "games-empty";
+    cell.textContent = "Noch keine Spiele vorhanden.";
+    row.appendChild(cell);
+    tbody.appendChild(row);
+  }
+
+  gameItems.forEach(item => {
+    const row = document.createElement("tr");
+
+    const gameCell = document.createElement("td");
+
+    const main = document.createElement("div");
+    main.className = "game-row-main";
+
+    const imageWrapper = document.createElement("div");
+    imageWrapper.className = "game-image-wrapper";
+
+    if (item.image) {
+      const img = document.createElement("img");
+      img.src = item.image;
+      img.className = "game-image";
+      img.alt = item.name ? "Vorschaubild von " + item.name : "Vorschaubild";
+      img.onclick = () => {
+        if (item.url) {
+          window.open(item.url, "_blank");
+        } else {
+          window.open(item.image, "_blank");
+        }
+      };
+      imageWrapper.appendChild(img);
+    } else {
+      const placeholder = document.createElement("div");
+      placeholder.className = "game-image-placeholder";
+      placeholder.textContent = "🎮";
+      imageWrapper.appendChild(placeholder);
+    }
+
+    const info = document.createElement("div");
+    info.className = "game-info";
+
+    const name = document.createElement("div");
+    name.className = "game-name";
+    name.textContent = item.name || "Unbenannt";
+    name.onclick = () => {
+      if (item.url) {
+        window.open(item.url, "_blank");
+      }
+    };
+
+    info.appendChild(name);
+
+    if (item.url) {
+      const urlText = document.createElement("div");
+      urlText.className = "game-url";
+      urlText.textContent = item.url;
+      info.appendChild(urlText);
+    }
+
+    const rowActions = document.createElement("div");
+    rowActions.className = "game-row-actions";
+
+    if (item.url) {
+      const linkButton = document.createElement("button");
+      linkButton.className = "game-row-link";
+      linkButton.type = "button";
+      linkButton.textContent = "🔗 Öffnen";
+      linkButton.onclick = () => window.open(item.url, "_blank");
+      rowActions.appendChild(linkButton);
+    }
+
+    const deleteButton = document.createElement("button");
+    deleteButton.className = "game-row-delete";
+    deleteButton.type = "button";
+    deleteButton.textContent = "❌ Löschen";
+    deleteButton.onclick = () => deleteGameItem(item.id, item.name || "Unbenannt");
+    rowActions.appendChild(deleteButton);
+
+    info.appendChild(rowActions);
+
+    main.appendChild(imageWrapper);
+    main.appendChild(info);
+    gameCell.appendChild(main);
+    row.appendChild(gameCell);
+
+    gameColumns.forEach(column => {
+      const cell = document.createElement("td");
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.className = "game-check";
+
+      const key = getGameCheckKey(item.id, column.id);
+      checkbox.checked = gameChecks[key]?.checked === true;
+
+      checkbox.addEventListener("change", async () => {
+        const newValue = checkbox.checked;
+        const success = await updateGameCheck(item.id, column.id, newValue);
+
+        if (!success) {
+          checkbox.checked = !newValue;
+        }
+      });
+
+      cell.appendChild(checkbox);
+      row.appendChild(cell);
+    });
+
+    tbody.appendChild(row);
+  });
+
+  table.appendChild(tbody);
+  gamesTableWrapper.appendChild(table);
+}
+
+async function addGameColumn() {
+  if (!currentUser) {
+    showLogin();
+    return;
+  }
+
+  const name = newGameColumnNameInput.value.trim();
+
+  if (!name) {
+    alert("Bitte einen Spaltennamen eingeben.");
+    return;
+  }
+
+  const maxPosition = gameColumns.reduce((max, column) => {
+    return Math.max(max, Number(column.position || 0));
+  }, 0);
+
+  const newColumn = {
+    name,
+    position: maxPosition + 1,
+    user_id: currentUser.id
+  };
+
+  const { data, error } = await supabaseClient
+    .from("game_columns")
+    .insert(newColumn)
+    .select("id, name, position, user_id, created_at")
+    .single();
+
+  if (error) {
+    showSupabaseError("Fehler beim Hinzufügen der Spalte", error);
+    return;
+  }
+
+  newGameColumnNameInput.value = "";
+
+  if (data) {
+    gameColumns.push(data);
+    gameColumns.sort((a, b) => Number(a.position || 0) - Number(b.position || 0));
+    renderGamesTable();
+  } else {
+    await loadGamesData();
+  }
+}
+
+async function deleteGameColumn(columnId, columnName) {
+  if (!confirm('Spalte "' + columnName + '" wirklich löschen? Die Haken in dieser Spalte werden ebenfalls gelöscht.')) {
+    return;
+  }
+
+  const { error } = await supabaseClient
+    .from("game_columns")
+    .delete()
+    .eq("id", columnId);
+
+  if (error) {
+    showSupabaseError("Fehler beim Löschen der Spalte", error);
+    return;
+  }
+
+  gameColumns = gameColumns.filter(column => column.id !== columnId);
+
+  Object.keys(gameChecks).forEach(key => {
+    if (key.endsWith("|" + columnId)) {
+      delete gameChecks[key];
+    }
+  });
+
+  renderGamesTable();
+}
+
+async function addGameItem() {
+  if (!currentUser) {
+    showLogin();
+    return;
+  }
+
+  const name = newGameNameInput.value.trim();
+  const url = normalize(newGameUrlInput.value.trim());
+
+  if (!name) {
+    alert("Bitte einen Namen eingeben.");
+    return;
+  }
+
+  const newItem = {
+    name,
+    url,
+    image: "",
+    user_id: currentUser.id
+  };
+
+  const { data, error } = await supabaseClient
+    .from("game_items")
+    .insert(newItem)
+    .select("id, name, url, image, user_id, created_at")
+    .single();
+
+  if (error) {
+    showSupabaseError("Fehler beim Hinzufügen des Spiels", error);
+    return;
+  }
+
+  newGameNameInput.value = "";
+  newGameUrlInput.value = "";
+
+  if (data) {
+    gameItems.unshift(data);
+    renderGamesTable();
+
+    if (url) {
+      autoGameImage(url, data.id);
+    }
+  } else {
+    await loadGamesData();
+  }
+}
+
+async function deleteGameItem(itemId, itemName) {
+  if (!confirm('Spiel "' + itemName + '" wirklich löschen?')) {
+    return;
+  }
+
+  const { error } = await supabaseClient
+    .from("game_items")
+    .delete()
+    .eq("id", itemId);
+
+  if (error) {
+    showSupabaseError("Fehler beim Löschen des Spiels", error);
+    return;
+  }
+
+  gameItems = gameItems.filter(item => item.id !== itemId);
+
+  Object.keys(gameChecks).forEach(key => {
+    if (key.startsWith(itemId + "|")) {
+      delete gameChecks[key];
+    }
+  });
+
+  renderGamesTable();
+}
+
+async function deleteAllGameItems() {
+  if (!currentUser) {
+    showLogin();
+    return;
+  }
+
+  if (!confirm("Wirklich alle Spiele löschen? Die angelegten Spalten bleiben bestehen.")) return;
+
+  const { error } = await supabaseClient
+    .from("game_items")
+    .delete()
+    .not("id", "is", null);
+
+  if (error) {
+    showSupabaseError("Fehler beim Löschen aller Spiele", error);
+    return;
+  }
+
+  gameItems = [];
+  gameChecks = {};
+  renderGamesTable();
+}
+
+async function updateGameCheck(gameId, columnId, checked) {
+  const key = getGameCheckKey(gameId, columnId);
+
+  const { data, error } = await supabaseClient
+    .from("game_checks")
+    .upsert(
+      {
+        game_id: gameId,
+        column_id: columnId,
+        checked,
+        user_id: currentUser.id
+      },
+      { onConflict: "game_id,column_id" }
+    )
+    .select("id, game_id, column_id, checked")
+    .single();
+
+  if (error) {
+    showSupabaseError("Fehler beim Speichern des Hakens", error);
+    return false;
+  }
+
+  if (data) {
+    gameChecks[key] = {
+      id: data.id,
+      checked: data.checked === true
+    };
+  } else {
+    gameChecks[key] = {
+      id: gameChecks[key]?.id || "",
+      checked
+    };
+  }
+
+  return true;
+}
+
+function autoGameImage(url, itemId) {
+  if (!url) return;
+
+  const api =
+    "https://api.microlink.io/?url=" + encodeURIComponent(url);
+
+  fetch(api)
+    .then(response => response.json())
+    .then(data => {
+      const imageUrl =
+        data?.data?.image?.url ||
+        new URL(url).origin + "/favicon.ico";
+
+      compressImage(imageUrl, async compressed => {
+        if (!compressed) return;
+
+        const item = gameItems.find(entry => entry.id === itemId);
+
+        if (!item || item.image) return;
+
+        item.image = compressed;
+
+        const { error } = await supabaseClient
+          .from("game_items")
+          .update({ image: compressed })
+          .eq("id", item.id);
+
+        if (error) {
+          showSupabaseError("Fehler beim Speichern des Spiele-Vorschaubilds", error);
+          return;
+        }
+
+        renderGamesTable();
+      });
+    })
+    .catch(error => {
+      console.warn("Automatisches Spiele-Bild konnte nicht geladen werden:", error);
+    });
+}
+
 /* Tastatursteuerung */
 
 passwordInput.addEventListener("keydown", event => {
@@ -2072,6 +2753,25 @@ cardLists.cocktail.nameInput.addEventListener("keydown", event => {
 cardLists.cocktail.urlInput.addEventListener("keydown", event => {
   if (event.key === "Enter") {
     addCardItem("cocktail");
+  }
+});
+
+
+newGameNameInput.addEventListener("keydown", event => {
+  if (event.key === "Enter") {
+    newGameUrlInput.focus();
+  }
+});
+
+newGameUrlInput.addEventListener("keydown", event => {
+  if (event.key === "Enter") {
+    addGameItem();
+  }
+});
+
+newGameColumnNameInput.addEventListener("keydown", event => {
+  if (event.key === "Enter") {
+    addGameColumn();
   }
 });
 
