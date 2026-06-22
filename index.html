@@ -590,7 +590,8 @@ input[type="checkbox"] {
 }
 
 .game-row-delete,
-.game-row-link {
+.game-row-link,
+.game-row-image-upload {
   width: auto;
   margin-top: 0;
   padding: 6px 9px;
@@ -612,6 +613,14 @@ input[type="checkbox"] {
 
 .game-row-delete:hover {
   background: #7a2929;
+}
+
+.game-row-image-upload {
+  background: #1f3b5c;
+}
+
+.game-row-image-upload:hover {
+  background: #28517d;
 }
 
 .game-check {
@@ -2485,6 +2494,7 @@ function renderGamesTable() {
       img.src = item.image;
       img.className = "game-image";
       img.alt = item.name ? "Vorschaubild von " + item.name : "Vorschaubild";
+      img.title = item.url ? "Link öffnen" : "Bild öffnen";
       img.onclick = () => {
         if (item.url) {
           window.open(item.url, "_blank");
@@ -2497,6 +2507,9 @@ function renderGamesTable() {
       const placeholder = document.createElement("div");
       placeholder.className = "game-image-placeholder";
       placeholder.textContent = "🎮";
+      placeholder.title = "Bild hochladen";
+      placeholder.style.cursor = "pointer";
+      placeholder.onclick = () => uploadGameImage(item.id);
       imageWrapper.appendChild(placeholder);
     }
 
@@ -2532,6 +2545,13 @@ function renderGamesTable() {
       linkButton.onclick = () => window.open(item.url, "_blank");
       rowActions.appendChild(linkButton);
     }
+
+    const imageButton = document.createElement("button");
+    imageButton.className = "game-row-image-upload";
+    imageButton.type = "button";
+    imageButton.textContent = item.image ? "🖼️ Bild ändern" : "🖼️ Bild hochladen";
+    imageButton.onclick = () => uploadGameImage(item.id);
+    rowActions.appendChild(imageButton);
 
     const deleteButton = document.createElement("button");
     deleteButton.className = "game-row-delete";
@@ -2737,6 +2757,48 @@ async function addGameItem() {
   } else {
     await loadGamesData();
   }
+}
+
+async function uploadGameImage(itemId) {
+  const item = gameItems.find(entry => entry.id === itemId);
+
+  if (!item) {
+    showRandomPopup("Der Spieleintrag wurde nicht gefunden.");
+    return;
+  }
+
+  const fileInput = document.createElement("input");
+  fileInput.type = "file";
+  fileInput.accept = "image/*";
+
+  fileInput.onchange = event => {
+    const selectedFile = event.target.files[0];
+
+    if (!selectedFile) return;
+
+    compressImage(selectedFile, async compressed => {
+      if (!compressed) {
+        alert("Bild konnte nicht verarbeitet werden.");
+        return;
+      }
+
+      item.image = compressed;
+
+      const { error } = await supabaseClient
+        .from("game_items")
+        .update({ image: compressed })
+        .eq("id", item.id);
+
+      if (error) {
+        showSupabaseError("Fehler beim Speichern des Spiele-Bildes", error);
+        return;
+      }
+
+      renderGamesTable();
+    });
+  };
+
+  fileInput.click();
 }
 
 async function deleteGameItem(itemId, itemName) {
