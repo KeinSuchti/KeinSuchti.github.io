@@ -541,10 +541,40 @@ input[type="checkbox"] {
   flex-wrap: wrap;
 }
 
+.games-drag-hint {
+  color: #bbb;
+  font-size: 13px;
+  text-align: center;
+}
+
 .game-column-header {
   display: grid;
-  gap: 8px;
+  gap: 6px;
   justify-items: center;
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+  padding: 4px;
+  border-radius: 10px;
+}
+
+.game-column-header:active {
+  cursor: grabbing;
+}
+
+.game-column-header.dragging {
+  opacity: 0.45;
+}
+
+.game-column-header.drag-over {
+  outline: 2px dashed #2795F5;
+  outline-offset: 4px;
+}
+
+.game-column-drag-handle {
+  color: #aaa;
+  font-size: 18px;
+  line-height: 1;
 }
 
 .game-column-title {
@@ -552,20 +582,6 @@ input[type="checkbox"] {
   word-break: break-word;
 }
 
-.game-column-actions,
-.games-column-toolbar {
-  display: flex;
-  gap: 8px;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-
-.games-column-toolbar {
-  margin-top: 10px;
-}
-
-.game-column-move,
-.game-column-sort,
 .game-row-delete,
 .game-row-link {
   width: auto;
@@ -575,22 +591,12 @@ input[type="checkbox"] {
   font-size: 13px;
 }
 
-.game-column-move,
-.game-column-sort,
 .game-row-link {
   background: #2c2c2c;
 }
 
-.game-column-move:hover,
-.game-column-sort:hover,
 .game-row-link:hover {
   background: #444;
-}
-
-.game-column-move:disabled {
-  opacity: 0.35;
-  cursor: not-allowed;
-  filter: none;
 }
 
 .game-row-delete {
@@ -747,9 +753,8 @@ input[type="checkbox"] {
         >
         <button onclick="addGameColumn()">➕ Spalte hinzufügen</button>
 
-        <div class="games-column-toolbar">
-          <button class="game-column-sort" onclick="sortGameColumns('az')">A–Z sortieren</button>
-          <button class="game-column-sort" onclick="sortGameColumns('za')">Z–A sortieren</button>
+        <div class="games-drag-hint">
+          Spalten im Tabellenkopf greifen und nach links oder rechts ziehen.
         </div>
       </div>
 
@@ -972,6 +977,9 @@ const newGameUrlInput = document.getElementById("newGameUrl");
 let gameItems = [];
 let gameColumns = [];
 let gameChecks = {};
+let draggedGameColumnId = null;
+let touchDraggedGameColumnId = null;
+let touchCurrentGameColumnId = null;
 
 const cardLists = {
   feast: {
@@ -2344,40 +2352,96 @@ function renderGamesTable() {
   gameHead.textContent = "Spiel";
   headRow.appendChild(gameHead);
 
-  gameColumns.forEach((column, columnIndex) => {
+  gameColumns.forEach((column) => {
     const th = document.createElement("th");
+    th.dataset.columnId = column.id;
 
     const headerWrap = document.createElement("div");
     headerWrap.className = "game-column-header";
+    headerWrap.draggable = true;
+    headerWrap.dataset.columnId = column.id;
+    headerWrap.title = "Spalte ziehen, um sie zu verschieben";
+
+    const handle = document.createElement("div");
+    handle.className = "game-column-drag-handle";
+    handle.textContent = "☰";
 
     const title = document.createElement("div");
     title.className = "game-column-title";
     title.textContent = column.name || "Spalte";
 
-    const actions = document.createElement("div");
-    actions.className = "game-column-actions";
+    headerWrap.addEventListener("dragstart", event => {
+      draggedGameColumnId = column.id;
+      headerWrap.classList.add("dragging");
+      event.dataTransfer.effectAllowed = "move";
+      event.dataTransfer.setData("text/plain", column.id);
+    });
 
-    const moveLeftButton = document.createElement("button");
-    moveLeftButton.className = "game-column-move";
-    moveLeftButton.type = "button";
-    moveLeftButton.textContent = "⬅️";
-    moveLeftButton.title = "Spalte nach links verschieben";
-    moveLeftButton.disabled = columnIndex === 0;
-    moveLeftButton.onclick = () => moveGameColumn(column.id, -1);
+    headerWrap.addEventListener("dragend", () => {
+      draggedGameColumnId = null;
+      clearGameColumnDragStyles();
+    });
 
-    const moveRightButton = document.createElement("button");
-    moveRightButton.className = "game-column-move";
-    moveRightButton.type = "button";
-    moveRightButton.textContent = "➡️";
-    moveRightButton.title = "Spalte nach rechts verschieben";
-    moveRightButton.disabled = columnIndex === gameColumns.length - 1;
-    moveRightButton.onclick = () => moveGameColumn(column.id, 1);
+    headerWrap.addEventListener("dragover", event => {
+      event.preventDefault();
 
-    actions.appendChild(moveLeftButton);
-    actions.appendChild(moveRightButton);
+      if (draggedGameColumnId && draggedGameColumnId !== column.id) {
+        event.dataTransfer.dropEffect = "move";
+        clearGameColumnDragOverStyles();
+        headerWrap.classList.add("drag-over");
+      }
+    });
 
+    headerWrap.addEventListener("dragleave", () => {
+      headerWrap.classList.remove("drag-over");
+    });
+
+    headerWrap.addEventListener("drop", async event => {
+      event.preventDefault();
+
+      const sourceColumnId =
+        draggedGameColumnId ||
+        event.dataTransfer.getData("text/plain");
+
+      await reorderGameColumnByDrop(sourceColumnId, column.id);
+
+      draggedGameColumnId = null;
+      clearGameColumnDragStyles();
+    });
+
+    headerWrap.addEventListener("touchstart", event => {
+      touchDraggedGameColumnId = column.id;
+      touchCurrentGameColumnId = column.id;
+      headerWrap.classList.add("dragging");
+    }, { passive: true });
+
+    headerWrap.addEventListener("touchmove", event => {
+      if (!touchDraggedGameColumnId) return;
+
+      const touch = event.touches[0];
+      const targetHeader = getGameColumnHeaderFromPoint(touch.clientX, touch.clientY);
+
+      clearGameColumnDragOverStyles();
+
+      if (targetHeader && targetHeader.dataset.columnId !== touchDraggedGameColumnId) {
+        touchCurrentGameColumnId = targetHeader.dataset.columnId;
+        targetHeader.classList.add("drag-over");
+      }
+    }, { passive: true });
+
+    headerWrap.addEventListener("touchend", async () => {
+      const sourceColumnId = touchDraggedGameColumnId;
+      const targetColumnId = touchCurrentGameColumnId;
+
+      touchDraggedGameColumnId = null;
+      touchCurrentGameColumnId = null;
+
+      await reorderGameColumnByDrop(sourceColumnId, targetColumnId);
+      clearGameColumnDragStyles();
+    });
+
+    headerWrap.appendChild(handle);
     headerWrap.appendChild(title);
-    headerWrap.appendChild(actions);
 
     th.appendChild(headerWrap);
     headRow.appendChild(th);
@@ -2573,49 +2637,42 @@ async function saveGameColumnPositions() {
   return true;
 }
 
-async function moveGameColumn(columnId, direction) {
-  const currentIndex = gameColumns.findIndex(column => column.id === columnId);
-  const targetIndex = currentIndex + direction;
+function clearGameColumnDragOverStyles() {
+  document.querySelectorAll(".game-column-header.drag-over").forEach(element => {
+    element.classList.remove("drag-over");
+  });
+}
 
-  if (
-    currentIndex < 0 ||
-    targetIndex < 0 ||
-    targetIndex >= gameColumns.length
-  ) {
+function clearGameColumnDragStyles() {
+  document.querySelectorAll(".game-column-header.dragging, .game-column-header.drag-over").forEach(element => {
+    element.classList.remove("dragging", "drag-over");
+  });
+}
+
+function getGameColumnHeaderFromPoint(x, y) {
+  const element = document.elementFromPoint(x, y);
+
+  if (!element) return null;
+
+  return element.closest(".game-column-header");
+}
+
+async function reorderGameColumnByDrop(sourceColumnId, targetColumnId) {
+  if (!sourceColumnId || !targetColumnId || sourceColumnId === targetColumnId) {
+    return;
+  }
+
+  const sourceIndex = gameColumns.findIndex(column => column.id === sourceColumnId);
+  const targetIndex = gameColumns.findIndex(column => column.id === targetColumnId);
+
+  if (sourceIndex < 0 || targetIndex < 0) {
     return;
   }
 
   const previousColumns = [...gameColumns];
 
-  const movedColumn = gameColumns[currentIndex];
-  gameColumns[currentIndex] = gameColumns[targetIndex];
-  gameColumns[targetIndex] = movedColumn;
-
-  renderGamesTable();
-
-  const success = await saveGameColumnPositions();
-
-  if (!success) {
-    gameColumns = previousColumns;
-    renderGamesTable();
-  }
-}
-
-async function sortGameColumns(direction) {
-  if (gameColumns.length < 2) return;
-
-  const previousColumns = [...gameColumns];
-
-  gameColumns.sort((a, b) => {
-    const nameA = a.name || "";
-    const nameB = b.name || "";
-    const result = nameA.localeCompare(nameB, "de", {
-      numeric: true,
-      sensitivity: "base"
-    });
-
-    return direction === "za" ? -result : result;
-  });
+  const [movedColumn] = gameColumns.splice(sourceIndex, 1);
+  gameColumns.splice(targetIndex, 0, movedColumn);
 
   renderGamesTable();
 
