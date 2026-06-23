@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Watch and Feast</title>
+<title>Watch, Feast and Game</title>
 
 <style>
 body {
@@ -547,17 +547,6 @@ input[type="checkbox"] {
   word-break: break-all;
 }
 
-.game-price {
-  margin-top: 5px;
-  font-size: 14px;
-  font-weight: bold;
-  color: #d8e7ff;
-}
-
-.game-price.empty {
-  color: #888;
-  font-weight: normal;
-}
 
 .game-row-actions {
   display: flex;
@@ -615,8 +604,7 @@ input[type="checkbox"] {
 }
 
 .game-row-delete,
-.game-row-link,
-.game-row-price {
+.game-row-link {
   width: auto;
   margin-top: 0;
   padding: 6px 9px;
@@ -632,13 +620,6 @@ input[type="checkbox"] {
   background: #444;
 }
 
-.game-row-price {
-  background: #1f3b5c;
-}
-
-.game-row-price:hover {
-  background: #28517d;
-}
 
 .game-row-delete {
   background: #5c1f1f;
@@ -2353,7 +2334,7 @@ async function loadGamesData() {
   const [itemsResult, columnsResult, checksResult] = await Promise.all([
     supabaseClient
       .from("game_items")
-      .select("id, name, url, image, price, user_id, created_at")
+      .select("id, name, url, image, user_id, created_at")
       .order("created_at", { ascending: false }),
 
     supabaseClient
@@ -2634,10 +2615,6 @@ function renderGamesTable() {
 
     info.appendChild(name);
 
-    const priceText = document.createElement("div");
-    priceText.className = item.price ? "game-price" : "game-price empty";
-    priceText.textContent = item.price ? "Preis: " + item.price : "Preis: nicht gefunden";
-    info.appendChild(priceText);
 
     if (item.url) {
       const urlText = document.createElement("div");
@@ -2657,12 +2634,6 @@ function renderGamesTable() {
       linkButton.onclick = () => window.open(item.url, "_blank");
       rowActions.appendChild(linkButton);
 
-      const priceButton = document.createElement("button");
-      priceButton.className = "game-row-price";
-      priceButton.type = "button";
-      priceButton.textContent = "💸 Preis aktualisieren";
-      priceButton.onclick = () => refreshGameMeta(item.id);
-      rowActions.appendChild(priceButton);
     }
 
     const imageButton = document.createElement("button");
@@ -2852,14 +2823,13 @@ async function addGameItem() {
     name,
     url,
     image: "",
-    price: "",
     user_id: currentUser.id
   };
 
   const { data, error } = await supabaseClient
     .from("game_items")
     .insert(newItem)
-    .select("id, name, url, image, price, user_id, created_at")
+    .select("id, name, url, image, user_id, created_at")
     .single();
 
   if (error) {
@@ -3010,123 +2980,7 @@ async function updateGameCheck(gameId, columnId, checked) {
   return true;
 }
 
-function normalizePriceText(value, currency = "") {
-  if (value === null || value === undefined || value === "") return "";
-
-  let text = String(value).trim();
-
-  if (!text) return "";
-
-  text = text.replace(/\s+/g, " ");
-
-  const hasCurrency = /(€|eur|euro|\$|usd|£|gbp)/i.test(text);
-
-  if (!hasCurrency && currency) {
-    const upperCurrency = String(currency).toUpperCase();
-
-    if (upperCurrency === "EUR") {
-      text = text.replace(".", ",") + " €";
-    } else {
-      text = text + " " + upperCurrency;
-    }
-  }
-
-  return text;
-}
-
-function findPriceInObject(value, depth = 0) {
-  if (depth > 5 || value === null || value === undefined) return "";
-
-  if (typeof value === "string") {
-    const match = value.match(/(?:€\s*)?\d{1,4}(?:[.,]\d{1,2})?\s*(?:€|EUR|Euro|\$|USD|£|GBP)/i);
-    return match ? normalizePriceText(match[0]) : "";
-  }
-
-  if (typeof value === "number") {
-    return "";
-  }
-
-  if (Array.isArray(value)) {
-    for (const entry of value) {
-      const found = findPriceInObject(entry, depth + 1);
-      if (found) return found;
-    }
-    return "";
-  }
-
-  if (typeof value === "object") {
-    const directPrice =
-      value.price ??
-      value.lowPrice ??
-      value.highPrice ??
-      value.amount ??
-      value.value;
-
-    const directCurrency =
-      value.priceCurrency ??
-      value.currency ??
-      value.currencyCode;
-
-    if (directPrice !== undefined && directPrice !== null && directPrice !== "") {
-      const formatted = normalizePriceText(directPrice, directCurrency);
-      if (formatted) return formatted;
-    }
-
-    const priorityKeys = ["offers", "offer", "product", "jsonld", "ld", "meta", "data", "items"];
-
-    for (const key of priorityKeys) {
-      if (value[key] !== undefined) {
-        const found = findPriceInObject(value[key], depth + 1);
-        if (found) return found;
-      }
-    }
-
-    for (const key of Object.keys(value)) {
-      if (priorityKeys.includes(key)) continue;
-
-      const found = findPriceInObject(value[key], depth + 1);
-      if (found) return found;
-    }
-  }
-
-  return "";
-}
-
-function extractGamePriceFromMicrolink(data) {
-  const root = data?.data || data || {};
-
-  const price = findPriceInObject(root);
-
-  if (price) return price;
-
-  const textSources = [
-    root.title,
-    root.description,
-    root.publisher,
-    root.author
-  ].filter(Boolean).join(" ");
-
-  const match = textSources.match(/(?:€\s*)?\d{1,4}(?:[.,]\d{1,2})?\s*(?:€|EUR|Euro|\$|USD|£|GBP)/i);
-
-  return match ? normalizePriceText(match[0]) : "";
-}
-
-async function refreshGameMeta(itemId) {
-  const item = gameItems.find(entry => entry.id === itemId);
-
-  if (!item || !item.url) {
-    showRandomPopup("Für diesen Spieleintrag ist kein Link hinterlegt.");
-    return;
-  }
-
-  setStatus("Aktualisiere Preis und Bild...");
-
-  await autoGameMeta(item.url, item.id, true);
-
-  setStatus("");
-}
-
-function autoGameMeta(url, itemId, forceUpdate = false) {
+function autoGameMeta(url, itemId) {
   if (!url) return Promise.resolve(false);
 
   const api =
@@ -3139,45 +2993,29 @@ function autoGameMeta(url, itemId, forceUpdate = false) {
         data?.data?.image?.url ||
         new URL(url).origin + "/favicon.ico";
 
-      const extractedPrice = extractGamePriceFromMicrolink(data);
-
       return new Promise(resolve => {
         compressImage(imageUrl, async compressed => {
+          if (!compressed) {
+            resolve(false);
+            return;
+          }
+
           const item = gameItems.find(entry => entry.id === itemId);
 
-          if (!item) {
+          if (!item || item.image) {
             resolve(false);
             return;
           }
 
-          const changes = {};
-
-          if (compressed && (forceUpdate || !item.image)) {
-            changes.image = compressed;
-          }
-
-          if (extractedPrice && (forceUpdate || !item.price)) {
-            changes.price = extractedPrice;
-          }
-
-          if (Object.keys(changes).length === 0) {
-            if (forceUpdate && !extractedPrice) {
-              showRandomPopup("Es konnte kein Preis auf der verlinkten Webseite gefunden werden.");
-            }
-
-            resolve(false);
-            return;
-          }
-
-          Object.assign(item, changes);
+          item.image = compressed;
 
           const { error } = await supabaseClient
             .from("game_items")
-            .update(changes)
+            .update({ image: compressed })
             .eq("id", item.id);
 
           if (error) {
-            showSupabaseError("Fehler beim Speichern der Spiele-Daten", error);
+            showSupabaseError("Fehler beim Speichern des Spiele-Bildes", error);
             resolve(false);
             return;
           }
@@ -3188,15 +3026,11 @@ function autoGameMeta(url, itemId, forceUpdate = false) {
       });
     })
     .catch(error => {
-      console.warn("Automatische Spiele-Daten konnten nicht geladen werden:", error);
-
-      if (forceUpdate) {
-        showRandomPopup("Preis und Bild konnten nicht automatisch geladen werden.");
-      }
-
+      console.warn("Automatisches Spiele-Bild konnte nicht geladen werden:", error);
       return false;
     });
 }
+
 /* Tastatursteuerung */
 
 passwordInput.addEventListener("keydown", event => {
