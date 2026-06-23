@@ -442,6 +442,19 @@ input[type="checkbox"] {
   width: 100%;
 }
 
+.games-check-controls {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 15px;
+  margin-bottom: 15px;
+}
+
+.games-check-controls select {
+  flex: 1;
+  min-width: 220px;
+}
+
 .games-table-wrapper {
   margin-top: 18px;
   overflow-x: auto;
@@ -534,6 +547,18 @@ input[type="checkbox"] {
   word-break: break-all;
 }
 
+.game-price {
+  margin-top: 5px;
+  font-size: 14px;
+  font-weight: bold;
+  color: #d8e7ff;
+}
+
+.game-price.empty {
+  color: #888;
+  font-weight: normal;
+}
+
 .game-row-actions {
   display: flex;
   gap: 8px;
@@ -591,7 +616,7 @@ input[type="checkbox"] {
 
 .game-row-delete,
 .game-row-link,
-.game-row-image-upload {
+.game-row-price {
   width: auto;
   margin-top: 0;
   padding: 6px 9px;
@@ -605,6 +630,14 @@ input[type="checkbox"] {
 
 .game-row-link:hover {
   background: #444;
+}
+
+.game-row-price {
+  background: #1f3b5c;
+}
+
+.game-row-price:hover {
+  background: #28517d;
 }
 
 .game-row-delete {
@@ -778,6 +811,24 @@ input[type="checkbox"] {
         <input id="newGameName" placeholder="Name">
         <input id="newGameUrl" placeholder="Link">
         <button onclick="addGameItem()">➕ Spiel hinzufügen</button>
+      </div>
+
+      <div class="games-check-controls">
+        <select id="gamesCheckSort" onchange="renderGamesTable()">
+          <option value="none">Haken-Sortierung</option>
+          <option value="checkedAsc">Wenige Haken zuerst</option>
+          <option value="checkedDesc">Viele Haken zuerst</option>
+          <option value="completeFirst">Vollständige zuerst</option>
+          <option value="incompleteFirst">Unvollständige zuerst</option>
+        </select>
+
+        <select id="gamesCheckFilter" onchange="renderGamesTable()">
+          <option value="all">Alle Spiele</option>
+          <option value="complete">Alle Spalten abgehakt</option>
+          <option value="incomplete">Nicht alle Spalten abgehakt</option>
+          <option value="noneChecked">Keine Haken gesetzt</option>
+          <option value="someChecked">Mindestens ein Haken gesetzt</option>
+        </select>
       </div>
 
       <div id="gamesTableWrapper" class="games-table-wrapper"></div>
@@ -989,6 +1040,8 @@ const gamesTableWrapper = document.getElementById("gamesTableWrapper");
 const newGameColumnNameInput = document.getElementById("newGameColumnName");
 const newGameNameInput = document.getElementById("newGameName");
 const newGameUrlInput = document.getElementById("newGameUrl");
+const gamesCheckSortSelect = document.getElementById("gamesCheckSort");
+const gamesCheckFilterSelect = document.getElementById("gamesCheckFilter");
 
 let gameItems = [];
 let gameColumns = [];
@@ -2300,7 +2353,7 @@ async function loadGamesData() {
   const [itemsResult, columnsResult, checksResult] = await Promise.all([
     supabaseClient
       .from("game_items")
-      .select("id, name, url, image, user_id, created_at")
+      .select("id, name, url, image, price, user_id, created_at")
       .order("created_at", { ascending: false }),
 
     supabaseClient
@@ -2345,6 +2398,48 @@ async function loadGamesData() {
 
   setStatus("");
   renderGamesTable();
+}
+
+function getGameCheckedCount(item) {
+  return gameColumns.reduce((count, column) => {
+    const key = getGameCheckKey(item.id, column.id);
+    return count + (gameChecks[key]?.checked === true ? 1 : 0);
+  }, 0);
+}
+
+function isGameComplete(item) {
+  return gameColumns.length > 0 && getGameCheckedCount(item) === gameColumns.length;
+}
+
+function getFilteredSortedGameItems() {
+  let data = [...gameItems];
+
+  const filter = gamesCheckFilterSelect ? gamesCheckFilterSelect.value : "all";
+  const sort = gamesCheckSortSelect ? gamesCheckSortSelect.value : "none";
+
+  data = data.filter(item => {
+    const checkedCount = getGameCheckedCount(item);
+    const complete = gameColumns.length > 0 && checkedCount === gameColumns.length;
+
+    if (filter === "complete") return complete;
+    if (filter === "incomplete") return !complete;
+    if (filter === "noneChecked") return checkedCount === 0;
+    if (filter === "someChecked") return checkedCount > 0;
+
+    return true;
+  });
+
+  if (sort === "checkedAsc") {
+    data.sort((a, b) => getGameCheckedCount(a) - getGameCheckedCount(b));
+  } else if (sort === "checkedDesc") {
+    data.sort((a, b) => getGameCheckedCount(b) - getGameCheckedCount(a));
+  } else if (sort === "completeFirst") {
+    data.sort((a, b) => Number(isGameComplete(b)) - Number(isGameComplete(a)));
+  } else if (sort === "incompleteFirst") {
+    data.sort((a, b) => Number(isGameComplete(a)) - Number(isGameComplete(b)));
+  }
+
+  return data;
 }
 
 function renderGamesTable() {
@@ -2478,7 +2573,19 @@ function renderGamesTable() {
     tbody.appendChild(row);
   }
 
-  gameItems.forEach(item => {
+  const visibleGameItems = getFilteredSortedGameItems();
+
+  if (gameItems.length > 0 && visibleGameItems.length === 0) {
+    const row = document.createElement("tr");
+    const cell = document.createElement("td");
+    cell.colSpan = Math.max(1, gameColumns.length + 1);
+    cell.className = "games-empty";
+    cell.textContent = "Keine Spiele passen zum aktuellen Filter.";
+    row.appendChild(cell);
+    tbody.appendChild(row);
+  }
+
+  visibleGameItems.forEach(item => {
     const row = document.createElement("tr");
 
     const gameCell = document.createElement("td");
@@ -2527,6 +2634,11 @@ function renderGamesTable() {
 
     info.appendChild(name);
 
+    const priceText = document.createElement("div");
+    priceText.className = item.price ? "game-price" : "game-price empty";
+    priceText.textContent = item.price ? "Preis: " + item.price : "Preis: nicht gefunden";
+    info.appendChild(priceText);
+
     if (item.url) {
       const urlText = document.createElement("div");
       urlText.className = "game-url";
@@ -2544,6 +2656,13 @@ function renderGamesTable() {
       linkButton.textContent = "🔗 Öffnen";
       linkButton.onclick = () => window.open(item.url, "_blank");
       rowActions.appendChild(linkButton);
+
+      const priceButton = document.createElement("button");
+      priceButton.className = "game-row-price";
+      priceButton.type = "button";
+      priceButton.textContent = "💸 Preis aktualisieren";
+      priceButton.onclick = () => refreshGameMeta(item.id);
+      rowActions.appendChild(priceButton);
     }
 
     const imageButton = document.createElement("button");
@@ -2582,7 +2701,10 @@ function renderGamesTable() {
 
         if (!success) {
           checkbox.checked = !newValue;
+          return;
         }
+
+        renderGamesTable();
       });
 
       cell.appendChild(checkbox);
@@ -2730,13 +2852,14 @@ async function addGameItem() {
     name,
     url,
     image: "",
+    price: "",
     user_id: currentUser.id
   };
 
   const { data, error } = await supabaseClient
     .from("game_items")
     .insert(newItem)
-    .select("id, name, url, image, user_id, created_at")
+    .select("id, name, url, image, price, user_id, created_at")
     .single();
 
   if (error) {
@@ -2752,7 +2875,7 @@ async function addGameItem() {
     renderGamesTable();
 
     if (url) {
-      autoGameImage(url, data.id);
+      autoGameMeta(url, data.id);
     }
   } else {
     await loadGamesData();
@@ -2887,46 +3010,193 @@ async function updateGameCheck(gameId, columnId, checked) {
   return true;
 }
 
-function autoGameImage(url, itemId) {
-  if (!url) return;
+function normalizePriceText(value, currency = "") {
+  if (value === null || value === undefined || value === "") return "";
+
+  let text = String(value).trim();
+
+  if (!text) return "";
+
+  text = text.replace(/\s+/g, " ");
+
+  const hasCurrency = /(€|eur|euro|\$|usd|£|gbp)/i.test(text);
+
+  if (!hasCurrency && currency) {
+    const upperCurrency = String(currency).toUpperCase();
+
+    if (upperCurrency === "EUR") {
+      text = text.replace(".", ",") + " €";
+    } else {
+      text = text + " " + upperCurrency;
+    }
+  }
+
+  return text;
+}
+
+function findPriceInObject(value, depth = 0) {
+  if (depth > 5 || value === null || value === undefined) return "";
+
+  if (typeof value === "string") {
+    const match = value.match(/(?:€\s*)?\d{1,4}(?:[.,]\d{1,2})?\s*(?:€|EUR|Euro|\$|USD|£|GBP)/i);
+    return match ? normalizePriceText(match[0]) : "";
+  }
+
+  if (typeof value === "number") {
+    return "";
+  }
+
+  if (Array.isArray(value)) {
+    for (const entry of value) {
+      const found = findPriceInObject(entry, depth + 1);
+      if (found) return found;
+    }
+    return "";
+  }
+
+  if (typeof value === "object") {
+    const directPrice =
+      value.price ??
+      value.lowPrice ??
+      value.highPrice ??
+      value.amount ??
+      value.value;
+
+    const directCurrency =
+      value.priceCurrency ??
+      value.currency ??
+      value.currencyCode;
+
+    if (directPrice !== undefined && directPrice !== null && directPrice !== "") {
+      const formatted = normalizePriceText(directPrice, directCurrency);
+      if (formatted) return formatted;
+    }
+
+    const priorityKeys = ["offers", "offer", "product", "jsonld", "ld", "meta", "data", "items"];
+
+    for (const key of priorityKeys) {
+      if (value[key] !== undefined) {
+        const found = findPriceInObject(value[key], depth + 1);
+        if (found) return found;
+      }
+    }
+
+    for (const key of Object.keys(value)) {
+      if (priorityKeys.includes(key)) continue;
+
+      const found = findPriceInObject(value[key], depth + 1);
+      if (found) return found;
+    }
+  }
+
+  return "";
+}
+
+function extractGamePriceFromMicrolink(data) {
+  const root = data?.data || data || {};
+
+  const price = findPriceInObject(root);
+
+  if (price) return price;
+
+  const textSources = [
+    root.title,
+    root.description,
+    root.publisher,
+    root.author
+  ].filter(Boolean).join(" ");
+
+  const match = textSources.match(/(?:€\s*)?\d{1,4}(?:[.,]\d{1,2})?\s*(?:€|EUR|Euro|\$|USD|£|GBP)/i);
+
+  return match ? normalizePriceText(match[0]) : "";
+}
+
+async function refreshGameMeta(itemId) {
+  const item = gameItems.find(entry => entry.id === itemId);
+
+  if (!item || !item.url) {
+    showRandomPopup("Für diesen Spieleintrag ist kein Link hinterlegt.");
+    return;
+  }
+
+  setStatus("Aktualisiere Preis und Bild...");
+
+  await autoGameMeta(item.url, item.id, true);
+
+  setStatus("");
+}
+
+function autoGameMeta(url, itemId, forceUpdate = false) {
+  if (!url) return Promise.resolve(false);
 
   const api =
     "https://api.microlink.io/?url=" + encodeURIComponent(url);
 
-  fetch(api)
+  return fetch(api)
     .then(response => response.json())
     .then(data => {
       const imageUrl =
         data?.data?.image?.url ||
         new URL(url).origin + "/favicon.ico";
 
-      compressImage(imageUrl, async compressed => {
-        if (!compressed) return;
+      const extractedPrice = extractGamePriceFromMicrolink(data);
 
-        const item = gameItems.find(entry => entry.id === itemId);
+      return new Promise(resolve => {
+        compressImage(imageUrl, async compressed => {
+          const item = gameItems.find(entry => entry.id === itemId);
 
-        if (!item || item.image) return;
+          if (!item) {
+            resolve(false);
+            return;
+          }
 
-        item.image = compressed;
+          const changes = {};
 
-        const { error } = await supabaseClient
-          .from("game_items")
-          .update({ image: compressed })
-          .eq("id", item.id);
+          if (compressed && (forceUpdate || !item.image)) {
+            changes.image = compressed;
+          }
 
-        if (error) {
-          showSupabaseError("Fehler beim Speichern des Spiele-Vorschaubilds", error);
-          return;
-        }
+          if (extractedPrice && (forceUpdate || !item.price)) {
+            changes.price = extractedPrice;
+          }
 
-        renderGamesTable();
+          if (Object.keys(changes).length === 0) {
+            if (forceUpdate && !extractedPrice) {
+              showRandomPopup("Es konnte kein Preis auf der verlinkten Webseite gefunden werden.");
+            }
+
+            resolve(false);
+            return;
+          }
+
+          Object.assign(item, changes);
+
+          const { error } = await supabaseClient
+            .from("game_items")
+            .update(changes)
+            .eq("id", item.id);
+
+          if (error) {
+            showSupabaseError("Fehler beim Speichern der Spiele-Daten", error);
+            resolve(false);
+            return;
+          }
+
+          renderGamesTable();
+          resolve(true);
+        });
       });
     })
     .catch(error => {
-      console.warn("Automatisches Spiele-Bild konnte nicht geladen werden:", error);
+      console.warn("Automatische Spiele-Daten konnten nicht geladen werden:", error);
+
+      if (forceUpdate) {
+        showRandomPopup("Preis und Bild konnten nicht automatisch geladen werden.");
+      }
+
+      return false;
     });
 }
-
 /* Tastatursteuerung */
 
 passwordInput.addEventListener("keydown", event => {
