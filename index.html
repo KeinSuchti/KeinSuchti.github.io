@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Watch, Feast and Game</title>
+<title>Watch and Feast</title>
 
 <style>
 body {
@@ -442,6 +442,19 @@ input[type="checkbox"] {
   width: 100%;
 }
 
+.games-check-controls {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 15px;
+  margin-bottom: 15px;
+}
+
+.games-check-controls select {
+  flex: 1;
+  min-width: 220px;
+}
+
 .games-table-wrapper {
   margin-top: 18px;
   overflow-x: auto;
@@ -534,6 +547,7 @@ input[type="checkbox"] {
   word-break: break-all;
 }
 
+
 .game-row-actions {
   display: flex;
   gap: 8px;
@@ -590,8 +604,7 @@ input[type="checkbox"] {
 }
 
 .game-row-delete,
-.game-row-link,
-.game-row-image-upload {
+.game-row-link {
   width: auto;
   margin-top: 0;
   padding: 6px 9px;
@@ -606,6 +619,7 @@ input[type="checkbox"] {
 .game-row-link:hover {
   background: #444;
 }
+
 
 .game-row-delete {
   background: #5c1f1f;
@@ -631,6 +645,156 @@ input[type="checkbox"] {
   color: #bbb;
   text-align: center;
   padding: 16px;
+}
+
+
+/* Yu-Gi-Oh!-Decks */
+
+.yugioh-add-form,
+.yugioh-player-panel {
+  margin-top: 15px;
+  display: grid;
+  gap: 10px;
+}
+
+.yugioh-add-form input,
+.yugioh-player-panel input,
+.yugioh-player-panel textarea {
+  width: 100%;
+}
+
+.yugioh-player-panel {
+  background: #252525;
+  padding: 14px;
+  border-radius: 14px;
+  margin-bottom: 18px;
+}
+
+.yugioh-player-grid {
+  display: grid;
+  gap: 8px;
+}
+
+.yugioh-list {
+  margin-top: 18px;
+  display: grid;
+  gap: 15px;
+}
+
+.yugioh-deck-card {
+  background: #2a2a2a;
+  padding: 15px;
+  border-radius: 16px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+}
+
+.yugioh-deck-main {
+  display: flex;
+  gap: 15px;
+  align-items: stretch;
+}
+
+.yugioh-image-wrapper {
+  width: 180px;
+  aspect-ratio: 16 / 9;
+  flex-shrink: 0;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #111;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.yugioh-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  cursor: pointer;
+}
+
+.yugioh-image-placeholder {
+  color: #777;
+  font-size: 30px;
+  cursor: pointer;
+}
+
+.yugioh-info {
+  min-width: 0;
+  flex: 1;
+}
+
+.yugioh-theme {
+  font-size: 22px;
+  font-weight: bold;
+  word-break: break-word;
+  margin-bottom: 8px;
+}
+
+.yugioh-meta {
+  color: #ddd;
+  margin-top: 4px;
+  word-break: break-word;
+}
+
+.yugioh-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+
+.yugioh-actions button {
+  width: auto;
+  margin-top: 0;
+  padding: 6px 9px;
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.yugioh-image-button {
+  background: #1f3b5c;
+}
+
+.yugioh-image-button:hover {
+  background: #28517d;
+}
+
+.yugioh-delete-button {
+  background: #5c1f1f;
+}
+
+.yugioh-delete-button:hover {
+  background: #7a2929;
+}
+
+.yugioh-assignment-results {
+  margin-top: 12px;
+  display: grid;
+  gap: 8px;
+}
+
+.yugioh-assignment-card {
+  background: #1e1e1e;
+  border-radius: 12px;
+  padding: 10px;
+}
+
+.yugioh-empty {
+  color: #bbb;
+  text-align: center;
+  padding: 16px;
+}
+
+@media (max-width: 650px) {
+  .yugioh-deck-main {
+    flex-direction: column;
+  }
+
+  .yugioh-image-wrapper {
+    width: 100%;
+  }
 }
 
 /* Zufalls-Popup */
@@ -744,6 +908,7 @@ input[type="checkbox"] {
         <button onclick="showFeastApp()">🔗 Feast Table</button>
         <button onclick="showSaufiMenu()">🍻 Saufi?</button>
         <button onclick="showGamesApp()">🎮 Spiele</button>
+        <button onclick="showYugiohApp()">🃏 Yu-Gi-Oh!-Decks</button>
       </div>
     </div>
 
@@ -780,9 +945,62 @@ input[type="checkbox"] {
         <button onclick="addGameItem()">➕ Spiel hinzufügen</button>
       </div>
 
+      <div class="games-check-controls">
+        <select id="gamesCheckSort" onchange="renderGamesTable()">
+          <option value="none">Haken-Sortierung</option>
+          <option value="checkedAsc">Wenige Haken zuerst</option>
+          <option value="checkedDesc">Viele Haken zuerst</option>
+          <option value="completeFirst">Vollständige zuerst</option>
+          <option value="incompleteFirst">Unvollständige zuerst</option>
+        </select>
+
+        <select id="gamesCheckFilter" onchange="renderGamesTable()">
+          <option value="all">Alle Spiele</option>
+          <option value="complete">Alle Spalten abgehakt</option>
+          <option value="incomplete">Nicht alle Spalten abgehakt</option>
+          <option value="noneChecked">Keine Haken gesetzt</option>
+          <option value="someChecked">Mindestens ein Haken gesetzt</option>
+        </select>
+      </div>
+
       <div id="gamesTableWrapper" class="games-table-wrapper"></div>
 
       <button onclick="deleteAllGameItems()">🗑️ Alle Spiele löschen</button>
+    </div>
+
+    <!-- Yu-Gi-Oh!-Decks -->
+    <div id="yugiohApp" class="app-panel" style="display:none;">
+      <h2>🃏 Yu-Gi-Oh!-Decks</h2>
+
+      <div class="yugioh-add-form">
+        <input id="newYugiohTheme" placeholder="Thema / Deckname">
+        <input id="newYugiohSleeveColor" placeholder="Hüllenfarbe">
+        <input id="newYugiohOwner" placeholder="Besitzer">
+        <button onclick="addYugiohDeck()">➕ Deck hinzufügen</button>
+      </div>
+
+      <div class="yugioh-player-panel">
+        <h3>🎲 Decks zufällig zuteilen</h3>
+        <input
+          id="yugiohPlayerCount"
+          type="number"
+          min="1"
+          max="20"
+          value="2"
+          placeholder="Anzahl Spieler"
+          onchange="renderYugiohPlayerInputs()"
+        >
+
+        <div id="yugiohPlayerInputs" class="yugioh-player-grid"></div>
+
+        <button onclick="assignRandomYugiohDecks()">🎲 Decks zufällig zuteilen</button>
+
+        <div id="yugiohAssignmentResults" class="yugioh-assignment-results"></div>
+      </div>
+
+      <div id="yugiohDeckList" class="yugioh-list"></div>
+
+      <button onclick="deleteAllYugiohDecks()">🗑️ Alle Decks löschen</button>
     </div>
 
     <!-- Serien & Filme -->
@@ -975,6 +1193,7 @@ const feastApp = document.getElementById("feastApp");
 const beerApp = document.getElementById("beerApp");
 const cocktailApp = document.getElementById("cocktailApp");
 const gamesApp = document.getElementById("gamesApp");
+const yugiohApp = document.getElementById("yugiohApp");
 
 const emailInput = document.getElementById("email");
 const passwordInput = document.getElementById("password");
@@ -989,6 +1208,16 @@ const gamesTableWrapper = document.getElementById("gamesTableWrapper");
 const newGameColumnNameInput = document.getElementById("newGameColumnName");
 const newGameNameInput = document.getElementById("newGameName");
 const newGameUrlInput = document.getElementById("newGameUrl");
+const gamesCheckSortSelect = document.getElementById("gamesCheckSort");
+const gamesCheckFilterSelect = document.getElementById("gamesCheckFilter");
+
+const yugiohDeckList = document.getElementById("yugiohDeckList");
+const newYugiohThemeInput = document.getElementById("newYugiohTheme");
+const newYugiohSleeveColorInput = document.getElementById("newYugiohSleeveColor");
+const newYugiohOwnerInput = document.getElementById("newYugiohOwner");
+const yugiohPlayerCountInput = document.getElementById("yugiohPlayerCount");
+const yugiohPlayerInputs = document.getElementById("yugiohPlayerInputs");
+const yugiohAssignmentResults = document.getElementById("yugiohAssignmentResults");
 
 let gameItems = [];
 let gameColumns = [];
@@ -996,6 +1225,9 @@ let gameChecks = {};
 let draggedGameColumnId = null;
 let touchDraggedGameColumnId = null;
 let touchCurrentGameColumnId = null;
+
+let yugiohDecks = [];
+let yugiohPlayerNames = [];
 
 const cardLists = {
   feast: {
@@ -1121,6 +1353,10 @@ function showLogin() {
 
   movieList.innerHTML = "";
   gamesTableWrapper.innerHTML = "";
+  yugiohDecks = [];
+  yugiohPlayerNames = [];
+  yugiohDeckList.innerHTML = "";
+  yugiohAssignmentResults.innerHTML = "";
   loginError.textContent = "";
   userInfo.textContent = "";
   setStatus("");
@@ -1200,6 +1436,7 @@ function hideAllPanels() {
   beerApp.style.display = "none";
   cocktailApp.style.display = "none";
   gamesApp.style.display = "none";
+  yugiohApp.style.display = "none";
   setStatus("");
 }
 
@@ -1241,6 +1478,13 @@ async function showGamesApp() {
   hideAllPanels();
   gamesApp.style.display = "block";
   await loadGamesData();
+}
+
+async function showYugiohApp() {
+  hideAllPanels();
+  yugiohApp.style.display = "block";
+  renderYugiohPlayerInputs();
+  await loadYugiohDecks();
 }
 
 
@@ -2347,6 +2591,48 @@ async function loadGamesData() {
   renderGamesTable();
 }
 
+function getGameCheckedCount(item) {
+  return gameColumns.reduce((count, column) => {
+    const key = getGameCheckKey(item.id, column.id);
+    return count + (gameChecks[key]?.checked === true ? 1 : 0);
+  }, 0);
+}
+
+function isGameComplete(item) {
+  return gameColumns.length > 0 && getGameCheckedCount(item) === gameColumns.length;
+}
+
+function getFilteredSortedGameItems() {
+  let data = [...gameItems];
+
+  const filter = gamesCheckFilterSelect ? gamesCheckFilterSelect.value : "all";
+  const sort = gamesCheckSortSelect ? gamesCheckSortSelect.value : "none";
+
+  data = data.filter(item => {
+    const checkedCount = getGameCheckedCount(item);
+    const complete = gameColumns.length > 0 && checkedCount === gameColumns.length;
+
+    if (filter === "complete") return complete;
+    if (filter === "incomplete") return !complete;
+    if (filter === "noneChecked") return checkedCount === 0;
+    if (filter === "someChecked") return checkedCount > 0;
+
+    return true;
+  });
+
+  if (sort === "checkedAsc") {
+    data.sort((a, b) => getGameCheckedCount(a) - getGameCheckedCount(b));
+  } else if (sort === "checkedDesc") {
+    data.sort((a, b) => getGameCheckedCount(b) - getGameCheckedCount(a));
+  } else if (sort === "completeFirst") {
+    data.sort((a, b) => Number(isGameComplete(b)) - Number(isGameComplete(a)));
+  } else if (sort === "incompleteFirst") {
+    data.sort((a, b) => Number(isGameComplete(a)) - Number(isGameComplete(b)));
+  }
+
+  return data;
+}
+
 function renderGamesTable() {
   gamesTableWrapper.innerHTML = "";
 
@@ -2478,7 +2764,19 @@ function renderGamesTable() {
     tbody.appendChild(row);
   }
 
-  gameItems.forEach(item => {
+  const visibleGameItems = getFilteredSortedGameItems();
+
+  if (gameItems.length > 0 && visibleGameItems.length === 0) {
+    const row = document.createElement("tr");
+    const cell = document.createElement("td");
+    cell.colSpan = Math.max(1, gameColumns.length + 1);
+    cell.className = "games-empty";
+    cell.textContent = "Keine Spiele passen zum aktuellen Filter.";
+    row.appendChild(cell);
+    tbody.appendChild(row);
+  }
+
+  visibleGameItems.forEach(item => {
     const row = document.createElement("tr");
 
     const gameCell = document.createElement("td");
@@ -2527,6 +2825,7 @@ function renderGamesTable() {
 
     info.appendChild(name);
 
+
     if (item.url) {
       const urlText = document.createElement("div");
       urlText.className = "game-url";
@@ -2544,6 +2843,7 @@ function renderGamesTable() {
       linkButton.textContent = "🔗 Öffnen";
       linkButton.onclick = () => window.open(item.url, "_blank");
       rowActions.appendChild(linkButton);
+
     }
 
     const imageButton = document.createElement("button");
@@ -2582,7 +2882,10 @@ function renderGamesTable() {
 
         if (!success) {
           checkbox.checked = !newValue;
+          return;
         }
+
+        renderGamesTable();
       });
 
       cell.appendChild(checkbox);
@@ -2752,7 +3055,7 @@ async function addGameItem() {
     renderGamesTable();
 
     if (url) {
-      autoGameImage(url, data.id);
+      autoGameMeta(url, data.id);
     }
   } else {
     await loadGamesData();
@@ -2887,44 +3190,381 @@ async function updateGameCheck(gameId, columnId, checked) {
   return true;
 }
 
-function autoGameImage(url, itemId) {
-  if (!url) return;
+function autoGameMeta(url, itemId) {
+  if (!url) return Promise.resolve(false);
 
   const api =
     "https://api.microlink.io/?url=" + encodeURIComponent(url);
 
-  fetch(api)
+  return fetch(api)
     .then(response => response.json())
     .then(data => {
       const imageUrl =
         data?.data?.image?.url ||
         new URL(url).origin + "/favicon.ico";
 
-      compressImage(imageUrl, async compressed => {
-        if (!compressed) return;
+      return new Promise(resolve => {
+        compressImage(imageUrl, async compressed => {
+          if (!compressed) {
+            resolve(false);
+            return;
+          }
 
-        const item = gameItems.find(entry => entry.id === itemId);
+          const item = gameItems.find(entry => entry.id === itemId);
 
-        if (!item || item.image) return;
+          if (!item || item.image) {
+            resolve(false);
+            return;
+          }
 
-        item.image = compressed;
+          item.image = compressed;
 
-        const { error } = await supabaseClient
-          .from("game_items")
-          .update({ image: compressed })
-          .eq("id", item.id);
+          const { error } = await supabaseClient
+            .from("game_items")
+            .update({ image: compressed })
+            .eq("id", item.id);
 
-        if (error) {
-          showSupabaseError("Fehler beim Speichern des Spiele-Vorschaubilds", error);
-          return;
-        }
+          if (error) {
+            showSupabaseError("Fehler beim Speichern des Spiele-Bildes", error);
+            resolve(false);
+            return;
+          }
 
-        renderGamesTable();
+          renderGamesTable();
+          resolve(true);
+        });
       });
     })
     .catch(error => {
       console.warn("Automatisches Spiele-Bild konnte nicht geladen werden:", error);
+      return false;
     });
+}
+
+
+/* Yu-Gi-Oh!-Decks */
+
+async function loadYugiohDecks() {
+  if (!currentUser) {
+    showLogin();
+    return;
+  }
+
+  setStatus("Lade Yu-Gi-Oh!-Decks...");
+
+  const { data, error } = await supabaseClient
+    .from("yugioh_decks")
+    .select("id, theme, sleeve_color, owner, image, user_id, created_at")
+    .order("theme", { ascending: true });
+
+  if (error) {
+    setStatus("Fehler beim Laden der Yu-Gi-Oh!-Decks.", true);
+    showSupabaseError("Fehler beim Laden der Yu-Gi-Oh!-Decks", error);
+    return;
+  }
+
+  yugiohDecks = data || [];
+
+  setStatus("");
+  renderYugiohDecks();
+}
+
+function renderYugiohDecks() {
+  yugiohDeckList.innerHTML = "";
+
+  if (!Array.isArray(yugiohDecks) || yugiohDecks.length === 0) {
+    const empty = document.createElement("div");
+    empty.className = "yugioh-empty";
+    empty.textContent = "Noch keine Yu-Gi-Oh!-Decks vorhanden.";
+    yugiohDeckList.appendChild(empty);
+    return;
+  }
+
+  yugiohDecks.forEach(deck => {
+    const card = document.createElement("div");
+    card.className = "yugioh-deck-card";
+
+    const main = document.createElement("div");
+    main.className = "yugioh-deck-main";
+
+    const imageWrapper = document.createElement("div");
+    imageWrapper.className = "yugioh-image-wrapper";
+
+    if (deck.image) {
+      const img = document.createElement("img");
+      img.src = deck.image;
+      img.className = "yugioh-image";
+      img.alt = deck.theme ? "Bild von " + deck.theme : "Deckbild";
+      img.title = "Bild öffnen";
+      img.onclick = () => window.open(deck.image, "_blank");
+      imageWrapper.appendChild(img);
+    } else {
+      const placeholder = document.createElement("div");
+      placeholder.className = "yugioh-image-placeholder";
+      placeholder.textContent = "🃏";
+      placeholder.title = "Bild hochladen";
+      placeholder.onclick = () => uploadYugiohImage(deck.id);
+      imageWrapper.appendChild(placeholder);
+    }
+
+    const info = document.createElement("div");
+    info.className = "yugioh-info";
+
+    const theme = document.createElement("div");
+    theme.className = "yugioh-theme";
+    theme.textContent = deck.theme || "Unbenanntes Deck";
+
+    const sleeve = document.createElement("div");
+    sleeve.className = "yugioh-meta";
+    sleeve.textContent = "Hüllenfarbe: " + (deck.sleeve_color || "nicht angegeben");
+
+    const owner = document.createElement("div");
+    owner.className = "yugioh-meta";
+    owner.textContent = "Besitzer: " + (deck.owner || "nicht angegeben");
+
+    const actions = document.createElement("div");
+    actions.className = "yugioh-actions";
+
+    const imageButton = document.createElement("button");
+    imageButton.type = "button";
+    imageButton.className = "yugioh-image-button";
+    imageButton.textContent = deck.image ? "🖼️ Bild ändern" : "🖼️ Bild hochladen";
+    imageButton.onclick = () => uploadYugiohImage(deck.id);
+
+    const deleteButton = document.createElement("button");
+    deleteButton.type = "button";
+    deleteButton.className = "yugioh-delete-button";
+    deleteButton.textContent = "❌ Löschen";
+    deleteButton.onclick = () => deleteYugiohDeck(deck.id, deck.theme || "Unbenanntes Deck");
+
+    actions.appendChild(imageButton);
+    actions.appendChild(deleteButton);
+
+    info.appendChild(theme);
+    info.appendChild(sleeve);
+    info.appendChild(owner);
+    info.appendChild(actions);
+
+    main.appendChild(imageWrapper);
+    main.appendChild(info);
+    card.appendChild(main);
+
+    yugiohDeckList.appendChild(card);
+  });
+}
+
+function parseYugiohPlayerCount() {
+  const value = Number(yugiohPlayerCountInput.value || 0);
+
+  if (!Number.isFinite(value) || value < 1) {
+    return 1;
+  }
+
+  return Math.min(Math.floor(value), 20);
+}
+
+function renderYugiohPlayerInputs() {
+  const count = parseYugiohPlayerCount();
+
+  yugiohPlayerCountInput.value = count;
+
+  const currentValues = Array.from(
+    yugiohPlayerInputs.querySelectorAll("input")
+  ).map(input => input.value.trim());
+
+  yugiohPlayerInputs.innerHTML = "";
+
+  for (let index = 0; index < count; index++) {
+    const input = document.createElement("input");
+    input.placeholder = "Spieler " + (index + 1);
+    input.value = currentValues[index] || yugiohPlayerNames[index] || "";
+
+    input.addEventListener("input", () => {
+      yugiohPlayerNames[index] = input.value.trim();
+    });
+
+    yugiohPlayerInputs.appendChild(input);
+  }
+}
+
+function getYugiohPlayerNames() {
+  return Array.from(yugiohPlayerInputs.querySelectorAll("input"))
+    .map((input, index) => input.value.trim() || "Spieler " + (index + 1));
+}
+
+function assignRandomYugiohDecks() {
+  renderYugiohPlayerInputs();
+
+  const players = getYugiohPlayerNames();
+
+  if (players.length === 0) {
+    showRandomPopup("Bitte mindestens einen Spieler eintragen.");
+    return;
+  }
+
+  if (!Array.isArray(yugiohDecks) || yugiohDecks.length === 0) {
+    showRandomPopup("Es sind noch keine Yu-Gi-Oh!-Decks vorhanden.");
+    return;
+  }
+
+  if (players.length > yugiohDecks.length) {
+    showRandomPopup("Es gibt weniger Decks als Spieler.");
+    return;
+  }
+
+  const shuffledDecks = [...yugiohDecks]
+    .sort(() => Math.random() - 0.5);
+
+  yugiohAssignmentResults.innerHTML = "";
+
+  players.forEach((playerName, index) => {
+    const deck = shuffledDecks[index];
+
+    const result = document.createElement("div");
+    result.className = "yugioh-assignment-card";
+
+    result.textContent =
+      playerName + " bekommt " +
+      (deck.theme || "ein unbenanntes Deck") +
+      " | Hüllenfarbe: " + (deck.sleeve_color || "nicht angegeben") +
+      " | Besitzer: " + (deck.owner || "nicht angegeben");
+
+    yugiohAssignmentResults.appendChild(result);
+  });
+}
+
+async function addYugiohDeck() {
+  if (!currentUser) {
+    showLogin();
+    return;
+  }
+
+  const theme = newYugiohThemeInput.value.trim();
+  const sleeveColor = newYugiohSleeveColorInput.value.trim();
+  const owner = newYugiohOwnerInput.value.trim();
+
+  if (!theme) {
+    alert("Bitte ein Thema / einen Decknamen eingeben.");
+    return;
+  }
+
+  const newDeck = {
+    theme,
+    sleeve_color: sleeveColor,
+    owner,
+    image: "",
+    user_id: currentUser.id
+  };
+
+  const { data, error } = await supabaseClient
+    .from("yugioh_decks")
+    .insert(newDeck)
+    .select("id, theme, sleeve_color, owner, image, user_id, created_at")
+    .single();
+
+  if (error) {
+    showSupabaseError("Fehler beim Hinzufügen des Yu-Gi-Oh!-Decks", error);
+    return;
+  }
+
+  newYugiohThemeInput.value = "";
+  newYugiohSleeveColorInput.value = "";
+  newYugiohOwnerInput.value = "";
+
+  if (data) {
+    yugiohDecks.push(data);
+    yugiohDecks.sort((a, b) => {
+      return (a.theme || "").localeCompare(b.theme || "", "de");
+    });
+    renderYugiohDecks();
+  } else {
+    await loadYugiohDecks();
+  }
+}
+
+async function uploadYugiohImage(deckId) {
+  const deck = yugiohDecks.find(entry => entry.id === deckId);
+
+  if (!deck) {
+    showRandomPopup("Das Deck wurde nicht gefunden.");
+    return;
+  }
+
+  const fileInput = document.createElement("input");
+  fileInput.type = "file";
+  fileInput.accept = "image/*";
+
+  fileInput.onchange = event => {
+    const selectedFile = event.target.files[0];
+
+    if (!selectedFile) return;
+
+    compressImage(selectedFile, async compressed => {
+      if (!compressed) {
+        alert("Bild konnte nicht verarbeitet werden.");
+        return;
+      }
+
+      deck.image = compressed;
+
+      const { error } = await supabaseClient
+        .from("yugioh_decks")
+        .update({ image: compressed })
+        .eq("id", deck.id);
+
+      if (error) {
+        showSupabaseError("Fehler beim Speichern des Deck-Bildes", error);
+        return;
+      }
+
+      renderYugiohDecks();
+    });
+  };
+
+  fileInput.click();
+}
+
+async function deleteYugiohDeck(deckId, deckName) {
+  if (!confirm('Deck "' + deckName + '" wirklich löschen?')) {
+    return;
+  }
+
+  const { error } = await supabaseClient
+    .from("yugioh_decks")
+    .delete()
+    .eq("id", deckId);
+
+  if (error) {
+    showSupabaseError("Fehler beim Löschen des Yu-Gi-Oh!-Decks", error);
+    return;
+  }
+
+  yugiohDecks = yugiohDecks.filter(deck => deck.id !== deckId);
+  yugiohAssignmentResults.innerHTML = "";
+  renderYugiohDecks();
+}
+
+async function deleteAllYugiohDecks() {
+  if (!currentUser) {
+    showLogin();
+    return;
+  }
+
+  if (!confirm("Wirklich alle Yu-Gi-Oh!-Decks löschen?")) return;
+
+  const { error } = await supabaseClient
+    .from("yugioh_decks")
+    .delete()
+    .not("id", "is", null);
+
+  if (error) {
+    showSupabaseError("Fehler beim Löschen aller Yu-Gi-Oh!-Decks", error);
+    return;
+  }
+
+  yugiohDecks = [];
+  yugiohAssignmentResults.innerHTML = "";
+  renderYugiohDecks();
 }
 
 /* Tastatursteuerung */
@@ -3002,6 +3642,30 @@ newGameUrlInput.addEventListener("keydown", event => {
   }
 });
 
+newYugiohThemeInput.addEventListener("keydown", event => {
+  if (event.key === "Enter") {
+    newYugiohSleeveColorInput.focus();
+  }
+});
+
+newYugiohSleeveColorInput.addEventListener("keydown", event => {
+  if (event.key === "Enter") {
+    newYugiohOwnerInput.focus();
+  }
+});
+
+newYugiohOwnerInput.addEventListener("keydown", event => {
+  if (event.key === "Enter") {
+    addYugiohDeck();
+  }
+});
+
+yugiohPlayerCountInput.addEventListener("keydown", event => {
+  if (event.key === "Enter") {
+    renderYugiohPlayerInputs();
+  }
+});
+
 newGameColumnNameInput.addEventListener("keydown", event => {
   if (event.key === "Enter") {
     addGameColumn();
@@ -3014,6 +3678,7 @@ document.addEventListener("keydown", event => {
   }
 });
 
+renderYugiohPlayerInputs();
 initAuth();
 </script>
 
