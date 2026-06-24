@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Watch, Feast and Game</title>
+<title>Watch and Feast</title>
 
 <style>
 body {
@@ -661,6 +661,56 @@ input[type="checkbox"] {
 }
 
 
+.games-mobile-list {
+  display: none;
+}
+
+.game-mobile-card {
+  background: #2a2a2a;
+  padding: 15px;
+  border-radius: 16px;
+  margin-bottom: 15px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+}
+
+.game-mobile-checks {
+  margin-top: 14px;
+  display: grid;
+  gap: 8px;
+}
+
+.game-mobile-check-row {
+  background: #333;
+  border-radius: 10px;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.game-mobile-check-title {
+  font-weight: bold;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.game-mobile-check-row .game-check {
+  flex-shrink: 0;
+}
+
+.game-mobile-no-columns {
+  margin-top: 14px;
+  color: #bbb;
+  background: #333;
+  border-radius: 10px;
+  padding: 10px;
+  text-align: center;
+}
+
+
 /* Yu-Gi-Oh!-Decks */
 
 .yugioh-add-form,
@@ -792,6 +842,100 @@ input[type="checkbox"] {
   background: #1e1e1e;
   border-radius: 12px;
   padding: 10px;
+}
+
+.assignment-popup-box {
+  background: #1e1e1e;
+  color: white;
+  padding: 26px;
+  border-radius: 18px;
+  max-width: 780px;
+  width: calc(100% - 40px);
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+}
+
+.assignment-popup-box h3 {
+  text-align: center;
+  margin: 0 0 18px 0;
+  font-size: 26px;
+}
+
+.assignment-popup-results {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.assignment-result-card {
+  background: #2a2a2a;
+  border-radius: 16px;
+  padding: 12px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.35);
+}
+
+.assignment-player-name {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  text-align: center;
+  color: #ffffff;
+}
+
+.assignment-deck-image-wrapper {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #111;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.assignment-deck-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.assignment-deck-placeholder {
+  color: #777;
+  font-size: 34px;
+}
+
+.assignment-deck-theme {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 6px;
+  word-break: break-word;
+}
+
+.assignment-deck-meta {
+  color: #ddd;
+  font-size: 14px;
+  margin-top: 4px;
+  word-break: break-word;
+}
+
+.assignment-popup-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.assignment-popup-actions button {
+  margin-top: 0;
+}
+
+@media (max-width: 650px) {
+  .assignment-popup-actions {
+    grid-template-columns: 1fr;
+  }
 }
 
 .yugioh-empty {
@@ -975,6 +1119,45 @@ input[type="checkbox"] {
     height: 100%;
   }
 }
+
+@media (max-width: 650px) {
+  .games-table-wrapper {
+    overflow-x: visible;
+  }
+
+  .games-desktop-table {
+    display: none;
+  }
+
+  .games-mobile-list {
+    display: grid;
+    gap: 15px;
+  }
+
+  .game-mobile-card .game-row-main {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .game-mobile-card .game-image-wrapper {
+    width: 100%;
+    max-width: none;
+  }
+
+  .game-mobile-card .game-info {
+    width: 100%;
+  }
+
+  .game-mobile-card .game-row-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .game-mobile-card .game-row-actions button {
+    width: 100%;
+  }
+}
+
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -1291,6 +1474,25 @@ input[type="checkbox"] {
   </div>
 </div>
 
+<!-- Yu-Gi-Oh!-Zuteilungs-Popup -->
+<div
+  id="yugiohAssignmentPopup"
+  class="popup-overlay"
+  style="display: none;"
+  onclick="closeYugiohAssignmentPopupOnOverlay(event)"
+>
+  <div class="assignment-popup-box">
+    <h3>🎲 Deck-Zuteilung</h3>
+
+    <div id="yugiohAssignmentPopupResults" class="assignment-popup-results"></div>
+
+    <div class="assignment-popup-actions">
+      <button onclick="assignRandomYugiohDecks()">🔄 Neu zuteilen</button>
+      <button onclick="closeYugiohAssignmentPopup()">OK</button>
+    </div>
+  </div>
+</div>
+
 <!-- Bearbeiten-Popup -->
 <div
   id="editEntryModal"
@@ -1364,6 +1566,8 @@ const newYugiohOwnerInput = document.getElementById("newYugiohOwner");
 const yugiohPlayerCountInput = document.getElementById("yugiohPlayerCount");
 const yugiohPlayerInputs = document.getElementById("yugiohPlayerInputs");
 const yugiohAssignmentResults = document.getElementById("yugiohAssignmentResults");
+const yugiohAssignmentPopup = document.getElementById("yugiohAssignmentPopup");
+const yugiohAssignmentPopupResults = document.getElementById("yugiohAssignmentPopupResults");
 
 let gameItems = [];
 let gameColumns = [];
@@ -1923,6 +2127,7 @@ async function saveYugiohEdit() {
   Object.assign(deck, changes);
   yugiohDecks.sort((a, b) => (a.theme || "").localeCompare(b.theme || "", "de"));
   yugiohAssignmentResults.innerHTML = "";
+  closeYugiohAssignmentPopup();
   closeEditEntryModal();
   renderYugiohDecks();
 }
@@ -1961,6 +2166,69 @@ function openPendingRandomUrl() {
   window.open(pendingRandomUrl, "_blank", "noopener,noreferrer");
 }
 
+function showYugiohAssignmentPopup(assignments) {
+  yugiohAssignmentPopupResults.innerHTML = "";
+
+  assignments.forEach(assignment => {
+    const deck = assignment.deck;
+
+    const card = document.createElement("div");
+    card.className = "assignment-result-card";
+
+    const player = document.createElement("div");
+    player.className = "assignment-player-name";
+    player.textContent = assignment.playerName;
+
+    const imageWrapper = document.createElement("div");
+    imageWrapper.className = "assignment-deck-image-wrapper";
+
+    if (deck.image) {
+      const image = document.createElement("img");
+      image.className = "assignment-deck-image";
+      image.src = deck.image;
+      image.alt = deck.theme ? "Bild von " + deck.theme : "Deckbild";
+      imageWrapper.appendChild(image);
+    } else {
+      const placeholder = document.createElement("div");
+      placeholder.className = "assignment-deck-placeholder";
+      placeholder.textContent = "🃏";
+      imageWrapper.appendChild(placeholder);
+    }
+
+    const theme = document.createElement("div");
+    theme.className = "assignment-deck-theme";
+    theme.textContent = deck.theme || "Unbenanntes Deck";
+
+    const sleeve = document.createElement("div");
+    sleeve.className = "assignment-deck-meta";
+    sleeve.textContent = "Hüllenfarbe: " + (deck.sleeve_color || "nicht angegeben");
+
+    const owner = document.createElement("div");
+    owner.className = "assignment-deck-meta";
+    owner.textContent = "Besitzer: " + (deck.owner || "nicht angegeben");
+
+    card.appendChild(player);
+    card.appendChild(imageWrapper);
+    card.appendChild(theme);
+    card.appendChild(sleeve);
+    card.appendChild(owner);
+
+    yugiohAssignmentPopupResults.appendChild(card);
+  });
+
+  yugiohAssignmentPopup.style.display = "flex";
+}
+
+function closeYugiohAssignmentPopup() {
+  yugiohAssignmentPopup.style.display = "none";
+}
+
+function closeYugiohAssignmentPopupOnOverlay(event) {
+  if (event.target.id === "yugiohAssignmentPopup") {
+    closeYugiohAssignmentPopup();
+  }
+}
+
 /* Auth */
 
 function showLogin() {
@@ -1989,6 +2257,7 @@ function showLogin() {
   userInfo.textContent = "";
   setStatus("");
   closeRandomPopup();
+  closeYugiohAssignmentPopup();
   closeEditEntryModal();
 }
 
@@ -3359,7 +3628,7 @@ function renderGamesTable() {
   }
 
   const table = document.createElement("table");
-  table.className = "games-table";
+  table.className = "games-table games-desktop-table";
 
   const thead = document.createElement("thead");
   const headRow = document.createElement("tr");
@@ -3627,6 +3896,165 @@ function renderGamesTable() {
 
   table.appendChild(tbody);
   gamesTableWrapper.appendChild(table);
+
+  const mobileList = document.createElement("div");
+  mobileList.className = "games-mobile-list";
+
+  if (gameItems.length === 0) {
+    const empty = document.createElement("div");
+    empty.className = "games-empty";
+    empty.textContent = "Noch keine Spiele vorhanden.";
+    mobileList.appendChild(empty);
+  } else if (visibleGameItems.length === 0) {
+    const empty = document.createElement("div");
+    empty.className = "games-empty";
+    empty.textContent = "Keine Spiele passen zum aktuellen Filter.";
+    mobileList.appendChild(empty);
+  } else {
+    visibleGameItems.forEach(item => {
+      const card = document.createElement("div");
+      card.className = "game-mobile-card";
+      addDblClickEdit(card, () => openGameEdit(item.id));
+
+      const main = document.createElement("div");
+      main.className = "game-row-main";
+
+      const imageWrapper = document.createElement("div");
+      imageWrapper.className = "game-image-wrapper";
+
+      if (item.image) {
+        const img = document.createElement("img");
+        img.src = item.image;
+        img.className = "game-image";
+        img.alt = item.name ? "Vorschaubild von " + item.name : "Vorschaubild";
+        img.title = item.url ? "Link öffnen" : "Bild öffnen";
+        img.onclick = () => {
+          if (item.url) {
+            window.open(item.url, "_blank");
+          } else {
+            window.open(item.image, "_blank");
+          }
+        };
+        imageWrapper.appendChild(img);
+      } else {
+        const placeholder = document.createElement("div");
+        placeholder.className = "game-image-placeholder";
+        placeholder.textContent = "🎮";
+        placeholder.title = "Bild hochladen";
+        placeholder.style.cursor = "pointer";
+        placeholder.onclick = () => uploadGameImage(item.id);
+        imageWrapper.appendChild(placeholder);
+      }
+
+      const info = document.createElement("div");
+      info.className = "game-info";
+
+      const name = document.createElement("div");
+      name.className = "game-name";
+      name.textContent = item.name || "Unbenannt";
+      name.onclick = () => {
+        if (item.url) {
+          window.open(item.url, "_blank");
+        }
+      };
+
+      info.appendChild(name);
+
+      if (item.url) {
+        const urlText = document.createElement("div");
+        urlText.className = "game-url";
+        urlText.textContent = item.url;
+        info.appendChild(urlText);
+      }
+
+      const rowActions = document.createElement("div");
+      rowActions.className = "game-row-actions";
+
+      const editButton = document.createElement("button");
+      editButton.className = "game-row-edit";
+      editButton.type = "button";
+      editButton.textContent = "✏️ Bearbeiten";
+      editButton.onclick = () => openGameEdit(item.id);
+      rowActions.appendChild(editButton);
+
+      if (item.url) {
+        const linkButton = document.createElement("button");
+        linkButton.className = "game-row-link";
+        linkButton.type = "button";
+        linkButton.textContent = "🔗 Öffnen";
+        linkButton.onclick = () => window.open(item.url, "_blank");
+        rowActions.appendChild(linkButton);
+      }
+
+      const imageButton = document.createElement("button");
+      imageButton.className = "game-row-image-upload";
+      imageButton.type = "button";
+      imageButton.textContent = item.image ? "🖼️ Bild ändern" : "🖼️ Bild hochladen";
+      imageButton.onclick = () => uploadGameImage(item.id);
+      rowActions.appendChild(imageButton);
+
+      const deleteButton = document.createElement("button");
+      deleteButton.className = "game-row-delete";
+      deleteButton.type = "button";
+      deleteButton.textContent = "❌ Löschen";
+      deleteButton.onclick = () => deleteGameItem(item.id, item.name || "Unbenannt");
+      rowActions.appendChild(deleteButton);
+
+      info.appendChild(rowActions);
+      main.appendChild(imageWrapper);
+      main.appendChild(info);
+      card.appendChild(main);
+
+      if (gameColumns.length === 0) {
+        const noColumns = document.createElement("div");
+        noColumns.className = "game-mobile-no-columns";
+        noColumns.textContent = "Noch keine Spalten vorhanden.";
+        card.appendChild(noColumns);
+      } else {
+        const checks = document.createElement("div");
+        checks.className = "game-mobile-checks";
+
+        gameColumns.forEach(column => {
+          const label = document.createElement("label");
+          label.className = "game-mobile-check-row";
+
+          const title = document.createElement("span");
+          title.className = "game-mobile-check-title";
+          title.textContent = column.name || "Spalte";
+          title.title = column.name || "Spalte";
+
+          const checkbox = document.createElement("input");
+          checkbox.type = "checkbox";
+          checkbox.className = "game-check";
+
+          const key = getGameCheckKey(item.id, column.id);
+          checkbox.checked = gameChecks[key]?.checked === true;
+
+          checkbox.addEventListener("change", async () => {
+            const newValue = checkbox.checked;
+            const success = await updateGameCheck(item.id, column.id, newValue);
+
+            if (!success) {
+              checkbox.checked = !newValue;
+              return;
+            }
+
+            renderGamesTable();
+          });
+
+          label.appendChild(title);
+          label.appendChild(checkbox);
+          checks.appendChild(label);
+        });
+
+        card.appendChild(checks);
+      }
+
+      mobileList.appendChild(card);
+    });
+  }
+
+  gamesTableWrapper.appendChild(mobileList);
 }
 
 async function addGameColumn() {
@@ -4132,22 +4560,15 @@ function assignRandomYugiohDecks() {
   const shuffledDecks = [...yugiohDecks]
     .sort(() => Math.random() - 0.5);
 
-  yugiohAssignmentResults.innerHTML = "";
-
-  players.forEach((playerName, index) => {
-    const deck = shuffledDecks[index];
-
-    const result = document.createElement("div");
-    result.className = "yugioh-assignment-card";
-
-    result.textContent =
-      playerName + " bekommt " +
-      (deck.theme || "ein unbenanntes Deck") +
-      " | Hüllenfarbe: " + (deck.sleeve_color || "nicht angegeben") +
-      " | Besitzer: " + (deck.owner || "nicht angegeben");
-
-    yugiohAssignmentResults.appendChild(result);
+  const assignments = players.map((playerName, index) => {
+    return {
+      playerName,
+      deck: shuffledDecks[index]
+    };
   });
+
+  yugiohAssignmentResults.innerHTML = "";
+  showYugiohAssignmentPopup(assignments);
 }
 
 async function addYugiohDeck() {
@@ -4258,6 +4679,7 @@ async function deleteYugiohDeck(deckId, deckName) {
 
   yugiohDecks = yugiohDecks.filter(deck => deck.id !== deckId);
   yugiohAssignmentResults.innerHTML = "";
+  closeYugiohAssignmentPopup();
   renderYugiohDecks();
 }
 
@@ -4371,6 +4793,7 @@ newGameColumnNameInput.addEventListener("keydown", event => {
 document.addEventListener("keydown", event => {
   if (event.key === "Escape") {
     closeRandomPopup();
+    closeYugiohAssignmentPopup();
     closeEditEntryModal();
   }
 });
