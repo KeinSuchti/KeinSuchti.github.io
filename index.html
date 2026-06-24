@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Watch and Feast</title>
+<title>Watch, Feast and Game</title>
 
 <style>
 body {
@@ -112,6 +112,10 @@ textarea {
 .back-button:hover,
 .logout-button:hover {
   background: #555;
+}
+
+.arrow-back-button {
+  font-weight: bold;
 }
 
 .menu-grid {
@@ -1009,6 +1013,14 @@ input[type="checkbox"] {
     <div id="userInfo" class="user-info"></div>
 
     <div class="top-actions">
+      <button
+        id="appBackButton"
+        class="back-button arrow-back-button"
+        onclick="goBackInApp()"
+        style="display:none;"
+      >
+        ← Zurück
+      </button>
       <button class="back-button" onclick="showMenu()">🏠 Menü</button>
       <button class="logout-button" onclick="logout()">Logout</button>
     </div>
@@ -1081,7 +1093,6 @@ input[type="checkbox"] {
 
       <div id="gamesTableWrapper" class="games-table-wrapper"></div>
 
-      <button onclick="deleteAllGameItems()">🗑️ Alle Spiele löschen</button>
     </div>
 
     <!-- Yu-Gi-Oh!-Decks -->
@@ -1116,7 +1127,6 @@ input[type="checkbox"] {
 
       <div id="yugiohDeckList" class="yugioh-list"></div>
 
-      <button onclick="deleteAllYugiohDecks()">🗑️ Alle Decks löschen</button>
     </div>
 
     <!-- Serien & Filme -->
@@ -1178,7 +1188,6 @@ input[type="checkbox"] {
 
       <div id="feastList"></div>
 
-      <button onclick="deleteAllCardItems('feast')">🗑️ Alles löschen</button>
     </div>
 
     <!-- Bier -->
@@ -1218,7 +1227,6 @@ input[type="checkbox"] {
 
       <div id="beerList"></div>
 
-      <button onclick="deleteAllCardItems('beer')">🗑️ Alles löschen</button>
     </div>
 
     <!-- Cocktail -->
@@ -1255,7 +1263,6 @@ input[type="checkbox"] {
 
       <div id="cocktailList"></div>
 
-      <button onclick="deleteAllCardItems('cocktail')">🗑️ Alles löschen</button>
     </div>
   </div>
 </div>
@@ -1993,7 +2000,7 @@ function showAppShell() {
     userInfo.textContent = "Eingeloggt als: " + currentUser.email;
   }
 
-  showMenu();
+  showMenu(false);
 }
 
 async function initAuth() {
@@ -2050,6 +2057,23 @@ async function logout() {
 
 /* Navigation */
 
+let currentView = "menu";
+let suppressHistoryPush = false;
+
+const appViewLoaders = {
+  menu: null,
+  saufi: null,
+  movies: loadMovieItems,
+  feast: () => loadCardItems("feast"),
+  beer: () => loadCardItems("beer"),
+  cocktail: () => loadCardItems("cocktail"),
+  games: loadGamesData,
+  yugioh: async () => {
+    renderYugiohPlayerInputs();
+    await loadYugiohDecks();
+  }
+};
+
 function hideAllPanels() {
   menuBox.style.display = "none";
   saufiMenuBox.style.display = "none";
@@ -2062,51 +2086,134 @@ function hideAllPanels() {
   setStatus("");
 }
 
-function showMenu() {
+function showPanelForView(view) {
   hideAllPanels();
-  menuBox.style.display = "block";
+  currentView = view;
+
+  if (view === "saufi") {
+    saufiMenuBox.style.display = "block";
+  } else if (view === "movies") {
+    moviesApp.style.display = "block";
+  } else if (view === "feast") {
+    feastApp.style.display = "block";
+  } else if (view === "beer") {
+    beerApp.style.display = "block";
+  } else if (view === "cocktail") {
+    cocktailApp.style.display = "block";
+  } else if (view === "games") {
+    gamesApp.style.display = "block";
+  } else if (view === "yugioh") {
+    yugiohApp.style.display = "block";
+  } else {
+    currentView = "menu";
+    menuBox.style.display = "block";
+  }
+
+  updateBackButtonVisibility();
+}
+
+function updateBackButtonVisibility() {
+  const backButton = document.getElementById("appBackButton");
+
+  if (!backButton) return;
+
+  backButton.style.display = currentView === "menu" ? "none" : "block";
+}
+
+function writeAppHistory(view, mode) {
+  if (!window.history || !window.history.pushState) return;
+
+  const state = { appView: view };
+  const hash = "#" + view;
+
+  if (mode === "replace") {
+    window.history.replaceState(state, "", hash);
+  } else if (mode === "push") {
+    window.history.pushState(state, "", hash);
+  }
+}
+
+async function navigateToView(view, historyMode = "push") {
+  if (!currentUser && view !== "menu") {
+    showLogin();
+    return;
+  }
+
+  showPanelForView(view);
+
+  if (!suppressHistoryPush) {
+    writeAppHistory(currentView, historyMode);
+  }
+
+  const loader = appViewLoaders[currentView];
+
+  if (typeof loader === "function") {
+    await loader();
+  }
+}
+
+function goBackInApp() {
+  if (currentView === "menu") return;
+
+  window.history.back();
+}
+
+function getViewFromHistoryState(event) {
+  if (event.state && event.state.appView) {
+    return event.state.appView;
+  }
+
+  const hashView = window.location.hash.replace("#", "");
+
+  if (hashView) {
+    return hashView;
+  }
+
+  return "menu";
+}
+
+window.addEventListener("popstate", async event => {
+  if (!currentUser) return;
+
+  suppressHistoryPush = true;
+
+  try {
+    await navigateToView(getViewFromHistoryState(event), "replace");
+  } finally {
+    suppressHistoryPush = false;
+  }
+});
+
+function showMenu(pushHistory = true) {
+  return navigateToView("menu", pushHistory ? "push" : "replace");
 }
 
 function showSaufiMenu() {
-  hideAllPanels();
-  saufiMenuBox.style.display = "block";
+  return navigateToView("saufi", "push");
 }
 
-async function showMoviesApp() {
-  hideAllPanels();
-  moviesApp.style.display = "block";
-  await loadMovieItems();
+function showMoviesApp() {
+  return navigateToView("movies", "push");
 }
 
-async function showFeastApp() {
-  hideAllPanels();
-  feastApp.style.display = "block";
-  await loadCardItems("feast");
+function showFeastApp() {
+  return navigateToView("feast", "push");
 }
 
-async function showBeerApp() {
-  hideAllPanels();
-  beerApp.style.display = "block";
-  await loadCardItems("beer");
+function showBeerApp() {
+  return navigateToView("beer", "push");
 }
 
-async function showCocktailApp() {
-  hideAllPanels();
-  cocktailApp.style.display = "block";
-  await loadCardItems("cocktail");
+function showCocktailApp() {
+  return navigateToView("cocktail", "push");
 }
 
-async function showGamesApp() {
-  hideAllPanels();
-  gamesApp.style.display = "block";
-  await loadGamesData();
+function showGamesApp() {
+  return navigateToView("games", "push");
 }
 
-async function showYugiohApp() {
-  hideAllPanels();
-  yugiohApp.style.display = "block";
-  renderYugiohPlayerInputs();
-  await loadYugiohDecks();
+function showYugiohApp() {
+  return navigateToView("yugioh", "push");
 }
 
 
@@ -3132,29 +3239,6 @@ async function addCardItem(type) {
 }
 
 
-async function deleteAllCardItems(type) {
-  if (!currentUser) {
-    showLogin();
-    return;
-  }
-
-  const config = cardLists[type];
-
-  if (!confirm("Wirklich alle Einträge in \"" + config.title + "\" löschen?")) return;
-
-  const { error } = await supabaseClient
-    .from(config.table)
-    .delete()
-    .not("id", "is", null);
-
-  if (error) {
-    showSupabaseError("Fehler beim Löschen aller Einträge", error);
-    return;
-  }
-
-  config.items = [];
-  renderCardItems(type);
-}
 
 
 /* Spiele */
@@ -3776,28 +3860,6 @@ async function deleteGameItem(itemId, itemName) {
   renderGamesTable();
 }
 
-async function deleteAllGameItems() {
-  if (!currentUser) {
-    showLogin();
-    return;
-  }
-
-  if (!confirm("Wirklich alle Spiele löschen? Die angelegten Spalten bleiben bestehen.")) return;
-
-  const { error } = await supabaseClient
-    .from("game_items")
-    .delete()
-    .not("id", "is", null);
-
-  if (error) {
-    showSupabaseError("Fehler beim Löschen aller Spiele", error);
-    return;
-  }
-
-  gameItems = [];
-  gameChecks = {};
-  renderGamesTable();
-}
 
 async function updateGameCheck(gameId, columnId, checked) {
   const key = getGameCheckKey(gameId, columnId);
@@ -4199,28 +4261,7 @@ async function deleteYugiohDeck(deckId, deckName) {
   renderYugiohDecks();
 }
 
-async function deleteAllYugiohDecks() {
-  if (!currentUser) {
-    showLogin();
-    return;
-  }
 
-  if (!confirm("Wirklich alle Yu-Gi-Oh!-Decks löschen?")) return;
-
-  const { error } = await supabaseClient
-    .from("yugioh_decks")
-    .delete()
-    .not("id", "is", null);
-
-  if (error) {
-    showSupabaseError("Fehler beim Löschen aller Yu-Gi-Oh!-Decks", error);
-    return;
-  }
-
-  yugiohDecks = [];
-  yugiohAssignmentResults.innerHTML = "";
-  renderYugiohDecks();
-}
 
 /* Tastatursteuerung */
 
