@@ -604,6 +604,7 @@ input[type="checkbox"] {
 }
 
 .game-row-delete,
+.game-row-edit,
 .game-row-link {
   width: auto;
   margin-top: 0;
@@ -614,6 +615,14 @@ input[type="checkbox"] {
 
 .game-row-link {
   background: #2c2c2c;
+}
+
+.game-row-edit {
+  background: #3b315f;
+}
+
+.game-row-edit:hover {
+  background: #51417f;
 }
 
 .game-row-link:hover {
@@ -795,6 +804,113 @@ input[type="checkbox"] {
   .yugioh-image-wrapper {
     width: 100%;
   }
+}
+
+
+/* Bearbeiten-Popup */
+
+.btn-edit {
+  background: #3b315f;
+}
+
+.btn-edit:hover {
+  background: #51417f;
+}
+
+.edit-entry-button,
+.game-row-edit,
+.yugioh-edit-button {
+  background: #3b315f;
+}
+
+.edit-entry-button:hover,
+.game-row-edit:hover,
+.yugioh-edit-button:hover {
+  background: #51417f;
+}
+
+.edit-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.75);
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+}
+
+.edit-box {
+  background: #1e1e1e;
+  color: white;
+  padding: 24px;
+  border-radius: 18px;
+  max-width: 520px;
+  width: calc(100% - 40px);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+}
+
+.edit-box h3 {
+  margin: 0 0 16px 0;
+  text-align: center;
+}
+
+.edit-fields {
+  display: grid;
+  gap: 12px;
+}
+
+.edit-field {
+  display: grid;
+  gap: 6px;
+}
+
+.edit-field label {
+  color: #ddd;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.edit-field input,
+.edit-field textarea,
+.edit-field select {
+  width: 100%;
+  background: #333;
+  color: white;
+}
+
+.edit-field textarea {
+  min-height: 110px;
+  resize: vertical;
+}
+
+.edit-checkbox-field {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.edit-checkbox-field input {
+  width: auto;
+}
+
+.edit-actions {
+  display: grid;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.edit-actions button {
+  margin-top: 0;
+}
+
+.edit-cancel-button {
+  background: #444;
+}
+
+.edit-cancel-button:hover {
+  background: #555;
 }
 
 /* Zufalls-Popup */
@@ -1168,6 +1284,25 @@ input[type="checkbox"] {
   </div>
 </div>
 
+<!-- Bearbeiten-Popup -->
+<div
+  id="editEntryModal"
+  class="edit-overlay"
+  style="display: none;"
+  onclick="closeEditEntryModalOnOverlay(event)"
+>
+  <div class="edit-box">
+    <h3 id="editEntryTitle">Eintrag bearbeiten</h3>
+
+    <div id="editEntryFields" class="edit-fields"></div>
+
+    <div class="edit-actions">
+      <button onclick="saveEditedEntry()">💾 Speichern</button>
+      <button class="edit-cancel-button" onclick="closeEditEntryModal()">Abbrechen</button>
+    </div>
+  </div>
+</div>
+
 <script>
 const supabaseUrl = "https://tqxyofqzlflnpfomslky.supabase.co";
 
@@ -1183,6 +1318,7 @@ const MOVIE_TABLE = "items";
 let currentUser = null;
 let movieItems = [];
 let pendingRandomUrl = "";
+let editEntryState = null;
 
 const loginBox = document.getElementById("loginBox");
 const appShell = document.getElementById("appShell");
@@ -1200,6 +1336,9 @@ const passwordInput = document.getElementById("password");
 const loginError = document.getElementById("loginError");
 const userInfo = document.getElementById("userInfo");
 const globalStatus = document.getElementById("globalStatus");
+const editEntryModal = document.getElementById("editEntryModal");
+const editEntryTitle = document.getElementById("editEntryTitle");
+const editEntryFields = document.getElementById("editEntryFields");
 
 const movieList = document.getElementById("movieList");
 const newMovieItemInput = document.getElementById("newMovieItem");
@@ -1299,6 +1438,488 @@ function debounce(callback, delay = 700) {
   };
 }
 
+
+/* Bearbeiten */
+
+function createEditIconButton(onClick, className = "btn btn-edit") {
+  const button = document.createElement("div");
+  button.className = className;
+  button.textContent = "✏️";
+  button.title = "Eintrag bearbeiten";
+  button.onclick = event => {
+    event.stopPropagation();
+    onClick();
+  };
+  return button;
+}
+
+function createSmallEditButton(onClick) {
+  const button = document.createElement("div");
+  button.className = "btn-small edit-entry-button";
+  button.textContent = "✏️";
+  button.title = "Eintrag bearbeiten";
+  button.onclick = event => {
+    event.stopPropagation();
+    onClick();
+  };
+  return button;
+}
+
+function shouldIgnoreEditDblClick(event) {
+  return Boolean(
+    event.target.closest(
+      "button, input, textarea, select, a, .btn, .btn-small, .star, .game-check, .game-column-header, .image, .game-image, .yugioh-image, .yugioh-image-placeholder, .game-image-placeholder"
+    )
+  );
+}
+
+function addDblClickEdit(element, callback) {
+  element.addEventListener("dblclick", event => {
+    if (shouldIgnoreEditDblClick(event)) return;
+    event.preventDefault();
+    callback();
+  });
+}
+
+function closeEditEntryModal() {
+  editEntryState = null;
+  editEntryFields.innerHTML = "";
+  editEntryModal.style.display = "none";
+}
+
+function closeEditEntryModalOnOverlay(event) {
+  if (event.target.id === "editEntryModal") {
+    closeEditEntryModal();
+  }
+}
+
+function createEditField(field) {
+  const wrapper = document.createElement("div");
+  wrapper.className = field.type === "checkbox" ? "edit-checkbox-field" : "edit-field";
+
+  const label = document.createElement("label");
+  label.htmlFor = "editField_" + field.key;
+  label.textContent = field.label;
+
+  let input;
+
+  if (field.type === "textarea") {
+    input = document.createElement("textarea");
+    input.value = field.value || "";
+  } else if (field.type === "select") {
+    input = document.createElement("select");
+
+    (field.options || []).forEach(option => {
+      const optionElement = document.createElement("option");
+      optionElement.value = option.value;
+      optionElement.textContent = option.label;
+      input.appendChild(optionElement);
+    });
+
+    input.value = field.value || "";
+  } else {
+    input = document.createElement("input");
+    input.type = field.type || "text";
+
+    if (field.inputMode) {
+      input.inputMode = field.inputMode;
+    }
+
+    if (field.min !== undefined) input.min = field.min;
+    if (field.max !== undefined) input.max = field.max;
+    if (field.step !== undefined) input.step = field.step;
+
+    if (field.type === "checkbox") {
+      input.checked = field.value === true;
+    } else {
+      input.value = field.value || "";
+    }
+  }
+
+  input.id = "editField_" + field.key;
+  input.dataset.key = field.key;
+
+  if (field.placeholder) {
+    input.placeholder = field.placeholder;
+  }
+
+  if (field.type === "checkbox") {
+    wrapper.appendChild(input);
+    wrapper.appendChild(label);
+  } else {
+    wrapper.appendChild(label);
+    wrapper.appendChild(input);
+  }
+
+  return wrapper;
+}
+
+function getEditInputValue(key) {
+  const input = editEntryFields.querySelector('[data-key="' + key + '"]');
+
+  if (!input) return "";
+
+  if (input.type === "checkbox") {
+    return input.checked;
+  }
+
+  return input.value.trim();
+}
+
+function renderEditFields(title, fields) {
+  editEntryTitle.textContent = title;
+  editEntryFields.innerHTML = "";
+
+  fields.forEach(field => {
+    editEntryFields.appendChild(createEditField(field));
+  });
+
+  editEntryModal.style.display = "flex";
+
+  const firstInput = editEntryFields.querySelector("input, textarea, select");
+  if (firstInput) {
+    setTimeout(() => {
+      firstInput.focus();
+      if (typeof firstInput.select === "function" && firstInput.type !== "checkbox") {
+        firstInput.select();
+      }
+    }, 50);
+  }
+}
+
+function openMovieEdit(itemId) {
+  const item = movieItems.find(entry => entry.id === itemId);
+
+  if (!item) {
+    showRandomPopup("Der Eintrag wurde nicht gefunden.");
+    return;
+  }
+
+  editEntryState = {
+    kind: "movie",
+    id: itemId
+  };
+
+  renderEditFields("Serien-/Film-Eintrag bearbeiten", [
+    { key: "name", label: "Name", value: item.name || "" },
+    { key: "link", label: "Link", value: item.link || "", placeholder: "https://..." },
+    { key: "comment", label: "Kommentar", type: "textarea", value: item.comment || "" },
+    { key: "checked", label: "Abgehakt", type: "checkbox", value: item.checked === true }
+  ]);
+}
+
+function openCardEdit(type, itemId) {
+  const config = cardLists[type];
+  const item = config.items.find(entry => entry.id === itemId);
+
+  if (!item) {
+    showRandomPopup("Der Eintrag wurde nicht gefunden.");
+    return;
+  }
+
+  editEntryState = {
+    kind: "card",
+    type,
+    id: itemId
+  };
+
+  const fields = [
+    { key: "name", label: "Name", value: item.name || "" }
+  ];
+
+  if (type !== "beer") {
+    fields.push({ key: "url", label: "Link", value: item.url || "", placeholder: "https://..." });
+    fields.push({
+      key: "rating",
+      label: "Bewertung 0–5 Sterne",
+      type: "number",
+      min: "0",
+      max: "5",
+      step: "1",
+      value: String(Number(item.rating || 0))
+    });
+  } else {
+    fields.push({
+      key: "rating",
+      label: "Bier-Note 1,0–6,0 oder leer für ohne Bewertung",
+      value: Number(item.rating || 0) > 0 ? formatBeerGrade(item.rating) : "",
+      inputMode: "decimal",
+      placeholder: "z. B. 2,6"
+    });
+  }
+
+  fields.push({ key: "comment", label: "Kommentar", type: "textarea", value: item.comment || "" });
+
+  renderEditFields(config.title + " bearbeiten", fields);
+}
+
+function openGameEdit(itemId) {
+  const item = gameItems.find(entry => entry.id === itemId);
+
+  if (!item) {
+    showRandomPopup("Der Spieleintrag wurde nicht gefunden.");
+    return;
+  }
+
+  editEntryState = {
+    kind: "game",
+    id: itemId
+  };
+
+  renderEditFields("Spiel bearbeiten", [
+    { key: "name", label: "Name", value: item.name || "" },
+    { key: "url", label: "Link", value: item.url || "", placeholder: "https://..." }
+  ]);
+}
+
+function openGameColumnEdit(columnId) {
+  const column = gameColumns.find(entry => entry.id === columnId);
+
+  if (!column) {
+    showRandomPopup("Die Spalte wurde nicht gefunden.");
+    return;
+  }
+
+  editEntryState = {
+    kind: "gameColumn",
+    id: columnId
+  };
+
+  renderEditFields("Spalte bearbeiten", [
+    { key: "name", label: "Spaltenname", value: column.name || "" }
+  ]);
+}
+
+function openYugiohEdit(deckId) {
+  const deck = yugiohDecks.find(entry => entry.id === deckId);
+
+  if (!deck) {
+    showRandomPopup("Das Deck wurde nicht gefunden.");
+    return;
+  }
+
+  editEntryState = {
+    kind: "yugioh",
+    id: deckId
+  };
+
+  renderEditFields("Yu-Gi-Oh!-Deck bearbeiten", [
+    { key: "theme", label: "Thema / Deckname", value: deck.theme || "" },
+    { key: "sleeve_color", label: "Hüllenfarbe", value: deck.sleeve_color || "" },
+    { key: "owner", label: "Besitzer", value: deck.owner || "" }
+  ]);
+}
+
+async function saveEditedEntry() {
+  if (!editEntryState) return;
+
+  if (editEntryState.kind === "movie") {
+    await saveMovieEdit();
+  } else if (editEntryState.kind === "card") {
+    await saveCardEdit();
+  } else if (editEntryState.kind === "game") {
+    await saveGameEdit();
+  } else if (editEntryState.kind === "gameColumn") {
+    await saveGameColumnEdit();
+  } else if (editEntryState.kind === "yugioh") {
+    await saveYugiohEdit();
+  }
+}
+
+async function saveMovieEdit() {
+  const item = movieItems.find(entry => entry.id === editEntryState.id);
+  if (!item) return;
+
+  const name = getEditInputValue("name");
+
+  if (!name) {
+    alert("Bitte einen Namen eingeben.");
+    return;
+  }
+
+  const rawLink = getEditInputValue("link");
+  const changes = {
+    name,
+    link: rawLink ? normalize(rawLink) : "",
+    comment: getEditInputValue("comment"),
+    checked: getEditInputValue("checked") === true
+  };
+
+  const { error } = await supabaseClient
+    .from(MOVIE_TABLE)
+    .update(changes)
+    .eq("id", item.id);
+
+  if (error) {
+    showSupabaseError("Fehler beim Bearbeiten des Serien-/Film-Eintrags", error);
+    return;
+  }
+
+  Object.assign(item, changes);
+  movieItems.sort((a, b) => (a.name || "").localeCompare(b.name || "", "de"));
+  closeEditEntryModal();
+  renderMovieItems();
+}
+
+async function saveCardEdit() {
+  const type = editEntryState.type;
+  const config = cardLists[type];
+  const item = config.items.find(entry => entry.id === editEntryState.id);
+
+  if (!item) return;
+
+  const name = getEditInputValue("name");
+
+  if (!name) {
+    alert("Bitte einen Namen eingeben.");
+    return;
+  }
+
+  const changes = {
+    name,
+    comment: getEditInputValue("comment")
+  };
+
+  let shouldTryAutoImage = false;
+
+  if (type === "beer") {
+    const ratingText = getEditInputValue("rating");
+    const rating = parseBeerRatingInput(ratingText);
+
+    if (rating === null) {
+      alert("Bitte eine gültige Bier-Bewertung zwischen 1,0 und 6,0 eingeben oder das Feld leer lassen.");
+      return;
+    }
+
+    changes.rating = rating;
+  } else {
+    const rawUrl = getEditInputValue("url");
+    const normalizedUrl = rawUrl ? normalize(rawUrl) : "";
+    const rating = Number(getEditInputValue("rating") || 0);
+
+    if (!Number.isInteger(rating) || rating < 0 || rating > 5) {
+      alert("Bitte eine Bewertung zwischen 0 und 5 eingeben.");
+      return;
+    }
+
+    changes.url = normalizedUrl;
+    changes.rating = rating;
+    shouldTryAutoImage = normalizedUrl && normalizedUrl !== (item.url || "") && !item.image;
+  }
+
+  const success = await updateCardItem(
+    type,
+    item.id,
+    changes,
+    "Fehler beim Bearbeiten von " + config.title
+  );
+
+  if (!success) return;
+
+  Object.assign(item, changes);
+  closeEditEntryModal();
+  renderCardItems(type);
+
+  if (shouldTryAutoImage) {
+    autoImage(type, changes.url, item.id);
+  }
+}
+
+async function saveGameEdit() {
+  const item = gameItems.find(entry => entry.id === editEntryState.id);
+  if (!item) return;
+
+  const name = getEditInputValue("name");
+
+  if (!name) {
+    alert("Bitte einen Namen eingeben.");
+    return;
+  }
+
+  const rawUrl = getEditInputValue("url");
+  const url = rawUrl ? normalize(rawUrl) : "";
+  const changes = { name, url };
+  const shouldTryAutoImage = url && url !== (item.url || "") && !item.image;
+
+  const { error } = await supabaseClient
+    .from("game_items")
+    .update(changes)
+    .eq("id", item.id);
+
+  if (error) {
+    showSupabaseError("Fehler beim Bearbeiten des Spiels", error);
+    return;
+  }
+
+  Object.assign(item, changes);
+  closeEditEntryModal();
+  renderGamesTable();
+
+  if (shouldTryAutoImage) {
+    autoGameMeta(url, item.id);
+  }
+}
+
+async function saveGameColumnEdit() {
+  const column = gameColumns.find(entry => entry.id === editEntryState.id);
+  if (!column) return;
+
+  const name = getEditInputValue("name");
+
+  if (!name) {
+    alert("Bitte einen Spaltennamen eingeben.");
+    return;
+  }
+
+  const { error } = await supabaseClient
+    .from("game_columns")
+    .update({ name })
+    .eq("id", column.id);
+
+  if (error) {
+    showSupabaseError("Fehler beim Bearbeiten der Spalte", error);
+    return;
+  }
+
+  column.name = name;
+  closeEditEntryModal();
+  renderGamesTable();
+}
+
+async function saveYugiohEdit() {
+  const deck = yugiohDecks.find(entry => entry.id === editEntryState.id);
+  if (!deck) return;
+
+  const theme = getEditInputValue("theme");
+
+  if (!theme) {
+    alert("Bitte ein Thema / einen Decknamen eingeben.");
+    return;
+  }
+
+  const changes = {
+    theme,
+    sleeve_color: getEditInputValue("sleeve_color"),
+    owner: getEditInputValue("owner")
+  };
+
+  const { error } = await supabaseClient
+    .from("yugioh_decks")
+    .update(changes)
+    .eq("id", deck.id);
+
+  if (error) {
+    showSupabaseError("Fehler beim Bearbeiten des Yu-Gi-Oh!-Decks", error);
+    return;
+  }
+
+  Object.assign(deck, changes);
+  yugiohDecks.sort((a, b) => (a.theme || "").localeCompare(b.theme || "", "de"));
+  yugiohAssignmentResults.innerHTML = "";
+  closeEditEntryModal();
+  renderYugiohDecks();
+}
+
 /* Popup */
 
 function showRandomPopup(message, url = "") {
@@ -1361,6 +1982,7 @@ function showLogin() {
   userInfo.textContent = "";
   setStatus("");
   closeRandomPopup();
+  closeEditEntryModal();
 }
 
 function showAppShell() {
@@ -1574,6 +2196,8 @@ function renderMovieItems() {
     linkBtn.className = "btn-small";
     linkBtn.textContent = "🔗";
 
+    const editBtn = createSmallEditButton(() => openMovieEdit(item.id));
+
     const deleteBtn = document.createElement("div");
     deleteBtn.className = "btn-small";
     deleteBtn.textContent = "❌";
@@ -1597,6 +2221,7 @@ function renderMovieItems() {
     updateCommentIcon();
     updateLinkIcon();
 
+    actions.appendChild(editBtn);
     actions.appendChild(commentBtn);
     actions.appendChild(linkBtn);
     actions.appendChild(deleteBtn);
@@ -1692,6 +2317,8 @@ function renderMovieItems() {
       movieItems = movieItems.filter(entry => entry.id !== item.id);
       renderMovieItems();
     };
+
+    addDblClickEdit(div, () => openMovieEdit(item.id));
 
     div.appendChild(top);
     div.appendChild(comment);
@@ -2099,6 +2726,7 @@ function renderCardItems(type) {
     const actions = document.createElement("div");
     actions.className = "card-actions";
 
+    const editBtn = createEditIconButton(() => openCardEdit(type, item.id));
     const imgBtn = createCardButton("🖼️", "btn btn-img");
     const noteBtn = createCardButton("📝", "btn btn-note");
     const delBtn = createCardButton("❌", "btn btn-del");
@@ -2197,7 +2825,7 @@ function renderCardItems(type) {
       renderCardItems(type);
     };
 
-    actions.append(imgBtn, noteBtn, delBtn);
+    actions.append(editBtn, imgBtn, noteBtn, delBtn);
 
     content.appendChild(title);
     content.appendChild(actions);
@@ -2242,6 +2870,8 @@ function renderCardItems(type) {
     }
 
     content.appendChild(comment);
+
+    addDblClickEdit(div, () => openCardEdit(type, item.id));
 
     header.appendChild(content);
     div.appendChild(header);
@@ -2671,6 +3301,13 @@ function renderGamesTable() {
     const title = document.createElement("div");
     title.className = "game-column-title";
     title.textContent = column.name || "Spalte";
+    title.title = "Doppelklick zum Bearbeiten";
+
+    title.addEventListener("dblclick", event => {
+      event.preventDefault();
+      event.stopPropagation();
+      openGameColumnEdit(column.id);
+    });
 
     headerWrap.addEventListener("dragstart", event => {
       draggedGameColumnId = column.id;
@@ -2836,6 +3473,13 @@ function renderGamesTable() {
     const rowActions = document.createElement("div");
     rowActions.className = "game-row-actions";
 
+    const editButton = document.createElement("button");
+    editButton.className = "game-row-edit";
+    editButton.type = "button";
+    editButton.textContent = "✏️ Bearbeiten";
+    editButton.onclick = () => openGameEdit(item.id);
+    rowActions.appendChild(editButton);
+
     if (item.url) {
       const linkButton = document.createElement("button");
       linkButton.className = "game-row-link";
@@ -2864,6 +3508,8 @@ function renderGamesTable() {
 
     main.appendChild(imageWrapper);
     main.appendChild(info);
+    addDblClickEdit(row, () => openGameEdit(item.id));
+
     gameCell.appendChild(main);
     row.appendChild(gameCell);
 
@@ -3325,6 +3971,12 @@ function renderYugiohDecks() {
     const actions = document.createElement("div");
     actions.className = "yugioh-actions";
 
+    const editButton = document.createElement("button");
+    editButton.type = "button";
+    editButton.className = "yugioh-edit-button";
+    editButton.textContent = "✏️ Bearbeiten";
+    editButton.onclick = () => openYugiohEdit(deck.id);
+
     const imageButton = document.createElement("button");
     imageButton.type = "button";
     imageButton.className = "yugioh-image-button";
@@ -3337,6 +3989,7 @@ function renderYugiohDecks() {
     deleteButton.textContent = "❌ Löschen";
     deleteButton.onclick = () => deleteYugiohDeck(deck.id, deck.theme || "Unbenanntes Deck");
 
+    actions.appendChild(editButton);
     actions.appendChild(imageButton);
     actions.appendChild(deleteButton);
 
@@ -3344,6 +3997,8 @@ function renderYugiohDecks() {
     info.appendChild(sleeve);
     info.appendChild(owner);
     info.appendChild(actions);
+
+    addDblClickEdit(card, () => openYugiohEdit(deck.id));
 
     main.appendChild(imageWrapper);
     main.appendChild(info);
@@ -3675,6 +4330,7 @@ newGameColumnNameInput.addEventListener("keydown", event => {
 document.addEventListener("keydown", event => {
   if (event.key === "Escape") {
     closeRandomPopup();
+    closeEditEntryModal();
   }
 });
 
