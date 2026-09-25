@@ -3059,6 +3059,73 @@ button, input, select, textarea { max-width: 100%; }
   body.app-scene .dashboard-sidebar > .dashboard-nav { padding-bottom:106px; }
 }
 
+
+/* --- Separates Logout-Icon, wenn das mobile Burger-Menü geschlossen ist --- */
+.mobile-collapsed-logout { display:none; }
+@media (max-width:900px) {
+  body.app-scene:not(.mobile-sidebar-open) #mobileCollapsedLogout {
+    position:fixed;
+    left:12px;
+    bottom:max(24px, env(safe-area-inset-bottom, 0px));
+    z-index:10003;
+    display:grid;
+    place-items:center;
+    box-sizing:border-box;
+    width:50px;
+    height:50px;
+    min-width:50px;
+    min-height:50px;
+    max-width:50px;
+    max-height:50px;
+    padding:0;
+    border:1px solid rgba(118,145,199,.34);
+    border-radius:12px;
+    background:linear-gradient(135deg, rgba(29,68,107,.96), rgba(71,62,139,.96));
+    color:#ffd1d1;
+    font:700 24px/1 Arial,sans-serif;
+    box-shadow:0 8px 24px rgba(0,0,0,.35), 0 0 0 2px rgba(101,226,215,.08);
+    cursor:pointer;
+    visibility:visible;
+    opacity:1;
+  }
+  body.app-scene:not(.mobile-sidebar-open) #mobileCollapsedLogout:hover,
+  body.app-scene:not(.mobile-sidebar-open) #mobileCollapsedLogout:focus-visible {
+    border-color:#65e2d7;
+    background:linear-gradient(135deg, rgba(43,126,139,.98), rgba(86,69,171,.98));
+    color:#fff;
+    outline:none;
+    transform:translateY(-1px);
+  }
+  body.app-scene.mobile-sidebar-open #mobileCollapsedLogout { display:none; }
+}
+@media (max-width:380px) {
+  body.app-scene:not(.mobile-sidebar-open) #mobileCollapsedLogout { left:10px; bottom:max(22px, env(safe-area-inset-bottom, 0px)); }
+}
+
+
+/* --- Tablet/Desktop: Abstand zum unteren Viewport-Rand --- */
+@media (min-width:901px) {
+  body.app-scene .dashboard-sidebar {
+    box-sizing:border-box;
+    overflow:hidden;
+  }
+  body.app-scene .dashboard-sidebar > .dashboard-nav {
+    min-height:0;
+    overflow-y:auto;
+    padding-bottom:18px;
+  }
+  body.app-scene .dashboard-sidebar > .sidebar-logout-button {
+    margin-bottom:18px !important;
+    flex:0 0 50px !important;
+    height:50px !important;
+    min-height:50px !important;
+    max-height:50px !important;
+  }
+}
+@media (min-width:901px) and (max-height:700px) {
+  body.app-scene .dashboard-sidebar > .sidebar-logout-button { margin-bottom:24px !important; }
+}
+
 </style>
 
 <!-- Cinematic background -->
@@ -3140,6 +3207,7 @@ button, input, select, textarea { max-width: 100%; }
 
     <div id="globalStatus" class="status"></div>
     <button id="mobileMenuToggle" class="mobile-menu-toggle" type="button" onclick="toggleSidebar()" aria-label="Navigation öffnen" aria-expanded="false" aria-controls="menuSidebar" title="Navigation öffnen"><span aria-hidden="true"><i></i><i></i><i></i></span><span class="mobile-menu-label">Menü</span></button>
+    <button id="mobileCollapsedLogout" class="mobile-collapsed-logout" type="button" onclick="logout()" aria-label="Logout" title="Logout"><span aria-hidden="true">⎋</span></button>
     <div id="mobileSidebarBackdrop" class="mobile-sidebar-backdrop" aria-hidden="true" onclick="closeMobileSidebar()"></div>
     <!-- Hauptmenü -->
     <div id="menuBox" class="dashboard-shell">
@@ -3204,6 +3272,8 @@ button, input, select, textarea { max-width: 100%; }
             <div class="dashboard-card-body"><span class="card-icon">✦</span><div><h3>Neue Liste</h3><p>Eigene Liste mit Sortierung, Filtern und Zufallsauswahl anlegen.</p></div><span class="card-arrow">→</span></div>
           </button>
         </div>
+
+        <div class="dashboard-statusbar"><span class="online-dot"></span><strong>Online</strong><span>Bereit für den nächsten gemeinsamen Abend.</span><span class="dashboard-status-badge">CINEMATIC UI</span></div>
       </main>
     </div>
 
