@@ -2781,6 +2781,48 @@ button, input, select, textarea { max-width: 100%; }
 }
 @media (max-width:380px) { body.app-scene .mobile-menu-toggle { top:8px; left:8px; min-height:38px; padding:7px 10px 7px 8px; } body.app-scene .mobile-menu-label { font-size:11px; } }
 
+.sidebar-logout-button { width:100%; margin-top:auto; padding:11px 12px; display:flex; align-items:center; gap:12px; border:1px solid rgba(118,145,199,.18); border-radius:11px; background:rgba(13,31,57,.52); color:#b7c7df; font:600 13px var(--font-sans); cursor:pointer; }
+.sidebar-logout-button:hover, .sidebar-logout-button:focus-visible { color:#fff; border-color:rgba(101,226,215,.5); background:rgba(28,65,103,.58); outline:none; }
+.sidebar-logout-button .nav-icon { width:20px; text-align:center; color:#ef9b9b; font-size:17px; }
+.sidebar-collapsed .sidebar-logout-button { justify-content:center; gap:0; padding-inline:8px; }
+@media (max-width:900px) { body.app-scene .sidebar-logout-button { flex:0 0 auto; margin-top:auto; min-height:46px; } }
+
+/* --- Termine und Kalender --- */
+.next-appointment-banner { margin:0 auto 18px; max-width:920px; padding:16px 18px; border:1px solid rgba(101,226,215,.34); border-radius:16px; background:linear-gradient(110deg,rgba(16,64,75,.80),rgba(29,38,86,.80)); box-shadow:0 12px 30px rgba(0,0,0,.18); }
+.next-appointment-banner[hidden] { display:none; }
+.appointment-banner-grid { display:flex; align-items:center; gap:14px; }
+.appointment-banner-icon { display:grid; place-items:center; flex:0 0 44px; width:44px; height:44px; border-radius:13px; background:linear-gradient(135deg,#35dfd0,#5868ed); color:white; font-size:23px; }
+.appointment-banner-copy { min-width:0; flex:1; }
+.appointment-banner-kicker { color:#77e6db; font-size:10px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; }
+.appointment-banner-countdown { color:#f1f7ff; font-size:21px; font-weight:800; margin-top:2px; }
+.appointment-banner-meta { display:flex; flex-wrap:wrap; gap:8px 15px; margin-top:4px; color:#b7cbe5; font-size:12px; }
+.appointment-banner-note { color:#91a8c5; font-size:11px; margin-top:4px; }
+.appointment-layout { display:grid; grid-template-columns:minmax(0,1.1fr) minmax(300px,.9fr); gap:18px; }
+.calendar-card, .appointment-form-card, .appointment-preview-card { padding:18px; border:1px solid rgba(101,141,207,.22); border-radius:16px; background:rgba(8,24,45,.64); }
+.calendar-toolbar { display:grid; grid-template-columns:38px 1fr 38px; align-items:center; gap:8px; margin-bottom:14px; text-align:center; }
+.calendar-toolbar button { width:38px; height:34px; padding:0; margin:0; font-size:23px; }
+.calendar-toolbar strong { color:#eaf2ff; font-size:15px; }
+.calendar-weekdays, .appointment-calendar { display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:5px; }
+.calendar-weekdays { margin-bottom:5px; color:#7790b0; font-size:10px; font-weight:800; text-align:center; text-transform:uppercase; }
+.calendar-day { min-height:39px; padding:6px 2px; border:1px solid rgba(101,141,207,.15); border-radius:9px; background:rgba(14,35,62,.68); color:#c9d7e9; font:600 12px var(--font-sans); cursor:pointer; }
+.calendar-day:hover, .calendar-day.selected { border-color:#62e4d6; background:rgba(36,124,128,.45); color:#fff; }
+.calendar-day.is-today { box-shadow:inset 0 0 0 1px rgba(126,161,255,.72); }
+.calendar-day.is-empty { visibility:hidden; pointer-events:none; }
+.calendar-help, .panel-subtitle, .appointment-status { color:#8fa5c1; font-size:11px; line-height:1.45; }
+.calendar-help { margin:13px 0 0; }
+.appointment-form-card { display:grid; align-content:start; gap:11px; }
+.appointment-form-card .edit-field { margin:0; }
+.appointment-form-card textarea { resize:vertical; min-height:76px; }
+.appointment-save-button { margin-top:3px; width:100%; }
+.appointment-status { margin:0; min-height:16px; }
+.appointment-preview-card { margin-top:18px; border-color:rgba(140,109,244,.32); background:linear-gradient(135deg,rgba(47,40,92,.48),rgba(11,33,56,.72)); }
+.preview-countdown { display:flex; align-items:baseline; flex-wrap:wrap; gap:12px; margin-top:7px; }
+.preview-countdown strong { color:#eff4ff; font-size:20px; }
+.preview-countdown span, .preview-location { color:#b6c8df; font-size:12px; }
+.preview-location { margin-top:9px; color:#71e3d8; font-weight:700; }
+@media (max-width:760px) { .appointment-layout { grid-template-columns:1fr; } .appointment-preview-card { margin-top:12px; } }
+@media (max-width:600px) { .appointment-banner-grid { align-items:flex-start; } .appointment-banner-countdown { font-size:18px; } .appointment-banner-meta { font-size:11px; } .calendar-card, .appointment-form-card, .appointment-preview-card { padding:14px; } .calendar-day { min-height:35px; } }
+
 </style>
 
 <!-- Cinematic background -->
@@ -2857,7 +2899,7 @@ button, input, select, textarea { max-width: 100%; }
         ← Zurück
       </button>
       <button class="back-button" onclick="showMenu()">🏠 Menü</button>
-      <button class="logout-button" onclick="logout()">Logout</button>
+      <button id="appTopLogout" class="logout-button" onclick="logout()" style="display:none;">Logout</button>
     </div>
 
     <div id="globalStatus" class="status"></div>
@@ -2874,11 +2916,14 @@ button, input, select, textarea { max-width: 100%; }
           <button class="dashboard-nav-item" type="button" onclick="showSaufiMenu()" title="Bier &amp; Cocktails"><span class="nav-icon" aria-hidden="true">♧</span><span class="nav-label">Bier &amp; Cocktails</span></button>
           <button class="dashboard-nav-item" type="button" onclick="showGamesApp()" title="Spieleabend"><span class="nav-icon" aria-hidden="true">⌘</span><span class="nav-label">Spieleabend</span></button>
           <button class="dashboard-nav-item" type="button" onclick="showYugiohApp()" title="Yu-Gi-Oh! Decks"><span class="nav-icon" aria-hidden="true">◈</span><span class="nav-label">Yu-Gi-Oh! Decks</span></button>
+          <button class="dashboard-nav-item" type="button" onclick="showAppointmentsApp()" title="Termine abstimmen"><span class="nav-icon" aria-hidden="true">◷</span><span class="nav-label">Termine</span></button>
         </nav>
+        <button id="sidebarLogout" class="sidebar-logout-button" type="button" onclick="logout()"><span class="nav-icon" aria-hidden="true">⇥</span><span class="nav-label">Logout</span></button>
 
       </aside>
 
       <main class="dashboard-main">
+        <section id="nextAppointmentBanner" class="next-appointment-banner" aria-live="polite" hidden></section>
         <div class="dashboard-masthead" aria-label="WatchFeast and Game">
           <div class="dashboard-masthead-mark" aria-hidden="true">▶</div>
           <div class="dashboard-masthead-text">
@@ -3011,6 +3056,36 @@ button, input, select, textarea { max-width: 100%; }
 
       <div id="yugiohDeckList" class="yugioh-list"></div>
 
+    </div>
+
+    <!-- Termine abstimmen -->
+    <div id="appointmentsApp" class="app-panel appointments-panel" style="display:none;">
+      <div class="list-panel-heading">
+        <div><h2>◷ Termine abstimmen</h2><p class="panel-subtitle">Gemeinsame Abende planen und den nächsten Termin festlegen.</p></div>
+        <button class="list-settings-button" type="button" onclick="clearNextAppointment()" aria-label="Nächsten Termin entfernen" title="Nächsten Termin entfernen">×</button>
+      </div>
+      <div class="appointment-layout">
+        <section class="calendar-card" aria-label="Kalender">
+          <div class="calendar-toolbar"><button type="button" onclick="changeCalendarMonth(-1)" aria-label="Vorheriger Monat">‹</button><strong id="calendarMonthLabel"></strong><button type="button" onclick="changeCalendarMonth(1)" aria-label="Nächster Monat">›</button></div>
+          <div class="calendar-weekdays"><span>Mo</span><span>Di</span><span>Mi</span><span>Do</span><span>Fr</span><span>Sa</span><span>So</span></div>
+          <div id="appointmentCalendar" class="appointment-calendar"></div>
+          <p class="calendar-help">Wähle einen Tag aus. Er wird direkt in das Terminformular übernommen.</p>
+        </section>
+        <section class="appointment-form-card">
+          <div class="dashboard-kicker">Nächsten Termin festlegen</div>
+          <label class="edit-field"><span>Titel</span><input id="appointmentTitle" placeholder="z. B. Spieleabend"></label>
+          <label class="edit-field"><span>Datum und Uhrzeit</span><input id="appointmentDate" type="datetime-local"></label>
+          <label class="edit-field"><span>Ort</span><input id="appointmentLocation" placeholder="z. B. Bei Anna, Café oder online"></label>
+          <label class="edit-field"><span>Freitext / Notiz</span><textarea id="appointmentNote" rows="3" placeholder="Was soll mitgebracht werden? Wer kommt mit?"></textarea></label>
+          <button class="appointment-save-button" type="button" onclick="saveNextAppointment()">📅 Nächsten Termin festlegen</button>
+          <p id="appointmentStatus" class="appointment-status" role="status"></p>
+        </section>
+      </div>
+      <section class="appointment-preview-card" aria-label="Beispielvorschau">
+        <div class="dashboard-kicker">Beispielvorschau</div>
+        <div class="preview-countdown"><strong>In 12 Tagen</strong><span>Freitag, 09. Oktober · 19:00 Uhr</span></div>
+        <div class="preview-location">⌖ Bei Anna · Spieleabend</div>
+      </section>
     </div>
 
     <!-- Serien & Filme -->
@@ -3301,6 +3376,11 @@ const beerApp = document.getElementById("beerApp");
 const cocktailApp = document.getElementById("cocktailApp");
 const gamesApp = document.getElementById("gamesApp");
 const yugiohApp = document.getElementById("yugiohApp");
+const appointmentsApp = document.getElementById("appointmentsApp");
+const nextAppointmentBanner = document.getElementById("nextAppointmentBanner");
+let nextAppointment = null;
+let calendarCursor = new Date();
+let appointmentCountdownTimer = null;
 
 const emailInput = document.getElementById("email");
 const passwordInput = document.getElementById("password");
@@ -4287,6 +4367,7 @@ function showAppShell() {
 
   showMenu(false);
   loadCustomLists();
+  loadNextAppointment();
 }
 
 async function initAuth() {
@@ -4357,7 +4438,8 @@ const appViewLoaders = {
     renderYugiohPlayerInputs();
     await loadYugiohDecks();
   },
-  custom: loadCustomListItems
+  custom: loadCustomListItems,
+  appointments: loadNextAppointment
 };
 
 function hideAllPanels() {
@@ -4370,9 +4452,17 @@ function hideAllPanels() {
   gamesApp.style.display = "none";
   yugiohApp.style.display = "none";
   customListApp.style.display = "none";
+  appointmentsApp.style.display = "none";
   setStatus("");
 }
 
+function updateLogoutVisibility() {
+  const topLogout = document.getElementById("appTopLogout");
+  const sidebarLogout = document.getElementById("sidebarLogout");
+  const isMenu = currentView === "menu";
+  if (topLogout) topLogout.style.display = isMenu ? "none" : "inline-flex";
+  if (sidebarLogout) sidebarLogout.style.display = "flex";
+}
 function showPanelForView(view) {
   hideAllPanels();
   currentView = view;
@@ -4394,12 +4484,17 @@ function showPanelForView(view) {
   } else if (view === "custom") {
     customListApp.style.display = "block";
     renderCustomListPanel();
+  } else if (view === "appointments") {
+    appointmentsApp.style.display = "block";
+    renderAppointmentCalendar();
+    fillAppointmentFormFromCurrent();
   } else {
     currentView = "menu";
     menuBox.style.display = "block";
   }
 
   updateBackButtonVisibility();
+  updateLogoutVisibility();
 }
 
 function updateBackButtonVisibility() {
@@ -4506,9 +4601,102 @@ function showGamesApp() {
 function showYugiohApp() {
   return navigateToView("yugioh", "push");
 }
+function showAppointmentsApp() {
+  return navigateToView("appointments", "push");
+}
 
 
 
+/* Termine, Kalender und Countdown */
+function appointmentStorageKey() { return `wfg-next-appointment:${currentUser?.id || "guest"}`; }
+function formatAppointmentDate(value, withTime = true) {
+  if (!value) return "";
+  const date = new Date(value);
+  return new Intl.DateTimeFormat("de-DE", { weekday:"long", day:"2-digit", month:"long", year:"numeric", ...(withTime ? { hour:"2-digit", minute:"2-digit" } : {}) }).format(date);
+}
+function appointmentCountdown(value) {
+  const diff = new Date(value).getTime() - Date.now();
+  if (diff <= 0) return "Heute";
+  const days = Math.floor(diff / 86400000), hours = Math.floor(diff % 86400000 / 3600000), minutes = Math.floor(diff % 3600000 / 60000);
+  if (days > 0) return `In ${days} ${days === 1 ? "Tag" : "Tagen"}`;
+  if (hours > 0) return `In ${hours} ${hours === 1 ? "Stunde" : "Stunden"}`;
+  return `In ${Math.max(1, minutes)} Min.`;
+}
+function renderNextAppointment() {
+  if (!nextAppointment || !nextAppointment.start_at || new Date(nextAppointment.start_at) < new Date()) {
+    nextAppointmentBanner.hidden = true;
+    return;
+  }
+  const title = nextAppointment.title || "Nächster gemeinsamer Termin";
+  nextAppointmentBanner.hidden = false;
+  nextAppointmentBanner.innerHTML = `<div class="appointment-banner-grid"><div class="appointment-banner-icon">◷</div><div class="appointment-banner-copy"><div class="appointment-banner-kicker">Nächster gemeinsamer Termin</div><div class="appointment-banner-countdown">${escapeHtml(title)} · ${appointmentCountdown(nextAppointment.start_at)}</div><div class="appointment-banner-meta"><span>📅 ${formatAppointmentDate(nextAppointment.start_at)}</span>${nextAppointment.location ? `<span>⌖ ${escapeHtml(nextAppointment.location)}</span>` : ""}</div>${nextAppointment.note ? `<div class="appointment-banner-note">${escapeHtml(nextAppointment.note)}</div>` : ""}</div></div>`;
+}
+function tickAppointmentCountdown() { if (currentView === "menu") renderNextAppointment(); }
+async function loadNextAppointment() {
+  if (!currentUser) return;
+  const { data, error } = await supabaseClient.from("shared_events").select("id,title,start_at,location,note,user_id").eq("user_id", currentUser.id).gte("start_at", new Date().toISOString()).order("start_at", { ascending:true }).limit(1);
+  if (!error) {
+    nextAppointment = data?.[0] || null;
+  } else {
+    try { nextAppointment = JSON.parse(localStorage.getItem(appointmentStorageKey()) || "null"); } catch (_) { nextAppointment = null; }
+  }
+  renderNextAppointment();
+  renderAppointmentCalendar();
+}
+function fillAppointmentFormFromCurrent() {
+  if (!nextAppointment) return;
+  document.getElementById("appointmentTitle").value = nextAppointment.title || "";
+  document.getElementById("appointmentDate").value = toDateTimeLocal(nextAppointment.start_at);
+  document.getElementById("appointmentLocation").value = nextAppointment.location || "";
+  document.getElementById("appointmentNote").value = nextAppointment.note || "";
+}
+function toDateTimeLocal(value) {
+  const d = new Date(value); if (Number.isNaN(d.getTime())) return "";
+  const pad = n => String(n).padStart(2,"0");
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+function changeCalendarMonth(delta) { calendarCursor = new Date(calendarCursor.getFullYear(), calendarCursor.getMonth()+delta, 1); renderAppointmentCalendar(); }
+function selectCalendarDate(day) {
+  const d = new Date(calendarCursor.getFullYear(), calendarCursor.getMonth(), day, 19, 0, 0);
+  document.getElementById("appointmentDate").value = toDateTimeLocal(d.toISOString());
+  renderAppointmentCalendar(day);
+}
+function renderAppointmentCalendar(selectedDay) {
+  const grid = document.getElementById("appointmentCalendar"), label = document.getElementById("calendarMonthLabel");
+  if (!grid || !label) return;
+  const year=calendarCursor.getFullYear(), month=calendarCursor.getMonth(), first=new Date(year,month,1), last=new Date(year,month+1,0);
+  label.textContent = new Intl.DateTimeFormat("de-DE", {month:"long", year:"numeric"}).format(first);
+  const offset=(first.getDay()+6)%7, selected=selectedDay || (nextAppointment ? new Date(nextAppointment.start_at).getMonth()===month && new Date(nextAppointment.start_at).getFullYear()===year ? new Date(nextAppointment.start_at).getDate() : 0 : 0), today=new Date();
+  grid.innerHTML="";
+  for(let i=0;i<offset;i++){const empty=document.createElement("span");empty.className="calendar-day is-empty";grid.appendChild(empty);}
+  for(let day=1;day<=last.getDate();day++){
+    const button=document.createElement("button");button.type="button";button.className="calendar-day";button.textContent=day;
+    if(day===today.getDate()&&month===today.getMonth()&&year===today.getFullYear())button.classList.add("is-today");
+    if(day===selected)button.classList.add("selected");
+    button.onclick=()=>selectCalendarDate(day);grid.appendChild(button);
+  }
+}
+async function saveNextAppointment() {
+  const title=document.getElementById("appointmentTitle").value.trim() || "Gemeinsamer Termin";
+  const raw=document.getElementById("appointmentDate").value;
+  const status=document.getElementById("appointmentStatus");
+  if(!raw){status.textContent="Bitte zuerst ein Datum auswählen.";return;}
+  const startAt=new Date(raw); if(Number.isNaN(startAt.getTime()) || startAt <= new Date()){status.textContent="Bitte einen Termin in der Zukunft wählen.";return;}
+  const payload={title,start_at:startAt.toISOString(),location:document.getElementById("appointmentLocation").value.trim(),note:document.getElementById("appointmentNote").value.trim(),user_id:currentUser.id};
+  const {data,error}=await supabaseClient.from("shared_events").upsert(payload,{onConflict:"user_id"}).select().single();
+  if(error){ nextAppointment={...payload,id:"local-preview"}; localStorage.setItem(appointmentStorageKey(),JSON.stringify(nextAppointment)); status.textContent="Lokal gespeichert. Für gemeinsame Synchronisierung bitte das SQL-Schema ausführen."; }
+  else { nextAppointment=data; localStorage.removeItem(appointmentStorageKey()); status.textContent="Termin gespeichert und auf der Übersicht aktiviert."; }
+  renderNextAppointment(); renderAppointmentCalendar(new Date(startAt).getDate());
+}
+async function clearNextAppointment() {
+  if(!currentUser) return;
+  if(!confirm("Den nächsten Termin wirklich entfernen?")) return;
+  const {error}=await supabaseClient.from("shared_events").delete().eq("user_id",currentUser.id);
+  localStorage.removeItem(appointmentStorageKey()); nextAppointment=null; renderNextAppointment();
+  if(currentView==="appointments") document.getElementById("appointmentStatus").textContent=error ? "Lokaler Termin entfernt." : "Termin entfernt.";
+}
+function escapeHtml(value) { return String(value).replace(/[&<>'"]/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;","\"":"&quot;"}[ch])); }
+if (!appointmentCountdownTimer) appointmentCountdownTimer=setInterval(tickAppointmentCountdown, 30000);
 /* Serien & Filme */
 
 async function loadMovieItems() {
