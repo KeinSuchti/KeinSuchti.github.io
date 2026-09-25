@@ -3175,6 +3175,39 @@ button, input, select, textarea { max-width: 100%; }
   body.app-scene .dashboard-sidebar > .sidebar-logout-button { margin-top:12px !important; }
 }
 
+
+/* --- Alle größeren Ansichten: Logout direkt unter dem letzten Menüpunkt --- */
+@media (min-width:901px) {
+  body.app-scene .dashboard-sidebar {
+    box-sizing:border-box;
+    overflow-y:auto !important;
+    overflow-x:hidden !important;
+    display:flex;
+    flex-direction:column;
+    padding-bottom:18px;
+  }
+  body.app-scene .dashboard-sidebar > .dashboard-nav {
+    flex:0 0 auto !important;
+    min-height:0;
+    overflow:visible !important;
+    padding-bottom:0 !important;
+    margin-bottom:0;
+  }
+  body.app-scene .dashboard-sidebar > .sidebar-logout-button {
+    position:static !important;
+    inset:auto !important;
+    transform:none !important;
+    width:100% !important;
+    height:50px !important;
+    min-height:50px !important;
+    max-height:50px !important;
+    flex:0 0 50px !important;
+    margin:14px 0 0 !important;
+    padding:0 14px !important;
+    z-index:auto;
+  }
+}
+
 </style>
 
 <!-- Cinematic background -->
