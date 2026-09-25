@@ -3535,8 +3535,6 @@ button, input, select, textarea { max-width: 100%; }
             <div class="dashboard-card-body"><span class="card-icon">✦</span><div><h3>Neue Liste</h3><p>Eigene Liste mit Sortierung, Filtern und Zufallsauswahl anlegen.</p></div><span class="card-arrow">→</span></div>
           </button>
         </div>
-
-        <div class="dashboard-statusbar"><span class="online-dot"></span><strong>Online</strong><span>Bereit für den nächsten gemeinsamen Abend.</span><span class="dashboard-status-badge">CINEMATIC UI</span></div>
       </main>
     </div>
 
@@ -5224,7 +5222,7 @@ function renderNextAppointment() {
     nextAppointmentBanner.hidden = true;
     return;
   }
-  const title = nextAppointment.title || "Nächster gemeinsamer Termin";
+  const title = nextAppointment.title || "Wo und wann?";
   nextAppointmentBanner.hidden = false;
   nextAppointmentBanner.innerHTML = `<div class="appointment-banner-grid"><div class="appointment-banner-icon">◷</div><div class="appointment-banner-copy"><div class="appointment-banner-kicker">Nächster gemeinsamer Termin</div><div class="appointment-banner-countdown">${escapeHtml(title)} · ${appointmentCountdown(nextAppointment.start_at)}</div><div class="appointment-banner-meta"><span>📅 ${formatAppointmentDate(nextAppointment.start_at)}</span>${nextAppointment.location ? `<span>⌖ ${escapeHtml(nextAppointment.location)}</span>` : ""}</div>${nextAppointment.note ? `<div class="appointment-banner-note">${escapeHtml(nextAppointment.note)}</div>` : ""}</div></div>`;
 }
