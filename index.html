@@ -2291,7 +2291,7 @@ body.app-scene #menuBox {
   margin:0 !important; padding:0 !important; border:0 !important; background:transparent !important; box-shadow:none !important;
 }
 .dashboard-shell { display:grid; grid-template-columns:238px minmax(0,1fr); min-height:calc(100vh - 50px); border:1px solid rgba(101,137,198,.18); border-radius:22px; overflow:hidden; background:rgba(4,14,29,.78); box-shadow:0 28px 90px rgba(0,0,0,.38); backdrop-filter:blur(12px); }
-.dashboard-sidebar { padding:22px 15px 18px; border-right:1px solid rgba(118,145,199,.16); background:linear-gradient(180deg, rgba(5,18,37,.94), rgba(5,14,29,.90)); display:flex; flex-direction:column; }
+.dashboard-sidebar {position: fixed; top: 0; left: 0; width: 260px;  height: 100vh; z-index: 1000; padding:22px 15px 18px; border-right:1px solid rgba(118,145,199,.16); background:linear-gradient(180deg, rgba(5,18,37,.94), rgba(5,14,29,.90)); display:flex; flex-direction:column; }
 .dashboard-brand { display:flex; align-items:center; gap:10px; color:#eef5ff; font-size:21px; font-weight:800; padding:5px 8px 25px; }
 .dashboard-brand > span:last-child span { color:#48dfd0; } .dashboard-brand > span:last-child b { color:#8a6df4; }
 .brand-mark { width:34px; height:34px; border-radius:11px; display:grid; place-items:center; background:linear-gradient(135deg,#35e4d0,#5968ff 60%,#8c4cf5); color:#fff; box-shadow:0 8px 22px rgba(81,99,245,.25); }
@@ -2302,7 +2302,7 @@ body.app-scene #menuBox {
 .dashboard-nav-item.active span { color:#57e1d5; }
 .dashboard-sidebar-footer { margin-top:auto; border-top:1px solid rgba(118,145,199,.13); padding-top:14px; }
 .sidebar-motto { color:#6f83a3; font-family:var(--font-display); font-size:12px; line-height:1.55; text-align:center; padding:28px 12px 4px; }
-.dashboard-main { padding:28px 30px 22px; min-width:0; }
+.dashboard-main {margin-left: 260px; padding:28px 30px 22px; min-width:0; }
 .dashboard-topbar { display:flex; align-items:flex-start; justify-content:space-between; gap:18px; margin:0 0 20px; }
 .dashboard-kicker { color:#62e4d5; font-size:11px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; margin-bottom:3px; }
 .dashboard-topbar h2 { text-align:left; margin:0; font-size:29px; color:#eaf1fc; }
@@ -2570,10 +2570,6 @@ body.login-scene::before{content:"";display:block !important;position:fixed;inse
           <button class="dashboard-nav-item" type="button" onclick="showYugiohApp()"><span>◈</span> Yu-Gi-Oh! Decks</button>
         </nav>
 
-        <div class="dashboard-sidebar-footer">
-          <button class="dashboard-nav-item" type="button" onclick="logout()"><span>↪</span> Logout</button>
-          <div class="sidebar-motto">Gute Gesellschaft<br>macht aus einfachen<br>Momenten besondere.</div>
-        </div>
       </aside>
 
       <main class="dashboard-main">
