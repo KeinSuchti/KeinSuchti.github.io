@@ -3218,6 +3218,78 @@ button, input, select, textarea { max-width: 100%; }
   body.app-scene:not(.mobile-sidebar-open) .dashboard-shell .dashboard-sidebar { z-index:9002 !important; }
 }
 
+
+/* --- Finaler mobiler Drawer: eigenständig, klickbar und sanft animiert --- */
+@media (max-width:900px) {
+  body.app-scene .dashboard-shell {
+    position:static !important;
+    z-index:auto !important;
+  }
+  body.app-scene .mobile-sidebar-backdrop {
+    position:fixed !important;
+    inset:0 !important;
+    z-index:10000 !important;
+    display:block !important;
+    opacity:0;
+    visibility:hidden;
+    pointer-events:none;
+    transition:opacity .28s ease, visibility 0s linear .28s;
+  }
+  body.app-scene .dashboard-shell .dashboard-sidebar {
+    position:fixed !important;
+    top:0 !important;
+    left:0 !important;
+    z-index:10002 !important;
+    box-sizing:border-box;
+    width:min(86vw,310px);
+    height:100dvh;
+    max-height:none;
+    visibility:hidden;
+    opacity:0;
+    pointer-events:none;
+    transform:translate3d(-105%,0,0) !important;
+    will-change:transform,opacity;
+    transition:transform .34s cubic-bezier(.22,.61,.36,1), opacity .22s ease, visibility 0s linear .34s;
+  }
+  body.app-scene.mobile-sidebar-open .mobile-sidebar-backdrop {
+    opacity:1;
+    visibility:visible;
+    pointer-events:auto;
+    transition:opacity .28s ease, visibility 0s linear 0s;
+  }
+  body.app-scene.mobile-sidebar-open .dashboard-shell .dashboard-sidebar {
+    visibility:visible !important;
+    opacity:1 !important;
+    pointer-events:auto !important;
+    transform:translate3d(0,0,0) !important;
+    transition:transform .34s cubic-bezier(.22,.61,.36,1), opacity .22s ease, visibility 0s linear 0s;
+  }
+  body.app-scene .mobile-menu-toggle {
+    z-index:10004 !important;
+    transition:opacity .2s ease, transform .2s ease;
+  }
+  body.app-scene.mobile-sidebar-open .mobile-menu-toggle {
+    opacity:0;
+    pointer-events:none;
+  }
+  body.app-scene .mobile-collapsed-logout { z-index:10003 !important; }
+}
+@media (max-width:380px) {
+  body.app-scene .dashboard-shell .dashboard-sidebar { width:min(92vw,300px); }
+}
+
+
+/* Overlay bleibt sichtbar, darf im geöffneten Zustand aber keine Menü-Klicks blockieren. */
+@media (max-width:900px) {
+  body.app-scene.mobile-sidebar-open .mobile-sidebar-backdrop {
+    pointer-events:none !important;
+  }
+  body.app-scene.mobile-sidebar-open .dashboard-shell .dashboard-sidebar,
+  body.app-scene.mobile-sidebar-open .dashboard-shell .dashboard-sidebar * {
+    pointer-events:auto !important;
+  }
+}
+
 </style>
 
 <!-- Cinematic background -->
@@ -7487,6 +7559,17 @@ function toggleSidebar() {
     const b=document.getElementById("mobileMenuToggle"), o=document.getElementById("mobileSidebarBackdrop");
     if (b) { b.setAttribute("aria-expanded",String(open)); b.setAttribute("aria-label",open?"Navigation schließen":"Navigation öffnen"); b.title=open?"Navigation schließen":"Navigation öffnen"; }
     if (o) o.setAttribute("aria-hidden",String(!open));
+    const drawer=document.getElementById("menuSidebar");
+    if (drawer) {
+      if (drawer.getAnimations) drawer.getAnimations().forEach(animation => animation.cancel());
+      drawer.style.setProperty("transition", "none", "important");
+      drawer.style.setProperty("transform", open ? "translate3d(0,0,0)" : "translate3d(-105%,0,0)", "important");
+      drawer.style.setProperty("opacity", open ? "1" : "0", "important");
+      drawer.style.setProperty("visibility", open ? "visible" : "hidden", "important");
+      drawer.style.setProperty("pointer-events", open ? "auto" : "none", "important");
+      drawer.style.setProperty("z-index", "10002", "important");
+      if (open) setTimeout(() => drawer.style.removeProperty("transition"), 20);
+    }
     return;
   }
   const isCollapsed=document.body.classList.toggle('sidebar-collapsed');
@@ -7495,6 +7578,36 @@ function toggleSidebar() {
 }
 document.querySelectorAll(".dashboard-nav-item").forEach(item => item.addEventListener("click", closeMobileSidebar));
 window.addEventListener("resize", () => { if (!isMobileSidebar()) document.body.classList.remove("mobile-sidebar-open"); });
+</script>
+<script>
+/* Stabilisiert den mobilen Drawer auch nach Auth-/Navigationsupdates. */
+(function () {
+  function syncMobileDrawer() {
+    if (!window.matchMedia || !window.matchMedia("(max-width: 900px)").matches) return;
+    const drawer = document.querySelector("#menuSidebar");
+    if (!drawer) return;
+    const open = document.body.classList.contains("mobile-sidebar-open");
+    if (drawer.getAnimations) drawer.getAnimations().forEach(animation => animation.cancel());
+    drawer.style.setProperty("transition", "none", "important");
+    drawer.style.setProperty("transform", open ? "translate3d(0,0,0)" : "translate3d(-105%,0,0)", "important");
+    drawer.style.setProperty("opacity", open ? "1" : "0", "important");
+    drawer.style.setProperty("visibility", open ? "visible" : "hidden", "important");
+    drawer.style.setProperty("pointer-events", open ? "auto" : "none", "important");
+    drawer.style.setProperty("z-index", "10002", "important");
+    if (open) setTimeout(() => drawer.style.removeProperty("transition"), 20);
+  }
+  document.addEventListener("click", function (event) {
+    if (event.target.closest("#mobileMenuToggle, #sidebarToggle, .dashboard-nav-item, #sidebarLogout")) {
+      requestAnimationFrame(syncMobileDrawer);
+      setTimeout(syncMobileDrawer, 30);
+    }
+  }, true);
+  document.addEventListener("keydown", function (event) {
+    if (event.key === "Escape") requestAnimationFrame(syncMobileDrawer);
+  });
+  window.addEventListener("resize", syncMobileDrawer);
+  window.addEventListener("load", function () { setTimeout(syncMobileDrawer, 80); });
+})();
 </script>
 </body>
 </html>
