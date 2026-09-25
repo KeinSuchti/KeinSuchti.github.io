@@ -2914,6 +2914,41 @@ button, input, select, textarea { max-width: 100%; }
   body.app-scene .dashboard-sidebar > .sidebar-logout-button { min-height:46px; padding:11px 12px; font-size:12px; }
 }
 
+
+/* --- Sichtbarer Logout-Footer im mobilen Drawer --- */
+@media (max-width:900px) {
+  body.app-scene .dashboard-sidebar { position:fixed; }
+  body.app-scene .dashboard-sidebar > .dashboard-nav { padding-bottom:78px; }
+  body.app-scene .dashboard-sidebar > .sidebar-logout-button {
+    position:absolute !important;
+    left:12px;
+    right:12px;
+    bottom:calc(12px + env(safe-area-inset-bottom, 0px));
+    width:auto;
+    margin:0;
+    min-height:48px;
+    max-height:54px;
+  }
+}
+@media (max-width:380px) {
+  body.app-scene .dashboard-sidebar { padding-left:10px; padding-right:10px; }
+  body.app-scene .dashboard-sidebar > .sidebar-logout-button { left:10px; right:10px; bottom:calc(10px + env(safe-area-inset-bottom, 0px)); min-height:46px; }
+  body.app-scene .dashboard-sidebar > .dashboard-nav { padding-bottom:72px; }
+}
+
+
+/* Zusätzlicher visueller Sicherheitsabstand gegen Browserleisten und Safe Areas */
+@media (max-width:900px) {
+  body.app-scene .dashboard-sidebar > .sidebar-logout-button {
+    bottom:24px;
+    min-height:46px;
+    max-height:50px;
+  }
+}
+@media (max-width:380px) {
+  body.app-scene .dashboard-sidebar > .sidebar-logout-button { bottom:22px; min-height:44px; }
+}
+
 </style>
 
 <!-- Cinematic background -->
