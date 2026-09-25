@@ -3290,6 +3290,27 @@ button, input, select, textarea { max-width: 100%; }
   }
 }
 
+
+/* --- Mobile Overlay darf den Drawer nicht mehr überdecken --- */
+@media (max-width:900px) {
+  body.app-scene.mobile-sidebar-open .mobile-sidebar-backdrop {
+    top:0 !important;
+    right:0 !important;
+    bottom:0 !important;
+    left:calc(min(86vw,310px) + 16px) !important;
+    width:auto !important;
+    background:rgba(1,7,17,.48) !important;
+    backdrop-filter:none !important;
+    -webkit-backdrop-filter:none !important;
+    pointer-events:none !important;
+  }
+}
+@media (max-width:380px) {
+  body.app-scene.mobile-sidebar-open .mobile-sidebar-backdrop {
+    left:calc(min(92vw,300px) + 16px) !important;
+  }
+}
+
 </style>
 
 <!-- Cinematic background -->
