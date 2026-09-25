@@ -2655,6 +2655,132 @@ body.login-scene::before{content:"";display:block !important;position:fixed;inse
 .settings-feature-list strong { color:#eaf1fc; }
 @media (max-width:760px) { .custom-list-heading-actions { width:100%; justify-content:space-between; } }
 
+
+/* =========================================================
+   Final responsive pass – Smartphone, Tablet und kleine Laptops
+   ========================================================= */
+*, *::before, *::after { box-sizing: border-box; }
+html { overflow-x: hidden; }
+body { min-width: 0; overflow-x: hidden; }
+img, video, canvas, svg { max-width: 100%; }
+button, input, select, textarea { max-width: 100%; }
+
+@media (max-width: 900px) {
+  body.app-scene #appShell { width:100%; max-width:100%; padding:10px 12px 24px; }
+  body.app-scene .top-actions { position:static; display:flex; align-items:center; flex-wrap:wrap; gap:8px; margin:0 0 12px; }
+  body.app-scene .top-actions button { min-height:40px; }
+  body.app-scene .top-actions #appBackButton { margin-right:auto; }
+  body.app-scene .dashboard-shell { display:block; min-height:0; width:100%; overflow:visible; border-radius:16px; }
+  body.app-scene .dashboard-sidebar { position:static; width:100%; height:auto; min-height:0; padding:10px; border-right:0; border-bottom:1px solid rgba(118,145,199,.16); overflow:visible; display:block; }
+  body.app-scene .dashboard-sidebar > .sidebar-toggle-floating { display:none; }
+  body.app-scene .dashboard-sidebar > .dashboard-nav { margin:0; display:flex; flex-direction:row; gap:7px; overflow-x:auto; overflow-y:hidden; padding:2px 0 4px; scrollbar-width:thin; }
+  body.app-scene .dashboard-nav-item { flex:0 0 auto; width:auto !important; min-height:42px; padding:9px 12px !important; justify-content:center; white-space:nowrap; }
+  body.app-scene .dashboard-nav-item .nav-label { max-width:180px; opacity:1; pointer-events:auto; }
+  body.app-scene .dashboard-main, body.app-scene .sidebar-collapsed .dashboard-main { width:100%; min-width:0; margin-left:0; padding:18px 14px 22px; }
+  body.app-scene .dashboard-masthead { max-width:100%; }
+  body.app-scene .dashboard-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+  body.app-scene .dashboard-card { min-width:0; min-height:190px; }
+  body.app-scene .dashboard-card-body { grid-template-columns:32px minmax(0,1fr) 26px; padding:11px; gap:7px; }
+  body.app-scene .dashboard-card h3 { font-size:14px; }
+  body.app-scene .dashboard-card p { font-size:10px; }
+  body.app-scene .dashboard-statusbar { flex-wrap:wrap; }
+  body.app-scene .dashboard-status-badge { margin-left:auto; }
+  body.app-scene .app-panel { width:100%; min-width:0; margin-top:12px; padding:18px 14px; border-radius:15px; overflow:hidden; }
+  body.app-scene .app-panel > h2, body.app-scene .list-panel-heading h2 { font-size:21px; line-height:1.2; }
+  body.app-scene .card-controls, body.app-scene .games-check-controls { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
+  body.app-scene .card-controls select, body.app-scene .games-check-controls select { width:100%; min-width:0; }
+  body.app-scene .movie-add-section, body.app-scene .card-add-form, body.app-scene .games-add-form, body.app-scene .games-column-form, body.app-scene .yugioh-add-form { width:100%; min-width:0; }
+  body.app-scene .custom-list-add-form { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  body.app-scene .card-item-header, body.app-scene .movie-item-top { min-width:0; }
+  body.app-scene .movie-item, body.app-scene .card-item, body.app-scene .yugioh-deck-card { min-width:0; overflow:hidden; }
+  body.app-scene .movie-left, body.app-scene .card-item-header > * { min-width:0; }
+  body.app-scene .movie-left label, body.app-scene .card-item-header label { overflow-wrap:anywhere; }
+  body.app-scene .games-table-wrapper { max-width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch; }
+  body.app-scene .games-mobile-list { width:100%; }
+  body.app-scene .popup-overlay, body.app-scene .edit-overlay { padding:12px; align-items:flex-start; overflow-y:auto; }
+  body.app-scene .popup-box, body.app-scene .edit-box { width:min(100%,560px); max-height:calc(100dvh - 24px); overflow-y:auto; padding:20px 16px; }
+  body.app-scene .create-list-dialog-box { width:100%; }
+}
+
+@media (max-width: 600px) {
+  body.app-scene #appShell { padding:8px 8px 20px; }
+  body.app-scene .top-actions { gap:6px; }
+  body.app-scene .top-actions button { flex:1 1 auto; min-width:0; padding:9px 10px; font-size:12px; }
+  body.app-scene .top-actions #appBackButton { flex:1 1 100%; margin-right:0; }
+  body.app-scene .dashboard-sidebar { padding:8px 6px; }
+  body.app-scene .dashboard-nav-item { padding:8px 10px !important; font-size:11px !important; }
+  body.app-scene .dashboard-nav-item .nav-icon { font-size:14px !important; }
+  body.app-scene .dashboard-main { padding:14px 10px 18px; }
+  body.app-scene .dashboard-masthead { justify-content:flex-start; gap:8px; padding:2px 0 12px; margin-bottom:12px; }
+  body.app-scene .dashboard-masthead-title { font-size:19px; }
+  body.app-scene .dashboard-masthead-mark { width:32px; height:32px; font-size:15px; border-radius:9px; }
+  body.app-scene .dashboard-grid { grid-template-columns:1fr; gap:10px; }
+  body.app-scene .dashboard-card { min-height:170px; }
+  body.app-scene .dashboard-card-image { min-height:100px; }
+  body.app-scene .dashboard-card-body { min-height:68px; }
+  body.app-scene .dashboard-statusbar { gap:6px; font-size:9px; }
+  body.app-scene .dashboard-status-badge { width:100%; margin-left:0; text-align:center; }
+  body.app-scene .app-panel { padding:16px 11px; }
+  body.app-scene .list-panel-heading { align-items:flex-start; gap:8px; }
+  body.app-scene .list-panel-heading h2 { font-size:19px; overflow-wrap:anywhere; }
+  body.app-scene .list-settings-button { width:36px; height:36px; font-size:18px; }
+  body.app-scene .custom-list-panel .custom-list-heading { gap:12px; }
+  body.app-scene .custom-list-heading-actions { width:100%; display:grid; grid-template-columns:minmax(0,1fr) 38px; }
+  body.app-scene .custom-list-heading-actions .random-card-button { width:100%; min-width:0; }
+  body.app-scene .card-controls, body.app-scene .games-check-controls, body.app-scene .custom-list-add-form { grid-template-columns:1fr; }
+  body.app-scene .movie-add-section { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:8px; }
+  body.app-scene .movie-add-section input { min-width:0; }
+  body.app-scene .movie-item-top { align-items:flex-start; }
+  body.app-scene .movie-actions { gap:4px; }
+  body.app-scene .btn-small { min-width:30px; padding:7px 6px; }
+  body.app-scene .card-item-header { align-items:stretch; }
+  body.app-scene .card-item-header .card-item-actions { width:100%; }
+  body.app-scene .card-item-header .card-item-actions button { flex:1; min-width:0; }
+  body.app-scene .beer-grade-inputs { grid-template-columns:minmax(0,1fr) 72px; }
+  body.app-scene .yugioh-player-grid { grid-template-columns:1fr !important; }
+  body.app-scene .edit-actions, body.app-scene .popup-actions { grid-template-columns:1fr; }
+  body.app-scene .popup-box p { font-size:18px; }
+  body.login-scene #loginBox { width:calc(100% - 20px); max-width:none; margin:10px auto; }
+  body.login-scene .auth-brand-name { font-size:26px; }
+  body.login-scene .auth-tagline { font-size:11px; }
+}
+
+@media (max-width: 380px) {
+  body.app-scene .dashboard-nav-item .nav-label { display:none; }
+  body.app-scene .dashboard-nav-item { width:42px !important; padding:9px 8px !important; }
+  body.app-scene .dashboard-nav-item .nav-icon { margin:auto; }
+  body.app-scene .top-actions button { font-size:11px; padding-inline:7px; }
+  body.app-scene .app-panel { padding-inline:9px; }
+  body.app-scene .dashboard-card-body { grid-template-columns:28px minmax(0,1fr) 22px; padding:9px; }
+  body.app-scene .card-icon { width:28px; height:28px; font-size:13px; }
+  body.app-scene .card-arrow { width:24px; height:24px; font-size:14px; }
+}
+
+
+/* --- Mobile Burger-Navigation --- */
+.mobile-menu-toggle, .mobile-sidebar-backdrop { display:none; }
+@media (max-width:900px) {
+  body.app-scene .mobile-menu-toggle { position:fixed; top:12px; left:12px; z-index:1200; display:inline-flex; align-items:center; gap:8px; min-height:42px; padding:9px 13px 9px 10px; border:1px solid rgba(110,157,221,.38); border-radius:13px; background:rgba(7,22,42,.94); color:#eef5ff; box-shadow:0 10px 28px rgba(0,0,0,.28); cursor:pointer; }
+  body.app-scene .mobile-menu-toggle > span:first-child { display:grid; gap:4px; }
+  body.app-scene .mobile-menu-toggle i { display:block; width:20px; height:2px; border-radius:9px; background:#71e5d8; transition:transform .22s ease, opacity .22s ease; }
+  body.app-scene .mobile-menu-label { font-size:12px; font-weight:800; }
+  body.app-scene .mobile-sidebar-backdrop { position:fixed; inset:0; z-index:1090; display:block; background:rgba(1,7,17,.62); opacity:0; pointer-events:none; transition:opacity .25s ease; backdrop-filter:blur(2px); }
+  body.app-scene .dashboard-sidebar { position:fixed; top:0; left:0; z-index:1100; display:flex; flex-direction:column; width:min(86vw,310px); height:100dvh; padding:68px 12px 16px; border:0; border-right:1px solid rgba(118,145,199,.22); border-radius:0 18px 18px 0; background:linear-gradient(180deg,rgba(5,18,37,.99),rgba(5,14,29,.98)); box-shadow:18px 0 50px rgba(0,0,0,.35); transform:translateX(-105%); transition:transform .28s cubic-bezier(.22,.61,.36,1); overflow-y:auto; }
+  body.app-scene .dashboard-sidebar > .sidebar-toggle-floating { display:grid; position:absolute; top:16px; right:14px; left:auto; width:34px; height:34px; margin:0; transform:none; }
+  body.app-scene .dashboard-sidebar > .dashboard-nav { margin:8px 0 0; display:flex; flex-direction:column; gap:6px; overflow:visible; padding:0; }
+  body.app-scene .dashboard-nav-item { flex:0 0 auto; width:100% !important; min-height:46px; justify-content:flex-start; padding:11px 12px !important; }
+  body.app-scene .dashboard-nav-item .nav-label { display:block; max-width:220px; opacity:1; pointer-events:auto; }
+  body.app-scene.mobile-sidebar-open .dashboard-sidebar { transform:translateX(0); }
+  body.app-scene.mobile-sidebar-open .mobile-sidebar-backdrop { opacity:1; pointer-events:auto; }
+  body.app-scene.mobile-sidebar-open .mobile-menu-toggle { opacity:0; pointer-events:none; }
+  body.app-scene.mobile-sidebar-open .mobile-menu-toggle i:first-child { transform:translateY(6px) rotate(45deg); }
+  body.app-scene.mobile-sidebar-open .mobile-menu-toggle i:nth-child(2) { opacity:0; }
+  body.app-scene.mobile-sidebar-open .mobile-menu-toggle i:last-child { transform:translateY(-6px) rotate(-45deg); }
+  body.app-scene .dashboard-shell { display:block; }
+  body.app-scene .dashboard-main { margin-left:0; }
+}
+@media (max-width:380px) { body.app-scene .mobile-menu-toggle { top:8px; left:8px; min-height:38px; padding:7px 10px 7px 8px; } body.app-scene .mobile-menu-label { font-size:11px; } }
+
 </style>
 
 <!-- Cinematic background -->
@@ -2735,10 +2861,11 @@ body.login-scene::before{content:"";display:block !important;position:fixed;inse
     </div>
 
     <div id="globalStatus" class="status"></div>
-
+    <button id="mobileMenuToggle" class="mobile-menu-toggle" type="button" onclick="toggleSidebar()" aria-label="Navigation öffnen" aria-expanded="false" aria-controls="menuSidebar" title="Navigation öffnen"><span aria-hidden="true"><i></i><i></i><i></i></span><span class="mobile-menu-label">Menü</span></button>
+    <div id="mobileSidebarBackdrop" class="mobile-sidebar-backdrop" aria-hidden="true" onclick="closeMobileSidebar()"></div>
     <!-- Hauptmenü -->
     <div id="menuBox" class="dashboard-shell">
-      <aside class="dashboard-sidebar" aria-label="Hauptnavigation">
+      <aside id="menuSidebar" class="dashboard-sidebar" aria-label="Hauptnavigation">
         <button id="sidebarToggle" type="button" class="sidebar-toggle-btn sidebar-toggle-floating" onclick="toggleSidebar()" aria-label="Sidebar einklappen" aria-expanded="true" title="Sidebar ein- oder ausklappen">‹</button>
         <nav class="dashboard-nav">
           <button class="dashboard-nav-item active" type="button" onclick="showMenu()" aria-current="page" title="Übersicht"><span class="nav-icon" aria-hidden="true">⌂</span><span class="nav-label">Übersicht</span></button>
@@ -6682,6 +6809,7 @@ newGameColumnNameInput.addEventListener("keydown", event => {
 
 document.addEventListener("keydown", event => {
   if (event.key === "Escape") {
+    closeMobileSidebar();
     closeRandomPopup();
     closeYugiohAssignmentPopup();
     closeEditEntryModal();
@@ -6691,16 +6819,28 @@ document.addEventListener("keydown", event => {
 renderYugiohPlayerInputs();
 initAuth();
 
-function toggleSidebar() {
-  const isCollapsed = document.body.classList.toggle('sidebar-collapsed');
-  const toggleButton = document.getElementById('sidebarToggle');
-
-  if (toggleButton) {
-    toggleButton.setAttribute('aria-expanded', String(!isCollapsed));
-    toggleButton.setAttribute('aria-label', isCollapsed ? 'Sidebar ausklappen' : 'Sidebar einklappen');
-    toggleButton.title = isCollapsed ? 'Sidebar ausklappen' : 'Sidebar einklappen';
-  }
+function isMobileSidebar() { return window.matchMedia && window.matchMedia("(max-width: 900px)").matches; }
+function closeMobileSidebar() {
+  if (!isMobileSidebar()) return;
+  document.body.classList.remove("mobile-sidebar-open");
+  const b=document.getElementById("mobileMenuToggle"), o=document.getElementById("mobileSidebarBackdrop");
+  if (b) { b.setAttribute("aria-expanded","false"); b.setAttribute("aria-label","Navigation öffnen"); b.title="Navigation öffnen"; }
+  if (o) o.setAttribute("aria-hidden","true");
 }
+function toggleSidebar() {
+  if (isMobileSidebar()) {
+    const open=document.body.classList.toggle("mobile-sidebar-open");
+    const b=document.getElementById("mobileMenuToggle"), o=document.getElementById("mobileSidebarBackdrop");
+    if (b) { b.setAttribute("aria-expanded",String(open)); b.setAttribute("aria-label",open?"Navigation schließen":"Navigation öffnen"); b.title=open?"Navigation schließen":"Navigation öffnen"; }
+    if (o) o.setAttribute("aria-hidden",String(!open));
+    return;
+  }
+  const isCollapsed=document.body.classList.toggle('sidebar-collapsed');
+  const toggleButton=document.getElementById('sidebarToggle');
+  if (toggleButton) { toggleButton.setAttribute('aria-expanded',String(!isCollapsed)); toggleButton.setAttribute('aria-label',isCollapsed?'Sidebar ausklappen':'Sidebar einklappen'); toggleButton.title=isCollapsed?'Sidebar ausklappen':'Sidebar einklappen'; }
+}
+document.querySelectorAll(".dashboard-nav-item").forEach(item => item.addEventListener("click", closeMobileSidebar));
+window.addEventListener("resize", () => { if (!isMobileSidebar()) document.body.classList.remove("mobile-sidebar-open"); });
 </script>
 </body>
 </html>
