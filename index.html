@@ -2344,42 +2344,72 @@ body.app-scene #menuBox {
 .online-dot { width:8px; height:8px; border-radius:50%; background:#3ee0cb; box-shadow:0 0 12px rgba(62,224,203,.6); }
 .dashboard-status-badge { margin-left:auto; border:1px solid rgba(103,226,215,.24); color:#65e1d5; padding:5px 8px; border-radius:999px; font-size:9px; letter-spacing:.04em; }
 
-/* --- ZUSTAND: EINGEKLAPPT --- */
-
-/* Wenn der Body die Klasse 'sidebar-collapsed' hat... */
-.sidebar-collapsed .dashboard-sidebar {
-  width: var(--sidebar-collapsed-width);
-}
-
-/* ...schiebt sich auch der Hauptinhalt nach links */
-.sidebar-collapsed .dashboard-main {
-  margin-left: var(--sidebar-collapsed-width);
-}
-
-/* Optional: Text in der Sidebar verstecken, wenn eingeklappt (nur Icons zeigen) */
-.sidebar-collapsed .dashboard-sidebar span:not(.brand-mark) {
-  display: none;
+/* --- EIN- UND AUSKLAPPBARE SIDEBAR --- */
+.dashboard-sidebar {
+  box-sizing: border-box;
 }
 .dashboard-brand {
   display: flex;
   align-items: center;
-  justify-content: space-between; /* Schiebt das Logo nach links und den Button nach rechts */
-  margin-bottom: 20px;
+  gap: 10px;
+  width: 100%;
+  min-width: 0;
+  padding: 5px 0 25px;
+  margin-bottom: 0;
 }
-
+.brand-name {
+  min-width: 0;
+  white-space: nowrap;
+}
 .sidebar-toggle-btn {
-  background: none;
-  border: none;
-  color: #fff; /* Weiße Farbe passend zum dunklen Hintergrund */
-  font-size: 20px;
+  flex: 0 0 auto;
+  width: 36px;
+  height: 36px;
+  margin-left: auto;
+  padding: 0;
+  border: 1px solid rgba(118,145,199,.28);
+  border-radius: 10px;
+  background: rgba(13,31,57,.78);
+  color: #eef5ff;
+  font-size: 24px;
+  line-height: 1;
   cursor: pointer;
-  padding: 5px;
+  transition: background .2s ease, border-color .2s ease, transform .3s ease;
 }
-
-.sidebar-toggle-btn:hover {
-  opacity: 0.7; /* Leichtes Ausblenden beim Drüberfahren */
+.sidebar-toggle-btn:hover,
+.sidebar-toggle-btn:focus-visible {
+  background: rgba(45,83,137,.48);
+  border-color: rgba(101,226,215,.7);
+  outline: none;
 }
-
+/* Im eingeklappten Zustand bleiben Markierung, Umschalter und Navigations-Icons sichtbar. */
+.sidebar-collapsed .dashboard-sidebar {
+  width: var(--sidebar-collapsed-width);
+}
+.sidebar-collapsed .dashboard-main {
+  margin-left: var(--sidebar-collapsed-width);
+}
+.sidebar-collapsed .dashboard-brand {
+  justify-content: center;
+  gap: 0;
+}
+.sidebar-collapsed .brand-name {
+  display: none;
+}
+.sidebar-collapsed .sidebar-toggle-btn {
+  margin-left: 0;
+  transform: rotate(180deg);
+}
+.sidebar-collapsed .dashboard-nav-item {
+  justify-content: center;
+  gap: 0;
+  padding-right: 8px !important;
+  padding-left: 8px !important;
+  font-size: 0 !important;
+}
+.sidebar-collapsed .dashboard-nav-item span {
+  font-size: 16px;
+}
 /* Consistent cinematic panels for every list screen */
 body.app-scene .app-panel { margin-top:0; background:linear-gradient(145deg, rgba(7,20,39,.94), rgba(5,15,29,.96)); border:1px solid rgba(95,139,211,.24); border-radius:18px; box-shadow:0 22px 55px rgba(0,0,0,.32); padding:24px; }
 body.app-scene .app-panel > h2 { color:#eef5ff; font-size:24px; text-align:left; }
@@ -2596,17 +2626,10 @@ body.login-scene::before{content:"";display:block !important;position:fixed;inse
     <div id="menuBox" class="dashboard-shell">
       <aside class="dashboard-sidebar" aria-label="Hauptnavigation">
         <div class="dashboard-brand">
-          <span class="brand-mark">▶</span>
-          <span>Watch<span>Feast</span><b>Game</b></span>
-        <div class="dashboard-brand">
-  <span class="brand-mark">▶</span>
-  <span>Watch<span>Feast</span><b>Game</b></span>
-  
-  <!-- HIER KOMMT DER BUTTON HIN -->
-  <button type="button" class="sidebar-toggle-btn" onclick="toggleSidebar()">☰</button>
-</div>
-		</div>
-
+          <span class="brand-mark" aria-hidden="true">▶</span>
+          <span class="brand-name">Watch<span>Feast</span><b>Game</b></span>
+          <button id="sidebarToggle" type="button" class="sidebar-toggle-btn" onclick="toggleSidebar()" aria-label="Sidebar einklappen" aria-expanded="true" title="Sidebar ein- oder ausklappen">‹</button>
+        </div>
         <nav class="dashboard-nav">
           <button class="dashboard-nav-item active" type="button" onclick="showMenu()" aria-current="page"><span>⌂</span> Übersicht</button>
           <button class="dashboard-nav-item" type="button" onclick="showMoviesApp()"><span>▣</span> Serien &amp; Filme</button>
@@ -6286,10 +6309,15 @@ renderYugiohPlayerInputs();
 initAuth();
 
 function toggleSidebar() {
-  // Fügt der CSS-Klasse des body-Tags 'sidebar-collapsed' hinzu oder entfernt sie
-  document.body.classList.toggle('sidebar-collapsed');
-}
+  const isCollapsed = document.body.classList.toggle('sidebar-collapsed');
+  const toggleButton = document.getElementById('sidebarToggle');
 
+  if (toggleButton) {
+    toggleButton.setAttribute('aria-expanded', String(!isCollapsed));
+    toggleButton.setAttribute('aria-label', isCollapsed ? 'Sidebar ausklappen' : 'Sidebar einklappen');
+    toggleButton.title = isCollapsed ? 'Sidebar ausklappen' : 'Sidebar einklappen';
+  }
+}
 </script>
 </body>
 </html>
