@@ -3311,6 +3311,66 @@ button, input, select, textarea { max-width: 100%; }
   }
 }
 
+
+/* --- Mobiler Burger-Button wie das schwebende Logout-Icon --- */
+@media (max-width:900px) {
+  body.app-scene:not(.mobile-sidebar-open) .mobile-menu-toggle {
+    position:fixed !important;
+    top:auto !important;
+    right:auto !important;
+    left:12px !important;
+    bottom:max(84px, calc(env(safe-area-inset-bottom, 0px) + 84px)) !important;
+    z-index:10004 !important;
+    display:grid !important;
+    place-items:center;
+    box-sizing:border-box;
+    width:50px !important;
+    height:50px !important;
+    min-width:50px !important;
+    min-height:50px !important;
+    max-width:50px !important;
+    max-height:50px !important;
+    padding:0 !important;
+    gap:0;
+    border:1px solid rgba(118,145,199,.34);
+    border-radius:12px;
+    background:linear-gradient(135deg, rgba(29,68,107,.96), rgba(71,62,139,.96));
+    color:#71e5d8;
+    box-shadow:0 8px 24px rgba(0,0,0,.35), 0 0 0 2px rgba(101,226,215,.08);
+    opacity:1;
+    visibility:visible;
+    transform:none;
+  }
+  body.app-scene:not(.mobile-sidebar-open) .mobile-menu-toggle:hover,
+  body.app-scene:not(.mobile-sidebar-open) .mobile-menu-toggle:focus-visible {
+    border-color:#65e2d7;
+    background:linear-gradient(135deg, rgba(43,126,139,.98), rgba(86,69,171,.98));
+    outline:none;
+    transform:translateY(-1px);
+  }
+  body.app-scene .mobile-menu-toggle > span:first-child {
+    display:grid;
+    place-items:center;
+    gap:4px;
+    width:22px;
+    height:18px;
+  }
+  body.app-scene .mobile-menu-toggle i {
+    display:block;
+    width:22px;
+    height:2px;
+    border-radius:9px;
+    background:#71e5d8;
+  }
+  body.app-scene .mobile-menu-label { display:none !important; }
+}
+@media (max-width:380px) {
+  body.app-scene:not(.mobile-sidebar-open) .mobile-menu-toggle {
+    left:10px !important;
+    bottom:max(80px, calc(env(safe-area-inset-bottom, 0px) + 80px)) !important;
+  }
+}
+
 </style>
 
 <!-- Cinematic background -->
