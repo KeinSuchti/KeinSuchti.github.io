@@ -2823,6 +2823,21 @@ button, input, select, textarea { max-width: 100%; }
 @media (max-width:760px) { .appointment-layout { grid-template-columns:1fr; } .appointment-preview-card { margin-top:12px; } }
 @media (max-width:600px) { .appointment-banner-grid { align-items:flex-start; } .appointment-banner-countdown { font-size:18px; } .appointment-banner-meta { font-size:11px; } .calendar-card, .appointment-form-card, .appointment-preview-card { padding:14px; } .calendar-day { min-height:35px; } }
 
+
+/* --- Termin-Karte, Umfrage und sichtbarer mobiler Logout --- */
+.card-appointments .appointment-card-image { display:grid; place-items:center; background:linear-gradient(135deg,rgba(30,177,176,.52),rgba(75,65,169,.72)); }
+.appointment-card-symbol { color:#d5fffb; font-size:48px; text-shadow:0 0 24px rgba(102,237,220,.55); }
+.appointment-poll-card { margin-top:18px; padding:18px; border:1px solid rgba(101,141,207,.22); border-radius:16px; background:rgba(8,24,45,.64); }
+.appointment-poll-card h3 { margin:5px 0 4px; color:#eef5ff; }
+.poll-form-row { display:grid; grid-template-columns:minmax(0,1.3fr) minmax(180px,.7fr); gap:12px; margin-top:14px; }
+.poll-calendar-toolbar { max-width:360px; margin:16px auto 12px; }
+.poll-selected-dates { display:flex; flex-wrap:wrap; gap:7px; min-height:30px; margin-top:13px; }
+.poll-date-chip { display:inline-flex; align-items:center; gap:6px; padding:7px 9px; border:1px solid rgba(99,224,213,.35); border-radius:999px; background:rgba(33,111,112,.35); color:#d9fffa; font-size:11px; }
+.poll-date-chip button { width:auto; min-width:0; margin:0; padding:0; border:0; background:transparent; color:#a8f2e7; font-size:14px; }
+.poll-save-button { margin-top:12px; }
+.sidebar-logout-button { position:sticky; bottom:0; z-index:3; flex-shrink:0; box-shadow:0 -8px 18px rgba(5,14,29,.7); }
+@media (max-width:760px) { .poll-form-row { grid-template-columns:1fr; } .appointment-poll-card { margin-top:12px; padding:14px; } }
+
 </style>
 
 <!-- Cinematic background -->
@@ -2958,6 +2973,10 @@ button, input, select, textarea { max-width: 100%; }
             </div>
             <div class="dashboard-card-body"><span class="card-icon">◈</span><div><h3>Yu-Gi-Oh! Decks</h3><p>Verwalte Decks, plane Duelle und finde die perfekte Strategie.</p></div><span class="card-arrow">→</span></div>
           </button>
+          <button class="dashboard-card card-appointments" type="button" onclick="showAppointmentsApp()">
+            <div class="dashboard-card-image appointment-card-image"><span class="appointment-card-symbol">◷</span></div>
+            <div class="dashboard-card-body"><span class="card-icon">◷</span><div><h3>Termine abstimmen</h3><p>Gemeinsame Termine vorschlagen, abstimmen und den nächsten Abend planen.</p></div><span class="card-arrow">→</span></div>
+          </button>
           <div id="customListCards" class="custom-list-cards"></div>
           <button class="dashboard-card card-custom-list" type="button" onclick="openCreateListDialog()">
             <div class="dashboard-card-image custom-list-image"><span class="custom-list-plus">＋</span></div>
@@ -3081,6 +3100,18 @@ button, input, select, textarea { max-width: 100%; }
           <p id="appointmentStatus" class="appointment-status" role="status"></p>
         </section>
       </div>
+      <section class="appointment-poll-card" aria-label="Termin-Umfrage">
+        <div class="dashboard-kicker">Termin abstimmen</div>
+        <h3>Welche Termine passen?</h3>
+        <p class="panel-subtitle">Gib einen Namen ein und markiere mehrere mögliche Tage im Kalender. So kann die Gruppe später gemeinsam einen Termin auswählen.</p>
+        <div class="poll-form-row"><label class="edit-field"><span>Name der Umfrage</span><input id="pollName" placeholder="z. B. Spieleabend Oktober"></label><label class="edit-field"><span>Monat für Vorschläge</span><input id="pollMonth" type="month"></label></div>
+        <div class="calendar-toolbar poll-calendar-toolbar"><button type="button" onclick="changePollMonth(-1)" aria-label="Vorheriger Monat">‹</button><strong id="pollCalendarMonthLabel"></strong><button type="button" onclick="changePollMonth(1)" aria-label="Nächster Monat">›</button></div>
+        <div class="calendar-weekdays"><span>Mo</span><span>Di</span><span>Mi</span><span>Do</span><span>Fr</span><span>Sa</span><span>So</span></div>
+        <div id="pollCalendar" class="appointment-calendar"></div>
+        <div id="pollSelectedDates" class="poll-selected-dates" aria-live="polite"></div>
+        <button class="poll-save-button" type="button" onclick="saveAppointmentPoll()">🗳️ Terminvorschläge speichern</button>
+        <p id="pollStatus" class="appointment-status" role="status"></p>
+      </section>
       <section class="appointment-preview-card" aria-label="Beispielvorschau">
         <div class="dashboard-kicker">Beispielvorschau</div>
         <div class="preview-countdown"><strong>In 12 Tagen</strong><span>Freitag, 09. Oktober · 19:00 Uhr</span></div>
@@ -3381,6 +3412,9 @@ const nextAppointmentBanner = document.getElementById("nextAppointmentBanner");
 let nextAppointment = null;
 let calendarCursor = new Date();
 let appointmentCountdownTimer = null;
+let pollCalendarCursor = new Date();
+let selectedPollDates = [];
+let currentAppointmentPoll = null;
 
 const emailInput = document.getElementById("email");
 const passwordInput = document.getElementById("password");
@@ -4617,10 +4651,12 @@ function formatAppointmentDate(value, withTime = true) {
 function appointmentCountdown(value) {
   const diff = new Date(value).getTime() - Date.now();
   if (diff <= 0) return "Heute";
-  const days = Math.floor(diff / 86400000), hours = Math.floor(diff % 86400000 / 3600000), minutes = Math.floor(diff % 3600000 / 60000);
-  if (days > 0) return `In ${days} ${days === 1 ? "Tag" : "Tagen"}`;
-  if (hours > 0) return `In ${hours} ${hours === 1 ? "Stunde" : "Stunden"}`;
-  return `In ${Math.max(1, minutes)} Min.`;
+  const totalSeconds = Math.floor(diff / 1000);
+  const days = Math.floor(totalSeconds / 86400);
+  const hours = Math.floor((totalSeconds % 86400) / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+  return `In ${days} ${days === 1 ? "Tag" : "Tagen"}, ${String(hours).padStart(2,"0")} Std., ${String(minutes).padStart(2,"0")} Min., ${String(seconds).padStart(2,"0")} Sek.`;
 }
 function renderNextAppointment() {
   if (!nextAppointment || !nextAppointment.start_at || new Date(nextAppointment.start_at) < new Date()) {
@@ -4642,6 +4678,7 @@ async function loadNextAppointment() {
   }
   renderNextAppointment();
   renderAppointmentCalendar();
+  loadAppointmentPoll();
 }
 function fillAppointmentFormFromCurrent() {
   if (!nextAppointment) return;
@@ -4696,7 +4733,23 @@ async function clearNextAppointment() {
   if(currentView==="appointments") document.getElementById("appointmentStatus").textContent=error ? "Lokaler Termin entfernt." : "Termin entfernt.";
 }
 function escapeHtml(value) { return String(value).replace(/[&<>'"]/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;","\"":"&quot;"}[ch])); }
-if (!appointmentCountdownTimer) appointmentCountdownTimer=setInterval(tickAppointmentCountdown, 30000);
+if (!appointmentCountdownTimer) appointmentCountdownTimer=setInterval(tickAppointmentCountdown, 1000);
+/* Termin-Umfrage mit mehreren Datumsvorschlägen */
+function pollStorageKey() { return `wfg-appointment-poll:${currentUser?.id || "guest"}`; }
+function pollDateKey(date) { return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,"0")}-${String(date.getDate()).padStart(2,"0")}`; }
+function formatPollDate(key) { return new Intl.DateTimeFormat("de-DE", { weekday:"short", day:"2-digit", month:"2-digit", year:"numeric" }).format(new Date(`${key}T12:00:00`)); }
+function changePollMonth(delta) { pollCalendarCursor = new Date(pollCalendarCursor.getFullYear(), pollCalendarCursor.getMonth()+delta, 1); document.getElementById("pollMonth").value = `${pollCalendarCursor.getFullYear()}-${String(pollCalendarCursor.getMonth()+1).padStart(2,"0")}`; renderPollCalendar(); }
+function togglePollDate(day) { const key=pollDateKey(new Date(pollCalendarCursor.getFullYear(),pollCalendarCursor.getMonth(),day)); selectedPollDates=selectedPollDates.includes(key)?selectedPollDates.filter(x=>x!==key):[...selectedPollDates,key]; renderPollCalendar(); renderSelectedPollDates(); }
+function renderPollCalendar() {
+  const grid=document.getElementById("pollCalendar"), label=document.getElementById("pollCalendarMonthLabel"); if(!grid||!label)return;
+  const y=pollCalendarCursor.getFullYear(),m=pollCalendarCursor.getMonth(),first=new Date(y,m,1),last=new Date(y,m+1,0); label.textContent=new Intl.DateTimeFormat("de-DE",{month:"long",year:"numeric"}).format(first); grid.innerHTML="";
+  const offset=(first.getDay()+6)%7; for(let i=0;i<offset;i++){const e=document.createElement("span");e.className="calendar-day is-empty";grid.appendChild(e);}
+  for(let d=1;d<=last.getDate();d++){const b=document.createElement("button");b.type="button";b.className="calendar-day";b.textContent=d;const key=pollDateKey(new Date(y,m,d));if(selectedPollDates.includes(key))b.classList.add("selected");b.onclick=()=>togglePollDate(d);grid.appendChild(b);}
+}
+function renderSelectedPollDates() { const host=document.getElementById("pollSelectedDates"); if(!host)return; host.innerHTML=selectedPollDates.length?selectedPollDates.sort().map(key=>`<span class="poll-date-chip">${formatPollDate(key)} <button type="button" onclick="toggleSavedPollDate('${key}')" aria-label="${formatPollDate(key)} entfernen">×</button></span>`).join(""):"<span class=\"panel-subtitle\">Noch keine Vorschläge ausgewählt.</span>"; }
+function toggleSavedPollDate(key) { selectedPollDates=selectedPollDates.filter(x=>x!==key); renderPollCalendar(); renderSelectedPollDates(); }
+async function loadAppointmentPoll() { try { currentAppointmentPoll=JSON.parse(localStorage.getItem(pollStorageKey())||"null"); } catch(_){currentAppointmentPoll=null;} const result=await supabaseClient.from("appointment_polls").select("*").eq("user_id",currentUser.id).maybeSingle(); if(!result.error&&result.data) currentAppointmentPoll=result.data; if(currentAppointmentPoll){document.getElementById("pollName").value=currentAppointmentPoll.name||"";selectedPollDates=currentAppointmentPoll.dates||[];} const month=document.getElementById("pollMonth"); if(month){month.value=`${pollCalendarCursor.getFullYear()}-${String(pollCalendarCursor.getMonth()+1).padStart(2,"0")}`;month.onchange=()=>{const [y,m]=month.value.split("-").map(Number);pollCalendarCursor=new Date(y,m-1,1);renderPollCalendar();};} renderPollCalendar();renderSelectedPollDates(); }
+async function saveAppointmentPoll() { const name=document.getElementById("pollName").value.trim();const status=document.getElementById("pollStatus");if(!name){status.textContent="Bitte einen Namen für die Umfrage eingeben.";return;}if(!selectedPollDates.length){status.textContent="Bitte mindestens einen Datumsvorschlag auswählen.";return;}const poll={name,dates:[...selectedPollDates].sort(),user_id:currentUser.id};const result=await supabaseClient.from("appointment_polls").upsert(poll,{onConflict:"user_id"}).select().single();localStorage.setItem(pollStorageKey(),JSON.stringify(poll));currentAppointmentPoll=result.error?poll:result.data;status.textContent=result.error?"Lokal gespeichert. Für gemeinsame Synchronisierung bitte das SQL-Schema ausführen.":"Umfrage gespeichert. Die Vorschläge sind bereit zur Abstimmung.";}
 /* Serien & Filme */
 
 async function loadMovieItems() {
