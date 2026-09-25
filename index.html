@@ -2643,6 +2643,18 @@ body.login-scene::before{content:"";display:block !important;position:fixed;inse
   .custom-list-add-form { grid-template-columns:1fr; }
 }
 
+
+/* --- Listeneinstellungen --- */
+.list-panel-heading { display:flex; align-items:center; justify-content:space-between; gap:14px; margin-bottom:14px; }
+.list-panel-heading h2 { margin:0 !important; }
+.list-settings-button { display:inline-grid; place-items:center; flex:0 0 auto; width:40px; height:40px; padding:0; border:1px solid rgba(118,145,199,.30); border-radius:12px; background:rgba(13,31,57,.78); color:#cfe0f5; font-size:20px; cursor:pointer; transition:color .2s ease, background .2s ease, border-color .2s ease, transform .2s ease; }
+.list-settings-button:hover, .list-settings-button:focus-visible { color:#7ce8dc; background:rgba(38,75,123,.48); border-color:rgba(101,226,215,.68); transform:rotate(12deg); outline:none; }
+.custom-list-heading-actions { display:flex; align-items:center; gap:10px; }
+.list-settings-dialog-box { max-width:580px; }
+.settings-feature-list { display:grid; gap:8px; margin:16px 0 4px; padding:14px; border:1px solid rgba(95,139,211,.20); border-radius:12px; background:rgba(8,24,45,.52); color:#aebed4; font-size:12px; }
+.settings-feature-list strong { color:#eaf1fc; }
+@media (max-width:760px) { .custom-list-heading-actions { width:100%; justify-content:space-between; } }
+
 </style>
 
 <!-- Cinematic background -->
@@ -2751,36 +2763,26 @@ body.login-scene::before{content:"";display:block !important;position:fixed;inse
         <div class="dashboard-grid">
           <button class="dashboard-card card-movies" type="button" onclick="showMoviesApp()">
             <div class="dashboard-card-image" data-overview-image="movies">
-              <span class="overview-image-hint">Titelbild ändern</span>
-              <input class="overview-image-input" type="file" accept="image/*" aria-label="Titelbild für diese Liste ändern" onclick="event.stopPropagation()" onchange="handleOverviewImage(event, 'movies')">
             </div>
             <div class="dashboard-card-body"><span class="card-icon">▣</span><div><h3>Serien &amp; Filme</h3><p>Deine Watchlist, Empfehlungen und Zufalls-Generator.</p></div><span class="card-arrow">→</span></div>
           </button>
           <button class="dashboard-card card-feast" type="button" onclick="showFeastApp()">
             <div class="dashboard-card-image" data-overview-image="feast">
-              <span class="overview-image-hint">Titelbild ändern</span>
-              <input class="overview-image-input" type="file" accept="image/*" aria-label="Titelbild für diese Liste ändern" onclick="event.stopPropagation()" onchange="handleOverviewImage(event, 'feast')">
             </div>
             <div class="dashboard-card-body"><span class="card-icon">♜</span><div><h3>Feast Table</h3><p>Rezepte, Restaurant-Ideen und kulinarische Inspirationen.</p></div><span class="card-arrow">→</span></div>
           </button>
           <button class="dashboard-card card-drinks" type="button" onclick="showSaufiMenu()">
             <div class="dashboard-card-image" data-overview-image="drinks">
-              <span class="overview-image-hint">Titelbild ändern</span>
-              <input class="overview-image-input" type="file" accept="image/*" aria-label="Titelbild für diese Liste ändern" onclick="event.stopPropagation()" onchange="handleOverviewImage(event, 'drinks')">
             </div>
             <div class="dashboard-card-body"><span class="card-icon">♧</span><div><h3>Bier &amp; Cocktails</h3><p>Bewerte deine Lieblingsdrinks und entdecke neue Favoriten.</p></div><span class="card-arrow">→</span></div>
           </button>
           <button class="dashboard-card card-games" type="button" onclick="showGamesApp()">
             <div class="dashboard-card-image" data-overview-image="games">
-              <span class="overview-image-hint">Titelbild ändern</span>
-              <input class="overview-image-input" type="file" accept="image/*" aria-label="Titelbild für diese Liste ändern" onclick="event.stopPropagation()" onchange="handleOverviewImage(event, 'games')">
             </div>
             <div class="dashboard-card-body"><span class="card-icon">⌘</span><div><h3>Spieleabend</h3><p>Spiele, Teilnehmer, Kolonnen und Bewertungen im Überblick.</p></div><span class="card-arrow">→</span></div>
           </button>
           <button class="dashboard-card card-yugioh" type="button" onclick="showYugiohApp()">
             <div class="dashboard-card-image" data-overview-image="yugioh">
-              <span class="overview-image-hint">Titelbild ändern</span>
-              <input class="overview-image-input" type="file" accept="image/*" aria-label="Titelbild für diese Liste ändern" onclick="event.stopPropagation()" onchange="handleOverviewImage(event, 'yugioh')">
             </div>
             <div class="dashboard-card-body"><span class="card-icon">◈</span><div><h3>Yu-Gi-Oh! Decks</h3><p>Verwalte Decks, plane Duelle und finde die perfekte Strategie.</p></div><span class="card-arrow">→</span></div>
           </button>
@@ -2808,7 +2810,7 @@ body.login-scene::before{content:"";display:block !important;position:fixed;inse
 
     <!-- Spiele -->
     <div id="gamesApp" class="app-panel" style="display:none;">
-      <h2>🎮 Spiele</h2>
+      <div class="list-panel-heading"><h2>🎮 Spiele</h2><button class="list-settings-button" type="button" onclick="openListSettings('games')" aria-label="Einstellungen für Spieleabend" title="Listeneinstellungen">⚙</button></div>
 
       <div class="games-column-form">
         <input
@@ -2852,7 +2854,7 @@ body.login-scene::before{content:"";display:block !important;position:fixed;inse
 
     <!-- Yu-Gi-Oh!-Decks -->
     <div id="yugiohApp" class="app-panel" style="display:none;">
-      <h2>🃏 Yu-Gi-Oh!-Decks</h2>
+      <div class="list-panel-heading"><h2>🃏 Yu-Gi-Oh!-Decks</h2><button class="list-settings-button" type="button" onclick="openListSettings('yugioh')" aria-label="Einstellungen für Yu-Gi-Oh!-Decks" title="Listeneinstellungen">⚙</button></div>
 
       <div class="yugioh-add-form">
         <input id="newYugiohTheme" placeholder="Thema / Deckname">
@@ -2886,7 +2888,7 @@ body.login-scene::before{content:"";display:block !important;position:fixed;inse
 
     <!-- Serien & Filme -->
     <div id="moviesApp" class="app-panel" style="display:none;">
-      <h2>🎬 Serien & Film Tracker</h2>
+      <div class="list-panel-heading"><h2>🎬 Serien & Film Tracker</h2><button class="list-settings-button" type="button" onclick="openListSettings('movies')" aria-label="Einstellungen für Serien und Filme" title="Listeneinstellungen">⚙</button></div>
 
       <button class="random-movie-button" onclick="openRandomUncheckedMovie()">
         🎲 Zufälligen offenen Film / offene Serie wählen
@@ -2911,7 +2913,7 @@ body.login-scene::before{content:"";display:block !important;position:fixed;inse
 
     <!-- Feast Table -->
     <div id="feastApp" class="app-panel" style="display:none;">
-      <h2>🔗 Feast Table</h2>
+      <div class="list-panel-heading"><h2>🔗 Feast Table</h2><button class="list-settings-button" type="button" onclick="openListSettings('feast')" aria-label="Einstellungen für Feast Table" title="Listeneinstellungen">⚙</button></div>
 
       <button class="random-card-button" onclick="openRandomUnratedCard('feast')">
         🎲 Was fressen wir?
@@ -2947,7 +2949,7 @@ body.login-scene::before{content:"";display:block !important;position:fixed;inse
 
     <!-- Bier -->
     <div id="beerApp" class="app-panel" style="display:none;">
-      <h2>🍺 Bier</h2>
+      <div class="list-panel-heading"><h2>🍺 Bier</h2><button class="list-settings-button" type="button" onclick="openListSettings('beer')" aria-label="Einstellungen für Bier" title="Listeneinstellungen">⚙</button></div>
 
       <div class="card-controls">
         <select id="beerSort" onchange="renderCardItems('beer')">
@@ -2986,7 +2988,7 @@ body.login-scene::before{content:"";display:block !important;position:fixed;inse
 
     <!-- Cocktail -->
     <div id="cocktailApp" class="app-panel" style="display:none;">
-      <h2>🍸 Cocktail</h2>
+      <div class="list-panel-heading"><h2>🍸 Cocktail</h2><button class="list-settings-button" type="button" onclick="openListSettings('cocktail')" aria-label="Einstellungen für Cocktails" title="Listeneinstellungen">⚙</button></div>
 
       <button class="random-card-button" onclick="openRandomUnratedCard('cocktail')">
         🎲 Was trinken wir?
@@ -3030,7 +3032,7 @@ body.login-scene::before{content:"";display:block !important;position:fixed;inse
       <h2 id="customListTitle">Neue Liste</h2>
       <p id="customListDescription">Deine persönliche Sammlung mit Suche, Filtern und Zufallsauswahl.</p>
     </div>
-    <button class="random-card-button" type="button" onclick="openRandomCustomItem()">🎲 Zufällige Auswahl</button>
+    <div class="custom-list-heading-actions"><button class="random-card-button" type="button" onclick="openRandomCustomItem()">🎲 Zufällige Auswahl</button><button class="list-settings-button" type="button" onclick="openListSettings('custom')" aria-label="Einstellungen für eigene Liste" title="Listeneinstellungen">⚙</button></div>
   </div>
   <div class="card-controls custom-list-controls">
     <select id="customListSort" onchange="renderCustomListItems()" aria-label="Sortierung">
@@ -3053,6 +3055,19 @@ body.login-scene::before{content:"";display:block !important;position:fixed;inse
     <button type="button" onclick="addCustomListItem()">➕ Hinzufügen</button>
   </div>
   <div id="customListItems"></div>
+</div>
+
+<!-- Listen-Einstellungen -->
+<div id="listSettingsDialog" class="popup-overlay" style="display:none;" onclick="closeListSettingsOnOverlay(event)">
+  <div class="popup-box create-list-dialog-box list-settings-dialog-box">
+    <h3>⚙ Listeneinstellungen</h3>
+    <p id="listSettingsHint">Passe die Liste an, ohne den Inhalt zu verändern.</p>
+    <label class="edit-field"><span>Titelbild für die Übersicht</span><input id="listSettingsImage" type="file" accept="image/*"></label>
+    <label class="edit-field"><span>Zufallsauswahl</span><select id="listSettingsRandom"><option value="all">Aus allen Einträgen</option><option value="open">Nur aus offenen Einträgen</option><option value="rated">Nur aus bewerteten Einträgen</option></select></label>
+    <label class="edit-field"><span>Filter beim Öffnen</span><select id="listSettingsFilter"><option value="all">Alle Einträge</option><option value="open">Nur offene Einträge</option><option value="checked">Nur erledigte Einträge</option><option value="rated">Nur bewertete Einträge</option></select></label>
+    <div class="settings-feature-list"><strong>Verfügbare Funktionen</strong><span>✓ Sortierung und Filter direkt in der Liste</span><span>✓ Zufällige Auswahl über den Würfel-Button</span><span>✓ Titelbild wird auf der Übersicht verwendet</span></div>
+    <div class="popup-actions"><button type="button" onclick="saveListSettings()">💾 Speichern</button><button type="button" onclick="closeListSettings()">Abbrechen</button></div>
+  </div>
 </div>
 
 <!-- Eigene Liste anlegen -->
@@ -3789,6 +3804,44 @@ function handleOverviewImage(event, key) {
   });
   event.target.value = "";
 }
+let activeSettingsKey = "";
+const listSettingsNames = { movies: "Serien & Filme", feast: "Feast Table", beer: "Bier", cocktail: "Cocktail", games: "Spieleabend", yugioh: "Yu-Gi-Oh!-Decks", custom: "Eigene Liste" };
+function listSettingsStorageKey(key, suffix) { return `wfg-list-setting:${currentUser?.id || "guest"}:${key}:${suffix}`; }
+function getListSetting(key, suffix, fallback) { return localStorage.getItem(listSettingsStorageKey(key, suffix)) || fallback; }
+function openListSettings(key) {
+  if (!currentUser) { showLogin(); return; }
+  activeSettingsKey = key;
+  document.getElementById("listSettingsHint").textContent = `Einstellungen für ${listSettingsNames[key] || "diese Liste"}`;
+  document.getElementById("listSettingsRandom").value = getListSetting(key, "random", "all");
+  const filterSelect = document.getElementById("listSettingsFilter");
+  const existingFilter = key === "feast" || key === "cocktail" ? document.getElementById(key + "Filter") : key === "beer" ? document.getElementById("beerFilter") : null;
+  filterSelect.value = getListSetting(key, "filter", existingFilter?.value === "0" ? "all" : existingFilter?.value || "all");
+  document.getElementById("listSettingsImage").value = "";
+  document.getElementById("listSettingsDialog").style.display = "flex";
+}
+function closeListSettings() { document.getElementById("listSettingsDialog").style.display = "none"; activeSettingsKey = ""; }
+function closeListSettingsOnOverlay(event) { if (event.target.id === "listSettingsDialog") closeListSettings(); }
+function saveListSettings() {
+  if (!activeSettingsKey) return;
+  const randomMode = document.getElementById("listSettingsRandom").value;
+  const filterMode = document.getElementById("listSettingsFilter").value;
+  localStorage.setItem(listSettingsStorageKey(activeSettingsKey, "random"), randomMode);
+  localStorage.setItem(listSettingsStorageKey(activeSettingsKey, "filter"), filterMode);
+  const imageInput = document.getElementById("listSettingsImage");
+  if (imageInput.files?.[0]) handleOverviewImage({ stopPropagation(){}, target:imageInput }, activeSettingsKey === "custom" && activeCustomList ? "custom-" + activeCustomList.id : activeSettingsKey);
+  const existingFilter = activeSettingsKey === "feast" || activeSettingsKey === "cocktail" ? document.getElementById(activeSettingsKey + "Filter") : activeSettingsKey === "beer" ? document.getElementById("beerFilter") : null;
+  if (existingFilter) {
+    existingFilter.value = filterMode === "all" ? (activeSettingsKey === "feast" || activeSettingsKey === "cocktail" ? "0" : "all") : filterMode;
+    renderCardItems(activeSettingsKey);
+  }
+  if (activeSettingsKey === "custom" && activeCustomList) {
+    activeCustomList.random_mode = randomMode; activeCustomList.filter_mode = filterMode; customListFilter.value = filterMode; renderCustomListItems();
+    supabaseClient.from("custom_lists").update({ random_mode: randomMode, filter_mode: filterMode }).eq("id", activeCustomList.id).eq("user_id", currentUser.id).then(({ error }) => {
+      if (error) showSupabaseError("Die Listeneinstellungen konnten nicht in Supabase gespeichert werden", error);
+    });
+  }
+  closeListSettings();
+}
 function openCreateListDialog() {
   if (!currentUser) { showLogin(); return; }
   document.getElementById("createListDialog").style.display = "flex";
@@ -3841,9 +3894,7 @@ function renderCustomListCards() {
     const image = document.createElement("div");
     image.className = "dashboard-card-image";
     image.dataset.overviewImage = "custom-" + list.id;
-    const hint = document.createElement("span"); hint.className = "overview-image-hint"; hint.textContent = "Titelbild ändern";
-    const input = document.createElement("input"); input.className = "overview-image-input"; input.type = "file"; input.accept = "image/*"; input.setAttribute("aria-label", "Titelbild für diese Liste ändern"); input.onclick = e => e.stopPropagation(); input.onchange = e => handleOverviewImage(e, "custom-" + list.id);
-    image.append(hint, input);
+    image.innerHTML = '<span class="custom-list-plus">✦</span>';
     const body = document.createElement("div"); body.className = "dashboard-card-body";
     body.innerHTML = `<span class="card-icon">✦</span><div><h3></h3><p></p></div><span class="card-arrow">→</span>`;
     body.querySelector("h3").textContent = list.name;
