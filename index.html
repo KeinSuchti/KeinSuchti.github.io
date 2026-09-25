@@ -3208,6 +3208,16 @@ button, input, select, textarea { max-width: 100%; }
   }
 }
 
+
+/* --- Mobile Overlay-Fix: Sidebar muss über dem Backdrop liegen --- */
+@media (max-width:900px) {
+  body.app-scene .mobile-sidebar-backdrop { z-index:9000 !important; }
+  body.app-scene .dashboard-shell { position:relative; z-index:9001; }
+  body.app-scene .dashboard-shell .dashboard-sidebar { z-index:9002 !important; }
+  body.app-scene.mobile-sidebar-open .dashboard-shell .dashboard-sidebar { transform:translateX(0) !important; visibility:visible !important; opacity:1 !important; }
+  body.app-scene:not(.mobile-sidebar-open) .dashboard-shell .dashboard-sidebar { z-index:9002 !important; }
+}
+
 </style>
 
 <!-- Cinematic background -->
