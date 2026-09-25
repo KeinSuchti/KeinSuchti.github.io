@@ -2331,14 +2331,6 @@ body.app-scene #menuBox {
 .dashboard-card h3 { text-align:left; margin:0 0 3px; font-size:16px; }
 .dashboard-card p { margin:0; color:#8ea2bf; font-size:11px; line-height:1.45; font-weight:500; }
 .card-arrow { width:30px; height:30px; border-radius:50%; display:grid; place-items:center; background:linear-gradient(135deg,#47cfd0,#4967b9); color:#fff; font-size:18px; }
-.dashboard-side-note { grid-column:3; grid-row:2 / span 1; min-height:218px; border:1px solid rgba(104,145,211,.30); border-radius:15px; overflow:hidden; position:relative; background:linear-gradient(180deg, rgba(7,22,42,.82), rgba(5,14,28,.98)); }
-.note-mountain { position:absolute; inset:0 0 auto; height:100%; opacity:.38; background-image:linear-gradient(180deg, rgba(5,14,28,.12), rgba(5,14,28,.90)), var(--cinematic-bg); background-size:cover; background-position:right bottom; }
-.note-content { position:relative; z-index:1; padding:18px; }
-.note-content > span { color:#62e4d5; font-size:9px; font-weight:800; letter-spacing:.12em; }
-.note-content h3 { text-align:left; font-size:20px; margin:5px 0 7px; }
-.note-content p { color:#9db0c9; font-size:11px; line-height:1.45; margin:0 0 13px; }
-.note-check { color:#c8d6e8; font-size:10px; margin:7px 0; }
-.note-check::first-letter { color:#55e1d4; }
 .dashboard-statusbar { margin-top:16px; padding:10px 13px; display:flex; align-items:center; gap:9px; border:1px solid rgba(102,145,208,.20); border-radius:12px; background:rgba(6,21,40,.72); color:#7389a8; font-size:10px; }
 .dashboard-statusbar strong { color:#c4d3e7; }
 .online-dot { width:8px; height:8px; border-radius:50%; background:#3ee0cb; box-shadow:0 0 12px rgba(62,224,203,.6); }
@@ -2487,7 +2479,6 @@ body.app-scene input, body.app-scene select, body.app-scene textarea { backgroun
   .dashboard-shell { grid-template-columns:190px minmax(0,1fr); }
   .dashboard-main { padding:22px; }
   .dashboard-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
-  .dashboard-side-note { grid-column:1 / -1; grid-row:auto; min-height:170px; }
 }
 @media (max-width: 760px) {
   body.login-scene { background-position:center center; background-attachment:scroll; }
@@ -2604,6 +2595,54 @@ body.login-scene::before{content:"";display:block !important;position:fixed;inse
   }
 }
 
+
+/* --- Eigene Listen und Titelbilder auf dem Dashboard --- */
+.dashboard-sidebar > .sidebar-toggle-floating {
+  position: absolute;
+  top: 22px;
+  right: 15px;
+  margin: 0;
+}
+.dashboard-sidebar > .dashboard-nav {
+  margin-top: 58px;
+}
+.sidebar-collapsed .dashboard-sidebar > .sidebar-toggle-floating {
+  top: 22px;
+  left: 20px;
+  right: auto;
+  width: 30px;
+  height: 30px;
+}
+.sidebar-collapsed .dashboard-sidebar > .dashboard-nav {
+  margin-top: 58px;
+}
+.dashboard-card-image { position:relative; }
+.overview-image-hint {
+  position:absolute; right:10px; bottom:10px; z-index:2;
+  padding:5px 8px; border:1px solid rgba(255,255,255,.25); border-radius:999px;
+  background:rgba(3,10,22,.72); color:#eef5ff; font-size:10px; opacity:0;
+  transition:opacity .2s ease, transform .2s ease; pointer-events:none;
+}
+.dashboard-card:hover .overview-image-hint,
+.dashboard-card:focus-within .overview-image-hint { opacity:1; transform:translateY(-2px); }
+.overview-image-input { position:absolute; inset:0; z-index:3; opacity:0; cursor:pointer; }
+.card-custom-list .custom-list-image { display:grid; place-items:center; background:linear-gradient(135deg,rgba(28,203,195,.28),rgba(91,77,224,.42)); }
+.custom-list-plus { color:#bffbf2; font-size:54px; font-weight:300; text-shadow:0 0 26px rgba(70,226,210,.45); }
+.custom-list-cards { display:contents; }
+.custom-list-panel .custom-list-heading { display:flex; justify-content:space-between; align-items:flex-start; gap:18px; margin-bottom:18px; }
+.custom-list-panel .custom-list-heading h2 { margin:0; }
+.custom-list-panel .custom-list-heading p { margin:5px 0 0; color:#8fa1bd; }
+.custom-list-add-form { grid-template-columns:repeat(4,minmax(0,1fr)); }
+.create-list-dialog-box { max-width:560px; text-align:left; }
+.create-list-dialog-box h3 { margin-top:0; }
+.create-list-dialog-box > p { color:#9aabc4; }
+.create-list-dialog-box .edit-field { display:grid; gap:6px; margin:12px 0; }
+.create-list-dialog-box .edit-field span { color:#c7d4e8; font-size:12px; font-weight:700; }
+@media (max-width:760px) {
+  .custom-list-panel .custom-list-heading { flex-direction:column; }
+  .custom-list-add-form { grid-template-columns:1fr; }
+}
+
 </style>
 
 <!-- Cinematic background -->
@@ -2688,11 +2727,7 @@ body.login-scene::before{content:"";display:block !important;position:fixed;inse
     <!-- Hauptmenü -->
     <div id="menuBox" class="dashboard-shell">
       <aside class="dashboard-sidebar" aria-label="Hauptnavigation">
-        <div class="dashboard-brand">
-          <span class="brand-mark" aria-hidden="true">▶</span>
-          <span class="brand-name">Watch<span>Feast</span><b>Game</b></span>
-          <button id="sidebarToggle" type="button" class="sidebar-toggle-btn" onclick="toggleSidebar()" aria-label="Sidebar einklappen" aria-expanded="true" title="Sidebar ein- oder ausklappen">‹</button>
-        </div>
+        <button id="sidebarToggle" type="button" class="sidebar-toggle-btn sidebar-toggle-floating" onclick="toggleSidebar()" aria-label="Sidebar einklappen" aria-expanded="true" title="Sidebar ein- oder ausklappen">‹</button>
         <nav class="dashboard-nav">
           <button class="dashboard-nav-item active" type="button" onclick="showMenu()" aria-current="page" title="Übersicht"><span class="nav-icon" aria-hidden="true">⌂</span><span class="nav-label">Übersicht</span></button>
           <button class="dashboard-nav-item" type="button" onclick="showMoviesApp()" title="Serien &amp; Filme"><span class="nav-icon" aria-hidden="true">▣</span><span class="nav-label">Serien &amp; Filme</span></button>
@@ -2715,29 +2750,45 @@ body.login-scene::before{content:"";display:block !important;position:fixed;inse
 
         <div class="dashboard-grid">
           <button class="dashboard-card card-movies" type="button" onclick="showMoviesApp()">
-            <div class="dashboard-card-image"></div>
+            <div class="dashboard-card-image" data-overview-image="movies">
+              <span class="overview-image-hint">Titelbild ändern</span>
+              <input class="overview-image-input" type="file" accept="image/*" aria-label="Titelbild für diese Liste ändern" onclick="event.stopPropagation()" onchange="handleOverviewImage(event, 'movies')">
+            </div>
             <div class="dashboard-card-body"><span class="card-icon">▣</span><div><h3>Serien &amp; Filme</h3><p>Deine Watchlist, Empfehlungen und Zufalls-Generator.</p></div><span class="card-arrow">→</span></div>
           </button>
           <button class="dashboard-card card-feast" type="button" onclick="showFeastApp()">
-            <div class="dashboard-card-image"></div>
+            <div class="dashboard-card-image" data-overview-image="feast">
+              <span class="overview-image-hint">Titelbild ändern</span>
+              <input class="overview-image-input" type="file" accept="image/*" aria-label="Titelbild für diese Liste ändern" onclick="event.stopPropagation()" onchange="handleOverviewImage(event, 'feast')">
+            </div>
             <div class="dashboard-card-body"><span class="card-icon">♜</span><div><h3>Feast Table</h3><p>Rezepte, Restaurant-Ideen und kulinarische Inspirationen.</p></div><span class="card-arrow">→</span></div>
           </button>
           <button class="dashboard-card card-drinks" type="button" onclick="showSaufiMenu()">
-            <div class="dashboard-card-image"></div>
+            <div class="dashboard-card-image" data-overview-image="drinks">
+              <span class="overview-image-hint">Titelbild ändern</span>
+              <input class="overview-image-input" type="file" accept="image/*" aria-label="Titelbild für diese Liste ändern" onclick="event.stopPropagation()" onchange="handleOverviewImage(event, 'drinks')">
+            </div>
             <div class="dashboard-card-body"><span class="card-icon">♧</span><div><h3>Bier &amp; Cocktails</h3><p>Bewerte deine Lieblingsdrinks und entdecke neue Favoriten.</p></div><span class="card-arrow">→</span></div>
           </button>
           <button class="dashboard-card card-games" type="button" onclick="showGamesApp()">
-            <div class="dashboard-card-image"></div>
+            <div class="dashboard-card-image" data-overview-image="games">
+              <span class="overview-image-hint">Titelbild ändern</span>
+              <input class="overview-image-input" type="file" accept="image/*" aria-label="Titelbild für diese Liste ändern" onclick="event.stopPropagation()" onchange="handleOverviewImage(event, 'games')">
+            </div>
             <div class="dashboard-card-body"><span class="card-icon">⌘</span><div><h3>Spieleabend</h3><p>Spiele, Teilnehmer, Kolonnen und Bewertungen im Überblick.</p></div><span class="card-arrow">→</span></div>
           </button>
           <button class="dashboard-card card-yugioh" type="button" onclick="showYugiohApp()">
-            <div class="dashboard-card-image"></div>
+            <div class="dashboard-card-image" data-overview-image="yugioh">
+              <span class="overview-image-hint">Titelbild ändern</span>
+              <input class="overview-image-input" type="file" accept="image/*" aria-label="Titelbild für diese Liste ändern" onclick="event.stopPropagation()" onchange="handleOverviewImage(event, 'yugioh')">
+            </div>
             <div class="dashboard-card-body"><span class="card-icon">◈</span><div><h3>Yu-Gi-Oh! Decks</h3><p>Verwalte Decks, plane Duelle und finde die perfekte Strategie.</p></div><span class="card-arrow">→</span></div>
           </button>
-          <div class="dashboard-side-note">
-            <div class="note-mountain"></div>
-            <div class="note-content"><span>GEMEINSAM MEHR ERLEBEN</span><h3>Mehr als nur eine Liste.</h3><p>Watch, Feast and Game verbindet eure Lieblingsabende an einem Ort.</p><div class="note-check">✓ Übersichtlich</div><div class="note-check">✓ Einfach zu bedienen</div><div class="note-check">✓ Für echte gemeinsame Momente</div></div>
-          </div>
+          <div id="customListCards" class="custom-list-cards"></div>
+          <button class="dashboard-card card-custom-list" type="button" onclick="openCreateListDialog()">
+            <div class="dashboard-card-image custom-list-image"><span class="custom-list-plus">＋</span></div>
+            <div class="dashboard-card-body"><span class="card-icon">✦</span><div><h3>Neue Liste</h3><p>Eigene Liste mit Sortierung, Filtern und Zufallsauswahl anlegen.</p></div><span class="card-arrow">→</span></div>
+          </button>
         </div>
 
         <div class="dashboard-statusbar"><span class="online-dot"></span><strong>Online</strong><span>Bereit für den nächsten gemeinsamen Abend.</span><span class="dashboard-status-badge">CINEMATIC UI</span></div>
@@ -2971,6 +3022,53 @@ body.login-scene::before{content:"";display:block !important;position:fixed;inse
   </div>
 </div>
 
+<!-- Konfigurierbare eigene Liste -->
+<div id="customListApp" class="app-panel custom-list-panel" style="display:none;">
+  <div class="custom-list-heading">
+    <div>
+      <div class="dashboard-kicker">Eigene Liste</div>
+      <h2 id="customListTitle">Neue Liste</h2>
+      <p id="customListDescription">Deine persönliche Sammlung mit Suche, Filtern und Zufallsauswahl.</p>
+    </div>
+    <button class="random-card-button" type="button" onclick="openRandomCustomItem()">🎲 Zufällige Auswahl</button>
+  </div>
+  <div class="card-controls custom-list-controls">
+    <select id="customListSort" onchange="renderCustomListItems()" aria-label="Sortierung">
+      <option value="created_desc">Neueste zuerst</option>
+      <option value="name_asc">Name A–Z</option>
+      <option value="name_desc">Name Z–A</option>
+      <option value="rating_desc">Bewertung zuerst</option>
+    </select>
+    <select id="customListFilter" onchange="renderCustomListItems()" aria-label="Filter">
+      <option value="all">Alle Einträge</option>
+      <option value="open">Nur offene</option>
+      <option value="checked">Nur erledigte</option>
+      <option value="rated">Nur bewertete</option>
+    </select>
+  </div>
+  <div class="card-add-form custom-list-add-form">
+    <input id="newCustomItemName" placeholder="Name des neuen Eintrags">
+    <input id="newCustomItemUrl" placeholder="Link (optional)">
+    <input id="newCustomItemRating" type="number" min="0" max="5" step="1" placeholder="Bewertung 0–5">
+    <button type="button" onclick="addCustomListItem()">➕ Hinzufügen</button>
+  </div>
+  <div id="customListItems"></div>
+</div>
+
+<!-- Eigene Liste anlegen -->
+<div id="createListDialog" class="popup-overlay" style="display:none;" onclick="closeCreateListDialogOnOverlay(event)">
+  <div class="popup-box create-list-dialog-box">
+    <h3>✦ Neue Liste anlegen</h3>
+    <p>Die Liste wird in Supabase gespeichert und kann später erweitert werden.</p>
+    <label class="edit-field"><span>Name der Liste</span><input id="newListName" placeholder="z. B. Reiseziele"></label>
+    <label class="edit-field"><span>Beschreibung</span><input id="newListDescription" placeholder="Wofür ist diese Liste gedacht?"></label>
+    <label class="edit-field"><span>Standardsortierung</span><select id="newListSort"><option value="created_desc">Neueste zuerst</option><option value="name_asc">Name A–Z</option><option value="rating_desc">Bewertung zuerst</option></select></label>
+    <label class="edit-field"><span>Standardfilter</span><select id="newListFilter"><option value="all">Alle Einträge</option><option value="open">Nur offene</option><option value="rated">Nur bewertete</option></select></label>
+    <label class="edit-field"><span>Zufallsauswahl</span><select id="newListRandom"><option value="all">Aus allen Einträgen</option><option value="open">Nur aus offenen Einträgen</option><option value="rated">Nur aus bewerteten Einträgen</option></select></label>
+    <div class="popup-actions"><button type="button" onclick="createCustomList()">💾 Liste anlegen</button><button type="button" onclick="closeCreateListDialog()">Abbrechen</button></div>
+  </div>
+</div>
+
 <!-- Mittiges Zufalls-Popup -->
 <div
   id="randomPopup"
@@ -3090,6 +3188,16 @@ const yugiohPlayerInputs = document.getElementById("yugiohPlayerInputs");
 const yugiohAssignmentResults = document.getElementById("yugiohAssignmentResults");
 const yugiohAssignmentPopup = document.getElementById("yugiohAssignmentPopup");
 const yugiohAssignmentPopupResults = document.getElementById("yugiohAssignmentPopupResults");
+const customListApp = document.getElementById("customListApp");
+const customListTitle = document.getElementById("customListTitle");
+const customListDescription = document.getElementById("customListDescription");
+const customListSort = document.getElementById("customListSort");
+const customListFilter = document.getElementById("customListFilter");
+const customListItemsElement = document.getElementById("customListItems");
+let customLists = [];
+let activeCustomList = null;
+let activeCustomListItems = [];
+const overviewImageKeys = ["movies", "feast", "drinks", "games", "yugioh"];
 
 let gameItems = [];
 let gameColumns = [];
@@ -3654,6 +3762,160 @@ async function saveYugiohEdit() {
   renderYugiohDecks();
 }
 
+/* Dashboard-Titelbilder und eigene Listen */
+function overviewImageStorageKey(key) {
+  return `wfg-overview-image:${currentUser?.id || "guest"}:${key}`;
+}
+function applyOverviewImages() {
+  document.querySelectorAll("[data-overview-image]").forEach(card => {
+    const key = card.dataset.overviewImage;
+    const image = localStorage.getItem(overviewImageStorageKey(key));
+    card.style.backgroundImage = image ? `linear-gradient(180deg, rgba(4,12,26,.05), rgba(4,12,26,.72)), url(${image})` : "";
+    card.style.backgroundSize = image ? "cover" : "";
+    card.style.backgroundPosition = image ? "center" : "";
+  });
+}
+function handleOverviewImage(event, key) {
+  event.stopPropagation();
+  const file = event.target.files?.[0];
+  if (!file) return;
+  compressImage(file, compressed => {
+    if (!compressed) {
+      alert("Das Titelbild konnte nicht verarbeitet werden.");
+      return;
+    }
+    localStorage.setItem(overviewImageStorageKey(key), compressed);
+    applyOverviewImages();
+  });
+  event.target.value = "";
+}
+function openCreateListDialog() {
+  if (!currentUser) { showLogin(); return; }
+  document.getElementById("createListDialog").style.display = "flex";
+  document.getElementById("newListName").focus();
+}
+function closeCreateListDialog() {
+  document.getElementById("createListDialog").style.display = "none";
+}
+function closeCreateListDialogOnOverlay(event) {
+  if (event.target.id === "createListDialog") closeCreateListDialog();
+}
+function customListSlug(name) {
+  return name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 48) || "liste";
+}
+async function createCustomList() {
+  if (!currentUser) { showLogin(); return; }
+  const name = document.getElementById("newListName").value.trim();
+  if (!name) { alert("Bitte einen Namen für die Liste eingeben."); return; }
+  const payload = {
+    name,
+    description: document.getElementById("newListDescription").value.trim(),
+    slug: customListSlug(name) + "-" + Date.now().toString(36),
+    sort_mode: document.getElementById("newListSort").value,
+    filter_mode: document.getElementById("newListFilter").value,
+    random_mode: document.getElementById("newListRandom").value,
+    user_id: currentUser.id
+  };
+  setStatus("Lege neue Liste in Supabase an …");
+  const { data, error } = await supabaseClient.from("custom_lists").insert(payload).select().single();
+  if (error) {
+    setStatus("Die Liste konnte nicht angelegt werden.", true);
+    showSupabaseError("Supabase-Tabelle für eigene Listen fehlt oder ist nicht freigegeben", error);
+    return;
+  }
+  customLists.unshift(data);
+  closeCreateListDialog();
+  renderCustomListCards();
+  activeCustomList = data;
+  await navigateToView("custom", "push");
+}
+function renderCustomListCards() {
+  const host = document.getElementById("customListCards");
+  if (!host) return;
+  host.innerHTML = "";
+  customLists.forEach(list => {
+    const card = document.createElement("button");
+    card.type = "button";
+    card.className = "dashboard-card custom-list-card";
+    card.onclick = () => openCustomList(list.id);
+    const image = document.createElement("div");
+    image.className = "dashboard-card-image";
+    image.dataset.overviewImage = "custom-" + list.id;
+    const hint = document.createElement("span"); hint.className = "overview-image-hint"; hint.textContent = "Titelbild ändern";
+    const input = document.createElement("input"); input.className = "overview-image-input"; input.type = "file"; input.accept = "image/*"; input.setAttribute("aria-label", "Titelbild für diese Liste ändern"); input.onclick = e => e.stopPropagation(); input.onchange = e => handleOverviewImage(e, "custom-" + list.id);
+    image.append(hint, input);
+    const body = document.createElement("div"); body.className = "dashboard-card-body";
+    body.innerHTML = `<span class="card-icon">✦</span><div><h3></h3><p></p></div><span class="card-arrow">→</span>`;
+    body.querySelector("h3").textContent = list.name;
+    body.querySelector("p").textContent = list.description || "Eigene konfigurierbare Liste.";
+    card.append(image, body); host.appendChild(card);
+  });
+  applyOverviewImages();
+}
+async function loadCustomLists() {
+  if (!currentUser) return;
+  const { data, error } = await supabaseClient.from("custom_lists").select("*").eq("user_id", currentUser.id).order("created_at", { ascending: false });
+  if (error) { console.warn("Eigene Listen sind noch nicht verfügbar:", error.message); return; }
+  customLists = data || [];
+  renderCustomListCards();
+}
+function openCustomList(id) {
+  activeCustomList = customLists.find(list => list.id === id);
+  if (!activeCustomList) return;
+  navigateToView("custom", "push");
+}
+function renderCustomListPanel() {
+  if (!activeCustomList) return;
+  customListTitle.textContent = activeCustomList.name;
+  customListDescription.textContent = activeCustomList.description || "Deine persönliche Sammlung mit Suche, Filtern und Zufallsauswahl.";
+  customListSort.value = activeCustomList.sort_mode || "created_desc";
+  customListFilter.value = activeCustomList.filter_mode || "all";
+  renderCustomListItems();
+}
+function getVisibleCustomListItems() {
+  let items = [...activeCustomListItems];
+  if (customListFilter.value === "open") items = items.filter(item => !item.checked);
+  if (customListFilter.value === "checked") items = items.filter(item => item.checked);
+  if (customListFilter.value === "rated") items = items.filter(item => Number(item.rating || 0) > 0);
+  if (customListSort.value === "name_asc") items.sort((a,b) => (a.name||"").localeCompare(b.name||"", "de"));
+  if (customListSort.value === "name_desc") items.sort((a,b) => (b.name||"").localeCompare(a.name||"", "de"));
+  if (customListSort.value === "rating_desc") items.sort((a,b) => Number(b.rating||0)-Number(a.rating||0));
+  if (customListSort.value === "created_desc") items.sort((a,b) => new Date(b.created_at||0)-new Date(a.created_at||0));
+  return items;
+}
+function renderCustomListItems() {
+  if (!customListItemsElement) return;
+  customListItemsElement.innerHTML = "";
+  getVisibleCustomListItems().forEach(item => {
+    const row = document.createElement("div"); row.className = "movie-item";
+    row.innerHTML = `<div class="movie-item-top"><div class="movie-left"><input type="checkbox"><label></label></div><div class="movie-actions"><span class="btn-small">${Number(item.rating||0) ? "⭐".repeat(Number(item.rating)) : "☆"}</span><span class="btn-small custom-delete-item">❌</span></div></div>`;
+    const checkbox=row.querySelector("input"); checkbox.checked=!!item.checked; checkbox.onchange=async()=>{const {error}=await supabaseClient.from("custom_list_items").update({checked:checkbox.checked}).eq("id",item.id);if(!error){item.checked=checkbox.checked;renderCustomListItems();}else showSupabaseError("Fehler beim Aktualisieren des Eintrags",error);};
+    row.querySelector("label").textContent=item.name||"Unbenannt";
+    row.querySelector("label").onclick=()=>item.url&&window.open(item.url,"_blank");
+    row.querySelector(".custom-delete-item").onclick=async()=>{if(!confirm(`"${item.name}" wirklich löschen?`))return;const {error}=await supabaseClient.from("custom_list_items").delete().eq("id",item.id);if(!error){activeCustomListItems=activeCustomListItems.filter(x=>x.id!==item.id);renderCustomListItems();}else showSupabaseError("Fehler beim Löschen",error);};
+    customListItemsElement.appendChild(row);
+  });
+}
+async function loadCustomListItems() {
+  const {data,error}=await supabaseClient.from("custom_list_items").select("*").eq("list_id",activeCustomList.id).order("created_at",{ascending:false});
+  if(error){showSupabaseError("Supabase-Tabelle für Listeneinträge fehlt oder ist nicht freigegeben",error);return;}
+  activeCustomListItems=data||[];renderCustomListPanel();
+}
+async function addCustomListItem() {
+  if(!activeCustomList||!currentUser)return;
+  const name=document.getElementById("newCustomItemName").value.trim(); if(!name){alert("Bitte einen Namen eingeben.");return;}
+  const payload={list_id:activeCustomList.id,name,url:normalize(document.getElementById("newCustomItemUrl").value.trim()),rating:Number(document.getElementById("newCustomItemRating").value||0),checked:false,user_id:currentUser.id};
+  const {data,error}=await supabaseClient.from("custom_list_items").insert(payload).select().single();
+  if(error){showSupabaseError("Fehler beim Hinzufügen des Listeneintrags",error);return;}
+  activeCustomListItems.unshift(data);document.getElementById("newCustomItemName").value="";document.getElementById("newCustomItemUrl").value="";document.getElementById("newCustomItemRating").value="";renderCustomListItems();
+}
+function openRandomCustomItem() {
+  let candidates=getVisibleCustomListItems();
+  if(activeCustomList?.random_mode==="open") candidates=candidates.filter(item=>!item.checked);
+  if(activeCustomList?.random_mode==="rated") candidates=candidates.filter(item=>Number(item.rating||0)>0);
+  if(!candidates.length){showRandomPopup("Für diese Auswahl gibt es keinen passenden Eintrag.");return;}
+  const item=candidates[Math.floor(Math.random()*candidates.length)];showRandomPopup("Ausgewählt: "+(item.name||"Unbenannt"),item.url||"");
+}
 /* Popup */
 
 function showRandomPopup(message, url = "") {
@@ -3846,6 +4108,7 @@ function showAppShell() {
   }
 
   showMenu(false);
+  loadCustomLists();
 }
 
 async function initAuth() {
@@ -3915,7 +4178,8 @@ const appViewLoaders = {
   yugioh: async () => {
     renderYugiohPlayerInputs();
     await loadYugiohDecks();
-  }
+  },
+  custom: loadCustomListItems
 };
 
 function hideAllPanels() {
@@ -3927,6 +4191,7 @@ function hideAllPanels() {
   cocktailApp.style.display = "none";
   gamesApp.style.display = "none";
   yugiohApp.style.display = "none";
+  customListApp.style.display = "none";
   setStatus("");
 }
 
@@ -3948,6 +4213,9 @@ function showPanelForView(view) {
     gamesApp.style.display = "block";
   } else if (view === "yugioh") {
     yugiohApp.style.display = "block";
+  } else if (view === "custom") {
+    customListApp.style.display = "block";
+    renderCustomListPanel();
   } else {
     currentView = "menu";
     menuBox.style.display = "block";
@@ -4029,6 +4297,7 @@ window.addEventListener("popstate", async event => {
 });
 
 function showMenu(pushHistory = true) {
+  setTimeout(applyOverviewImages, 0);
   return navigateToView("menu", pushHistory ? "push" : "replace");
 }
 
