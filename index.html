@@ -2294,7 +2294,7 @@ body.app-scene #menuBox {
   margin:0 !important; padding:0 !important; border:0 !important; background:transparent !important; box-shadow:none !important;
 }
 .dashboard-shell { display:grid; grid-template-columns:238px minmax(0,1fr); min-height:calc(100vh - 50px); border:1px solid rgba(101,137,198,.18); border-radius:22px; overflow:hidden; background:rgba(4,14,29,.78); box-shadow:0 28px 90px rgba(0,0,0,.38); backdrop-filter:blur(12px); }
-.dashboard-sidebar {position: fixed; top: 0; left: 0; width: var(--sidebar-width);  height: 100vh; z-index: 1000; padding:22px 15px 18px; border-right:1px solid rgba(118,145,199,.16); background:linear-gradient(180deg, rgba(5,18,37,.94), rgba(5,14,29,.90)); display:flex; flex-direction:column;transition: width 0.3s ease; overflow: hidden; }
+.dashboard-sidebar {position: fixed; top: 0; left: 0; width: var(--sidebar-width);  height: 100vh; z-index: 1000; padding:22px 15px 18px; border-right:1px solid rgba(118,145,199,.16); background:linear-gradient(180deg, rgba(5,18,37,.94), rgba(5,14,29,.90)); display:flex; flex-direction:column;transition: width 360ms cubic-bezier(.22,.61,.36,1), box-shadow 360ms ease; overflow: hidden; will-change: width; }
 .dashboard-brand { display:flex; align-items:center; gap:10px; color:#eef5ff; font-size:21px; font-weight:800; padding:5px 8px 25px; }
 .dashboard-brand > span:last-child span { color:#48dfd0; } .dashboard-brand > span:last-child b { color:#8a6df4; }
 .brand-mark { width:34px; height:34px; border-radius:11px; display:grid; place-items:center; background:linear-gradient(135deg,#35e4d0,#5968ff 60%,#8c4cf5); color:#fff; box-shadow:0 8px 22px rgba(81,99,245,.25); }
@@ -2305,7 +2305,7 @@ body.app-scene #menuBox {
 .dashboard-nav-item.active span { color:#57e1d5; }
 .dashboard-sidebar-footer { margin-top:auto; border-top:1px solid rgba(118,145,199,.13); padding-top:14px; }
 .sidebar-motto { color:#6f83a3; font-family:var(--font-display); font-size:12px; line-height:1.55; text-align:center; padding:28px 12px 4px; }
-.dashboard-main {margin-left: var(--sidebar-width); transition: margin-left 0.3s ease; padding:28px 30px 22px; min-width:0; }
+.dashboard-main {margin-left: var(--sidebar-width); transition: margin-left 360ms cubic-bezier(.22,.61,.36,1); padding:28px 30px 22px; min-width:0; }
 .dashboard-topbar { display:flex; align-items:flex-start; justify-content:space-between; gap:18px; margin:0 0 20px; }
 .dashboard-kicker { color:#62e4d5; font-size:11px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; margin-bottom:3px; }
 .dashboard-topbar h2 { text-align:left; margin:0; font-size:29px; color:#eaf1fc; }
@@ -2347,42 +2347,78 @@ body.app-scene #menuBox {
 /* --- EIN- UND AUSKLAPPBARE SIDEBAR --- */
 .dashboard-sidebar {
   box-sizing: border-box;
+  box-shadow: 10px 0 30px rgba(0,0,0,.14);
 }
 .dashboard-brand {
-  display: flex;
+  position: relative;
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) 36px;
   align-items: center;
   gap: 10px;
   width: 100%;
   min-width: 0;
+  min-height: 70px;
   padding: 5px 0 25px;
   margin-bottom: 0;
 }
-.brand-name {
+.brand-name,
+.nav-label {
   min-width: 0;
+  overflow: hidden;
   white-space: nowrap;
+  opacity: 1;
+  max-width: 220px;
+  transition: opacity 220ms ease, max-width 320ms cubic-bezier(.22,.61,.36,1);
 }
 .sidebar-toggle-btn {
+  position: relative;
+  z-index: 2;
+  justify-self: end;
   flex: 0 0 auto;
   width: 36px;
   height: 36px;
-  margin-left: auto;
+  margin: 0;
   padding: 0;
   border: 1px solid rgba(118,145,199,.28);
   border-radius: 10px;
   background: rgba(13,31,57,.78);
   color: #eef5ff;
-  font-size: 24px;
-  line-height: 1;
+  font-size: 25px;
+  line-height: 30px;
   cursor: pointer;
-  transition: background .2s ease, border-color .2s ease, transform .3s ease;
+  transition: background 220ms ease, border-color 220ms ease, transform 360ms cubic-bezier(.22,.61,.36,1), box-shadow 220ms ease;
 }
 .sidebar-toggle-btn:hover,
 .sidebar-toggle-btn:focus-visible {
   background: rgba(45,83,137,.48);
   border-color: rgba(101,226,215,.7);
+  box-shadow: 0 0 0 3px rgba(101,226,215,.10);
   outline: none;
 }
-/* Im eingeklappten Zustand bleiben Markierung, Umschalter und Navigations-Icons sichtbar. */
+.dashboard-nav-item {
+  transition: color 220ms ease, background 220ms ease, border-color 220ms ease, transform 220ms ease, padding 360ms cubic-bezier(.22,.61,.36,1);
+}
+.dashboard-nav-item span.nav-icon {
+  flex: 0 0 20px;
+  width: 20px;
+  text-align: center;
+  color: #91aef4;
+  font-size: 16px;
+  line-height: 1;
+  transition: color 220ms ease, transform 220ms ease;
+}
+.dashboard-nav-item:hover .nav-icon,
+.dashboard-nav-item.active .nav-icon {
+  transform: scale(1.08);
+}
+.dashboard-nav-item .nav-label {
+  flex: 1 1 auto;
+  width: auto;
+  text-align: left;
+  color: inherit;
+  font-size: 13px;
+}
+/* Im eingeklappten Zustand haben Markierung und Umschalter eigene Zeilen: keine Überlappung. */
 .sidebar-collapsed .dashboard-sidebar {
   width: var(--sidebar-collapsed-width);
 }
@@ -2390,14 +2426,29 @@ body.app-scene #menuBox {
   margin-left: var(--sidebar-collapsed-width);
 }
 .sidebar-collapsed .dashboard-brand {
-  justify-content: center;
-  gap: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 7px;
+  min-height: 112px;
+  padding: 5px 0 15px;
 }
-.sidebar-collapsed .brand-name {
-  display: none;
+.sidebar-collapsed .brand-name,
+.sidebar-collapsed .nav-label {
+  max-width: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+.sidebar-collapsed .brand-mark {
+  flex: 0 0 34px;
 }
 .sidebar-collapsed .sidebar-toggle-btn {
-  margin-left: 0;
+  width: 30px;
+  height: 30px;
+  justify-self: center;
+  margin: 0;
+  font-size: 22px;
+  line-height: 24px;
   transform: rotate(180deg);
 }
 .sidebar-collapsed .dashboard-nav-item {
@@ -2405,10 +2456,22 @@ body.app-scene #menuBox {
   gap: 0;
   padding-right: 8px !important;
   padding-left: 8px !important;
-  font-size: 0 !important;
 }
-.sidebar-collapsed .dashboard-nav-item span {
-  font-size: 16px;
+.sidebar-collapsed .dashboard-nav-item span.nav-icon {
+  flex-basis: 20px;
+  transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-sidebar,
+  .dashboard-main,
+  .dashboard-brand,
+  .sidebar-toggle-btn,
+  .dashboard-nav-item,
+  .brand-name,
+  .nav-label,
+  .dashboard-nav-item span.nav-icon {
+    transition-duration: 0.01ms !important;
+  }
 }
 /* Consistent cinematic panels for every list screen */
 body.app-scene .app-panel { margin-top:0; background:linear-gradient(145deg, rgba(7,20,39,.94), rgba(5,15,29,.96)); border:1px solid rgba(95,139,211,.24); border-radius:18px; box-shadow:0 22px 55px rgba(0,0,0,.32); padding:24px; }
@@ -2631,12 +2694,12 @@ body.login-scene::before{content:"";display:block !important;position:fixed;inse
           <button id="sidebarToggle" type="button" class="sidebar-toggle-btn" onclick="toggleSidebar()" aria-label="Sidebar einklappen" aria-expanded="true" title="Sidebar ein- oder ausklappen">‹</button>
         </div>
         <nav class="dashboard-nav">
-          <button class="dashboard-nav-item active" type="button" onclick="showMenu()" aria-current="page"><span>⌂</span> Übersicht</button>
-          <button class="dashboard-nav-item" type="button" onclick="showMoviesApp()"><span>▣</span> Serien &amp; Filme</button>
-          <button class="dashboard-nav-item" type="button" onclick="showFeastApp()"><span>♜</span> Feast Table</button>
-          <button class="dashboard-nav-item" type="button" onclick="showSaufiMenu()"><span>♧</span> Bier &amp; Cocktails</button>
-          <button class="dashboard-nav-item" type="button" onclick="showGamesApp()"><span>⌘</span> Spieleabend</button>
-          <button class="dashboard-nav-item" type="button" onclick="showYugiohApp()"><span>◈</span> Yu-Gi-Oh! Decks</button>
+          <button class="dashboard-nav-item active" type="button" onclick="showMenu()" aria-current="page" title="Übersicht"><span class="nav-icon" aria-hidden="true">⌂</span><span class="nav-label">Übersicht</span></button>
+          <button class="dashboard-nav-item" type="button" onclick="showMoviesApp()" title="Serien &amp; Filme"><span class="nav-icon" aria-hidden="true">▣</span><span class="nav-label">Serien &amp; Filme</span></button>
+          <button class="dashboard-nav-item" type="button" onclick="showFeastApp()" title="Feast Table"><span class="nav-icon" aria-hidden="true">♜</span><span class="nav-label">Feast Table</span></button>
+          <button class="dashboard-nav-item" type="button" onclick="showSaufiMenu()" title="Bier &amp; Cocktails"><span class="nav-icon" aria-hidden="true">♧</span><span class="nav-label">Bier &amp; Cocktails</span></button>
+          <button class="dashboard-nav-item" type="button" onclick="showGamesApp()" title="Spieleabend"><span class="nav-icon" aria-hidden="true">⌘</span><span class="nav-label">Spieleabend</span></button>
+          <button class="dashboard-nav-item" type="button" onclick="showYugiohApp()" title="Yu-Gi-Oh! Decks"><span class="nav-icon" aria-hidden="true">◈</span><span class="nav-label">Yu-Gi-Oh! Decks</span></button>
         </nav>
 
       </aside>
