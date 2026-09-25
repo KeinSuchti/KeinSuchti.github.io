@@ -4426,7 +4426,13 @@ function showAppShell() {
     if (dashboardUserLabel) dashboardUserLabel.textContent = currentUser.email;
   }
 
-  showMenu(false);
+  const restoreView = sessionStorage.getItem("wfg-restore-view");
+  sessionStorage.removeItem("wfg-restore-view");
+  if (restoreView === "appointments") {
+    navigateToView("appointments", "replace");
+  } else {
+    showMenu(false);
+  }
   loadCustomLists();
   loadNextAppointment();
 }
@@ -4797,7 +4803,7 @@ function renderAvailabilityEntries() {
 }
 
 async function loadAppointmentPoll() { availabilityEntries=[]; try { availabilityEntries=JSON.parse(localStorage.getItem(pollStorageKey())||"[]"); } catch(_){ availabilityEntries=[]; } const result=await supabaseClient.from("appointment_availability").select("id,participant_name,dates,user_id").eq("user_id",currentUser.id).order("created_at",{ascending:true}); if(!result.error) availabilityEntries=result.data||[]; const month=document.getElementById("pollMonth"); if(month){month.value=`${pollCalendarCursor.getFullYear()}-${String(pollCalendarCursor.getMonth()+1).padStart(2,"0")}`;month.onchange=()=>{const [y,m]=month.value.split("-").map(Number);pollCalendarCursor=new Date(y,m-1,1);renderPollCalendar();};} renderPollCalendar();renderSelectedPollDates();renderAvailabilityEntries(); }
-async function saveAppointmentPoll() { const name=document.getElementById("pollName").value.trim();const status=document.getElementById("pollStatus");if(!name){status.textContent="Bitte deinen Namen eingeben.";return;}if(!selectedPollDates.length){status.textContent="Bitte mindestens einen möglichen Termin auswählen.";return;}const entry={participant_name:name,dates:[...selectedPollDates].sort(),user_id:currentUser.id};const result=await supabaseClient.from("appointment_availability").upsert(entry,{onConflict:"user_id,participant_name"}).select().single();if(result.error){const oldIndex=availabilityEntries.findIndex(x=>x.participant_name.toLowerCase()===name.toLowerCase());if(oldIndex>=0)availabilityEntries[oldIndex]=entry;else availabilityEntries.push(entry);localStorage.setItem(pollStorageKey(),JSON.stringify(availabilityEntries));status.textContent="Lokal gespeichert. Für gemeinsame Synchronisierung bitte das SQL-Schema ausführen.";}else{const oldIndex=availabilityEntries.findIndex(x=>x.participant_name.toLowerCase()===name.toLowerCase());if(oldIndex>=0)availabilityEntries[oldIndex]=result.data;else availabilityEntries.push(result.data);status.textContent="Deine Verfügbarkeit wurde gespeichert.";}renderAvailabilityEntries(); status.textContent += " Seite wird aktualisiert …"; setTimeout(() => window.location.reload(), 650); }
+async function saveAppointmentPoll() { const name=document.getElementById("pollName").value.trim();const status=document.getElementById("pollStatus");if(!name){status.textContent="Bitte deinen Namen eingeben.";return;}if(!selectedPollDates.length){status.textContent="Bitte mindestens einen möglichen Termin auswählen.";return;}const entry={participant_name:name,dates:[...selectedPollDates].sort(),user_id:currentUser.id};const result=await supabaseClient.from("appointment_availability").upsert(entry,{onConflict:"user_id,participant_name"}).select().single();if(result.error){const oldIndex=availabilityEntries.findIndex(x=>x.participant_name.toLowerCase()===name.toLowerCase());if(oldIndex>=0)availabilityEntries[oldIndex]=entry;else availabilityEntries.push(entry);localStorage.setItem(pollStorageKey(),JSON.stringify(availabilityEntries));status.textContent="Lokal gespeichert. Für gemeinsame Synchronisierung bitte das SQL-Schema ausführen.";}else{const oldIndex=availabilityEntries.findIndex(x=>x.participant_name.toLowerCase()===name.toLowerCase());if(oldIndex>=0)availabilityEntries[oldIndex]=result.data;else availabilityEntries.push(result.data);status.textContent="Deine Verfügbarkeit wurde gespeichert.";}renderAvailabilityEntries(); status.textContent += " Seite wird aktualisiert …"; sessionStorage.setItem("wfg-restore-view", "appointments"); setTimeout(() => window.location.reload(), 650); }
 async function removeAvailabilityEntry(index) { const entry=availabilityEntries[index]; if(!entry)return; if(!confirm(`Eintrag von ${entry.participant_name} entfernen?`))return; if(entry.id) await supabaseClient.from("appointment_availability").delete().eq("id",entry.id); availabilityEntries.splice(index,1);localStorage.setItem(pollStorageKey(),JSON.stringify(availabilityEntries));renderAvailabilityEntries(); }
 
 /* Serien & Filme */
