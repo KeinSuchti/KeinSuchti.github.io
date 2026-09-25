@@ -3027,6 +3027,38 @@ button, input, select, textarea { max-width: 100%; }
   body.app-scene .sidebar-collapsed .sidebar-logout-button .nav-icon { flex-basis:20px; width:20px; height:auto; font-size:17px; }
 }
 
+
+/* --- Logout-Button: exakt 50px Höhe in allen Sidebar-Zuständen --- */
+.sidebar-logout-button {
+  box-sizing:border-box !important;
+  height:50px !important;
+  min-height:50px !important;
+  max-height:50px !important;
+  flex:0 0 50px !important;
+  display:flex !important;
+  align-items:center !important;
+}
+.sidebar-collapsed .sidebar-logout-button {
+  height:50px !important;
+  min-height:50px !important;
+  max-height:50px !important;
+  flex-basis:50px !important;
+}
+@media (max-width:900px) {
+  body.app-scene .dashboard-sidebar > .sidebar-logout-button {
+    height:50px !important;
+    min-height:50px !important;
+    max-height:50px !important;
+    flex-basis:50px !important;
+    bottom:24px;
+  }
+  body.app-scene .dashboard-sidebar > .dashboard-nav { padding-bottom:100px; }
+}
+@media (max-width:380px) {
+  body.app-scene .dashboard-sidebar > .sidebar-logout-button { height:50px !important; min-height:50px !important; max-height:50px !important; bottom:22px; }
+  body.app-scene .dashboard-sidebar > .dashboard-nav { padding-bottom:106px; }
+}
+
 </style>
 
 <!-- Cinematic background -->
@@ -3172,8 +3204,6 @@ button, input, select, textarea { max-width: 100%; }
             <div class="dashboard-card-body"><span class="card-icon">✦</span><div><h3>Neue Liste</h3><p>Eigene Liste mit Sortierung, Filtern und Zufallsauswahl anlegen.</p></div><span class="card-arrow">→</span></div>
           </button>
         </div>
-
-        <div class="dashboard-statusbar"><span class="online-dot"></span><strong>Online</strong><span>Bereit für den nächsten gemeinsamen Abend.</span><span class="dashboard-status-badge">CINEMATIC UI</span></div>
       </main>
     </div>
 
