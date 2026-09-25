@@ -3126,6 +3126,55 @@ button, input, select, textarea { max-width: 100%; }
   body.app-scene .dashboard-sidebar > .sidebar-logout-button { margin-bottom:24px !important; }
 }
 
+
+/* --- Mobile Burger-Menü: Logout direkt unter dem letzten Navigationseintrag --- */
+@media (max-width:900px) {
+  body.app-scene .dashboard-sidebar {
+    box-sizing:border-box;
+    height:100dvh;
+    min-height:100svh;
+    max-height:none;
+    overflow-y:auto !important;
+    overflow-x:hidden !important;
+    display:flex;
+    flex-direction:column;
+    padding-bottom:16px;
+  }
+  body.app-scene .dashboard-sidebar > .dashboard-nav {
+    flex:0 0 auto !important;
+    min-height:0;
+    width:100%;
+    overflow:visible !important;
+    padding:0 2px !important;
+    margin:8px 0 0;
+  }
+  body.app-scene .dashboard-sidebar > .sidebar-logout-button {
+    position:static !important;
+    inset:auto !important;
+    transform:none !important;
+    width:100% !important;
+    height:50px !important;
+    min-height:50px !important;
+    max-height:50px !important;
+    flex:0 0 50px !important;
+    margin:14px 0 0 !important;
+    padding:0 14px !important;
+    z-index:auto;
+  }
+  body.app-scene .dashboard-sidebar > .sidebar-logout-button .nav-label {
+    display:block;
+    width:auto;
+    max-width:none;
+    opacity:1;
+    overflow:visible;
+    pointer-events:auto;
+  }
+}
+@media (max-width:380px) {
+  body.app-scene .dashboard-sidebar { padding-bottom:12px; }
+  body.app-scene .dashboard-sidebar > .sidebar-logout-button { margin-top:12px !important; }
+}
+
 </style>
 
 <!-- Cinematic background -->
