@@ -2862,6 +2862,58 @@ button, input, select, textarea { max-width: 100%; }
 .availability-common-dot { width:10px; height:10px; border-radius:50%; background:#3fd27f; box-shadow:0 0 8px rgba(63,210,127,.5); }
 .availability-entry-date.is-common { border:1px solid #58df92; background:rgba(31,150,91,.7); color:#edfff4; font-weight:800; }
 
+
+/* --- Finaler Mobile-Sidebar-Fix: Logout immer vollständig sichtbar --- */
+@media (max-width:900px) {
+  body.app-scene .dashboard-sidebar {
+    box-sizing:border-box;
+    width:min(86vw,310px);
+    height:100dvh;
+    min-height:100svh;
+    max-height:100dvh;
+    padding:68px 12px calc(12px + env(safe-area-inset-bottom, 0px));
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+  }
+  body.app-scene .dashboard-sidebar > .dashboard-nav {
+    box-sizing:border-box;
+    flex:1 1 auto;
+    min-height:0;
+    width:100%;
+    overflow-y:auto;
+    overflow-x:hidden;
+    padding:0 2px 12px;
+    margin:8px 0 0;
+    scrollbar-width:thin;
+  }
+  body.app-scene .dashboard-sidebar > .sidebar-logout-button {
+    box-sizing:border-box;
+    flex:0 0 auto;
+    position:relative;
+    bottom:auto;
+    width:100%;
+    min-height:48px;
+    height:auto;
+    margin:0;
+    padding:12px 14px;
+    white-space:nowrap;
+    overflow:visible;
+    z-index:5;
+  }
+  body.app-scene .dashboard-sidebar > .sidebar-logout-button .nav-label {
+    display:block;
+    flex:1 1 auto;
+    min-width:0;
+    overflow:visible;
+    white-space:nowrap;
+  }
+}
+@media (max-width:380px) {
+  body.app-scene .dashboard-sidebar { width:min(92vw,300px); padding-left:10px; padding-right:10px; }
+  body.app-scene .dashboard-sidebar > .sidebar-logout-button { min-height:46px; padding:11px 12px; font-size:12px; }
+}
+
 </style>
 
 <!-- Cinematic background -->
