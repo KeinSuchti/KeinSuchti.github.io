@@ -3371,6 +3371,24 @@ button, input, select, textarea { max-width: 100%; }
   }
 }
 
+
+/* --- Mobiler Burger-Button oben links fixiert --- */
+@media (max-width:900px) {
+  body.app-scene:not(.mobile-sidebar-open) .mobile-menu-toggle {
+    top:max(12px, env(safe-area-inset-top, 0px) + 8px) !important;
+    bottom:auto !important;
+    left:12px !important;
+    position:fixed !important;
+  }
+}
+@media (max-width:380px) {
+  body.app-scene:not(.mobile-sidebar-open) .mobile-menu-toggle {
+    top:max(8px, env(safe-area-inset-top, 0px) + 6px) !important;
+    left:10px !important;
+    bottom:auto !important;
+  }
+}
+
 </style>
 
 <!-- Cinematic background -->
