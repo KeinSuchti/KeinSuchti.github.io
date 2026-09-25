@@ -2949,6 +2949,84 @@ button, input, select, textarea { max-width: 100%; }
   body.app-scene .dashboard-sidebar > .sidebar-logout-button { bottom:22px; min-height:44px; }
 }
 
+
+/* --- Ultimativer Mobile-Fix: Logout darf nicht vom Drawer abgeschnitten werden --- */
+@media (max-width:900px) {
+  body.app-scene .dashboard-sidebar {
+    height:100svh;
+    height:100dvh;
+    max-height:none;
+    overflow:visible !important;
+  }
+  body.app-scene .dashboard-sidebar > .dashboard-nav {
+    overflow-y:auto;
+    padding-bottom:90px;
+  }
+  body.app-scene .dashboard-sidebar > .sidebar-logout-button {
+    position:fixed !important;
+    left:12px;
+    right:auto;
+    bottom:max(24px, env(safe-area-inset-bottom, 0px));
+    width:calc(min(86vw,310px) - 24px);
+    min-height:48px;
+    max-height:none;
+    margin:0 !important;
+    z-index:10002;
+    transform:translateZ(0);
+  }
+}
+@media (max-width:380px) {
+  body.app-scene .dashboard-sidebar > .sidebar-logout-button {
+    left:10px;
+    bottom:max(22px, env(safe-area-inset-bottom, 0px));
+    width:calc(min(92vw,300px) - 20px);
+    min-height:46px;
+  }
+  body.app-scene .dashboard-sidebar > .dashboard-nav { padding-bottom:84px; }
+}
+
+
+/* --- Logout-Icon im eingeklappten Sidebar-Zustand --- */
+.sidebar-collapsed .sidebar-logout-button {
+  justify-content:center;
+  gap:0;
+  width:100%;
+  min-width:0;
+  padding:11px 8px;
+}
+.sidebar-collapsed .sidebar-logout-button .nav-icon {
+  display:inline-grid;
+  place-items:center;
+  flex:0 0 22px;
+  width:22px;
+  height:22px;
+  margin:0;
+  font-size:21px;
+  line-height:1;
+  color:#ef9b9b;
+}
+.sidebar-collapsed .sidebar-logout-button .nav-label {
+  max-width:0;
+  width:0;
+  margin:0;
+  padding:0;
+  opacity:0;
+  overflow:hidden;
+  pointer-events:none;
+}
+@media (max-width:900px) {
+  body.app-scene .sidebar-collapsed .sidebar-logout-button .nav-label,
+  body.app-scene.mobile-sidebar-open .sidebar-logout-button .nav-label {
+    max-width:none;
+    width:auto;
+    opacity:1;
+    overflow:visible;
+    pointer-events:auto;
+  }
+  body.app-scene .sidebar-collapsed .sidebar-logout-button { justify-content:flex-start; gap:12px; }
+  body.app-scene .sidebar-collapsed .sidebar-logout-button .nav-icon { flex-basis:20px; width:20px; height:auto; font-size:17px; }
+}
+
 </style>
 
 <!-- Cinematic background -->
@@ -3044,7 +3122,7 @@ button, input, select, textarea { max-width: 100%; }
           <button class="dashboard-nav-item" type="button" onclick="showYugiohApp()" title="Yu-Gi-Oh! Decks"><span class="nav-icon" aria-hidden="true">◈</span><span class="nav-label">Yu-Gi-Oh! Decks</span></button>
           <button class="dashboard-nav-item" type="button" onclick="showAppointmentsApp()" title="Termine abstimmen"><span class="nav-icon" aria-hidden="true">◷</span><span class="nav-label">Termine</span></button>
         </nav>
-        <button id="sidebarLogout" class="sidebar-logout-button" type="button" onclick="logout()"><span class="nav-icon" aria-hidden="true">⇥</span><span class="nav-label">Logout</span></button>
+        <button id="sidebarLogout" class="sidebar-logout-button" type="button" onclick="logout()" aria-label="Logout" title="Logout"><span class="nav-icon" aria-hidden="true">⎋</span><span class="nav-label">Logout</span></button>
 
       </aside>
 
