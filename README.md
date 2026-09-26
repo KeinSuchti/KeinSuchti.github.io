@@ -58,7 +58,14 @@ Token wird nicht automatisch eingelöst, wenn ein E-Mail-Scanner den Link nur ö
 Nach der Bestätigung kann ein neues Passwort gesetzt werden. Falls ein Reset-Link nicht versendet
 wird, zeigt die Webseite nun Supabase' konkrete Fehlermeldung und, sofern verfügbar, den Fehlercode;
 prüfe zusätzlich **Authentication > Logs**, die SMTP-/E-Mail-Provider-Protokolle, Rate-Limits und
-die Redirect-Allowlist.
+die Redirect-Allowlist. Supabase begrenzt Passwort-Reset-Anfragen standardmäßig auf eine Anfrage
+pro Nutzer je 60 Sekunden. Der integrierte E-Mail-Dienst versendet höchstens zwei Auth-E-Mails pro
+Stunde für das gesamte Projekt; nach `email rate limit exceeded` muss dieses Projektlimit abgewartet
+werden. Für ein höheres Versandlimit einen eigenen SMTP-Anbieter konfigurieren und anschließend
+**Authentication > Rate Limits** prüfen/anpassen. Wiederholtes Klicken setzt das Limit nicht zurück.
+Angemeldete Nutzer können ihr Passwort außerdem im Bereich **Benutzerkonto > Passwort ändern**
+ändern. Die Webseite prüft das aktuelle Passwort erneut und speichert das neue Passwort über
+Supabase Auth; Passwörter werden in Supabase Auth und nicht in der `profiles`-Tabelle verwaltet.
 
 Das SQL-Script legt die Rollen `user` und `admin` an, schützt Profile per Row Level Security und
 erstellt den Admin-Bereich für Rollenverwaltung. Normale Nutzer können ihr eigenes Profil verwalten;
