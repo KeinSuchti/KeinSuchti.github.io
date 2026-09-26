@@ -12,12 +12,16 @@ create table if not exists public.profiles (
   role text not null default 'user'
     check (role in ('user', 'admin')),
   is_banned boolean not null default false,
+  is_protected boolean not null default false,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
 
 alter table public.profiles
   add column if not exists is_banned boolean not null default false;
+
+alter table public.profiles
+  add column if not exists is_protected boolean not null default false;
 
 alter table public.profiles
   drop constraint if exists profiles_username_check;
@@ -37,6 +41,10 @@ alter table public.profiles enable row level security;
 revoke all on table public.profiles from anon, authenticated;
 grant select on table public.profiles to authenticated;
 grant update (username) on table public.profiles to authenticated;
+
+update public.profiles
+set is_protected = true
+where lower(email) = '1keinsuchti1@gmail.com';
 
 create or replace function public.is_admin()
 returns boolean
@@ -95,19 +103,22 @@ begin
       base_username := left(base_username, 14) || '-' || left(new.id::text, 8);
     end if;
 
-    insert into public.profiles (id, username, email, role)
+    insert into public.profiles (id, username, email, role, is_protected)
     values (
       new.id,
       base_username,
       lower(new.email),
-      'user'
+      'user',
+      lower(new.email) = '1keinsuchti1@gmail.com'
     )
     on conflict (id) do update
       set email = excluded.email,
+          is_protected = profiles.is_protected or excluded.is_protected,
           updated_at = now();
   else
     update public.profiles
       set email = lower(new.email),
+          is_protected = is_protected or lower(new.email) = '1keinsuchti1@gmail.com',
           updated_at = now()
       where id = new.id;
   end if;
@@ -132,7 +143,7 @@ create trigger on_auth_user_email_updated
 
 -- Create profiles for accounts that existed before this script was installed.
 -- A short UUID suffix keeps generated usernames unique; users can later change them.
-insert into public.profiles (id, username, email, role)
+insert into public.profiles (id, username, email, role, is_protected)
 select
   au.id,
   left(
@@ -150,11 +161,13 @@ select
     24
   ),
   lower(au.email),
-  'user'
+  'user',
+  lower(au.email) = '1keinsuchti1@gmail.com'
 from auth.users au
 where au.email is not null
 on conflict (id) do update
   set email = excluded.email,
+      is_protected = profiles.is_protected or excluded.is_protected,
       updated_at = now();
 
 -- Promote only this existing, verified account. If it does not exist yet,
@@ -162,6 +175,7 @@ on conflict (id) do update
 -- script again.
 update public.profiles p
 set role = 'admin',
+    is_protected = true,
     updated_at = now()
 from auth.users au
 where au.id = p.id
@@ -188,6 +202,13 @@ begin
   end if;
 
   perform pg_advisory_xact_lock(hashtext('public.profiles.admin-role'));
+  if exists (
+    select 1 from public.profiles
+    where id = target_user_id and is_protected
+  ) then
+    raise exception 'This protected administrator account cannot be changed' using errcode = '42501';
+  end if;
+
   select count(*) into current_admin_count
   from public.profiles
   where role = 'admin' and not is_banned;
@@ -225,6 +246,7 @@ as $$
 declare
   current_user_id uuid := (select auth.uid());
   current_user_role text;
+  current_user_is_protected boolean;
   current_admin_count integer;
 begin
   if current_user_id is null then
@@ -233,9 +255,13 @@ begin
 
   perform pg_advisory_xact_lock(hashtext('public.profiles.admin-role'));
 
-  select role into current_user_role
+  select role, is_protected into current_user_role, current_user_is_protected
   from public.profiles
   where id = current_user_id;
+
+  if current_user_is_protected then
+    raise exception 'This protected administrator account cannot be deleted' using errcode = '42501';
+  end if;
 
   if current_user_role = 'admin' then
     select count(*) into current_admin_count
@@ -272,6 +298,7 @@ as $$
 declare
   target_role text;
   target_is_banned boolean;
+  target_is_protected boolean;
   admin_count integer;
 begin
   if not exists (
@@ -286,11 +313,14 @@ begin
 
   perform pg_advisory_xact_lock(hashtext('public.profiles.admin-role'));
 
-  select role, is_banned into target_role, target_is_banned
+  select role, is_banned, is_protected into target_role, target_is_banned, target_is_protected
   from public.profiles
   where id = target_user_id;
   if not found then
     raise exception 'Account not found' using errcode = 'P0002';
+  end if;
+  if target_is_protected then
+    raise exception 'This protected administrator account cannot be changed' using errcode = '42501';
   end if;
 
   if new_is_banned and target_role = 'admin' and not target_is_banned then
@@ -321,6 +351,7 @@ as $$
 declare
   target_role text;
   target_is_banned boolean;
+  target_is_protected boolean;
   admin_count integer;
 begin
   if not exists (
@@ -335,11 +366,14 @@ begin
 
   perform pg_advisory_xact_lock(hashtext('public.profiles.admin-role'));
 
-  select role, is_banned into target_role, target_is_banned
+  select role, is_banned, is_protected into target_role, target_is_banned, target_is_protected
   from public.profiles
   where id = target_user_id;
   if not found then
     raise exception 'Account not found' using errcode = 'P0002';
+  end if;
+  if target_is_protected then
+    raise exception 'This protected administrator account cannot be deleted' using errcode = '42501';
   end if;
 
   if target_role = 'admin' and not target_is_banned then
