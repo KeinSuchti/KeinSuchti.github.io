@@ -2708,7 +2708,7 @@ body.login-scene::before{content:"";display:block !important;position:fixed;inse
 .dashboard-card:hover .overview-image-hint,
 .dashboard-card:focus-within .overview-image-hint { opacity:1; transform:translateY(-2px); }
 .overview-image-input { position:absolute; inset:0; z-index:3; opacity:0; cursor:pointer; }
-.card-custom-list .custom-list-image { display:grid; place-items:center; background:linear-gradient(135deg,rgba(28,203,195,.28),rgba(91,77,224,.42)); }
+.card-custom-list .custom-list-image { background-image:url("assets/new-list-cover.svg"); background-position:center 48%; }
 .custom-list-plus { color:#bffbf2; font-size:54px; font-weight:300; text-shadow:0 0 26px rgba(70,226,210,.45); }
 .custom-list-cards { display:contents; }
 .custom-list-panel .custom-list-heading { display:flex; justify-content:space-between; align-items:flex-start; gap:18px; margin-bottom:18px; }
@@ -2938,7 +2938,7 @@ body.app-scene .sidebar-logout-button .nav-icon svg {
 
 
 /* --- Termin-Karte, Umfrage und sichtbarer mobiler Logout --- */
-.card-appointments .appointment-card-image { display:grid; place-items:center; background:linear-gradient(135deg,rgba(30,177,176,.52),rgba(75,65,169,.72)); }
+.card-appointments .appointment-card-image { background-image:url("assets/appointments-cover.svg"); background-position:center 52%; }
 .appointment-card-symbol { color:#d5fffb; font-size:48px; text-shadow:0 0 24px rgba(102,237,220,.55); }
 .appointment-poll-card { margin-top:18px; }
 .appointment-poll-card h3 { margin:5px 0 4px; color:#eef5ff; }
@@ -4604,12 +4604,12 @@ body.color-vision-mode .beer-grade-slider::-moz-range-thumb {
             <div class="dashboard-card-body"><span class="card-icon">◈</span><div><h3>Yu-Gi-Oh! Decks</h3><p>Verwalte Decks, plane Duelle und finde die perfekte Strategie.</p></div><span class="card-arrow">→</span></div>
           </button>
           <button class="dashboard-card card-appointments" type="button" onclick="showAppointmentsApp()">
-            <div class="dashboard-card-image appointment-card-image"><span class="appointment-card-symbol">◷</span></div>
+            <div class="dashboard-card-image appointment-card-image" aria-hidden="true"></div>
             <div class="dashboard-card-body"><span class="card-icon">◷</span><div><h3>Termine abstimmen</h3><p>Gemeinsame Termine vorschlagen, abstimmen und den nächsten Abend planen.</p></div><span class="card-arrow">→</span></div>
           </button>
           <div id="customListCards" class="custom-list-cards"></div>
           <button class="dashboard-card card-custom-list" type="button" onclick="openCreateListDialog()">
-            <div class="dashboard-card-image custom-list-image"><span class="custom-list-plus">＋</span></div>
+            <div class="dashboard-card-image custom-list-image" aria-hidden="true"></div>
             <div class="dashboard-card-body"><span class="card-icon">✦</span><div><h3>Neue Liste</h3><p>Eigene Liste mit Sortierung, Filtern und Zufallsauswahl anlegen.</p></div><span class="card-arrow">→</span></div>
           </button>
         </div>

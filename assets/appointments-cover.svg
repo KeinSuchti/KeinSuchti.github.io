@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="440" viewBox="0 0 1200 440" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="44" y1="18" x2="1164" y2="456" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#07182B"/>
+      <stop offset=".52" stop-color="#123B59"/>
+      <stop offset="1" stop-color="#24275A"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0" cy="0" r="1" gradientTransform="matrix(350 0 0 205 904 215)" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#37D7CC" stop-opacity=".34"/>
+      <stop offset="1" stop-color="#37D7CC" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="panel" x1="705" y1="72" x2="1014" y2="381" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F4F4EA"/>
+      <stop offset="1" stop-color="#AFC5D0"/>
+    </linearGradient>
+    <linearGradient id="top" x1="705" y1="72" x2="1015" y2="155" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#21B7B0"/>
+      <stop offset="1" stop-color="#4168C7"/>
+    </linearGradient>
+    <filter id="shadow" x="630" y="36" width="475" height="435" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse">
+      <feGaussianBlur stdDeviation="20"/>
+    </filter>
+    <filter id="blur" x="-100" y="-100" width="1400" height="640" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse">
+      <feGaussianBlur stdDeviation="1"/>
+    </filter>
+  </defs>
+  <path fill="url(#bg)" d="M0 0h1200v440H0z"/>
+  <path fill="url(#glow)" d="M0 0h1200v440H0z"/>
+  <g opacity=".5" fill="#DDF9FA">
+    <circle cx="126" cy="74" r="2"/><circle cx="225" cy="126" r="1.5"/><circle cx="352" cy="54" r="1.5"/>
+    <circle cx="498" cy="110" r="2"/><circle cx="1105" cy="74" r="1.5"/><circle cx="1080" cy="329" r="2"/>
+    <circle cx="195" cy="348" r="1.5"/><circle cx="458" cy="300" r="1"/><circle cx="566" cy="210" r="1.5"/>
+  </g>
+  <path d="M0 366c148-57 267-42 412 8 123 43 227 48 349-7 127-58 266-87 439-27v100H0V366Z" fill="#061426" fill-opacity=".58"/>
+  <path d="M0 393c165-40 276-25 406 10 143 39 246 19 379-28 144-51 270-63 415-32" stroke="#38D5CC" stroke-opacity=".22" stroke-width="2"/>
+  <circle cx="918" cy="210" r="179" fill="#42DAD0" fill-opacity=".12" filter="url(#blur)"/>
+  <ellipse cx="866" cy="398" rx="206" ry="27" fill="#000" fill-opacity=".36" filter="url(#shadow)"/>
+  <g transform="rotate(-7 859 224)">
+    <rect x="704" y="76" width="314" height="304" rx="24" fill="#020D1A" fill-opacity=".26"/>
+    <rect x="690" y="61" width="314" height="304" rx="24" fill="url(#panel)" stroke="#E9FFFF" stroke-opacity=".64" stroke-width="2"/>
+    <path d="M690 85c0-13.255 10.745-24 24-24h266c13.255 0 24 10.745 24 24v70H690V85Z" fill="url(#top)"/>
+    <path d="M755 52v27M939 52v27" stroke="#DBFFFF" stroke-linecap="round" stroke-width="10"/>
+    <text x="722" y="118" fill="#F2FFFF" font-family="Arial,sans-serif" font-size="17" font-weight="700" letter-spacing="3">GEMEINSAM PLANEN</text>
+    <text x="720" y="211" fill="#1C3348" font-family="Arial,sans-serif" font-size="16" font-weight="700">FREITAG</text>
+    <text x="720" y="237" fill="#1C3348" font-family="Arial,sans-serif" font-size="28" font-weight="700">18. JUNI</text>
+    <text x="720" y="268" fill="#547083" font-family="Arial,sans-serif" font-size="13">Ein Abend für alle</text>
+    <g fill="#647C8A">
+      <circle cx="742" cy="307" r="5"/><circle cx="785" cy="307" r="5"/><circle cx="828" cy="307" r="5"/>
+      <circle cx="871" cy="307" r="5"/><circle cx="914" cy="307" r="5"/><circle cx="957" cy="307" r="5"/>
+    </g>
+    <circle cx="871" cy="307" r="16" fill="#19AFA8"/>
+    <path d="m865 307 4 4 8-9" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+    <rect x="719" y="335" width="130" height="8" rx="4" fill="#91A8B4" fill-opacity=".48"/>
+    <rect x="860" y="335" width="77" height="8" rx="4" fill="#91A8B4" fill-opacity=".28"/>
+  </g>
+  <g transform="translate(566 257)">
+    <path d="M72 117c-12-22-3-53 19-70 13-10 31-14 45-8 18 7 27 26 23 44-5 21-26 35-47 37l-40-3Z" fill="#F0B783"/>
+    <path d="M60 122c-1-32 13-56 39-68 17-8 37-9 51-1 10 6 18 15 22 27 3 10-1 21-10 27l-24 16-78-1Z" fill="#152A42"/>
+    <path d="M55 124c-25 2-45 15-51 36h126c-3-21-26-38-51-36H55Z" fill="#2FC4BA"/>
+    <path d="M120 125c-22 1-37 14-41 35h104c-3-20-19-35-41-35h-22Z" fill="#665EC2"/>
+    <circle cx="80" cy="89" r="5" fill="#F8F4E9"/><circle cx="134" cy="90" r="5" fill="#F8F4E9"/>
+  </g>
+  <path d="m1089 127 10 21 23 3-17 16 4 23-20-11-20 11 4-23-17-16 23-3 10-21Z" fill="#F4C66E" fill-opacity=".88"/>
+  <path d="m510 145 6 12 13 2-9 9 2 13-12-6-11 6 2-13-10-9 14-2 5-12Z" fill="#83E6DE" fill-opacity=".64"/>
+</svg>
