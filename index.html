@@ -4098,68 +4098,335 @@ body.color-vision-mode {
   --note: #e69f00;
   --note-hover: #f4b92e;
   --star: #e69f00;
+  --bg: #081521;
+  --surface: #102538;
+  --surface-2: #17364d;
+  --surface-3: #20445e;
+  --surface-input: #0b1d2c;
+  --border: rgba(137, 195, 224, .34);
+  --border-strong: rgba(137, 195, 224, .58);
+  --text: #f4f7fa;
+  --text-muted: #c2d0dc;
+  --text-faint: #a6b8c7;
+  --neutral: #29465a;
+  --neutral-hover: #355b73;
+  --shadow-card: 0 12px 34px rgba(0, 0, 0, .38);
+  color-scheme: dark;
+  color: #f4f7fa;
+}
+
+body.color-vision-mode,
+body.color-vision-mode .container,
+body.color-vision-mode #appShell {
+  background: #081521 !important;
+  background-image: none !important;
+  color: #f4f7fa !important;
+}
+
+body.color-vision-mode .dashboard-shell,
+body.color-vision-mode .dashboard-sidebar,
+body.color-vision-mode .app-panel,
+body.color-vision-mode .dashboard-card,
+body.color-vision-mode .dashboard-user-pill,
+body.color-vision-mode .dashboard-statusbar,
+body.color-vision-mode .movie-item,
+body.color-vision-mode .card-item,
+body.color-vision-mode .yugioh-deck-card,
+body.color-vision-mode .games-table-wrapper,
+body.color-vision-mode .calendar-card,
+body.color-vision-mode .appointment-form-card,
+body.color-vision-mode .appointment-poll-card,
+body.color-vision-mode .appointment-preview-card,
+body.color-vision-mode .next-appointment-banner,
+body.color-vision-mode .beer-grade-wrapper,
+body.color-vision-mode .card-add-form,
+body.color-vision-mode .yugioh-add-form,
+body.color-vision-mode .games-add-form,
+body.color-vision-mode .games-column-form,
+body.color-vision-mode .yugioh-player-panel,
+body.color-vision-mode .availability-entry,
+body.color-vision-mode .poll-selected-dates,
+body.color-vision-mode .popup-box,
+body.color-vision-mode .edit-box,
+body.color-vision-mode .assignment-popup-box,
+body.color-vision-mode .auth-card {
+  border-color: rgba(137, 195, 224, .38) !important;
+  background-color: #102538 !important;
+  background-image: none !important;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, .28) !important;
+}
+
+body.color-vision-mode .dashboard-sidebar {
+  background: #0b1d2c !important;
+}
+
+body.color-vision-mode .dashboard-card,
+body.color-vision-mode .movie-item,
+body.color-vision-mode .card-item,
+body.color-vision-mode .yugioh-deck-card,
+body.color-vision-mode .availability-entry {
+  background: #17364d !important;
+}
+
+body.color-vision-mode :is(
+  h1, h2, h3, h4, p, label, th, td, li,
+  .dashboard-brand, .dashboard-card, .dashboard-user-pill,
+  .dashboard-statusbar, .dashboard-statusbar strong,
+  .dashboard-topbar h2, .dashboard-topbar p,
+  .dashboard-masthead-title, .dashboard-card p,
+  .calendar-toolbar strong, .calendar-day,
+  .calendar-help, .panel-subtitle, .appointment-status,
+  .appointment-banner-countdown, .appointment-banner-meta,
+  .appointment-banner-note, .availability-entry-name,
+  .availability-entry-dates, .auth-tagline, .auth-legal,
+  .settings-feature-list, .progress-text
+) {
+  color: #e5edf3 !important;
+}
+
+body.color-vision-mode :is(
+  .dashboard-topbar p, .dashboard-card p, .panel-subtitle,
+  .calendar-help, .appointment-status, .appointment-banner-meta,
+  .appointment-banner-note, .availability-entry-dates,
+  .dashboard-statusbar, .auth-tagline, .auth-legal
+) {
+  color: #bdcbd6 !important;
+}
+
+body.color-vision-mode a,
+body.color-vision-mode .dashboard-kicker,
+body.color-vision-mode .appointment-banner-kicker,
+body.color-vision-mode .preview-location {
+  color: #f0b323 !important;
+}
+
+body.color-vision-mode :is(
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+  select, textarea, .beer-grade-number, .auth-field > input
+) {
+  border-color: rgba(137, 195, 224, .55) !important;
+  background: #0b1d2c !important;
+  color: #f4f7fa !important;
+}
+
+body.color-vision-mode :is(input, select, textarea)::placeholder {
+  color: #a6b8c7 !important;
+  opacity: 1;
+}
+
+body.color-vision-mode :is(input, select, textarea):focus-visible,
+body.color-vision-mode button:focus-visible,
+body.color-vision-mode a:focus-visible {
+  outline: 3px solid #f0b323 !important;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 2px #081521 !important;
+}
+
+body.color-vision-mode button {
+  border-color: #56b4e9 !important;
+  background: #164e6a !important;
+  color: #fff !important;
+  box-shadow: none !important;
+}
+
+body.color-vision-mode button:hover {
+  border-color: #f0b323 !important;
+  background: #205f7d !important;
+  color: #fff !important;
+}
+
+body.color-vision-mode button:is(
+  .random-movie-button, .random-card-button, .auth-primary,
+  .appointment-save-button, .poll-save-button
+) {
+  border-color: #f0b323 !important;
+  background: #e69f00 !important;
+  color: #10202b !important;
+  font-weight: 800;
+}
+
+body.color-vision-mode button:is(
+  .random-movie-button, .random-card-button, .auth-primary,
+  .appointment-save-button, .poll-save-button
+):hover {
+  border-color: #ffd166 !important;
+  background: #f0b323 !important;
+  color: #10202b !important;
+}
+
+body.color-vision-mode :is(
+  .delete-button, .delete-item-button, .availability-entry-remove,
+  .edit-cancel-button, .clear-button, .custom-delete-item,
+  .game-row-delete, .yugioh-delete-button, .btn-del
+) {
+  border-color: #ef9b6a !important;
+  background: #7b3518 !important;
+  color: #fff !important;
+}
+
+body.color-vision-mode .dashboard-nav-item,
+body.color-vision-mode .sidebar-logout-button {
+  border-color: transparent !important;
+  background: transparent !important;
+  color: #d5e0e8 !important;
+  box-shadow: none !important;
 }
 
 body.color-vision-mode .dashboard-nav-item:hover,
 body.color-vision-mode .dashboard-nav-item.active,
 body.color-vision-mode .color-vision-toggle[aria-pressed="true"] {
-  border-color: rgba(86, 180, 233, .72) !important;
+  border-color: #56b4e9 !important;
   background: linear-gradient(90deg, rgba(86, 180, 233, .24), rgba(230, 159, 0, .16)) !important;
   box-shadow: inset 4px 0 #e69f00 !important;
 }
 
-body.color-vision-mode .dashboard-nav-item.active .nav-icon,
+body.color-vision-mode .dashboard-nav-item .nav-icon,
 body.color-vision-mode .color-vision-toggle[aria-pressed="true"] .nav-icon {
-  color: #e69f00 !important;
+  color: #f0b323 !important;
+}
+
+body.color-vision-mode .sidebar-logout-button:hover,
+body.color-vision-mode .sidebar-logout-button:focus-visible {
+  border-color: #56b4e9 !important;
+  background: #17364d !important;
 }
 
 body.color-vision-mode .dashboard-sidebar > #sidebarToggle,
 body.color-vision-mode.mobile-sidebar-open .dashboard-sidebar > #sidebarToggle {
-  border-color: rgba(86, 180, 233, .72) !important;
-  background: linear-gradient(90deg, rgba(86, 180, 233, .24), rgba(230, 159, 0, .16)) !important;
-  color: #82c9ee !important;
+  border-color: #56b4e9 !important;
+  background: #164e6a !important;
+  color: #fff !important;
+}
+
+body.color-vision-mode :is(
+  .dashboard-masthead-mark, .card-arrow, .card-icon,
+  .appointment-banner-icon, .appointment-card-symbol,
+  .brand-mark, .auth-brand-icon
+) {
+  border-color: #56b4e9 !important;
+  background: #164e6a !important;
+  color: #fff !important;
+  box-shadow: none !important;
+}
+
+body.color-vision-mode .calendar-day {
+  border-color: rgba(137, 195, 224, .4) !important;
+  background: #17364d !important;
+  color: #e5edf3 !important;
+}
+
+body.color-vision-mode .calendar-day.is-today {
+  box-shadow: inset 0 0 0 2px #f0b323 !important;
 }
 
 body.color-vision-mode .calendar-day.selected:not(.availability-common) {
-  border: 2px solid #56b4e9;
-  background: #153d56;
-  box-shadow: inset 0 0 0 2px #0b1220;
-  color: #fff;
+  border: 2px solid #56b4e9 !important;
+  background: #164e6a !important;
+  box-shadow: inset 0 0 0 2px #081521 !important;
+  color: #fff !important;
   font-weight: 800;
 }
 
 body.color-vision-mode .calendar-day.availability-common {
-  border: 2px dashed #e69f00;
-  background: linear-gradient(145deg, rgba(133, 83, 0, .88), rgba(91, 57, 0, .88));
-  color: #fff;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .18);
+  border: 2px dashed #f0b323 !important;
+  background: #694800 !important;
+  color: #fff !important;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .18) !important;
 }
 
 body.color-vision-mode .calendar-day.availability-common.selected {
-  border: 2px dashed #e69f00;
-  background: #153d56;
-  box-shadow: inset 0 0 0 2px #56b4e9;
+  border: 2px dashed #f0b323 !important;
+  background: #164e6a !important;
+  box-shadow: inset 0 0 0 2px #56b4e9 !important;
 }
 
 body.color-vision-mode .calendar-day-count {
-  color: #fff;
+  color: #fff !important;
 }
 
 body.color-vision-mode .availability-common-dot {
   border-radius: 2px;
-  background: #e69f00;
-  box-shadow: none;
+  background: #f0b323 !important;
+  box-shadow: none !important;
 }
 
 body.color-vision-mode .availability-entry-date.is-common {
-  border: 2px dashed #e69f00;
-  background: rgba(133, 83, 0, .72);
-  color: #fff;
+  border: 2px dashed #f0b323 !important;
+  background: #694800 !important;
+  color: #fff !important;
+}
+
+body.color-vision-mode .poll-date-chip,
+body.color-vision-mode .poll-date-chip button {
+  border-color: #56b4e9 !important;
+  background: #17364d !important;
+  color: #e5edf3 !important;
+}
+
+body.color-vision-mode .status:not(:empty),
+body.color-vision-mode .appointment-status:not(:empty) {
+  border-color: #56b4e9 !important;
+  background: #102f44 !important;
+  color: #e5edf3 !important;
+}
+
+body.color-vision-mode :is(.error, .auth-error) {
+  border-color: #ef9b6a !important;
+  background-color: #442516 !important;
+  color: #ffd6bd !important;
+}
+
+body.color-vision-mode .progress {
+  background: #17364d !important;
+}
+
+body.color-vision-mode .progress > div {
+  background: linear-gradient(90deg, #56b4e9, #e69f00) !important;
+}
+
+body.color-vision-mode :is(.dashboard-sidebar-footer, .availability-summary) {
+  border-color: rgba(137, 195, 224, .38) !important;
+}
+
+body.color-vision-mode :is(
+  .dashboard-brand > span:last-child span,
+  .dashboard-brand > span:last-child b,
+  .dashboard-masthead-title strong,
+  .dashboard-masthead-title em,
+  .dashboard-masthead-rule,
+  .hero-eyebrow,
+  .dashboard-hero h3 strong,
+  .auth-link,
+  .auth-footer-line
+) {
+  color: #56b4e9 !important;
+}
+
+body.color-vision-mode .dashboard-masthead-rule {
+  background: linear-gradient(90deg, #56b4e9, #e69f00) !important;
+}
+
+body.color-vision-mode :is(.star, .star.active, .star:hover) {
+  color: #f0b323 !important;
+}
+
+body.color-vision-mode .dashboard-card:hover,
+body.color-vision-mode .movie-item:hover,
+body.color-vision-mode .card-item:hover,
+body.color-vision-mode .yugioh-deck-card:hover {
+  border-color: #f0b323 !important;
+  box-shadow: 0 0 0 2px rgba(240, 179, 35, .28) !important;
 }
 
 body.color-vision-mode .beer-grade-slider::-webkit-slider-runnable-track,
 body.color-vision-mode .beer-grade-slider::-moz-range-track {
-  background: linear-gradient(90deg, #56b4e9 0%, #d8e6ed 50%, #e69f00 100%);
+  background: linear-gradient(90deg, #56b4e9 0%, #d8e6ed 50%, #e69f00 100%) !important;
+}
+
+body.color-vision-mode .beer-grade-slider::-webkit-slider-thumb,
+body.color-vision-mode .beer-grade-slider::-moz-range-thumb {
+  border-color: #081521 !important;
+  background: #f0b323 !important;
 }
 
 </style>
