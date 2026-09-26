@@ -5080,6 +5080,8 @@ const appViewLoaders = {
 
 function hideAllPanels() {
   menuBox.style.display = "none";
+  const dashboardMain = menuBox.querySelector(".dashboard-main");
+  if (dashboardMain) dashboardMain.style.removeProperty("display");
   saufiMenuBox.style.display = "none";
   moviesApp.style.display = "none";
   feastApp.style.display = "none";
@@ -7686,9 +7688,16 @@ renderYugiohPlayerInputs();
 initAuth();
 
 function isMobileSidebar() { return window.matchMedia && window.matchMedia("(max-width: 900px)").matches; }
+function setMobileSidebarHostVisibility(visible) {
+  if (currentView === "menu") return;
+  menuBox.style.display = visible ? "block" : "none";
+  const dashboardMain = menuBox.querySelector(".dashboard-main");
+  if (dashboardMain) dashboardMain.style.display = visible ? "none" : "";
+}
 function closeMobileSidebar() {
   if (!isMobileSidebar()) return;
   document.body.classList.remove("mobile-sidebar-open");
+  setMobileSidebarHostVisibility(false);
   const b=document.getElementById("mobileMenuToggle"), o=document.getElementById("mobileSidebarBackdrop");
   if (b) { b.setAttribute("aria-expanded","false"); b.setAttribute("aria-label","Navigation öffnen"); b.title="Navigation öffnen"; }
   if (o) o.setAttribute("aria-hidden","true");
@@ -7696,6 +7705,7 @@ function closeMobileSidebar() {
 function toggleSidebar() {
   if (isMobileSidebar()) {
     const open=document.body.classList.toggle("mobile-sidebar-open");
+    setMobileSidebarHostVisibility(open);
     const b=document.getElementById("mobileMenuToggle"), o=document.getElementById("mobileSidebarBackdrop");
     if (b) { b.setAttribute("aria-expanded",String(open)); b.setAttribute("aria-label",open?"Navigation schließen":"Navigation öffnen"); b.title=open?"Navigation schließen":"Navigation öffnen"; }
     if (o) o.setAttribute("aria-hidden",String(!open));
@@ -7722,7 +7732,12 @@ function toggleSidebar() {
   if (toggleButton) { toggleButton.setAttribute('aria-expanded',String(!isCollapsed)); toggleButton.setAttribute('aria-label',isCollapsed?'Sidebar ausklappen':'Sidebar einklappen'); toggleButton.title=isCollapsed?'Sidebar ausklappen':'Sidebar einklappen'; }
 }
 document.querySelectorAll(".dashboard-nav-item").forEach(item => item.addEventListener("click", closeMobileSidebar));
-window.addEventListener("resize", () => { if (!isMobileSidebar()) document.body.classList.remove("mobile-sidebar-open"); });
+window.addEventListener("resize", () => {
+  if (!isMobileSidebar()) {
+    document.body.classList.remove("mobile-sidebar-open");
+    setMobileSidebarHostVisibility(false);
+  }
+});
 </script>
 <script>
 /* Stabilisiert den mobilen Drawer auch nach Auth-/Navigationsupdates. */
