@@ -7699,20 +7699,23 @@ function closeMobileSidebar() {
   document.body.classList.remove("mobile-sidebar-open");
   setMobileSidebarHostVisibility(false);
   const b=document.getElementById("mobileMenuToggle"), o=document.getElementById("mobileSidebarBackdrop");
+  const drawer=document.getElementById("menuSidebar");
+  if (drawer) drawer.style.removeProperty("--mobile-drawer-top");
   if (b) { b.setAttribute("aria-expanded","false"); b.setAttribute("aria-label","Navigation öffnen"); b.title="Navigation öffnen"; }
   if (o) o.setAttribute("aria-hidden","true");
 }
 function toggleSidebar() {
   if (isMobileSidebar()) {
+    const b=document.getElementById("mobileMenuToggle"), o=document.getElementById("mobileSidebarBackdrop");
+    const drawer=document.getElementById("menuSidebar");
+    const drawerTop = b?.getBoundingClientRect().top;
     const open=document.body.classList.toggle("mobile-sidebar-open");
     setMobileSidebarHostVisibility(open);
-    const b=document.getElementById("mobileMenuToggle"), o=document.getElementById("mobileSidebarBackdrop");
     if (b) { b.setAttribute("aria-expanded",String(open)); b.setAttribute("aria-label",open?"Navigation schließen":"Navigation öffnen"); b.title=open?"Navigation schließen":"Navigation öffnen"; }
     if (o) o.setAttribute("aria-hidden",String(!open));
-    const drawer=document.getElementById("menuSidebar");
     if (drawer) {
-      if (open && b) {
-        drawer.style.setProperty("--mobile-drawer-top", `${Math.max(0, b.getBoundingClientRect().top)}px`);
+      if (open && drawerTop !== undefined) {
+        drawer.style.setProperty("--mobile-drawer-top", `${Math.max(0, drawerTop)}px`);
       } else {
         drawer.style.removeProperty("--mobile-drawer-top");
       }
