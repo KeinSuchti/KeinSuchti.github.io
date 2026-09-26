@@ -2379,11 +2379,20 @@ body.app-scene #menuBox {
 .dashboard-nav-item:hover, .dashboard-nav-item.active { color:#f2f7ff !important; background:linear-gradient(90deg, rgba(28,203,195,.18), rgba(91,77,224,.28)) !important; border-color:rgba(86,207,220,.20) !important; transform:none !important; }
 .dashboard-nav-item.active span { color:#57e1d5; }
 .dashboard-nav-item.dashboard-nav-subitem { width:calc(100% - 14px) !important; margin-left:14px !important; padding-top:9px !important; padding-bottom:9px !important; font-size:12px !important; }
-.dashboard-account-nav-group { display:flex; flex-direction:column; gap:6px; }
+/* Administration ist ein klickbarer Unterpunkt des Benutzerkontos.
+   Nicht-Admins behalten das native [hidden]-Attribut; für Admins ist der Punkt
+   nur beim Hover bzw. bei Tastaturfokus innerhalb der Konto-Gruppe sichtbar. */
+.dashboard-account-nav-group { position:relative; display:flex; flex-direction:column; gap:6px; }
 .dashboard-account-nav-group #sidebarAdminNavItem[hidden] { display:none !important; }
-.dashboard-account-nav-group #sidebarAdminNavItem:not([hidden]) { display:none !important; }
+.dashboard-account-nav-group #sidebarAdminNavItem:not([hidden]) {
+  display:none !important;
+  pointer-events:none !important;
+}
 .dashboard-account-nav-group:hover #sidebarAdminNavItem:not([hidden]),
-.dashboard-account-nav-group:focus-within #sidebarAdminNavItem:not([hidden]) { display:flex !important; }
+.dashboard-account-nav-group:focus-within #sidebarAdminNavItem:not([hidden]) {
+  display:flex !important;
+  pointer-events:auto !important;
+}
 .dashboard-sidebar-footer { margin-top:auto; border-top:1px solid rgba(118,145,199,.13); padding-top:14px; }
 .sidebar-motto { color:#6f83a3; font-family:var(--font-display); font-size:12px; line-height:1.55; text-align:center; padding:28px 12px 4px; }
 .dashboard-main {margin-left: var(--sidebar-width); transition: margin-left 360ms cubic-bezier(.22,.61,.36,1); padding:28px 30px 22px; min-width:0; }
@@ -4510,6 +4519,7 @@ body.color-vision-mode .beer-grade-slider::-moz-range-thumb {
 <!-- Cinematic background -->
 </head>
 
+<!-- Einbindeversion: behält die vorhandene Supabase-Anbindung bei. -->
 <body>
 <div class="container">
   <h1>📚 Watch, Feast and Game</h1>
@@ -6648,18 +6658,15 @@ async function completeInvitation() {
 }
 
 async function logout() {
-  showLogin();
+  /* Immer auf die gewünschte Ziel-URL ohne Query-String oder Hash weiterleiten. */
+  const logoutRedirectUrl = "https://keinsuchti.github.io/";
   try {
-    const { error } = await supabaseClient.auth.signOut();
-    if (error) throw error;
+    await supabaseClient.auth.signOut({ scope: "local" });
   } catch (error) {
+    /* Die Weiterleitung ist ausdrücklich auch bei einer fehlgeschlagenen lokalen Abmeldung gewünscht. */
     console.error("Abmeldung fehlgeschlagen.", error);
-    const { data, error: sessionError } = await supabaseClient.auth.getSession();
-    if (!sessionError && data.session?.user) {
-      currentUser = data.session.user;
-      await showAppShell();
-    }
-    setAuthMessage("Abmeldung fehlgeschlagen. Bitte erneut versuchen.");
+  } finally {
+    window.location.replace(logoutRedirectUrl);
   }
 }
 
