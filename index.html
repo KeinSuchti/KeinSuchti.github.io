@@ -2379,9 +2379,6 @@ body.app-scene #menuBox {
 .dashboard-nav-item:hover, .dashboard-nav-item.active { color:#f2f7ff !important; background:linear-gradient(90deg, rgba(28,203,195,.18), rgba(91,77,224,.28)) !important; border-color:rgba(86,207,220,.20) !important; transform:none !important; }
 .dashboard-nav-item.active span { color:#57e1d5; }
 .dashboard-nav-item.dashboard-nav-subitem { width:calc(100% - 14px) !important; margin-left:14px !important; padding-top:9px !important; padding-bottom:9px !important; font-size:12px !important; }
-/* Administration ist ein klickbarer Unterpunkt des Benutzerkontos.
-   Nicht-Admins behalten das native [hidden]-Attribut; für Admins ist der Punkt
-   nur beim Hover bzw. bei Tastaturfokus innerhalb der Konto-Gruppe sichtbar. */
 .dashboard-account-nav-group { position:relative; display:flex; flex-direction:column; gap:6px; }
 .dashboard-account-nav-group #sidebarAdminNavItem[hidden] { display:none !important; }
 .dashboard-account-nav-group #sidebarAdminNavItem:not([hidden]) {
@@ -4519,7 +4516,6 @@ body.color-vision-mode .beer-grade-slider::-moz-range-thumb {
 <!-- Cinematic background -->
 </head>
 
-<!-- Einbindeversion: behält die vorhandene Supabase-Anbindung bei. -->
 <body>
 <div class="container">
   <h1>📚 Watch, Feast and Game</h1>
@@ -6658,14 +6654,14 @@ async function completeInvitation() {
 }
 
 async function logout() {
-  /* Immer auf die gewünschte Ziel-URL ohne Query-String oder Hash weiterleiten. */
   const logoutRedirectUrl = "https://keinsuchti.github.io/";
   try {
     await supabaseClient.auth.signOut({ scope: "local" });
   } catch (error) {
-    /* Die Weiterleitung ist ausdrücklich auch bei einer fehlgeschlagenen lokalen Abmeldung gewünscht. */
     console.error("Abmeldung fehlgeschlagen.", error);
   } finally {
+    // replace() verhindert Zurück-Navigation in die angemeldete Ansicht;
+    // die URL enthält bewusst weder Query-Parameter noch Hash.
     window.location.replace(logoutRedirectUrl);
   }
 }
