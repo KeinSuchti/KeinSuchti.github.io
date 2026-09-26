@@ -3485,27 +3485,28 @@ body.app-scene .sidebar-logout-button .nav-icon svg {
   body.app-scene .mobile-menu-toggle {
     position:fixed !important;
     top:18px !important;
-    left:calc(var(--sidebar-width) - 56px) !important;
+    left:calc(var(--sidebar-width) / 2 - 25px) !important;
     z-index:10004 !important;
     display:grid !important;
     place-items:center;
     box-sizing:border-box;
-    width:40px !important;
-    height:40px !important;
-    min-width:40px !important;
-    min-height:40px !important;
-    max-width:40px !important;
-    max-height:40px !important;
+    width:50px !important;
+    height:50px !important;
+    min-width:50px !important;
+    min-height:50px !important;
+    max-width:50px !important;
+    max-height:50px !important;
     padding:0 !important;
-    border:1px solid rgba(118,145,199,.34);
-    border-radius:12px;
-    background:linear-gradient(135deg, rgba(29,68,107,.96), rgba(71,62,139,.96));
-    color:#71e5d8;
-    box-shadow:0 8px 24px rgba(0,0,0,.35), 0 0 0 2px rgba(101,226,215,.08);
+    border:1px solid rgba(118,145,199,.24);
+    border-radius:11px;
+    background:rgba(13,31,57,.52);
+    color:#b7c7df;
+    box-shadow:none;
     cursor:pointer;
+    transition:left 360ms cubic-bezier(.22,.61,.36,1), background 220ms ease, border-color 220ms ease;
   }
   body.app-scene.sidebar-collapsed .mobile-menu-toggle {
-    left:calc(var(--sidebar-collapsed-width) - 50px) !important;
+    left:calc(var(--sidebar-collapsed-width) / 2 - 25px) !important;
   }
   body.app-scene .mobile-menu-toggle > span:first-child {
     display:none !important;
