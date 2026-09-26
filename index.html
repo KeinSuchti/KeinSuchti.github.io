@@ -3279,13 +3279,13 @@ button, input, select, textarea { max-width: 100%; }
     transition:opacity .28s ease, visibility 0s linear .28s;
   }
   body.app-scene .dashboard-shell .dashboard-sidebar {
-    position:fixed !important;
+    position:absolute !important;
     top:var(--mobile-drawer-top, 0px) !important;
     left:0 !important;
     z-index:10002 !important;
     box-sizing:border-box;
     width:min(86vw,310px);
-    height:calc(100dvh - var(--mobile-drawer-top, 0px));
+    height:var(--mobile-drawer-height, 100dvh);
     max-height:none;
     visibility:hidden;
     opacity:0;
@@ -7694,13 +7694,36 @@ function setMobileSidebarHostVisibility(visible) {
   const dashboardMain = menuBox.querySelector(".dashboard-main");
   if (dashboardMain) dashboardMain.style.display = visible ? "none" : "";
 }
+function positionMobileSidebar(drawer, toggleRect) {
+  const viewportHeight = window.innerHeight;
+  const desiredHeight = Math.min(520, Math.max(0, viewportHeight - 16));
+  const availableBelow = Math.max(0, viewportHeight - toggleRect.bottom - 8);
+  const availableAbove = Math.max(0, toggleRect.top - 16);
+  const opensBelow = availableBelow >= availableAbove;
+  const drawerHeight = Math.min(desiredHeight, opensBelow ? availableBelow : availableAbove);
+  const viewportTop = opensBelow
+    ? toggleRect.bottom + 8
+    : toggleRect.top - drawerHeight - 8;
+  const parent = drawer.offsetParent;
+  const parentRect = parent && parent.getBoundingClientRect ? parent.getBoundingClientRect() : null;
+  const localTop = Math.max(8, Math.round(
+    viewportTop - (parentRect ? parentRect.top : 0) +
+    (parent ? parent.scrollTop - parent.clientTop : 0)
+  ));
+
+  drawer.style.setProperty("--mobile-drawer-top", `${localTop}px`);
+  drawer.style.setProperty("--mobile-drawer-height", `${drawerHeight}px`);
+}
 function closeMobileSidebar() {
   if (!isMobileSidebar()) return;
   document.body.classList.remove("mobile-sidebar-open");
   setMobileSidebarHostVisibility(false);
   const b=document.getElementById("mobileMenuToggle"), o=document.getElementById("mobileSidebarBackdrop");
   const drawer=document.getElementById("menuSidebar");
-  if (drawer) drawer.style.removeProperty("--mobile-drawer-top");
+  if (drawer) {
+    drawer.style.removeProperty("--mobile-drawer-top");
+    drawer.style.removeProperty("--mobile-drawer-height");
+  }
   if (b) { b.setAttribute("aria-expanded","false"); b.setAttribute("aria-label","Navigation öffnen"); b.title="Navigation öffnen"; }
   if (o) o.setAttribute("aria-hidden","true");
 }
@@ -7708,16 +7731,17 @@ function toggleSidebar() {
   if (isMobileSidebar()) {
     const b=document.getElementById("mobileMenuToggle"), o=document.getElementById("mobileSidebarBackdrop");
     const drawer=document.getElementById("menuSidebar");
-    const drawerTop = b?.getBoundingClientRect().top;
+    const toggleRect = b?.getBoundingClientRect();
     const open=document.body.classList.toggle("mobile-sidebar-open");
     setMobileSidebarHostVisibility(open);
     if (b) { b.setAttribute("aria-expanded",String(open)); b.setAttribute("aria-label",open?"Navigation schließen":"Navigation öffnen"); b.title=open?"Navigation schließen":"Navigation öffnen"; }
     if (o) o.setAttribute("aria-hidden",String(!open));
     if (drawer) {
-      if (open && drawerTop !== undefined) {
-        drawer.style.setProperty("--mobile-drawer-top", `${Math.max(0, drawerTop)}px`);
+      if (open && toggleRect) {
+        positionMobileSidebar(drawer, toggleRect);
       } else {
         drawer.style.removeProperty("--mobile-drawer-top");
+        drawer.style.removeProperty("--mobile-drawer-height");
       }
       if (drawer.getAnimations) drawer.getAnimations().forEach(animation => animation.cancel());
       drawer.style.setProperty("transition", "none", "important");
@@ -7739,6 +7763,16 @@ window.addEventListener("resize", () => {
   if (!isMobileSidebar()) {
     document.body.classList.remove("mobile-sidebar-open");
     setMobileSidebarHostVisibility(false);
+    const drawer=document.getElementById("menuSidebar");
+    if (drawer) {
+      drawer.style.removeProperty("--mobile-drawer-top");
+      drawer.style.removeProperty("--mobile-drawer-height");
+    }
+  } else if (document.body.classList.contains("mobile-sidebar-open")) {
+    const b=document.getElementById("mobileMenuToggle");
+    const drawer=document.getElementById("menuSidebar");
+    const toggleRect=b?.getBoundingClientRect();
+    if (drawer && toggleRect) positionMobileSidebar(drawer, toggleRect);
   }
 });
 </script>
