@@ -2816,15 +2816,38 @@ button, input, select, textarea { max-width: 100%; }
   body.app-scene.mobile-sidebar-open .dashboard-sidebar { transform:translateX(0); }
   body.app-scene.mobile-sidebar-open .mobile-sidebar-backdrop { opacity:1; pointer-events:auto; }
   body.app-scene.mobile-sidebar-open .mobile-menu-toggle { opacity:0; pointer-events:none; }
-  body.app-scene.mobile-sidebar-open .mobile-menu-toggle i:first-child { transform:translateY(6px) rotate(45deg); }
-  body.app-scene.mobile-sidebar-open .mobile-menu-toggle i:nth-child(2) { opacity:0; }
-  body.app-scene.mobile-sidebar-open .mobile-menu-toggle i:last-child { transform:translateY(-6px) rotate(-45deg); }
   body.app-scene .dashboard-shell { display:block; }
   body.app-scene .dashboard-main { margin-left:0; }
 }
 @media (max-width:380px) { body.app-scene .mobile-menu-toggle { top:8px; left:8px; min-height:38px; padding:7px 10px 7px 8px; } body.app-scene .mobile-menu-label { font-size:11px; } }
 
 .sidebar-logout-button { width:100%; margin-top:auto; padding:11px 12px; display:flex; align-items:center; gap:12px; border:1px solid rgba(118,145,199,.18); border-radius:11px; background:rgba(13,31,57,.52); color:#b7c7df; font:600 13px var(--font-sans); cursor:pointer; }
+body.app-scene .sidebar-logout-button {
+  justify-content:center !important;
+  gap:0 !important;
+  align-self:center;
+  width:50px !important;
+  margin-top:auto !important;
+  padding:0 !important;
+  border:1px solid rgba(118,145,199,.24) !important;
+  border-radius:11px !important;
+  background:rgba(13,31,57,.52) !important;
+  color:#b7c7df !important;
+}
+body.app-scene .sidebar-logout-button:hover,
+body.app-scene .sidebar-logout-button:focus-visible {
+  background:rgba(28,65,103,.58) !important;
+}
+body.app-scene .sidebar-logout-button .nav-icon svg {
+  display:block;
+  width:20px;
+  height:20px;
+  fill:none;
+  stroke:currentColor;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+  stroke-width:1.8;
+}
 .sidebar-logout-button:hover, .sidebar-logout-button:focus-visible { color:#fff; border-color:rgba(101,226,215,.5); background:rgba(28,65,103,.58); outline:none; }
 .sidebar-logout-button .nav-icon { width:20px; text-align:center; color:#ef9b9b; font-size:17px; }
 .sidebar-logout-button { justify-content:center; gap:0; }
@@ -3154,7 +3177,8 @@ button, input, select, textarea { max-width: 100%; }
     position:static !important;
     inset:auto !important;
     transform:none !important;
-    width:100% !important;
+    align-self:center !important;
+    width:50px !important;
     height:50px !important;
     min-height:50px !important;
     max-height:50px !important;
@@ -3271,8 +3295,9 @@ button, input, select, textarea { max-width: 100%; }
     transition:opacity .2s ease, transform .2s ease;
   }
   body.app-scene.mobile-sidebar-open .mobile-menu-toggle {
-    opacity:1;
-    pointer-events:auto;
+    visibility:hidden !important;
+    opacity:0 !important;
+    pointer-events:none !important;
   }
   body.app-scene .dashboard-sidebar > .sidebar-logout-button {
     position:static !important;
@@ -3455,6 +3480,11 @@ button, input, select, textarea { max-width: 100%; }
   }
   body.app-scene .mobile-menu-label { display:none !important; }
   body.app-scene .dashboard-sidebar > .sidebar-toggle-floating { display:none !important; }
+  body.app-scene.mobile-sidebar-open .dashboard-sidebar > .sidebar-toggle-floating,
+  body.app-scene.desktop-sidebar-open .dashboard-sidebar > .sidebar-toggle-floating {
+    display:grid !important;
+    place-items:center;
+  }
   body.app-scene.desktop-sidebar-open .dashboard-sidebar {
     visibility:visible !important;
     opacity:1 !important;
@@ -3470,10 +3500,27 @@ button, input, select, textarea { max-width: 100%; }
     opacity:1;
     pointer-events:auto;
   }
-  body.app-scene.desktop-sidebar-open .mobile-menu-toggle { z-index:2147483647 !important; }
-  body.app-scene.desktop-sidebar-open .mobile-menu-toggle i:first-child { transform:translateY(6px) rotate(45deg); }
-  body.app-scene.desktop-sidebar-open .mobile-menu-toggle i:nth-child(2) { opacity:0; }
-  body.app-scene.desktop-sidebar-open .mobile-menu-toggle i:last-child { transform:translateY(-6px) rotate(-45deg); }
+  body.app-scene.desktop-sidebar-open .mobile-menu-toggle {
+    visibility:hidden !important;
+    opacity:0 !important;
+    pointer-events:none !important;
+  }
+  body.app-scene.desktop-sidebar-open .dashboard-sidebar > .sidebar-toggle-floating {
+    display:grid !important;
+    place-items:center;
+    top:18px;
+    right:16px;
+    left:auto;
+    width:40px;
+    height:40px;
+    justify-self:auto;
+    transform:none !important;
+    z-index:2147483647;
+    border:1px solid rgba(118,145,199,.34);
+    border-radius:12px;
+    background:rgba(13,31,57,.92);
+    color:#eaf1fc;
+  }
 }
 
 </style>
@@ -3570,7 +3617,7 @@ button, input, select, textarea { max-width: 100%; }
           <button class="dashboard-nav-item" type="button" onclick="showYugiohApp()" title="Yu-Gi-Oh! Decks"><span class="nav-icon" aria-hidden="true">◈</span><span class="nav-label">Yu-Gi-Oh! Decks</span></button>
           <button class="dashboard-nav-item" type="button" onclick="showAppointmentsApp()" title="Termine abstimmen"><span class="nav-icon" aria-hidden="true">◷</span><span class="nav-label">Termine</span></button>
         </nav>
-        <button id="sidebarLogout" class="sidebar-logout-button" type="button" onclick="logout()" aria-label="Logout" title="Logout"><span class="nav-icon" aria-hidden="true">⎋</span></button>
+        <button id="sidebarLogout" class="sidebar-logout-button" type="button" onclick="logout()" aria-label="Logout" title="Logout"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M10 17l5-5-5-5"></path><path d="M15 12H3"></path><path d="M12 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6"></path></svg></span></button>
 
       </aside>
 
@@ -7797,6 +7844,8 @@ function closeMobileSidebar() {
     const backdrop=document.getElementById("mobileSidebarBackdrop");
     if (toggle) { toggle.setAttribute("aria-expanded","false"); toggle.setAttribute("aria-label","Navigation öffnen"); toggle.title="Navigation öffnen"; }
     if (backdrop) backdrop.setAttribute("aria-hidden","true");
+    const sidebarToggle=document.getElementById("sidebarToggle");
+    if (sidebarToggle) { sidebarToggle.setAttribute("aria-expanded","false"); sidebarToggle.setAttribute("aria-label","Navigation öffnen"); sidebarToggle.title="Navigation öffnen"; }
     return;
   }
   document.body.classList.remove("mobile-sidebar-open");
@@ -7814,6 +7863,8 @@ function closeMobileSidebar() {
   setMobileSidebarPortal(false);
   if (b) { b.setAttribute("aria-expanded","false"); b.setAttribute("aria-label","Navigation öffnen"); b.title="Navigation öffnen"; }
   if (o) o.setAttribute("aria-hidden","true");
+  const sidebarToggle=document.getElementById("sidebarToggle");
+  if (sidebarToggle) { sidebarToggle.setAttribute("aria-expanded","false"); sidebarToggle.setAttribute("aria-label","Navigation öffnen"); sidebarToggle.title="Navigation öffnen"; }
 }
 function updateOpenMobileSidebarPosition() {
   if (!isMobileSidebar() || !document.body.classList.contains("mobile-sidebar-open")) return;
@@ -7832,6 +7883,12 @@ function toggleSidebar() {
     setMobileSidebarPortal(open);
     if (b) { b.setAttribute("aria-expanded",String(open)); b.setAttribute("aria-label",open?"Navigation schließen":"Navigation öffnen"); b.title=open?"Navigation schließen":"Navigation öffnen"; }
     if (o) o.setAttribute("aria-hidden",String(!open));
+    const sidebarToggle=document.getElementById("sidebarToggle");
+    if (sidebarToggle) {
+      sidebarToggle.setAttribute("aria-expanded",String(open));
+      sidebarToggle.setAttribute("aria-label",open?"Navigation schließen":"Navigation öffnen");
+      sidebarToggle.title=open?"Navigation schließen":"Navigation öffnen";
+    }
     if (drawer) {
       if (open && toggleRect) {
         positionMobileSidebar(drawer, toggleRect);
@@ -7860,6 +7917,12 @@ function toggleSidebar() {
       menuButton.setAttribute('aria-expanded',String(open));
       menuButton.setAttribute('aria-label',open?'Navigation schließen':'Navigation öffnen');
       menuButton.title=open?'Navigation schließen':'Navigation öffnen';
+    }
+    const sidebarToggle=document.getElementById('sidebarToggle');
+    if (sidebarToggle) {
+      sidebarToggle.setAttribute('aria-expanded',String(open));
+      sidebarToggle.setAttribute('aria-label',open?'Navigation schließen':'Navigation öffnen');
+      sidebarToggle.title=open?'Navigation schließen':'Navigation öffnen';
     }
     if (backdrop) backdrop.setAttribute('aria-hidden',String(!open));
     return;
