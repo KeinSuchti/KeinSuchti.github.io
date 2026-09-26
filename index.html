@@ -4551,7 +4551,7 @@ body.color-vision-mode .beer-grade-slider::-moz-range-thumb {
           <button class="dashboard-nav-item" type="button" onclick="showGamesApp()" title="Spieleabend"><span class="nav-icon" aria-hidden="true">⌘</span><span class="nav-label">Spieleabend</span></button>
           <button class="dashboard-nav-item" type="button" onclick="showYugiohApp()" title="Yu-Gi-Oh! Decks"><span class="nav-icon" aria-hidden="true">◈</span><span class="nav-label">Yu-Gi-Oh! Decks</span></button>
           <button class="dashboard-nav-item" type="button" onclick="showAppointmentsApp()" title="Termine abstimmen"><span class="nav-icon" aria-hidden="true">◷</span><span class="nav-label">Termine</span></button>
-          <button id="colorVisionToggle" class="dashboard-nav-item color-vision-toggle" type="button" onclick="toggleColorVisionMode()" aria-label="Farbenfreundlicher Modus" aria-pressed="false" title="Farbendummer Modus"><span class="nav-icon" aria-hidden="true">◐</span><span class="nav-label">Farbenfreundlicher Modus</span></button>
+          <button id="colorVisionToggle" class="dashboard-nav-item color-vision-toggle" type="button" onclick="toggleColorVisionMode()" aria-label="Farbenblöden Modus" aria-pressed="false" title="Farbenblöden Modus"><span class="nav-icon" aria-hidden="true">◐</span><span class="nav-label">Farbenfreundlicher Modus</span></button>
         </nav>
         <button id="sidebarLogout" class="sidebar-logout-button" type="button" onclick="logout()" aria-label="Logout" title="Logout"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M10 17l5-5-5-5"></path><path d="M15 12H3"></path><path d="M12 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6"></path></svg></span></button>
 
@@ -5139,8 +5139,8 @@ function setColorVisionMode(enabled) {
   if (toggle) {
     toggle.setAttribute("aria-pressed", String(enabled));
     toggle.title = enabled
-      ? "Farbenfreundlichen Modus ausschalten"
-      : "Farbenfreundlichen Modus einschalten";
+      ? "Farbenblöden Modus ausschalten"
+      : "Farbenblöden Modus einschalten";
   }
 }
 
@@ -5148,7 +5148,7 @@ function initializeColorVisionMode() {
   try {
     setColorVisionMode(localStorage.getItem(colorVisionModeStorageKey) === "enabled");
   } catch (error) {
-    console.error("Einstellung für den farbenfreundlichen Modus konnte nicht geladen werden.", error);
+    console.error("Einstellung für den farbenblöden Modus konnte nicht geladen werden.", error);
     setColorVisionMode(false);
   }
 }
@@ -5159,7 +5159,7 @@ function toggleColorVisionMode() {
   try {
     localStorage.setItem(colorVisionModeStorageKey, enabled ? "enabled" : "disabled");
   } catch (error) {
-    console.error("Einstellung für den farbenfreundlichen Modus konnte nicht gespeichert werden.", error);
+    console.error("Einstellung für den farbenblöden Modus konnte nicht gespeichert werden.", error);
     setStatus("Der Modus ist aktiv, konnte aber nicht dauerhaft gespeichert werden.", true);
   }
 }
