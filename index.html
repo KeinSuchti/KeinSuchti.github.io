@@ -2372,6 +2372,7 @@ body.app-scene #menuBox {
 .dashboard-nav { display:flex; flex-direction:column; gap:6px; }
 .dashboard-nav-item { width:100% !important; margin:0 !important; padding:11px 12px !important; display:flex; align-items:center; gap:12px; text-align:left; border:1px solid transparent !important; border-radius:11px !important; background:transparent !important; color:#b7c7df !important; font-size:13px !important; font-weight:600 !important; box-shadow:none !important; }
 .dashboard-nav-item span { width:20px; text-align:center; color:#91aef4; font-size:16px; }
+.dashboard-nav-item .nav-icon svg { display:block; width:20px; height:20px; fill:none; stroke:currentColor; stroke-linecap:round; stroke-linejoin:round; stroke-width:1.8; }
 .dashboard-nav-item:hover, .dashboard-nav-item.active { color:#f2f7ff !important; background:linear-gradient(90deg, rgba(28,203,195,.18), rgba(91,77,224,.28)) !important; border-color:rgba(86,207,220,.20) !important; transform:none !important; }
 .dashboard-nav-item.active span { color:#57e1d5; }
 .dashboard-sidebar-footer { margin-top:auto; border-top:1px solid rgba(118,145,199,.13); padding-top:14px; }
@@ -4522,9 +4523,7 @@ body.color-vision-mode .beer-grade-slider::-moz-range-thumb {
 
       <p class="auth-legal">Mit dem Login stimmst du unseren Nutzungsbedingungen und der Datenschutzerklärung zu.</p>
     </div>
-<p id="loginError" class="auth-error" role="alert"></p>
-
-   
+  <p id="loginError" class="auth-error" role="alert"></p>
   </div>
 
   <!-- App -->
@@ -4551,14 +4550,14 @@ body.color-vision-mode .beer-grade-slider::-moz-range-thumb {
       <aside id="menuSidebar" class="dashboard-sidebar" aria-label="Hauptnavigation">
         <button id="sidebarToggle" type="button" class="sidebar-toggle-btn sidebar-toggle-floating" onclick="toggleSidebar()" aria-label="Sidebar einklappen" aria-expanded="true" title="Sidebar ein- oder ausklappen"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"></path></svg></button>
         <nav class="dashboard-nav">
-          <button class="dashboard-nav-item active" type="button" onclick="showMenu()" aria-current="page" title="Übersicht"><span class="nav-icon" aria-hidden="true">⌂</span><span class="nav-label">Übersicht</span></button>
-          <button class="dashboard-nav-item" type="button" onclick="showMoviesApp()" title="Serien &amp; Filme"><span class="nav-icon" aria-hidden="true">▣</span><span class="nav-label">Serien &amp; Filme</span></button>
-          <button class="dashboard-nav-item" type="button" onclick="showFeastApp()" title="Feast Table"><span class="nav-icon" aria-hidden="true">♜</span><span class="nav-label">Feast Table</span></button>
-          <button class="dashboard-nav-item" type="button" onclick="showSaufiMenu()" title="Bier &amp; Cocktails"><span class="nav-icon" aria-hidden="true">♧</span><span class="nav-label">Bier &amp; Cocktails</span></button>
-          <button class="dashboard-nav-item" type="button" onclick="showGamesApp()" title="Games"><span class="nav-icon" aria-hidden="true">⌘</span><span class="nav-label">Games</span></button>
-          <button class="dashboard-nav-item" type="button" onclick="showYugiohApp()" title="Yu-Gi-Oh! Decks"><span class="nav-icon" aria-hidden="true">◈</span><span class="nav-label">Yu-Gi-Oh! Decks</span></button>
-          <button class="dashboard-nav-item" type="button" onclick="showAppointmentsApp()" title="Termine abstimmen"><span class="nav-icon" aria-hidden="true">◷</span><span class="nav-label">Termine</span></button>
-          <button id="colorVisionToggle" class="dashboard-nav-item color-vision-toggle" type="button" onclick="toggleColorVisionMode()" aria-label="Farbenblöden Modus" aria-pressed="false" title="Farbenblöden Modus"><span class="nav-icon" aria-hidden="true">◐</span><span class="nav-label">Farbenblöden Modus</span></button>
+          <button class="dashboard-nav-item active" type="button" onclick="showMenu()" aria-current="page" title="Übersicht"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m3 10 9-7 9 7"></path><path d="M5 9v11h14V9"></path><path d="M9 20v-6h6v6"></path></svg></span><span class="nav-label">Übersicht</span></button>
+          <button class="dashboard-nav-item" type="button" onclick="showMoviesApp()" title="Serien &amp; Filme"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="M7 5v4m5-4v4m5-4v4M7 19v-4m5 4v-4m5 4v-4"></path></svg></span><span class="nav-label">Serien &amp; Filme</span></button>
+          <button class="dashboard-nav-item" type="button" onclick="showFeastApp()" title="Feast Table"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 3v6m-3-6v4a3 3 0 0 0 6 0V3"></path><path d="M7 10v11"></path><path d="M16 3v18m0-18c3 2 4 5 4 8h-4"></path></svg></span><span class="nav-label">Feast Table</span></button>
+          <button class="dashboard-nav-item" type="button" onclick="showSaufiMenu()" title="Bier &amp; Cocktails"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 8h12l-1.2 12H6.2L5 8Z"></path><path d="M5 11h12"></path><path d="M8 5a2 2 0 0 1 4 0c0-2 4-2 4 1v2"></path><path d="M17 11h2a2 2 0 0 1 0 4h-2"></path></svg></span><span class="nav-label">Bier &amp; Cocktails</span></button>
+          <button class="dashboard-nav-item" type="button" onclick="showGamesApp()" title="Games"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 8h10a4 4 0 0 1 3.8 2.8l1.1 4a2.5 2.5 0 0 1-4.1 2.5l-2.3-2H8.5l-2.3 2a2.5 2.5 0 0 1-4.1-2.5l1.1-4A4 4 0 0 1 7 8Z"></path><path d="M7 11v4m-2-2h4m7-.5h.01M18 14.5h.01"></path></svg></span><span class="nav-label">Games</span></button>
+          <button class="dashboard-nav-item" type="button" onclick="showYugiohApp()" title="Yu-Gi-Oh! Decks"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="6" y="3" width="13" height="17" rx="2" transform="rotate(8 6 3)"></rect><rect x="4" y="5" width="13" height="17" rx="2"></rect><path d="m10.5 9 1.5-2 1.5 2-.5 2h-2l-.5-2Zm1.5 2v3m-2 2h4"></path></svg></span><span class="nav-label">Yu-Gi-Oh! Decks</span></button>
+          <button class="dashboard-nav-item" type="button" onclick="showAppointmentsApp()" title="Termine abstimmen"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M7 3v4m10-4v4M3 10h18m-12 4h6"></path></svg></span><span class="nav-label">Termine</span></button>
+          <button id="colorVisionToggle" class="dashboard-nav-item color-vision-toggle" type="button" onclick="toggleColorVisionMode()" aria-label="Farbenfreundlichen Modus" aria-pressed="false" title="Farbenfreundlichen Modus"><span class="nav-icon" aria-hidden="true">◐</span><span class="nav-label">Farbenfreundlicher Modus</span></button>
         </nav>
         <button id="sidebarLogout" class="sidebar-logout-button" type="button" onclick="logout()" aria-label="Logout" title="Logout"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M10 17l5-5-5-5"></path><path d="M15 12H3"></path><path d="M12 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6"></path></svg></span></button>
 
