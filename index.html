@@ -2827,6 +2827,8 @@ button, input, select, textarea { max-width: 100%; }
 .sidebar-logout-button { width:100%; margin-top:auto; padding:11px 12px; display:flex; align-items:center; gap:12px; border:1px solid rgba(118,145,199,.18); border-radius:11px; background:rgba(13,31,57,.52); color:#b7c7df; font:600 13px var(--font-sans); cursor:pointer; }
 .sidebar-logout-button:hover, .sidebar-logout-button:focus-visible { color:#fff; border-color:rgba(101,226,215,.5); background:rgba(28,65,103,.58); outline:none; }
 .sidebar-logout-button .nav-icon { width:20px; text-align:center; color:#ef9b9b; font-size:17px; }
+.sidebar-logout-button { justify-content:center; gap:0; }
+.sidebar-logout-button .nav-label { display:none !important; }
 .sidebar-collapsed .sidebar-logout-button { justify-content:center; gap:0; padding-inline:8px; }
 @media (max-width:900px) { body.app-scene .sidebar-logout-button { flex:0 0 auto; margin-top:auto; min-height:46px; } }
 
@@ -3103,49 +3105,6 @@ button, input, select, textarea { max-width: 100%; }
 }
 
 
-/* --- Separates Logout-Icon, wenn das mobile Burger-Menü geschlossen ist --- */
-.mobile-collapsed-logout { display:none; }
-@media (max-width:900px) {
-  body.app-scene:not(.mobile-sidebar-open) #mobileCollapsedLogout {
-    position:fixed;
-    left:12px;
-    bottom:max(24px, env(safe-area-inset-bottom, 0px));
-    z-index:10003;
-    display:grid;
-    place-items:center;
-    box-sizing:border-box;
-    width:50px;
-    height:50px;
-    min-width:50px;
-    min-height:50px;
-    max-width:50px;
-    max-height:50px;
-    padding:0;
-    border:1px solid rgba(118,145,199,.34);
-    border-radius:12px;
-    background:linear-gradient(135deg, rgba(29,68,107,.96), rgba(71,62,139,.96));
-    color:#ffd1d1;
-    font:700 24px/1 Arial,sans-serif;
-    box-shadow:0 8px 24px rgba(0,0,0,.35), 0 0 0 2px rgba(101,226,215,.08);
-    cursor:pointer;
-    visibility:visible;
-    opacity:1;
-  }
-  body.app-scene:not(.mobile-sidebar-open) #mobileCollapsedLogout:hover,
-  body.app-scene:not(.mobile-sidebar-open) #mobileCollapsedLogout:focus-visible {
-    border-color:#65e2d7;
-    background:linear-gradient(135deg, rgba(43,126,139,.98), rgba(86,69,171,.98));
-    color:#fff;
-    outline:none;
-    transform:translateY(-1px);
-  }
-  body.app-scene.mobile-sidebar-open #mobileCollapsedLogout { display:none; }
-}
-@media (max-width:380px) {
-  body.app-scene:not(.mobile-sidebar-open) #mobileCollapsedLogout { left:10px; bottom:max(22px, env(safe-area-inset-bottom, 0px)); }
-}
-
-
 /* --- Tablet/Desktop: Abstand zum unteren Viewport-Rand --- */
 @media (min-width:901px) {
   body.app-scene .dashboard-sidebar {
@@ -3271,18 +3230,18 @@ button, input, select, textarea { max-width: 100%; }
   body.app-scene .mobile-sidebar-backdrop {
     position:fixed !important;
     inset:0 !important;
-    z-index:10000 !important;
+    z-index:2147483646 !important;
     display:block !important;
     opacity:0;
     visibility:hidden;
     pointer-events:none;
     transition:opacity .28s ease, visibility 0s linear .28s;
   }
-  body.app-scene .dashboard-shell .dashboard-sidebar {
-    position:fixed !important;
+  body.app-scene .dashboard-sidebar {
+    position:absolute !important;
     top:var(--mobile-drawer-top, 0px) !important;
     left:0 !important;
-    z-index:10002 !important;
+    z-index:2147483647 !important;
     box-sizing:border-box;
     width:min(86vw,310px);
     height:var(--mobile-drawer-height, 100dvh);
@@ -3300,7 +3259,7 @@ button, input, select, textarea { max-width: 100%; }
     pointer-events:auto;
     transition:opacity .28s ease, visibility 0s linear 0s;
   }
-  body.app-scene.mobile-sidebar-open .dashboard-shell .dashboard-sidebar {
+  body.app-scene.mobile-sidebar-open .dashboard-sidebar {
     visibility:visible !important;
     opacity:1 !important;
     pointer-events:auto !important;
@@ -3315,10 +3274,33 @@ button, input, select, textarea { max-width: 100%; }
     opacity:0;
     pointer-events:none;
   }
-  body.app-scene .mobile-collapsed-logout { z-index:10003 !important; }
+  body.app-scene .dashboard-sidebar > .sidebar-logout-button {
+    position:absolute !important;
+    left:12px !important;
+    right:12px !important;
+    bottom:calc(12px + env(safe-area-inset-bottom, 0px)) !important;
+    width:auto !important;
+    height:50px !important;
+    min-height:50px !important;
+    max-height:50px !important;
+    margin:0 !important;
+    padding:0 !important;
+    justify-content:center !important;
+    transform:none !important;
+    z-index:1 !important;
+  }
+  body.app-scene .dashboard-sidebar > .sidebar-logout-button .nav-label {
+    display:none !important;
+  }
+  body.app-scene .dashboard-sidebar > .dashboard-nav { padding-bottom:78px; }
 }
 @media (max-width:380px) {
-  body.app-scene .dashboard-shell .dashboard-sidebar { width:min(92vw,300px); }
+  body.app-scene .dashboard-sidebar { width:min(92vw,300px); }
+  body.app-scene .dashboard-sidebar > .sidebar-logout-button {
+    left:10px !important;
+    right:10px !important;
+    bottom:calc(10px + env(safe-area-inset-bottom, 0px)) !important;
+  }
 }
 
 
@@ -3327,8 +3309,8 @@ button, input, select, textarea { max-width: 100%; }
   body.app-scene.mobile-sidebar-open .mobile-sidebar-backdrop {
     pointer-events:none !important;
   }
-  body.app-scene.mobile-sidebar-open .dashboard-shell .dashboard-sidebar,
-  body.app-scene.mobile-sidebar-open .dashboard-shell .dashboard-sidebar * {
+  body.app-scene.mobile-sidebar-open .dashboard-sidebar,
+  body.app-scene.mobile-sidebar-open .dashboard-sidebar * {
     pointer-events:auto !important;
   }
 }
@@ -3508,12 +3490,10 @@ button, input, select, textarea { max-width: 100%; }
         ← Zurück
       </button>
       <button class="back-button" onclick="showMenu()">🏠 Menü</button>
-      <button id="appTopLogout" class="logout-button" onclick="logout()" style="display:none;">Logout</button>
     </div>
 
     <div id="globalStatus" class="status"></div>
     <button id="mobileMenuToggle" class="mobile-menu-toggle" type="button" onclick="toggleSidebar()" aria-label="Navigation öffnen" aria-expanded="false" aria-controls="menuSidebar" title="Navigation öffnen"><span aria-hidden="true"><i></i><i></i><i></i></span><span class="mobile-menu-label">Menü</span></button>
-    <button id="mobileCollapsedLogout" class="mobile-collapsed-logout" type="button" onclick="logout()" aria-label="Logout" title="Logout"><span aria-hidden="true">⎋</span></button>
     <div id="mobileSidebarBackdrop" class="mobile-sidebar-backdrop" aria-hidden="true" onclick="closeMobileSidebar()"></div>
     <!-- Hauptmenü -->
     <div id="menuBox" class="dashboard-shell">
@@ -3528,7 +3508,7 @@ button, input, select, textarea { max-width: 100%; }
           <button class="dashboard-nav-item" type="button" onclick="showYugiohApp()" title="Yu-Gi-Oh! Decks"><span class="nav-icon" aria-hidden="true">◈</span><span class="nav-label">Yu-Gi-Oh! Decks</span></button>
           <button class="dashboard-nav-item" type="button" onclick="showAppointmentsApp()" title="Termine abstimmen"><span class="nav-icon" aria-hidden="true">◷</span><span class="nav-label">Termine</span></button>
         </nav>
-        <button id="sidebarLogout" class="sidebar-logout-button" type="button" onclick="logout()" aria-label="Logout" title="Logout"><span class="nav-icon" aria-hidden="true">⎋</span><span class="nav-label">Logout</span></button>
+        <button id="sidebarLogout" class="sidebar-logout-button" type="button" onclick="logout()" aria-label="Logout" title="Logout"><span class="nav-icon" aria-hidden="true">⎋</span></button>
 
       </aside>
 
@@ -5053,6 +5033,7 @@ async function login() {
 }
 
 async function logout() {
+  closeMobileSidebar();
   await supabaseClient.auth.signOut();
   showLogin();
 }
@@ -5095,10 +5076,7 @@ function hideAllPanels() {
 }
 
 function updateLogoutVisibility() {
-  const topLogout = document.getElementById("appTopLogout");
   const sidebarLogout = document.getElementById("sidebarLogout");
-  const isMenu = currentView === "menu";
-  if (topLogout) topLogout.style.display = isMenu ? "none" : "inline-flex";
   if (sidebarLogout) sidebarLogout.style.display = "flex";
 }
 function showPanelForView(view) {
@@ -7694,6 +7672,35 @@ function setMobileSidebarHostVisibility(visible) {
   const dashboardMain = menuBox.querySelector(".dashboard-main");
   if (dashboardMain) dashboardMain.style.display = visible ? "none" : "";
 }
+let mobileSidebarPlaceholder = null;
+let mobileSidebarBackdropPlaceholder = null;
+function setMobileSidebarPortal(active) {
+  const drawer = document.getElementById("menuSidebar");
+  const backdrop = document.getElementById("mobileSidebarBackdrop");
+  if (active) {
+    if (drawer && drawer.parentElement !== document.body) {
+      mobileSidebarPlaceholder = document.createComment("mobile sidebar position");
+      drawer.parentNode.insertBefore(mobileSidebarPlaceholder, drawer);
+      document.body.appendChild(drawer);
+    }
+    if (backdrop && backdrop.parentElement !== document.body) {
+      mobileSidebarBackdropPlaceholder = document.createComment("mobile sidebar backdrop position");
+      backdrop.parentNode.insertBefore(mobileSidebarBackdropPlaceholder, backdrop);
+      document.body.appendChild(backdrop);
+    }
+    return;
+  }
+  if (drawer && mobileSidebarPlaceholder?.parentNode) {
+    mobileSidebarPlaceholder.parentNode.insertBefore(drawer, mobileSidebarPlaceholder);
+    mobileSidebarPlaceholder.remove();
+    mobileSidebarPlaceholder = null;
+  }
+  if (backdrop && mobileSidebarBackdropPlaceholder?.parentNode) {
+    mobileSidebarBackdropPlaceholder.parentNode.insertBefore(backdrop, mobileSidebarBackdropPlaceholder);
+    mobileSidebarBackdropPlaceholder.remove();
+    mobileSidebarBackdropPlaceholder = null;
+  }
+}
 function positionMobileSidebar(drawer, toggleRect) {
   const viewportHeight = window.innerHeight;
   const desiredHeight = Math.min(520, Math.max(0, viewportHeight - 16));
@@ -7704,7 +7711,7 @@ function positionMobileSidebar(drawer, toggleRect) {
   const viewportTop = opensBelow
     ? toggleRect.bottom + 8
     : toggleRect.top - drawerHeight - 8;
-  drawer.style.setProperty("--mobile-drawer-top", `${Math.max(8, Math.round(viewportTop))}px`);
+  drawer.style.setProperty("--mobile-drawer-top", `${Math.max(8, Math.round(window.scrollY + viewportTop))}px`);
   drawer.style.setProperty("--mobile-drawer-height", `${drawerHeight}px`);
 }
 function closeMobileSidebar() {
@@ -7716,7 +7723,12 @@ function closeMobileSidebar() {
   if (drawer) {
     drawer.style.removeProperty("--mobile-drawer-top");
     drawer.style.removeProperty("--mobile-drawer-height");
+    drawer.style.setProperty("transform", "translate3d(-105%,0,0)", "important");
+    drawer.style.setProperty("opacity", "0", "important");
+    drawer.style.setProperty("visibility", "hidden", "important");
+    drawer.style.setProperty("pointer-events", "none", "important");
   }
+  setMobileSidebarPortal(false);
   if (b) { b.setAttribute("aria-expanded","false"); b.setAttribute("aria-label","Navigation öffnen"); b.title="Navigation öffnen"; }
   if (o) o.setAttribute("aria-hidden","true");
 }
@@ -7727,6 +7739,7 @@ function toggleSidebar() {
     const toggleRect = b?.getBoundingClientRect();
     const open=document.body.classList.toggle("mobile-sidebar-open");
     setMobileSidebarHostVisibility(open);
+    setMobileSidebarPortal(open);
     if (b) { b.setAttribute("aria-expanded",String(open)); b.setAttribute("aria-label",open?"Navigation schließen":"Navigation öffnen"); b.title=open?"Navigation schließen":"Navigation öffnen"; }
     if (o) o.setAttribute("aria-hidden",String(!open));
     if (drawer) {
@@ -7742,7 +7755,7 @@ function toggleSidebar() {
       drawer.style.setProperty("opacity", open ? "1" : "0", "important");
       drawer.style.setProperty("visibility", open ? "visible" : "hidden", "important");
       drawer.style.setProperty("pointer-events", open ? "auto" : "none", "important");
-      drawer.style.setProperty("z-index", "10002", "important");
+      drawer.style.setProperty("z-index", "2147483647", "important");
       if (open) setTimeout(() => drawer.style.removeProperty("transition"), 20);
     }
     return;
@@ -7760,7 +7773,14 @@ window.addEventListener("resize", () => {
     if (drawer) {
       drawer.style.removeProperty("--mobile-drawer-top");
       drawer.style.removeProperty("--mobile-drawer-height");
+      drawer.style.removeProperty("transform");
+      drawer.style.removeProperty("opacity");
+      drawer.style.removeProperty("visibility");
+      drawer.style.removeProperty("pointer-events");
+      drawer.style.removeProperty("z-index");
+      drawer.style.removeProperty("transition");
     }
+    setMobileSidebarPortal(false);
   } else if (document.body.classList.contains("mobile-sidebar-open")) {
     const b=document.getElementById("mobileMenuToggle");
     const drawer=document.getElementById("menuSidebar");
@@ -7783,7 +7803,7 @@ window.addEventListener("resize", () => {
     drawer.style.setProperty("opacity", open ? "1" : "0", "important");
     drawer.style.setProperty("visibility", open ? "visible" : "hidden", "important");
     drawer.style.setProperty("pointer-events", open ? "auto" : "none", "important");
-    drawer.style.setProperty("z-index", "10002", "important");
+    drawer.style.setProperty("z-index", "2147483647", "important");
     if (open) setTimeout(() => drawer.style.removeProperty("transition"), 20);
   }
   document.addEventListener("click", function (event) {
