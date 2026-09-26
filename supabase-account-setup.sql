@@ -11,9 +11,13 @@ create table if not exists public.profiles (
   email text not null,
   role text not null default 'user'
     check (role in ('user', 'admin')),
+  is_banned boolean not null default false,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+alter table public.profiles
+  add column if not exists is_banned boolean not null default false;
 
 create unique index if not exists profiles_username_lower_unique
   on public.profiles (lower(username));
@@ -39,6 +43,7 @@ as $$
     from public.profiles
     where id = (select auth.uid())
       and role = 'admin'
+      and not is_banned
   );
 $$;
 
@@ -178,16 +183,16 @@ begin
   perform pg_advisory_xact_lock(hashtext('public.profiles.admin-role'));
   select count(*) into current_admin_count
   from public.profiles
-  where role = 'admin';
+  where role = 'admin' and not is_banned;
 
   if target_role = 'user'
     and current_admin_count <= 1
     and exists (
       select 1 from public.profiles
-      where id = target_user_id and role = 'admin'
+      where id = target_user_id and role = 'admin' and not is_banned
     )
   then
-    raise exception 'The last administrator cannot be demoted' using errcode = '23514';
+    raise exception 'The last active administrator cannot be demoted' using errcode = '23514';
   end if;
 
   update public.profiles
@@ -246,6 +251,105 @@ $$;
 
 revoke all on function public.delete_own_account() from public, anon;
 grant execute on function public.delete_own_account() to authenticated;
+
+create or replace function public.admin_set_profile_banned(
+  target_user_id uuid,
+  new_is_banned boolean,
+  acting_admin_id uuid
+)
+returns void
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  target_role text;
+  target_is_banned boolean;
+  admin_count integer;
+begin
+  if not exists (
+    select 1 from public.profiles
+    where id = acting_admin_id and role = 'admin' and not is_banned
+  ) then
+    raise exception 'Administrator role required' using errcode = '42501';
+  end if;
+  if target_user_id = acting_admin_id then
+    raise exception 'Administrators cannot ban themselves' using errcode = '42501';
+  end if;
+
+  perform pg_advisory_xact_lock(hashtext('public.profiles.admin-role'));
+
+  select role, is_banned into target_role, target_is_banned
+  from public.profiles
+  where id = target_user_id;
+  if not found then
+    raise exception 'Account not found' using errcode = 'P0002';
+  end if;
+
+  if new_is_banned and target_role = 'admin' and not target_is_banned then
+    select count(*) into admin_count
+    from public.profiles
+    where role = 'admin' and not is_banned;
+    if admin_count <= 1 then
+      raise exception 'The last active administrator cannot be banned' using errcode = '23514';
+    end if;
+  end if;
+
+  update public.profiles
+  set is_banned = new_is_banned,
+      updated_at = now()
+  where id = target_user_id;
+end;
+$$;
+
+revoke all on function public.admin_set_profile_banned(uuid, boolean, uuid) from public, anon, authenticated;
+grant execute on function public.admin_set_profile_banned(uuid, boolean, uuid) to service_role;
+
+create or replace function public.admin_delete_user_account(target_user_id uuid, acting_admin_id uuid)
+returns void
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  target_role text;
+  target_is_banned boolean;
+  admin_count integer;
+begin
+  if not exists (
+    select 1 from public.profiles
+    where id = acting_admin_id and role = 'admin' and not is_banned
+  ) then
+    raise exception 'Administrator role required' using errcode = '42501';
+  end if;
+  if target_user_id = acting_admin_id then
+    raise exception 'Administrators cannot delete their own account from this panel' using errcode = '42501';
+  end if;
+
+  perform pg_advisory_xact_lock(hashtext('public.profiles.admin-role'));
+
+  select role, is_banned into target_role, target_is_banned
+  from public.profiles
+  where id = target_user_id;
+  if not found then
+    raise exception 'Account not found' using errcode = 'P0002';
+  end if;
+
+  if target_role = 'admin' and not target_is_banned then
+    select count(*) into admin_count
+    from public.profiles
+    where role = 'admin' and not is_banned;
+    if admin_count <= 1 then
+      raise exception 'The last active administrator account cannot be deleted' using errcode = '23514';
+    end if;
+  end if;
+
+  delete from auth.users where id = target_user_id;
+end;
+$$;
+
+revoke all on function public.admin_delete_user_account(uuid, uuid) from public, anon, authenticated;
+grant execute on function public.admin_delete_user_account(uuid, uuid) to service_role;
 
 create table if not exists public.registration_invites (
   id uuid primary key default gen_random_uuid(),

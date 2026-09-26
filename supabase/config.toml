@@ -6,3 +6,6 @@ verify_jwt = true
 
 [functions.complete-user-registration]
 verify_jwt = false
+
+[functions.manage-user-account]
+verify_jwt = true
