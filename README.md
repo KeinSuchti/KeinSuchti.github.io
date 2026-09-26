@@ -5,8 +5,8 @@
 Für Registrierungslinks, Nutzernamen-Login, Kontoverwaltung und Rollenverwaltung zuerst
 [`supabase-account-setup.sql`](supabase-account-setup.sql) vollständig im Supabase SQL Editor ausführen.
 Falls das Kontoschema bereits eingerichtet wurde, führe das aktualisierte SQL-Script erneut aus,
-damit die Tabelle und Funktionen für einmalige Registrierungslinks und das Löschen des eigenen
-Kontos angelegt werden.
+damit die Tabelle und Funktionen für einmalige Registrierungslinks, das Löschen des eigenen Kontos
+und die Admin-Kontoverwaltung angelegt werden.
 Wenn beim Erstellen eines Registrierungslinks eine Datenbankfehlermeldung erscheint, prüfe, ob
 dieses aktualisierte Script erfolgreich ausgeführt wurde; der Admin-Link wird in
 `public.registration_invites` gespeichert.
@@ -23,6 +23,7 @@ supabase link --project-ref tqxyofqzlflnpfomslky
 supabase functions deploy login-with-username
 supabase functions deploy create-user-invite
 supabase functions deploy complete-user-registration
+supabase functions deploy manage-user-account
 supabase secrets set APP_ORIGIN=https://keinsuchti.github.io
 ```
 
@@ -40,7 +41,10 @@ Setze in Supabase **Authentication > URL Configuration > Site URL** auf
 
 Das SQL-Script legt die Rollen `user` und `admin` an, schützt Profile per Row Level Security und
 erstellt den Admin-Bereich für Rollenverwaltung. Normale Nutzer können ihr eigenes Profil verwalten;
-Admins können Konten einsehen und Rollen anderer Konten ändern. Ein bereits vorhandener, bestätigter
+Admins können Konten einsehen, Rollen ändern, Nutzerkonten sperren und löschen sowie Passwort-Reset-
+E-Mails für andere Konten einschließlich anderer Admins anfordern. Sperren, Löschen und Herabstufen
+schützen das letzte aktive Administratorkonto. Dafür müssen das aktualisierte SQL-Script ausgeführt und
+`manage-user-account` deployed sein. Ein bereits vorhandener, bestätigter
 Account mit der Adresse `1keinsuchti1@gmail.com` wird beim Ausführen zum Admin. Falls der Account
 erst danach per Admin-Einladung erstellt wird, das Script nach dem Erstellen des Kontos erneut
 ausführen. Nutzer können ihr eigenes Konto im Benutzerkonto löschen; das SQL verhindert dabei, dass

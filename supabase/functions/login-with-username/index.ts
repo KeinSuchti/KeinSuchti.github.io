@@ -46,10 +46,10 @@ Deno.serve(async request => {
 
   const { data: profile, error: profileError } = await adminClient
     .from("profiles")
-    .select("email")
+    .select("email,is_banned")
     .eq("username", username)
     .maybeSingle();
-  if (profileError || !profile?.email) {
+  if (profileError || !profile?.email || profile.is_banned) {
     return jsonResponse({ error: "Invalid credentials." }, 401);
   }
 
