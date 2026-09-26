@@ -3482,6 +3482,33 @@ body.app-scene .sidebar-logout-button .nav-icon svg {
 }
 
 @media (min-width:901px) {
+  body.app-scene.dashboard-home-view .mobile-menu-toggle {
+    display:none !important;
+  }
+  body.app-scene.dashboard-home-view .dashboard-sidebar > #sidebarToggle {
+    position:relative !important;
+    top:auto !important;
+    right:auto !important;
+    left:auto !important;
+    align-self:center !important;
+    justify-self:center !important;
+    display:grid !important;
+    place-items:center;
+    width:50px !important;
+    height:50px !important;
+    margin:0 0 8px !important;
+    transform:none !important;
+  }
+  body.app-scene.dashboard-home-view .dashboard-sidebar > .dashboard-nav {
+    margin-top:0 !important;
+  }
+  body.app-scene.dashboard-home-view .sidebar-toggle-btn svg {
+    transform:rotate(180deg);
+    transition:transform 360ms cubic-bezier(.22,.61,.36,1);
+  }
+  body.app-scene.dashboard-home-view.sidebar-collapsed .sidebar-toggle-btn svg {
+    transform:none;
+  }
   body.app-scene .mobile-menu-toggle {
     position:fixed !important;
     top:77px !important;
@@ -5283,6 +5310,7 @@ function showPanelForView(view) {
     currentView = "menu";
     menuBox.style.display = "block";
   }
+  document.body.classList.toggle("dashboard-home-view", currentView === "menu");
 
   updateBackButtonVisibility();
   updateLogoutVisibility();
