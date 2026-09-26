@@ -3992,6 +3992,87 @@ body.app-scene .assignment-popup-box {
   body.app-scene.sidebar-collapsed #customListApp {
     margin-left:var(--sidebar-collapsed-width);
   }
+
+  body.app-scene .top-actions {
+    top:22px;
+    right:clamp(24px, 3vw, 48px);
+    z-index:1100;
+  }
+
+  body.app-scene .top-actions #appBackButton {
+    min-height:42px;
+    padding:10px 17px;
+    border:1px solid rgba(101,226,215,.32);
+    border-radius:12px;
+    background:linear-gradient(135deg, rgba(15,47,68,.94), rgba(35,43,89,.94));
+    color:#dffaf6;
+    font-size:13px;
+    font-weight:700;
+    box-shadow:0 8px 24px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.06);
+    transition:background 180ms ease, border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+  }
+
+  body.app-scene .top-actions #appBackButton:hover,
+  body.app-scene .top-actions #appBackButton:focus-visible {
+    border-color:rgba(101,226,215,.68);
+    background:linear-gradient(135deg, rgba(25,78,93,.98), rgba(53,60,119,.98));
+    box-shadow:0 10px 28px rgba(0,0,0,.30), 0 0 0 3px rgba(101,226,215,.10);
+    color:#fff;
+    transform:translateY(-1px);
+    outline:none;
+  }
+}
+
+@media (max-width: 900px) {
+  body.app-scene.mobile-sidebar-open .dashboard-sidebar {
+    padding:22px 15px 18px !important;
+    border-right:1px solid rgba(118,145,199,.16);
+    border-radius:0;
+    background:linear-gradient(180deg, rgba(5,18,37,.94), rgba(5,14,29,.90));
+    box-shadow:18px 0 50px rgba(0,0,0,.35);
+  }
+
+  body.app-scene.mobile-sidebar-open .dashboard-sidebar > #sidebarToggle {
+    position:relative !important;
+    inset:auto !important;
+    align-self:stretch !important;
+    justify-self:stretch !important;
+    display:flex !important;
+    align-items:center;
+    justify-content:flex-start;
+    box-sizing:border-box;
+    width:100% !important;
+    height:44px !important;
+    min-height:44px !important;
+    margin:0 0 6px !important;
+    padding:11px 12px !important;
+    gap:12px;
+    border:1px solid rgba(86,207,220,.20) !important;
+    border-radius:11px !important;
+    background:linear-gradient(90deg, rgba(28,203,195,.18), rgba(91,77,224,.28)) !important;
+    color:#71e5d8 !important;
+    transform:none !important;
+  }
+
+  body.app-scene.mobile-sidebar-open .dashboard-sidebar > #sidebarToggle:hover,
+  body.app-scene.mobile-sidebar-open .dashboard-sidebar > #sidebarToggle:focus-visible {
+    color:#f2f7ff !important;
+    background:linear-gradient(90deg, rgba(28,203,195,.30), rgba(91,77,224,.40)) !important;
+    border-color:rgba(86,207,220,.38) !important;
+    box-shadow:none !important;
+  }
+
+  body.app-scene.mobile-sidebar-open .dashboard-sidebar > #sidebarToggle svg {
+    flex:0 0 20px;
+    width:20px;
+    height:20px;
+    margin:0;
+    transform:rotate(180deg);
+  }
+
+  body.app-scene.mobile-sidebar-open .dashboard-sidebar > .dashboard-nav {
+    margin-top:0 !important;
+  }
 }
 
 </style>
