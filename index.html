@@ -4523,12 +4523,7 @@ body.color-vision-mode .beer-grade-slider::-moz-range-thumb {
 
       <p class="auth-legal">Mit dem Login stimmst du unseren Nutzungsbedingungen und der Datenschutzerklärung zu.</p>
     </div>
-<p id="loginError" class="auth-error" role="alert"></p>
-
-    <div class="auth-footer-line">
-      <span aria-hidden="true">🎮</span>
-      <span>Mehr als nur eine Liste.</span>
-    </div>
+  <p id="loginError" class="auth-error" role="alert"></p>
   </div>
 
   <!-- App -->
@@ -4559,10 +4554,10 @@ body.color-vision-mode .beer-grade-slider::-moz-range-thumb {
           <button class="dashboard-nav-item" type="button" onclick="showMoviesApp()" title="Serien &amp; Filme"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="M7 5v4m5-4v4m5-4v4M7 19v-4m5 4v-4m5 4v-4"></path></svg></span><span class="nav-label">Serien &amp; Filme</span></button>
           <button class="dashboard-nav-item" type="button" onclick="showFeastApp()" title="Feast Table"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 3v6m-3-6v4a3 3 0 0 0 6 0V3"></path><path d="M7 10v11"></path><path d="M16 3v18m0-18c3 2 4 5 4 8h-4"></path></svg></span><span class="nav-label">Feast Table</span></button>
           <button class="dashboard-nav-item" type="button" onclick="showSaufiMenu()" title="Bier &amp; Cocktails"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 8h12l-1.2 12H6.2L5 8Z"></path><path d="M5 11h12"></path><path d="M8 5a2 2 0 0 1 4 0c0-2 4-2 4 1v2"></path><path d="M17 11h2a2 2 0 0 1 0 4h-2"></path></svg></span><span class="nav-label">Bier &amp; Cocktails</span></button>
-          <button class="dashboard-nav-item" type="button" onclick="showGamesApp()" title="Spieleabend"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 8h10a4 4 0 0 1 3.8 2.8l1.1 4a2.5 2.5 0 0 1-4.1 2.5l-2.3-2H8.5l-2.3 2a2.5 2.5 0 0 1-4.1-2.5l1.1-4A4 4 0 0 1 7 8Z"></path><path d="M7 11v4m-2-2h4m7-.5h.01M18 14.5h.01"></path></svg></span><span class="nav-label">Spieleabend</span></button>
+          <button class="dashboard-nav-item" type="button" onclick="showGamesApp()" title="Games"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 8h10a4 4 0 0 1 3.8 2.8l1.1 4a2.5 2.5 0 0 1-4.1 2.5l-2.3-2H8.5l-2.3 2a2.5 2.5 0 0 1-4.1-2.5l1.1-4A4 4 0 0 1 7 8Z"></path><path d="M7 11v4m-2-2h4m7-.5h.01M18 14.5h.01"></path></svg></span><span class="nav-label">Games</span></button>
           <button class="dashboard-nav-item" type="button" onclick="showYugiohApp()" title="Yu-Gi-Oh! Decks"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="6" y="3" width="13" height="17" rx="2" transform="rotate(8 6 3)"></rect><rect x="4" y="5" width="13" height="17" rx="2"></rect><path d="m10.5 9 1.5-2 1.5 2-.5 2h-2l-.5-2Zm1.5 2v3m-2 2h4"></path></svg></span><span class="nav-label">Yu-Gi-Oh! Decks</span></button>
           <button class="dashboard-nav-item" type="button" onclick="showAppointmentsApp()" title="Termine abstimmen"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M7 3v4m10-4v4M3 10h18m-12 4h6"></path></svg></span><span class="nav-label">Termine</span></button>
-          <button id="colorVisionToggle" class="dashboard-nav-item color-vision-toggle" type="button" onclick="toggleColorVisionMode()" aria-label="Farbenfreundlicher Modus" aria-pressed="false" title="Farbenfreundlicher Modus"><span class="nav-icon" aria-hidden="true">◐</span><span class="nav-label">Farbenfreundlicher Modus</span></button>
+          <button id="colorVisionToggle" class="dashboard-nav-item color-vision-toggle" type="button" onclick="toggleColorVisionMode()" aria-label="Farbenfreundlichen Modus" aria-pressed="false" title="Farbenfreundlichen Modus"><span class="nav-icon" aria-hidden="true">◐</span><span class="nav-label">Farbenfreundlicher Modus</span></button>
         </nav>
         <button id="sidebarLogout" class="sidebar-logout-button" type="button" onclick="logout()" aria-label="Logout" title="Logout"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M10 17l5-5-5-5"></path><path d="M15 12H3"></path><path d="M12 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6"></path></svg></span></button>
 
@@ -4597,7 +4592,7 @@ body.color-vision-mode .beer-grade-slider::-moz-range-thumb {
           <button class="dashboard-card card-games" type="button" onclick="showGamesApp()">
             <div class="dashboard-card-image" data-overview-image="games">
             </div>
-            <div class="dashboard-card-body"><span class="card-icon">⌘</span><div><h3>Spieleabend</h3><p>Spiele, Teilnehmer, Kolonnen und Bewertungen im Überblick.</p></div><span class="card-arrow">→</span></div>
+            <div class="dashboard-card-body"><span class="card-icon">⌘</span><div><h3>Games</h3><p>Spiele, Teilnehmer, Kolonnen und Bewertungen im Überblick.</p></div><span class="card-arrow">→</span></div>
           </button>
           <button class="dashboard-card card-yugioh" type="button" onclick="showYugiohApp()">
             <div class="dashboard-card-image" data-overview-image="yugioh">
@@ -4630,7 +4625,7 @@ body.color-vision-mode .beer-grade-slider::-moz-range-thumb {
 
     <!-- Spiele -->
     <div id="gamesApp" class="app-panel" style="display:none;">
-      <div class="list-panel-heading"><h2>🎮 Spiele</h2><button class="list-settings-button" type="button" onclick="openListSettings('games')" aria-label="Einstellungen für Spieleabend" title="Listeneinstellungen">⚙</button></div>
+      <div class="list-panel-heading"><h2>🎮 Spiele</h2><button class="list-settings-button" type="button" onclick="openListSettings('games')" aria-label="Einstellungen für Games" title="Listeneinstellungen">⚙</button></div>
 
       <div class="games-column-form">
         <input
@@ -4727,7 +4722,7 @@ body.color-vision-mode .beer-grade-slider::-moz-range-thumb {
         </section>
         <section class="appointment-form-card">
           <div class="dashboard-kicker">Nächsten Termin festlegen</div>
-          <label class="edit-field"><span>Titel</span><input id="appointmentTitle" placeholder="z. B. Spieleabend"></label>
+          <label class="edit-field"><span>Titel</span><input id="appointmentTitle" placeholder="z. B. Games"></label>
           <label class="edit-field"><span>Datum und Uhrzeit</span><input id="appointmentDate" type="datetime-local"></label>
           <label class="edit-field"><span>Ort</span><input id="appointmentLocation" placeholder="z. B. Bei Anna, Café oder online"></label>
           <label class="edit-field"><span>Freitext / Notiz</span><textarea id="appointmentNote" rows="3" placeholder="Was soll mitgebracht werden? Wer kommt mit?"></textarea></label>
@@ -5159,8 +5154,8 @@ function setColorVisionMode(enabled) {
   if (toggle) {
     toggle.setAttribute("aria-pressed", String(enabled));
     toggle.title = enabled
-      ? "Farbenfreundlichen Modus ausschalten"
-      : "Farbenfreundlichen Modus einschalten";
+      ? "Farbenblöden Modus ausschalten"
+      : "Farbenblöden Modus einschalten";
   }
 }
 
@@ -5168,7 +5163,7 @@ function initializeColorVisionMode() {
   try {
     setColorVisionMode(localStorage.getItem(colorVisionModeStorageKey) === "enabled");
   } catch (error) {
-    console.error("Einstellung für den farbenfreundlichen Modus konnte nicht geladen werden.", error);
+    console.error("Einstellung für den farbenblöden Modus konnte nicht geladen werden.", error);
     setColorVisionMode(false);
   }
 }
@@ -5179,7 +5174,7 @@ function toggleColorVisionMode() {
   try {
     localStorage.setItem(colorVisionModeStorageKey, enabled ? "enabled" : "disabled");
   } catch (error) {
-    console.error("Einstellung für den farbenfreundlichen Modus konnte nicht gespeichert werden.", error);
+    console.error("Einstellung für den farbenblöden Modus konnte nicht gespeichert werden.", error);
     setStatus("Der Modus ist aktiv, konnte aber nicht dauerhaft gespeichert werden.", true);
   }
 }
@@ -5725,7 +5720,7 @@ function handleOverviewImage(event, key) {
   event.target.value = "";
 }
 let activeSettingsKey = "";
-const listSettingsNames = { movies: "Serien & Filme", feast: "Feast Table", beer: "Bier", cocktail: "Cocktail", games: "Spieleabend", yugioh: "Yu-Gi-Oh!-Decks", custom: "Eigene Liste" };
+const listSettingsNames = { movies: "Serien & Filme", feast: "Feast Table", beer: "Bier", cocktail: "Cocktail", games: "Games", yugioh: "Yu-Gi-Oh!-Decks", custom: "Eigene Liste" };
 function listSettingsStorageKey(key, suffix) { return `wfg-list-setting:${currentUser?.id || "guest"}:${key}:${suffix}`; }
 function getListSetting(key, suffix, fallback) { return localStorage.getItem(listSettingsStorageKey(key, suffix)) || fallback; }
 function openListSettings(key) {
