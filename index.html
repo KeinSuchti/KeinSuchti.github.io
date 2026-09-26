@@ -4570,20 +4570,31 @@ body.color-vision-mode .beer-grade-slider::-moz-range-thumb {
     </div>
     <div id="passwordRecoveryForm" class="auth-form" style="display:none;">
       <div class="auth-heading">
-        <h2>Neues Passwort festlegen</h2>
-        <p>Wähle ein neues Passwort für dein Konto.</p>
+        <h2 id="passwordRecoveryTitle">Neues Passwort festlegen</h2>
+        <p id="passwordRecoveryDescription">Wähle ein neues Passwort für dein Konto.</p>
       </div>
-      <label class="auth-field">
-        <span class="auth-field-icon password-field-icon" aria-hidden="true">●</span>
-        <input type="password" id="recoveryPassword" placeholder="Neues Passwort (mindestens 8 Zeichen)" autocomplete="new-password" aria-label="Neues Passwort" minlength="8" maxlength="256">
-      </label>
-      <label class="auth-field">
-        <span class="auth-field-icon password-field-icon" aria-hidden="true">●</span>
-        <input type="password" id="recoveryPasswordConfirm" placeholder="Neues Passwort wiederholen" autocomplete="new-password" aria-label="Neues Passwort wiederholen" minlength="8" maxlength="256">
-      </label>
-      <button type="button" id="saveRecoveryPasswordButton" class="auth-primary" onclick="saveRecoveryPassword()">
-        <span>Passwort speichern</span><span aria-hidden="true">→</span>
-      </button>
+      <div id="recoveryResendForm" style="display:none;">
+        <label class="auth-field">
+          <span class="auth-field-icon" aria-hidden="true">◎</span>
+          <input type="email" id="recoveryEmail" placeholder="E-Mail-Adresse" autocomplete="email" aria-label="E-Mail-Adresse">
+        </label>
+        <button type="button" id="resendRecoveryEmailButton" class="auth-primary" onclick="resendRecoveryEmail()">
+          <span>Neuen Reset-Link senden</span><span aria-hidden="true">→</span>
+        </button>
+      </div>
+      <div id="recoveryPasswordFields" style="display:none;">
+        <label class="auth-field">
+          <span class="auth-field-icon password-field-icon" aria-hidden="true">●</span>
+          <input type="password" id="recoveryPassword" placeholder="Neues Passwort (mindestens 8 Zeichen)" autocomplete="new-password" aria-label="Neues Passwort" minlength="8" maxlength="256">
+        </label>
+        <label class="auth-field">
+          <span class="auth-field-icon password-field-icon" aria-hidden="true">●</span>
+          <input type="password" id="recoveryPasswordConfirm" placeholder="Neues Passwort wiederholen" autocomplete="new-password" aria-label="Neues Passwort wiederholen" minlength="8" maxlength="256">
+        </label>
+        <button type="button" id="saveRecoveryPasswordButton" class="auth-primary" onclick="saveRecoveryPassword()">
+          <span>Passwort speichern</span><span aria-hidden="true">→</span>
+        </button>
+      </div>
       <button type="button" class="auth-link" onclick="showLogin()">Zurück zur Anmeldung</button>
     </div>
     <p id="loginError" class="auth-error" role="status" aria-live="polite"></p>
@@ -5128,8 +5139,17 @@ const MOVIE_TABLE = "items";
 
 let currentUser = null;
 let currentRegistrationToken = null;
-let passwordRecoveryPending = new URLSearchParams(window.location.hash.slice(1)).get("type") === "recovery"
-  || new URLSearchParams(window.location.search).get("type") === "recovery";
+const passwordRecoveryHashParams = new URLSearchParams(window.location.hash.slice(1));
+const passwordRecoverySearchParams = new URLSearchParams(window.location.search);
+let passwordRecoveryErrorCode = passwordRecoveryHashParams.get("error_code")
+  || passwordRecoverySearchParams.get("error_code")
+  || "";
+const passwordRecoveryUrlError = passwordRecoveryHashParams.get("error")
+  || passwordRecoverySearchParams.get("error")
+  || "";
+let passwordRecoveryPending = passwordRecoveryHashParams.get("type") === "recovery"
+  || passwordRecoverySearchParams.get("type") === "recovery"
+  || Boolean(passwordRecoveryErrorCode || passwordRecoveryUrlError);
 let passwordRecoveryAuthorized = false;
 let movieItems = [];
 let pendingRandomUrl = "";
@@ -6135,6 +6155,7 @@ function showLogin() {
   closeMobileSidebar();
   passwordRecoveryPending = false;
   passwordRecoveryAuthorized = false;
+  passwordRecoveryErrorCode = "";
   document.body.classList.add("login-scene");
   document.body.classList.remove("app-scene");
   currentUser = null;
@@ -6172,12 +6193,18 @@ function showLogin() {
   document.getElementById("loginForm").style.display = "block";
   document.getElementById("inviteSetup").style.display = "none";
   document.getElementById("passwordRecoveryForm").style.display = "none";
+  document.getElementById("recoveryResendForm").style.display = "none";
+  document.getElementById("recoveryPasswordFields").style.display = "none";
   document.getElementById("recoveryPassword").value = "";
   document.getElementById("recoveryPasswordConfirm").value = "";
 }
 
-function showPasswordRecovery(session) {
+function showPasswordRecovery(session, errorCode = "") {
   passwordRecoveryPending = true;
+  if (errorCode) {
+    passwordRecoveryAuthorized = false;
+    passwordRecoveryErrorCode = errorCode;
+  }
   currentUser = passwordRecoveryAuthorized ? session?.user || currentUser : null;
   document.body.classList.add("login-scene");
   document.body.classList.remove("app-scene");
@@ -6186,14 +6213,56 @@ function showPasswordRecovery(session) {
   document.getElementById("loginForm").style.display = "none";
   document.getElementById("inviteSetup").style.display = "none";
   document.getElementById("passwordRecoveryForm").style.display = "block";
+  const isAuthorized = Boolean(currentUser && passwordRecoveryAuthorized);
+  document.getElementById("passwordRecoveryTitle").textContent = isAuthorized
+    ? "Neues Passwort festlegen"
+    : "Reset-Link nicht gültig";
+  document.getElementById("passwordRecoveryDescription").textContent = isAuthorized
+    ? "Wähle ein neues Passwort für dein Konto."
+    : "Der Link ist abgelaufen oder wurde bereits verwendet. Fordere einen neuen Link an.";
+  document.getElementById("recoveryResendForm").style.display = isAuthorized ? "none" : "block";
+  document.getElementById("recoveryPasswordFields").style.display = isAuthorized ? "block" : "none";
+  document.getElementById("recoveryEmail").value = currentUser?.email || emailInput.value.trim();
   document.getElementById("recoveryPassword").value = "";
   document.getElementById("recoveryPasswordConfirm").value = "";
-  loginError.textContent = currentUser
+  loginError.textContent = isAuthorized
     ? "Der Link ist bestätigt. Lege jetzt dein neues Passwort fest."
-    : "Der Passwort-Reset-Link ist ungültig oder abgelaufen. Fordere einen neuen Link an.";
-  loginError.classList.toggle("auth-success", Boolean(currentUser));
+    : errorCode === "otp_expired"
+      ? "Supabase meldet, dass dieser E-Mail-Link abgelaufen oder bereits verwendet wurde. Sende dir hier einen neuen Link."
+      : "Der Passwort-Reset-Link ist ungültig oder abgelaufen. Du kannst hier einen neuen anfordern.";
+  loginError.classList.toggle("auth-success", isAuthorized);
   if (window.location.search || window.location.hash) {
     window.history.replaceState({}, document.title, window.location.pathname);
+  }
+}
+
+async function resendRecoveryEmail() {
+  const emailInput = document.getElementById("recoveryEmail");
+  const email = emailInput.value.trim();
+  if (!emailInput.checkValidity() || !email) {
+    setAuthMessage("Bitte gib eine gültige E-Mail-Adresse ein.");
+    emailInput.focus();
+    return;
+  }
+
+  const button = document.getElementById("resendRecoveryEmailButton");
+  button.disabled = true;
+  setAuthMessage("Neuer Reset-Link wird gesendet …", false);
+  try {
+    const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.origin + window.location.pathname
+    });
+    if (error) {
+      console.error("Neuer Passwort-Reset-Link konnte nicht angefordert werden.", error);
+      setAuthMessage("Reset-Link konnte nicht gesendet werden: " + error.message);
+      return;
+    }
+    setAuthMessage("Falls für diese Adresse ein Konto existiert, wurde ein neuer Reset-Link versendet.", false);
+  } catch (error) {
+    console.error("Neuer Passwort-Reset-Link konnte nicht angefordert werden.", error);
+    setAuthMessage("Reset-Link momentan nicht erreichbar. Bitte Verbindung prüfen und erneut versuchen.");
+  } finally {
+    button.disabled = false;
   }
 }
 
@@ -6303,7 +6372,7 @@ async function initAuth() {
   if (error) {
     console.error(error);
     if (passwordRecoveryPending) {
-      showPasswordRecovery(null);
+      showPasswordRecovery(null, passwordRecoveryErrorCode);
       return;
     }
     showLogin();
@@ -6312,7 +6381,7 @@ async function initAuth() {
 
   if (passwordRecoveryPending) {
     if (document.getElementById("passwordRecoveryForm").style.display !== "block") {
-      showPasswordRecovery(passwordRecoveryAuthorized ? data.session : null);
+      showPasswordRecovery(passwordRecoveryAuthorized ? data.session : null, passwordRecoveryErrorCode);
     }
     return;
   }
