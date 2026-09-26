@@ -2383,7 +2383,8 @@ body.app-scene #menuBox {
 .dashboard-account-nav-group #sidebarAdminNavItem[hidden] { display:none !important; }
 .dashboard-account-nav-group #sidebarAdminNavItem:not([hidden]) { display:none !important; }
 .dashboard-account-nav-group:hover #sidebarAdminNavItem:not([hidden]),
-.dashboard-account-nav-group:focus-within #sidebarAdminNavItem:not([hidden]) { display:flex !important; }
+.dashboard-account-nav-group:focus-within #sidebarAdminNavItem:not([hidden]) { display:flex !important; pointer-events:auto; }
+.dashboard-account-nav-group #sidebarAdminNavItem:not([hidden]) { cursor:pointer; }
 .dashboard-sidebar-footer { margin-top:auto; border-top:1px solid rgba(118,145,199,.13); padding-top:14px; }
 .sidebar-motto { color:#6f83a3; font-family:var(--font-display); font-size:12px; line-height:1.55; text-align:center; padding:28px 12px 4px; }
 .dashboard-main {margin-left: var(--sidebar-width); transition: margin-left 360ms cubic-bezier(.22,.61,.36,1); padding:28px 30px 22px; min-width:0; }
@@ -6465,6 +6466,8 @@ async function showAppShell() {
   }
 
   const adminNavItem = document.getElementById("sidebarAdminNavItem");
+  // Das Flyout blendet Administration nur beim Hover über das Benutzerkonto ein.
+  // Für Nicht-Admins bleibt der Punkt vollständig verborgen.
   adminNavItem.hidden = !isCurrentUserAdmin();
   adminNavItem.style.removeProperty("display");
   showMenu(false);
@@ -6648,18 +6651,13 @@ async function completeInvitation() {
 }
 
 async function logout() {
-  showLogin();
   try {
-    const { error } = await supabaseClient.auth.signOut();
-    if (error) throw error;
+    await supabaseClient.auth.signOut();
   } catch (error) {
     console.error("Abmeldung fehlgeschlagen.", error);
-    const { data, error: sessionError } = await supabaseClient.auth.getSession();
-    if (!sessionError && data.session?.user) {
-      currentUser = data.session.user;
-      await showAppShell();
-    }
-    setAuthMessage("Abmeldung fehlgeschlagen. Bitte erneut versuchen.");
+  } finally {
+    // Nach dem Logout immer auf die Startseite weiterleiten – ohne Query oder Hash.
+    window.location.replace("https://keinsuchti.github.io/");
   }
 }
 
