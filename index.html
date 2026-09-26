@@ -3875,6 +3875,125 @@ body.app-scene .assignment-popup-box {
   }
 }
 
+@media (min-width: 901px) {
+  body.app-scene {
+    width:100%;
+    margin:0 !important;
+  }
+
+  body.app-scene #appShell {
+    width:100%;
+    max-width:none;
+    min-height:100vh;
+    margin:0;
+    padding:0;
+  }
+
+  body.app-scene #menuBox {
+    display:block;
+    width:100%;
+    min-height:100vh;
+    border:0;
+    border-radius:0;
+  }
+
+  body.app-scene .dashboard-shell {
+    display:block;
+  }
+
+  body.app-scene .dashboard-main {
+    width:auto;
+    min-height:100vh;
+  }
+
+  body.app-scene .dashboard-sidebar > #sidebarToggle {
+    position:relative !important;
+    inset:auto !important;
+    align-self:stretch !important;
+    justify-self:stretch !important;
+    display:flex !important;
+    align-items:center;
+    justify-content:flex-start;
+    box-sizing:border-box;
+    width:100% !important;
+    height:44px !important;
+    min-height:44px !important;
+    margin:0 0 6px !important;
+    padding:11px 12px !important;
+    gap:12px;
+    border:1px solid rgba(86,207,220,.20) !important;
+    border-radius:11px !important;
+    background:linear-gradient(90deg, rgba(28,203,195,.18), rgba(91,77,224,.28)) !important;
+    color:#71e5d8 !important;
+    transform:none !important;
+  }
+
+  body.app-scene .dashboard-sidebar > #sidebarToggle:hover,
+  body.app-scene .dashboard-sidebar > #sidebarToggle:focus-visible {
+    color:#f2f7ff !important;
+    background:linear-gradient(90deg, rgba(28,203,195,.30), rgba(91,77,224,.40)) !important;
+    border-color:rgba(86,207,220,.38) !important;
+    box-shadow:none !important;
+  }
+
+  body.app-scene .dashboard-sidebar > #sidebarToggle svg {
+    flex:0 0 20px;
+    margin:0;
+    transform:rotate(180deg);
+    transition:transform 360ms cubic-bezier(.22,.61,.36,1);
+  }
+
+  body.app-scene.sidebar-collapsed .dashboard-sidebar > #sidebarToggle {
+    align-self:center !important;
+    justify-self:center !important;
+    width:40px !important;
+    padding:0 !important;
+    justify-content:center;
+    gap:0;
+    background:linear-gradient(135deg, rgba(29,68,107,.96), rgba(71,62,139,.96)) !important;
+    border:1px solid rgba(118,145,199,.34) !important;
+  }
+
+  body.app-scene.sidebar-collapsed .dashboard-sidebar > #sidebarToggle svg {
+    margin:auto;
+    transform:none;
+  }
+
+  body.app-scene .dashboard-sidebar > .dashboard-nav {
+    margin-top:0 !important;
+  }
+
+  body.app-scene .mobile-menu-toggle {
+    display:none !important;
+  }
+
+  body.app-scene .app-panel {
+    width:auto;
+    max-width:none;
+    min-height:calc(100vh - 36px);
+    margin:18px 0 18px var(--sidebar-width);
+    padding:28px clamp(22px, 3vw, 48px);
+    border-radius:18px 0 0 18px;
+    transition:margin-left 360ms cubic-bezier(.22,.61,.36,1);
+  }
+
+  body.app-scene.sidebar-collapsed .app-panel {
+    margin-left:var(--sidebar-collapsed-width);
+  }
+
+  body.app-scene #customListApp {
+    width:auto;
+    max-width:none;
+    margin:18px 0 18px var(--sidebar-width);
+    padding:28px clamp(22px, 3vw, 48px);
+    border-radius:18px 0 0 18px;
+  }
+
+  body.app-scene.sidebar-collapsed #customListApp {
+    margin-left:var(--sidebar-collapsed-width);
+  }
+}
+
 </style>
 
 <!-- Cinematic background -->
@@ -5570,6 +5689,7 @@ function showPanelForView(view) {
     menuBox.style.display = "block";
   }
   document.body.classList.toggle("dashboard-home-view", currentView === "menu");
+  syncDesktopSidebarLayout();
 
   updateBackButtonVisibility();
   updateLogoutVisibility();
@@ -5650,6 +5770,33 @@ window.addEventListener("popstate", async event => {
 function showMenu(pushHistory = true) {
   setTimeout(applyOverviewImages, 0);
   return navigateToView("menu", pushHistory ? "push" : "replace");
+}
+
+function syncDesktopSidebarLayout() {
+  if (!document.body.classList.contains("app-scene")
+    || typeof isMobileSidebar !== "function"
+    || typeof setMobileSidebarPortal !== "function"
+    || isMobileSidebar()) return;
+
+  const dashboardMain = menuBox.querySelector(".dashboard-main");
+  document.body.classList.remove("desktop-sidebar-open");
+  document.body.classList.remove("sidebar-collapsed");
+
+  if (currentView === "menu") {
+    setMobileSidebarPortal(true);
+    menuBox.style.display = "block";
+    if (dashboardMain) dashboardMain.style.removeProperty("display");
+  } else {
+    setMobileSidebarPortal(true);
+    menuBox.style.display = "none";
+  }
+
+  const toggle = document.getElementById("sidebarToggle");
+  if (toggle) {
+    toggle.setAttribute("aria-expanded", "true");
+    toggle.setAttribute("aria-label", "Sidebar einklappen");
+    toggle.title = "Sidebar einklappen";
+  }
 }
 
 function showSaufiMenu() {
@@ -8260,26 +8407,6 @@ function toggleSidebar() {
     }
     return;
   }
-  if (currentView !== "menu") {
-    const open=document.body.classList.toggle("desktop-sidebar-open");
-    if (open) setMobileSidebarPortal(true);
-    else setMobileSidebarPortal(false);
-    const menuButton=document.getElementById('mobileMenuToggle');
-    const backdrop=document.getElementById('mobileSidebarBackdrop');
-    if (menuButton) {
-      menuButton.setAttribute('aria-expanded',String(open));
-      menuButton.setAttribute('aria-label',open?'Navigation schließen':'Navigation öffnen');
-      menuButton.title=open?'Navigation schließen':'Navigation öffnen';
-    }
-    const sidebarToggle=document.getElementById('sidebarToggle');
-    if (sidebarToggle) {
-      sidebarToggle.setAttribute('aria-expanded',String(open));
-      sidebarToggle.setAttribute('aria-label',open?'Navigation schließen':'Navigation öffnen');
-      sidebarToggle.title=open?'Navigation schließen':'Navigation öffnen';
-    }
-    if (backdrop) backdrop.setAttribute('aria-hidden',String(!open));
-    return;
-  }
   const isCollapsed=document.body.classList.toggle('sidebar-collapsed');
   const toggleButton=document.getElementById('sidebarToggle');
   if (toggleButton) { toggleButton.setAttribute('aria-expanded',String(!isCollapsed)); toggleButton.setAttribute('aria-label',isCollapsed?'Sidebar ausklappen':'Sidebar einklappen'); toggleButton.title=isCollapsed?'Sidebar ausklappen':'Sidebar einklappen'; }
@@ -8325,6 +8452,7 @@ window.addEventListener("resize", () => {
       toggle.title=expanded?"Navigation einklappen":"Navigation ausklappen";
     }
     if (backdrop) backdrop.setAttribute("aria-hidden","true");
+    syncDesktopSidebarLayout();
   } else if (document.body.classList.contains("mobile-sidebar-open")) {
     updateOpenMobileSidebarPosition();
   }
@@ -8357,6 +8485,7 @@ window.addEventListener("resize", () => {
     if (event.key === "Escape") requestAnimationFrame(syncMobileDrawer);
   });
   window.addEventListener("resize", syncMobileDrawer);
+  window.addEventListener("load", syncDesktopSidebarLayout);
   window.addEventListener("load", function () { setTimeout(syncMobileDrawer, 80); });
 })();
 </script>
