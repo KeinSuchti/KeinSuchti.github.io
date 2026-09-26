@@ -3653,6 +3653,228 @@ body.app-scene .sidebar-logout-button .nav-icon svg {
   }
 }
 
+/* Responsive layout refinements for the full app and login experience. */
+body.app-scene #appShell,
+body.app-scene #customListApp {
+  width:100%;
+  min-width:0;
+  max-width:1450px;
+  margin-inline:auto;
+}
+
+body.app-scene #appShell {
+  padding-inline:clamp(10px, 2vw, 24px);
+}
+
+body.app-scene .dashboard-shell,
+body.app-scene .dashboard-main,
+body.app-scene .dashboard-grid,
+body.app-scene .dashboard-card,
+body.app-scene .app-panel,
+body.app-scene .appointment-layout,
+body.app-scene .appointment-poll-card,
+body.app-scene .custom-list-heading {
+  min-width:0;
+}
+
+body.app-scene .app-panel {
+  width:100%;
+  overflow:visible;
+}
+
+body.app-scene .app-panel h2,
+body.app-scene .app-panel h3,
+body.app-scene .app-panel p,
+body.app-scene .dashboard-card h3,
+body.app-scene .dashboard-card p,
+body.app-scene .appointment-banner-copy,
+body.app-scene .availability-entry-name {
+  overflow-wrap:anywhere;
+}
+
+body.app-scene .card-item-header,
+body.app-scene .movie-item-top,
+body.app-scene .dashboard-topbar,
+body.app-scene .custom-list-panel .custom-list-heading {
+  min-width:0;
+}
+
+body.app-scene .card-item-actions,
+body.app-scene .movie-actions,
+body.app-scene .dashboard-topbar,
+body.app-scene .custom-list-heading-actions {
+  flex-wrap:wrap;
+}
+
+body.app-scene .popup-overlay,
+body.app-scene .edit-overlay {
+  box-sizing:border-box;
+  padding:clamp(10px, 3vw, 24px);
+}
+
+body.app-scene .popup-box,
+body.app-scene .edit-box,
+body.app-scene .assignment-popup-box {
+  box-sizing:border-box;
+  width:min(100%, 780px);
+  max-height:calc(100vh - 20px);
+  max-height:calc(100dvh - 20px);
+  overflow-y:auto;
+}
+
+@media (max-width: 1199px) {
+  body.app-scene #appShell {
+    padding-inline:16px;
+  }
+
+  body.app-scene .dashboard-main {
+    padding-inline:clamp(16px, 2.5vw, 26px);
+  }
+}
+
+@media (max-width: 768px) {
+  body.app-scene .dashboard-topbar {
+    align-items:flex-start;
+    flex-direction:column;
+    gap:8px;
+  }
+
+  body.app-scene .dashboard-topbar h2 {
+    font-size:clamp(21px, 4vw, 27px);
+    overflow-wrap:anywhere;
+  }
+
+  body.app-scene .dashboard-hero {
+    min-height:clamp(180px, 32vw, 220px);
+  }
+
+  body.app-scene .dashboard-hero h3 {
+    font-size:clamp(22px, 4.5vw, 28px);
+    overflow-wrap:anywhere;
+  }
+
+  body.app-scene .appointment-layout {
+    grid-template-columns:minmax(0, 1fr);
+  }
+
+  body.app-scene .appointment-form-card,
+  body.app-scene .calendar-card,
+  body.app-scene .appointment-preview-card,
+  body.app-scene .appointment-poll-card {
+    padding:clamp(12px, 2.5vw, 18px);
+  }
+
+  body.login-scene .auth-options {
+    align-items:flex-start;
+    flex-wrap:wrap;
+  }
+}
+
+@media (max-width: 576px) {
+  body.app-scene #appShell {
+    padding:8px 8px 20px;
+  }
+
+  body.app-scene .dashboard-main {
+    padding:14px 10px 18px;
+  }
+
+  body.app-scene .dashboard-grid {
+    grid-template-columns:minmax(0, 1fr);
+  }
+
+  body.app-scene .app-panel {
+    padding:15px 12px;
+  }
+
+  body.app-scene .list-panel-heading {
+    align-items:flex-start;
+    flex-wrap:wrap;
+  }
+
+  body.app-scene .list-panel-heading > div {
+    min-width:0;
+    flex:1 1 100%;
+  }
+
+  body.app-scene .card-controls,
+  body.app-scene .games-check-controls,
+  body.app-scene .poll-form-row {
+    grid-template-columns:minmax(0, 1fr);
+  }
+
+  body.app-scene .card-controls select,
+  body.app-scene .games-check-controls select {
+    width:100%;
+    min-width:0;
+  }
+
+  body.app-scene .appointment-calendar {
+    gap:3px;
+  }
+
+  body.app-scene .calendar-day {
+    min-width:0;
+    padding-inline:1px;
+    font-size:11px;
+  }
+
+  body.app-scene .calendar-weekdays {
+    gap:3px;
+    font-size:9px;
+  }
+
+  body.app-scene .availability-entry {
+    align-items:stretch;
+    flex-direction:column;
+  }
+
+  body.app-scene .availability-entry-dates {
+    justify-content:flex-start;
+    text-align:left;
+  }
+
+  body.app-scene .movie-add-section {
+    grid-template-columns:minmax(0, 1fr) auto;
+  }
+
+  body.app-scene .movie-add-section input {
+    min-width:0;
+  }
+
+  body.login-scene #loginBox {
+    width:calc(100% - 20px);
+    padding:24px 18px 20px !important;
+  }
+
+  body.login-scene .auth-brand {
+    gap:10px;
+  }
+
+  body.login-scene .auth-brand-name {
+    font-size:clamp(21px, 6vw, 26px);
+  }
+}
+
+@media (max-width: 380px) {
+  body.app-scene .app-panel {
+    padding-inline:10px;
+  }
+
+  body.app-scene .calendar-toolbar {
+    grid-template-columns:34px minmax(0, 1fr) 34px;
+    gap:5px;
+  }
+
+  body.app-scene .calendar-toolbar strong {
+    font-size:13px;
+  }
+
+  body.app-scene .dashboard-card-body {
+    grid-template-columns:28px minmax(0, 1fr) 22px;
+  }
+}
+
 </style>
 
 <!-- Cinematic background -->
