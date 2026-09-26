@@ -42,10 +42,23 @@ ab; der eingeladene Nutzer trägt auf der Registrierungsseite E-Mail-Adresse, Nu
 ein. Der Link wird serverseitig einmalig eingelöst; in der Datenbank wird nur sein Hash gespeichert.
 Setze in Supabase **Authentication > URL Configuration > Site URL** auf
 `https://keinsuchti.github.io/` und erlaube dieselbe Adresse als Redirect-URL für Passwort-Resets.
-Der Reset-Link öffnet auf der Webseite ein Formular zum Festlegen eines neuen Passworts; nach dem
-Speichern kann sich der Nutzer mit dem neuen Passwort anmelden. Ist der E-Mail-Link bereits
-abgelaufen oder verwendet, zeigt die Webseite den Fehler an und ermöglicht direkt das Anfordern
-eines neuen Reset-Links.
+Damit automatische Link-Prüfer in E-Mail-Systemen den einmaligen Reset-Link nicht vor dem Nutzer
+verbrauchen, ändere unter **Authentication > Email Templates > Reset Password** den Link so, dass
+er den Token-Hash an die Webseite übergibt, statt `{{ .ConfirmationURL }}` zu verwenden:
+
+```html
+<h2>Passwort zurücksetzen</h2>
+<p>Öffne die Seite und bestätige den Reset erst nach dem Laden:</p>
+<p><a href="{{ .RedirectTo }}#token_hash={{ .TokenHash }}&amp;type=recovery">Passwort zurücksetzen</a></p>
+```
+
+Die Webseite fragt erst nach einem bewussten Klick auf „Reset-Link bestätigen“ bei Supabase nach
+dem Token. Er steht im URL-Fragment und wird daher nicht an den Webseitenserver übertragen. Der
+Token wird nicht automatisch eingelöst, wenn ein E-Mail-Scanner den Link nur öffnet.
+Nach der Bestätigung kann ein neues Passwort gesetzt werden. Falls ein Reset-Link nicht versendet
+wird, zeigt die Webseite nun Supabase' konkrete Fehlermeldung und, sofern verfügbar, den Fehlercode;
+prüfe zusätzlich **Authentication > Logs**, die SMTP-/E-Mail-Provider-Protokolle, Rate-Limits und
+die Redirect-Allowlist.
 
 Das SQL-Script legt die Rollen `user` und `admin` an, schützt Profile per Row Level Security und
 erstellt den Admin-Bereich für Rollenverwaltung. Normale Nutzer können ihr eigenes Profil verwalten;
