@@ -4160,19 +4160,6 @@ body.color-vision-mode .dashboard-sidebar {
   background: #0b1d2c !important;
 }
 
-body.color-vision-mode .dashboard-sidebar > .dashboard-nav {
-  flex: 1 1 auto !important;
-  min-height: 0 !important;
-  overflow-y: auto !important;
-  overflow-x: hidden !important;
-}
-
-body.color-vision-mode .dashboard-sidebar > .sidebar-logout-button {
-  flex: 0 0 50px !important;
-  margin-top: auto !important;
-  position: static !important;
-}
-
 body.color-vision-mode .dashboard-card,
 body.color-vision-mode .movie-item,
 body.color-vision-mode .card-item,
@@ -4277,12 +4264,18 @@ body.color-vision-mode :is(
   color: #fff !important;
 }
 
-body.color-vision-mode .dashboard-nav-item,
-body.color-vision-mode .sidebar-logout-button {
+body.color-vision-mode .dashboard-nav-item {
   border-color: transparent !important;
   background: transparent !important;
   color: #d5e0e8 !important;
   box-shadow: none !important;
+}
+
+body.color-vision-mode .sidebar-logout-button {
+  border: 1px solid #56b4e9 !important;
+  background: #164e6a !important;
+  color: #fff !important;
+  box-shadow: 0 0 0 2px rgba(86, 180, 233, .18) !important;
 }
 
 body.color-vision-mode .dashboard-nav-item:hover,
@@ -4300,8 +4293,13 @@ body.color-vision-mode .color-vision-toggle[aria-pressed="true"] .nav-icon {
 
 body.color-vision-mode .sidebar-logout-button:hover,
 body.color-vision-mode .sidebar-logout-button:focus-visible {
-  border-color: #56b4e9 !important;
-  background: #17364d !important;
+  border-color: #f0b323 !important;
+  background: #205f7d !important;
+  box-shadow: 0 0 0 3px rgba(240, 179, 35, .24) !important;
+}
+
+body.color-vision-mode .sidebar-logout-button .nav-icon {
+  color: #f0b323 !important;
 }
 
 body.color-vision-mode .dashboard-sidebar > #sidebarToggle,
