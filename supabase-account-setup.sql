@@ -204,6 +204,49 @@ $$;
 revoke all on function public.set_profile_role(uuid, text) from public, anon;
 grant execute on function public.set_profile_role(uuid, text) to authenticated;
 
+create or replace function public.delete_own_account()
+returns void
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  current_user_id uuid := (select auth.uid());
+  current_user_role text;
+  current_admin_count integer;
+begin
+  if current_user_id is null then
+    raise exception 'Authentication required' using errcode = '42501';
+  end if;
+
+  perform pg_advisory_xact_lock(hashtext('public.profiles.admin-role'));
+
+  select role into current_user_role
+  from public.profiles
+  where id = current_user_id;
+
+  if current_user_role = 'admin' then
+    select count(*) into current_admin_count
+    from public.profiles
+    where role = 'admin';
+
+    if current_admin_count <= 1 then
+      raise exception 'The last administrator cannot delete their account' using errcode = '23514';
+    end if;
+  end if;
+
+  delete from auth.users
+  where id = current_user_id;
+
+  if not found then
+    raise exception 'Account not found' using errcode = 'P0002';
+  end if;
+end;
+$$;
+
+revoke all on function public.delete_own_account() from public, anon;
+grant execute on function public.delete_own_account() to authenticated;
+
 create table if not exists public.registration_invites (
   id uuid primary key default gen_random_uuid(),
   token_hash text not null unique

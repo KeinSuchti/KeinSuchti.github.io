@@ -5,7 +5,8 @@
 Für Registrierungslinks, Nutzernamen-Login, Kontoverwaltung und Rollenverwaltung zuerst
 [`supabase-account-setup.sql`](supabase-account-setup.sql) vollständig im Supabase SQL Editor ausführen.
 Falls das Kontoschema bereits eingerichtet wurde, führe das aktualisierte SQL-Script erneut aus,
-damit die Tabelle und Funktion für einmalige Registrierungslinks angelegt werden.
+damit die Tabelle und Funktionen für einmalige Registrierungslinks und das Löschen des eigenen
+Kontos angelegt werden.
 Wenn beim Erstellen eines Registrierungslinks eine Datenbankfehlermeldung erscheint, prüfe, ob
 dieses aktualisierte Script erfolgreich ausgeführt wurde; der Admin-Link wird in
 `public.registration_invites` gespeichert.
@@ -42,4 +43,5 @@ erstellt den Admin-Bereich für Rollenverwaltung. Normale Nutzer können ihr eig
 Admins können Konten einsehen und Rollen anderer Konten ändern. Ein bereits vorhandener, bestätigter
 Account mit der Adresse `1keinsuchti1@gmail.com` wird beim Ausführen zum Admin. Falls der Account
 erst danach per Admin-Einladung erstellt wird, das Script nach dem Erstellen des Kontos erneut
-ausführen.
+ausführen. Nutzer können ihr eigenes Konto im Benutzerkonto löschen; das SQL verhindert dabei, dass
+der letzte Admin sein Konto entfernt.
