@@ -4085,6 +4085,83 @@ body.app-scene .assignment-popup-box {
   }
 }
 
+body.color-vision-mode {
+  --accent: #56b4e9;
+  --accent-hover: #82c9ee;
+  --accent-ink: #071722;
+  --accent-2: #e69f00;
+  --accent-2-hover: #f4b92e;
+  --danger: #d55e00;
+  --danger-hover: #ef7e2d;
+  --info: #56b4e9;
+  --info-hover: #82c9ee;
+  --note: #e69f00;
+  --note-hover: #f4b92e;
+  --star: #e69f00;
+}
+
+body.color-vision-mode .dashboard-nav-item:hover,
+body.color-vision-mode .dashboard-nav-item.active,
+body.color-vision-mode .color-vision-toggle[aria-pressed="true"] {
+  border-color: rgba(86, 180, 233, .72) !important;
+  background: linear-gradient(90deg, rgba(86, 180, 233, .24), rgba(230, 159, 0, .16)) !important;
+  box-shadow: inset 4px 0 #e69f00 !important;
+}
+
+body.color-vision-mode .dashboard-nav-item.active .nav-icon,
+body.color-vision-mode .color-vision-toggle[aria-pressed="true"] .nav-icon {
+  color: #e69f00 !important;
+}
+
+body.color-vision-mode .dashboard-sidebar > #sidebarToggle,
+body.color-vision-mode.mobile-sidebar-open .dashboard-sidebar > #sidebarToggle {
+  border-color: rgba(86, 180, 233, .72) !important;
+  background: linear-gradient(90deg, rgba(86, 180, 233, .24), rgba(230, 159, 0, .16)) !important;
+  color: #82c9ee !important;
+}
+
+body.color-vision-mode .calendar-day.selected:not(.availability-common) {
+  border: 2px solid #56b4e9;
+  background: #153d56;
+  box-shadow: inset 0 0 0 2px #0b1220;
+  color: #fff;
+  font-weight: 800;
+}
+
+body.color-vision-mode .calendar-day.availability-common {
+  border: 2px dashed #e69f00;
+  background: linear-gradient(145deg, rgba(133, 83, 0, .88), rgba(91, 57, 0, .88));
+  color: #fff;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .18);
+}
+
+body.color-vision-mode .calendar-day.availability-common.selected {
+  border: 2px dashed #e69f00;
+  background: #153d56;
+  box-shadow: inset 0 0 0 2px #56b4e9;
+}
+
+body.color-vision-mode .calendar-day-count {
+  color: #fff;
+}
+
+body.color-vision-mode .availability-common-dot {
+  border-radius: 2px;
+  background: #e69f00;
+  box-shadow: none;
+}
+
+body.color-vision-mode .availability-entry-date.is-common {
+  border: 2px dashed #e69f00;
+  background: rgba(133, 83, 0, .72);
+  color: #fff;
+}
+
+body.color-vision-mode .beer-grade-slider::-webkit-slider-runnable-track,
+body.color-vision-mode .beer-grade-slider::-moz-range-track {
+  background: linear-gradient(90deg, #56b4e9 0%, #d8e6ed 50%, #e69f00 100%);
+}
+
 </style>
 
 <!-- Cinematic background -->
@@ -4178,6 +4255,7 @@ body.app-scene .assignment-popup-box {
           <button class="dashboard-nav-item" type="button" onclick="showGamesApp()" title="Spieleabend"><span class="nav-icon" aria-hidden="true">⌘</span><span class="nav-label">Spieleabend</span></button>
           <button class="dashboard-nav-item" type="button" onclick="showYugiohApp()" title="Yu-Gi-Oh! Decks"><span class="nav-icon" aria-hidden="true">◈</span><span class="nav-label">Yu-Gi-Oh! Decks</span></button>
           <button class="dashboard-nav-item" type="button" onclick="showAppointmentsApp()" title="Termine abstimmen"><span class="nav-icon" aria-hidden="true">◷</span><span class="nav-label">Termine</span></button>
+          <button id="colorVisionToggle" class="dashboard-nav-item color-vision-toggle" type="button" onclick="toggleColorVisionMode()" aria-label="Farbenfreundlicher Modus" aria-pressed="false" title="Farbenfreundlicher Modus"><span class="nav-icon" aria-hidden="true">◐</span><span class="nav-label">Farbenfreundlicher Modus</span></button>
         </nav>
         <button id="sidebarLogout" class="sidebar-logout-button" type="button" onclick="logout()" aria-label="Logout" title="Logout"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M10 17l5-5-5-5"></path><path d="M15 12H3"></path><path d="M12 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6"></path></svg></span></button>
 
@@ -4353,7 +4431,7 @@ body.app-scene .assignment-popup-box {
         <div class="calendar-weekdays"><span>Mo</span><span>Di</span><span>Mi</span><span>Do</span><span>Fr</span><span>Sa</span><span>So</span></div>
         <div id="pollCalendar" class="appointment-calendar"></div>
         <div id="pollSelectedDates" class="poll-selected-dates" aria-live="polite"></div>
-        <div id="availabilityCommonLegend" class="availability-common-legend" hidden><span class="availability-common-dot"></span><span>Grün markiert: mindestens zwei Personen können an diesem Tag.</span></div>
+        <div id="availabilityCommonLegend" class="availability-common-legend" hidden><span class="availability-common-dot"></span><span>Markiert: mindestens zwei Personen können an diesem Tag.</span></div>
         <button class="poll-save-button" type="button" onclick="saveAppointmentPoll()">✅ Meine Verfügbarkeit speichern</button>
         <p id="pollStatus" class="appointment-status" role="status"></p>
         <div class="availability-summary"><div class="dashboard-kicker">Bisher eingetragen</div><div id="availabilityEntries" class="availability-entries"><span class="panel-subtitle">Noch keine Einträge vorhanden.</span></div></div>
@@ -4753,6 +4831,41 @@ function setStatus(message, isError = false) {
   globalStatus.textContent = message || "";
   globalStatus.className = isError ? "status error" : "status";
 }
+
+const colorVisionModeStorageKey = "wfg-color-vision-mode";
+
+function setColorVisionMode(enabled) {
+  document.body.classList.toggle("color-vision-mode", enabled);
+  const toggle = document.getElementById("colorVisionToggle");
+  if (toggle) {
+    toggle.setAttribute("aria-pressed", String(enabled));
+    toggle.title = enabled
+      ? "Farbenfreundlichen Modus ausschalten"
+      : "Farbenfreundlichen Modus einschalten";
+  }
+}
+
+function initializeColorVisionMode() {
+  try {
+    setColorVisionMode(localStorage.getItem(colorVisionModeStorageKey) === "enabled");
+  } catch (error) {
+    console.error("Einstellung für den farbenfreundlichen Modus konnte nicht geladen werden.", error);
+    setColorVisionMode(false);
+  }
+}
+
+function toggleColorVisionMode() {
+  const enabled = !document.body.classList.contains("color-vision-mode");
+  setColorVisionMode(enabled);
+  try {
+    localStorage.setItem(colorVisionModeStorageKey, enabled ? "enabled" : "disabled");
+  } catch (error) {
+    console.error("Einstellung für den farbenfreundlichen Modus konnte nicht gespeichert werden.", error);
+    setStatus("Der Modus ist aktiv, konnte aber nicht dauerhaft gespeichert werden.", true);
+  }
+}
+
+initializeColorVisionMode();
 
 function showSupabaseError(title, error) {
   console.error(title, error);
