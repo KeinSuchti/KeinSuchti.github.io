@@ -2940,6 +2940,8 @@ body.app-scene .sidebar-logout-button .nav-icon svg {
 .account-field span { color:#8fa5c1; font-size:11px; }
 .account-field strong { color:#eef5ff; font-size:14px; overflow-wrap:anywhere; }
 .account-card .edit-field { display:grid; gap:7px; margin:0; color:#c7d4e8; font-size:12px; font-weight:700; }
+.account-password-section { display:grid; gap:12px; padding-top:16px; border-top:1px solid rgba(101,141,207,.22); }
+.account-password-section h3, .account-password-section .panel-subtitle { margin:0; }
 .account-password-reset { justify-self:start; }
 .account-danger-zone { display:grid; gap:10px; margin-top:8px; padding-top:16px; border-top:1px solid rgba(255,115,115,.28); }
 .account-danger-zone h3 { margin:0; color:#ffaaa4; font-size:15px; }
@@ -4845,6 +4847,15 @@ body.color-vision-mode .beer-grade-slider::-moz-range-thumb {
         <div class="account-field"><span>Rolle</span><strong id="accountRole"></strong></div>
         <label class="edit-field"><span>Nutzername</span><input id="accountUsername" type="text" maxlength="24" autocomplete="username"></label>
         <button type="button" id="saveAccountButton" onclick="saveAccountProfile()">Profil speichern</button>
+        <div class="account-password-section">
+          <h3>Passwort ändern</h3>
+          <p class="panel-subtitle">Bestätige zuerst dein aktuelles Passwort und gib dann dein neues Passwort zweimal ein.</p>
+          <label class="edit-field"><span>Aktuelles Passwort</span><input id="accountCurrentPassword" type="password" autocomplete="current-password" aria-label="Aktuelles Passwort"></label>
+          <label class="edit-field"><span>Neues Passwort</span><input id="accountNewPassword" type="password" autocomplete="new-password" minlength="8" maxlength="256" aria-label="Neues Passwort"></label>
+          <label class="edit-field"><span>Neues Passwort wiederholen</span><input id="accountConfirmPassword" type="password" autocomplete="new-password" minlength="8" maxlength="256" aria-label="Neues Passwort wiederholen"></label>
+          <button type="button" id="changeAccountPasswordButton" onclick="changeAccountPassword()">Passwort speichern</button>
+          <p id="accountPasswordStatus" class="appointment-status" role="status" aria-live="polite"></p>
+        </div>
         <button type="button" class="auth-link account-password-reset" onclick="requestAccountPasswordReset()">Passwort-Reset per E-Mail anfordern</button>
         <p id="accountStatus" class="appointment-status" role="status" aria-live="polite"></p>
         <div id="accountDangerZone" class="account-danger-zone">
@@ -6121,6 +6132,31 @@ function setAuthMessage(message, isError = true) {
   loginError.classList.toggle("auth-success", !isError);
 }
 
+function describeAuthError(error, fallback) {
+  if (typeof error === "string" && error.trim()) return error.trim();
+  if (error && typeof error === "object") {
+    const details = [
+      error.message,
+      error.details,
+      error.hint,
+      error.code ? `Code: ${error.code}` : ""
+    ].filter(value => typeof value === "string" && value.trim());
+    if (details.length) return [...new Set(details)].join(" ");
+  }
+  return fallback;
+}
+
+function describePasswordResetError(error, fallback) {
+  const details = describeAuthError(error, fallback);
+  if (/email rate limit exceeded/i.test(details)) {
+    return "Supabase hat das Versandlimit für E-Mails erreicht. Mit dem integrierten E-Mail-Dienst sind höchstens 2 E-Mails pro Stunde für das gesamte Projekt möglich. Warte, bis das Limit zurückgesetzt ist, oder richte einen eigenen SMTP-Anbieter ein und prüfe Authentication > Rate Limits.";
+  }
+  if (/after \d+ seconds|only request this after|rate limit/i.test(details)) {
+    return `Supabase begrenzt Reset-Anfragen. Bitte warte, bevor du es erneut versuchst. Details: ${details}`;
+  }
+  return details;
+}
+
 function togglePasswordVisibility() {
   const input = document.getElementById("password");
   const button = document.querySelector("#loginForm .password-toggle");
@@ -6146,14 +6182,16 @@ async function resetPassword() {
       redirectTo: window.location.origin + window.location.pathname
     });
     if (error) {
-      console.error("Passwort-Reset konnte nicht angefordert werden.", error);
-      loginError.textContent = "Passwort-Reset fehlgeschlagen: " + error.message;
+      console.error("Reset-Anforderung in der Anmeldemaske fehlgeschlagen.", error);
+      loginError.textContent = "Passwort-Reset fehlgeschlagen: "
+        + describePasswordResetError(error, "Unbekannter Supabase-Fehler.");
       return;
     }
     setAuthMessage("Falls für diese Adresse ein Konto existiert, wurde ein Link zum Zurücksetzen des Passworts versendet.", false);
   } catch (error) {
-    console.error("Passwort-Reset konnte nicht angefordert werden.", error);
-    loginError.textContent = "Passwort-Reset momentan nicht erreichbar. Bitte Verbindung prüfen und erneut versuchen.";
+    console.error("Reset-Anforderung in der Anmeldemaske fehlgeschlagen.", error);
+    loginError.textContent = "Passwort-Reset fehlgeschlagen: "
+      + describePasswordResetError(error, "Unbekannter Netzwerk- oder Supabase-Fehler.");
   }
 }
 
@@ -6161,6 +6199,20 @@ async function resetPassword() {
 
 function showLogin() {
   closeMobileSidebar();
+  const mobileMenuToggle = document.getElementById("mobileMenuToggle");
+  if (mobileMenuToggle) {
+    mobileMenuToggle.disabled = true;
+    mobileMenuToggle.hidden = true;
+    mobileMenuToggle.style.display = "none";
+    mobileMenuToggle.setAttribute("aria-expanded", "false");
+  }
+  const mobileSidebarBackdrop = document.getElementById("mobileSidebarBackdrop");
+  if (mobileSidebarBackdrop) {
+    mobileSidebarBackdrop.hidden = true;
+    mobileSidebarBackdrop.style.display = "none";
+    mobileSidebarBackdrop.setAttribute("aria-hidden", "true");
+  }
+  menuBox.style.display = "none";
   passwordRecoveryPending = false;
   passwordRecoveryAuthorized = false;
   passwordRecoveryErrorCode = "";
@@ -6303,13 +6355,15 @@ async function resendRecoveryEmail() {
     });
     if (error) {
       console.error("Neuer Passwort-Reset-Link konnte nicht angefordert werden.", error);
-      setAuthMessage("Reset-Link konnte nicht gesendet werden: " + error.message);
+      setAuthMessage("Reset-Link konnte nicht gesendet werden: "
+        + describePasswordResetError(error, "Unbekannter Supabase-Fehler."));
       return;
     }
     setAuthMessage("Falls für diese Adresse ein Konto existiert, wurde ein neuer Reset-Link versendet.", false);
   } catch (error) {
     console.error("Neuer Passwort-Reset-Link konnte nicht angefordert werden.", error);
-    setAuthMessage("Reset-Link momentan nicht erreichbar. Bitte Verbindung prüfen und erneut versuchen.");
+    setAuthMessage("Reset-Link konnte nicht gesendet werden: "
+      + describePasswordResetError(error, "Unbekannter Netzwerk- oder Supabase-Fehler."));
   } finally {
     button.disabled = false;
   }
@@ -6378,6 +6432,17 @@ async function showAppShell() {
   document.body.classList.remove("login-scene");
   document.body.classList.add("app-scene");
   loginBox.style.display = "none";
+  const mobileMenuToggle = document.getElementById("mobileMenuToggle");
+  if (mobileMenuToggle) {
+    mobileMenuToggle.disabled = false;
+    mobileMenuToggle.hidden = false;
+    mobileMenuToggle.style.removeProperty("display");
+  }
+  const mobileSidebarBackdrop = document.getElementById("mobileSidebarBackdrop");
+  if (mobileSidebarBackdrop) {
+    mobileSidebarBackdrop.hidden = false;
+    mobileSidebarBackdrop.style.removeProperty("display");
+  }
   appShell.style.display = "block";
 
   if (currentUser && currentUser.email) {
@@ -6570,7 +6635,6 @@ async function completeInvitation() {
 }
 
 async function logout() {
-  closeMobileSidebar();
   showLogin();
   try {
     const { error } = await supabaseClient.auth.signOut();
@@ -6698,7 +6762,18 @@ function loadAccountPanel() {
   document.getElementById("accountRole").textContent = currentProfile.role === "admin" ? "Administrator" : "Nutzer";
   document.getElementById("accountUsername").value = currentProfile.username || "";
   document.getElementById("accountDangerZone").style.display = currentProfile.is_protected ? "none" : "";
+  document.getElementById("accountCurrentPassword").value = "";
+  document.getElementById("accountNewPassword").value = "";
+  document.getElementById("accountConfirmPassword").value = "";
+  setAccountPasswordStatus("");
   setAccountStatus("");
+}
+
+function setAccountPasswordStatus(message, isError = false) {
+  const status = document.getElementById("accountPasswordStatus");
+  if (!status) return;
+  status.textContent = message;
+  status.classList.toggle("status-error", isError);
 }
 
 async function saveAccountProfile() {
@@ -6738,6 +6813,89 @@ async function saveAccountProfile() {
   }
 }
 
+async function changeAccountPassword() {
+  if (!currentUser?.id || !currentUser.email) {
+    setAccountPasswordStatus("Bitte melde dich erneut an und versuche es noch einmal.", true);
+    return;
+  }
+
+  const currentPasswordInput = document.getElementById("accountCurrentPassword");
+  const newPasswordInput = document.getElementById("accountNewPassword");
+  const confirmPasswordInput = document.getElementById("accountConfirmPassword");
+  const currentPassword = currentPasswordInput.value;
+  const newPassword = newPasswordInput.value;
+
+  if (!currentPassword) {
+    setAccountPasswordStatus("Bitte gib dein aktuelles Passwort ein.", true);
+    currentPasswordInput.focus();
+    return;
+  }
+  if (newPassword.length < 8 || newPassword.length > 256) {
+    setAccountPasswordStatus("Das neue Passwort muss 8 bis 256 Zeichen lang sein.", true);
+    newPasswordInput.focus();
+    return;
+  }
+  if (newPassword !== confirmPasswordInput.value) {
+    setAccountPasswordStatus("Die neuen Passwörter stimmen nicht überein.", true);
+    confirmPasswordInput.focus();
+    return;
+  }
+
+  const userId = currentUser.id;
+  const email = currentUser.email;
+  const button = document.getElementById("changeAccountPasswordButton");
+  button.disabled = true;
+  setAccountPasswordStatus("Aktuelles Passwort wird überprüft …");
+  try {
+    const { data: verification, error: verificationError } = await supabaseClient.auth.signInWithPassword({
+      email,
+      password: currentPassword
+    });
+    if (verificationError) {
+      console.error("Aktuelles Kontopasswort konnte nicht bestätigt werden.", verificationError);
+      currentPasswordInput.value = "";
+      const message = verificationError.code === "invalid_credentials"
+        ? "Das aktuelle Passwort ist nicht korrekt."
+        : describeAuthError(verificationError, "Das aktuelle Passwort konnte nicht überprüft werden.");
+      setAccountPasswordStatus(message, true);
+      currentPasswordInput.focus();
+      return;
+    }
+    if (!verification.user || verification.user.id !== userId || currentUser?.id !== userId) {
+      setAccountPasswordStatus("Das angemeldete Konto hat sich geändert. Bitte melde dich erneut an.", true);
+      return;
+    }
+
+    setAccountPasswordStatus("Neues Passwort wird gespeichert …");
+    const { data: updated, error: updateError } = await supabaseClient.auth.updateUser({ password: newPassword });
+    if (updateError) {
+      console.error("Neues Kontopasswort konnte nicht gespeichert werden.", updateError);
+      setAccountPasswordStatus(
+        `Neues Passwort konnte nicht gespeichert werden: ${describeAuthError(updateError, "Unbekannter Supabase-Fehler.")}`,
+        true
+      );
+      return;
+    }
+    if (updated.user?.id !== userId || currentUser?.id !== userId) {
+      setAccountPasswordStatus("Das angemeldete Konto hat sich geändert. Bitte melde dich erneut an.", true);
+      return;
+    }
+
+    currentPasswordInput.value = "";
+    newPasswordInput.value = "";
+    confirmPasswordInput.value = "";
+    setAccountPasswordStatus("Passwort wurde erfolgreich geändert.");
+  } catch (error) {
+    console.error("Kontopasswort konnte nicht geändert werden.", error);
+    setAccountPasswordStatus(
+      `Passwort konnte nicht geändert werden: ${describeAuthError(error, "Unbekannter Netzwerk- oder Supabase-Fehler.")}`,
+      true
+    );
+  } finally {
+    button.disabled = false;
+  }
+}
+
 async function requestAccountPasswordReset() {
   if (!currentUser?.email) return;
   setAccountStatus("Passwort-Reset wird angefordert …");
@@ -6746,16 +6904,20 @@ async function requestAccountPasswordReset() {
       redirectTo: window.location.origin + window.location.pathname
     });
     if (error) {
-      console.error("Passwort-Reset konnte nicht angefordert werden.", error);
-      const errorCode = error.code ? ` (${error.code})` : "";
-      setAccountStatus(`Passwort-Reset fehlgeschlagen${errorCode}: ${error.message}`, true);
+      console.error("Reset-Anforderung im Benutzerkonto fehlgeschlagen.", error);
+      setAccountStatus(
+        `Passwort-Reset fehlgeschlagen: ${describePasswordResetError(error, "Unbekannter Supabase-Fehler.")}`,
+        true
+      );
       return;
     }
     setAccountStatus("Falls für dieses Konto ein Reset-Link verfügbar ist, wurde er per E-Mail versendet.");
   } catch (error) {
-    console.error("Passwort-Reset konnte nicht angefordert werden.", error);
-    const details = error instanceof Error ? error.message : String(error);
-    setAccountStatus(`Passwort-Reset fehlgeschlagen: ${details}`, true);
+    console.error("Reset-Anforderung im Benutzerkonto fehlgeschlagen.", error);
+    setAccountStatus(
+      `Passwort-Reset fehlgeschlagen: ${describePasswordResetError(error, "Unbekannter Netzwerk- oder Supabase-Fehler.")}`,
+      true
+    );
   }
 }
 
