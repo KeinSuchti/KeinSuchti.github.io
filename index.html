@@ -2911,11 +2911,13 @@ body.app-scene .sidebar-logout-button .nav-icon svg {
 .availability-form-card .edit-field { margin:0; }
 .calendar-toolbar { display:grid; grid-template-columns:38px 1fr 38px; align-items:center; gap:8px; margin-bottom:14px; text-align:center; }
 .calendar-toolbar button { width:38px; height:34px; padding:0; margin:0; font-size:23px; }
+.calendar-toolbar button:disabled { cursor:not-allowed; opacity:.42; }
 .calendar-toolbar strong { color:#eaf2ff; font-size:15px; }
 .calendar-weekdays, .appointment-calendar { display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:5px; }
 .calendar-weekdays { margin-bottom:5px; color:#7790b0; font-size:10px; font-weight:800; text-align:center; text-transform:uppercase; }
 .calendar-day { min-height:39px; padding:6px 2px; border:1px solid rgba(101,141,207,.15); border-radius:9px; background:rgba(14,35,62,.68); color:#c9d7e9; font:600 12px var(--font-sans); cursor:pointer; }
-.calendar-day:hover, .calendar-day.selected { border-color:#4faaa4; background:rgba(36,124,128,.24); color:#e6f4f2; }
+.calendar-day:hover:not(:disabled), .calendar-day.selected { border-color:#4faaa4; background:rgba(36,124,128,.24); color:#e6f4f2; }
+.calendar-day:disabled { cursor:not-allowed; opacity:.42; }
 .calendar-day.is-today { box-shadow:inset 0 0 0 1px rgba(126,161,255,.72); }
 .calendar-day.is-empty { visibility:hidden; pointer-events:none; }
 .calendar-help, .panel-subtitle, .appointment-status { color:#8fa5c1; font-size:11px; line-height:1.45; }
@@ -4716,7 +4718,7 @@ body.color-vision-mode .beer-grade-slider::-moz-range-thumb {
       </div>
       <div class="appointment-layout">
         <section class="calendar-card" aria-label="Kalender">
-          <div class="calendar-toolbar"><button type="button" onclick="changeCalendarMonth(-1)" aria-label="Vorheriger Monat">‹</button><strong id="calendarMonthLabel"></strong><button type="button" onclick="changeCalendarMonth(1)" aria-label="Nächster Monat">›</button></div>
+          <div class="calendar-toolbar"><button id="calendarPreviousMonth" type="button" onclick="changeCalendarMonth(-1)" aria-label="Vorheriger Monat">‹</button><strong id="calendarMonthLabel"></strong><button type="button" onclick="changeCalendarMonth(1)" aria-label="Nächster Monat">›</button></div>
           <div class="calendar-weekdays"><span>Mo</span><span>Di</span><span>Mi</span><span>Do</span><span>Fr</span><span>Sa</span><span>So</span></div>
           <div id="appointmentCalendar" class="appointment-calendar"></div>
           <p class="calendar-help">Wähle einen Tag aus. Er wird direkt in das Terminformular übernommen.</p>
@@ -4738,7 +4740,7 @@ body.color-vision-mode .beer-grade-slider::-moz-range-thumb {
         <p class="panel-subtitle">Jede Person trägt ihren Namen ein und markiert beliebig viele Tage. Die Einträge aller Personen werden gesammelt angezeigt.</p>
         <div class="availability-layout">
           <section class="availability-calendar-card" aria-label="Verfügbarkeitskalender">
-            <div class="calendar-toolbar poll-calendar-toolbar"><button type="button" onclick="changePollMonth(-1)" aria-label="Vorheriger Monat">‹</button><strong id="pollCalendarMonthLabel"></strong><button type="button" onclick="changePollMonth(1)" aria-label="Nächster Monat">›</button></div>
+            <div class="calendar-toolbar poll-calendar-toolbar"><button id="pollPreviousMonth" type="button" onclick="changePollMonth(-1)" aria-label="Vorheriger Monat">‹</button><strong id="pollCalendarMonthLabel"></strong><button type="button" onclick="changePollMonth(1)" aria-label="Nächster Monat">›</button></div>
             <div class="calendar-weekdays"><span>Mo</span><span>Di</span><span>Mi</span><span>Do</span><span>Fr</span><span>Sa</span><span>So</span></div>
             <div id="pollCalendar" class="appointment-calendar"></div>
             <div id="availabilityCommonLegend" class="availability-common-legend" hidden><span class="availability-common-dot"></span><span>Markiert: mindestens zwei Personen können an diesem Tag.</span></div>
@@ -6404,22 +6406,45 @@ function toDateTimeLocal(value) {
   const pad = n => String(n).padStart(2,"0");
   return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
-function changeCalendarMonth(delta) { calendarCursor = new Date(calendarCursor.getFullYear(), calendarCursor.getMonth()+delta, 1); renderAppointmentCalendar(); }
+function currentMonthStart() { const today = new Date(); return new Date(today.getFullYear(), today.getMonth(), 1); }
+function todayDateKey() { return pollDateKey(new Date()); }
+function changeCalendarMonth(delta) {
+  const targetMonth = new Date(calendarCursor.getFullYear(), calendarCursor.getMonth()+delta, 1);
+  if (targetMonth < currentMonthStart()) return;
+  calendarCursor = targetMonth;
+  renderAppointmentCalendar();
+}
 function selectCalendarDate(day) {
   const d = new Date(calendarCursor.getFullYear(), calendarCursor.getMonth(), day, 19, 0, 0);
+  const today = new Date();
+  if (d.getFullYear() === today.getFullYear() && d.getMonth() === today.getMonth() && d.getDate() === today.getDate() && d <= today) {
+    d.setTime(today.getTime() + 60_000);
+  }
+  if (d < new Date(today.getFullYear(), today.getMonth(), today.getDate())) return;
   document.getElementById("appointmentDate").value = toDateTimeLocal(d.toISOString());
   renderAppointmentCalendar(day);
 }
 function renderAppointmentCalendar(selectedDay) {
   const grid = document.getElementById("appointmentCalendar"), label = document.getElementById("calendarMonthLabel");
   if (!grid || !label) return;
+  const minimumMonth = currentMonthStart();
+  if (calendarCursor < minimumMonth) calendarCursor = minimumMonth;
+  const dateInput = document.getElementById("appointmentDate");
+  if (dateInput) dateInput.min = toDateTimeLocal(new Date());
+  const previousMonthButton = document.getElementById("calendarPreviousMonth");
+  if (previousMonthButton) previousMonthButton.disabled = calendarCursor <= minimumMonth;
   const year=calendarCursor.getFullYear(), month=calendarCursor.getMonth(), first=new Date(year,month,1), last=new Date(year,month+1,0);
   label.textContent = new Intl.DateTimeFormat("de-DE", {month:"long", year:"numeric"}).format(first);
-  const offset=(first.getDay()+6)%7, selected=selectedDay || (nextAppointment ? new Date(nextAppointment.start_at).getMonth()===month && new Date(nextAppointment.start_at).getFullYear()===year ? new Date(nextAppointment.start_at).getDate() : 0 : 0), today=new Date();
+  const offset=(first.getDay()+6)%7, selected=selectedDay || (nextAppointment ? new Date(nextAppointment.start_at).getMonth()===month && new Date(nextAppointment.start_at).getFullYear()===year && new Date(nextAppointment.start_at) >= new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate()) ? new Date(nextAppointment.start_at).getDate() : 0 : 0), today=new Date();
   grid.innerHTML="";
   for(let i=0;i<offset;i++){const empty=document.createElement("span");empty.className="calendar-day is-empty";grid.appendChild(empty);}
   for(let day=1;day<=last.getDate();day++){
     const button=document.createElement("button");button.type="button";button.className="calendar-day";button.textContent=day;
+    const date = new Date(year, month, day);
+    if (date < new Date(today.getFullYear(), today.getMonth(), today.getDate())) {
+      button.disabled = true;
+      button.title = "Vergangene Tage sind nicht auswählbar";
+    }
     if(day===today.getDate()&&month===today.getMonth()&&year===today.getFullYear())button.classList.add("is-today");
     if(day===selected)button.classList.add("selected");
     button.onclick=()=>selectCalendarDate(day);grid.appendChild(button);
@@ -6450,8 +6475,20 @@ if (!appointmentCountdownTimer) appointmentCountdownTimer=setInterval(tickAppoin
 function pollStorageKey() { return `wfg-availability:${currentUser?.id || "guest"}`; }
 function pollDateKey(date) { return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,"0")}-${String(date.getDate()).padStart(2,"0")}`; }
 function formatPollDate(key) { return new Intl.DateTimeFormat("de-DE", { weekday:"short", day:"2-digit", month:"2-digit", year:"numeric" }).format(new Date(`${key}T12:00:00`)); }
-function changePollMonth(delta) { pollCalendarCursor = new Date(pollCalendarCursor.getFullYear(), pollCalendarCursor.getMonth()+delta, 1); document.getElementById("pollMonth").value = `${pollCalendarCursor.getFullYear()}-${String(pollCalendarCursor.getMonth()+1).padStart(2,"0")}`; renderPollCalendar(); }
-function togglePollDate(day) { const key=pollDateKey(new Date(pollCalendarCursor.getFullYear(),pollCalendarCursor.getMonth(),day)); selectedPollDates=selectedPollDates.includes(key)?selectedPollDates.filter(x=>x!==key):[...selectedPollDates,key]; renderPollCalendar(); renderSelectedPollDates(); }
+function changePollMonth(delta) {
+  const targetMonth = new Date(pollCalendarCursor.getFullYear(), pollCalendarCursor.getMonth()+delta, 1);
+  if (targetMonth < currentMonthStart()) return;
+  pollCalendarCursor = targetMonth;
+  document.getElementById("pollMonth").value = `${pollCalendarCursor.getFullYear()}-${String(pollCalendarCursor.getMonth()+1).padStart(2,"0")}`;
+  renderPollCalendar();
+}
+function togglePollDate(day) {
+  const key=pollDateKey(new Date(pollCalendarCursor.getFullYear(),pollCalendarCursor.getMonth(),day));
+  if (key < todayDateKey()) return;
+  selectedPollDates=selectedPollDates.includes(key)?selectedPollDates.filter(x=>x!==key):[...selectedPollDates,key];
+  renderPollCalendar();
+  renderSelectedPollDates();
+}
 function availabilityDateCounts() {
   const counts = {};
   availabilityEntries.forEach(entry => (entry.dates || []).forEach(date => { counts[date] = (counts[date] || 0) + 1; }));
@@ -6459,14 +6496,27 @@ function availabilityDateCounts() {
 }
 function renderPollCalendar() {
   const grid=document.getElementById("pollCalendar"), label=document.getElementById("pollCalendarMonthLabel"); if(!grid||!label)return;
+  const minimumMonth = currentMonthStart();
+  if (pollCalendarCursor < minimumMonth) pollCalendarCursor = minimumMonth;
+  selectedPollDates = selectedPollDates.filter(key => key >= todayDateKey());
+  const monthInput = document.getElementById("pollMonth");
+  if (monthInput) {
+    const currentMonthValue = `${minimumMonth.getFullYear()}-${String(minimumMonth.getMonth()+1).padStart(2,"0")}`;
+    monthInput.min = currentMonthValue;
+    const selectedMonth = `${pollCalendarCursor.getFullYear()}-${String(pollCalendarCursor.getMonth()+1).padStart(2,"0")}`;
+    if (!monthInput.value || monthInput.value < currentMonthValue) monthInput.value = selectedMonth;
+  }
+  const previousMonthButton = document.getElementById("pollPreviousMonth");
+  if (previousMonthButton) previousMonthButton.disabled = pollCalendarCursor <= minimumMonth;
   const y=pollCalendarCursor.getFullYear(),m=pollCalendarCursor.getMonth(),first=new Date(y,m,1),last=new Date(y,m+1,0),counts=availabilityDateCounts();
   label.textContent=new Intl.DateTimeFormat("de-DE",{month:"long",year:"numeric"}).format(first); grid.innerHTML="";
   const offset=(first.getDay()+6)%7; for(let i=0;i<offset;i++){const e=document.createElement("span");e.className="calendar-day is-empty";grid.appendChild(e);}
   for(let d=1;d<=last.getDate();d++){
     const b=document.createElement("button"); b.type="button"; b.className="calendar-day"; b.textContent=d;
     const key=pollDateKey(new Date(y,m,d)), count=counts[key] || 0;
+    if(key < todayDateKey()){ b.disabled=true; b.title="Vergangene Tage sind nicht auswählbar"; }
     if(selectedPollDates.includes(key)) b.classList.add("selected");
-    if(count>=2){ b.classList.add("availability-common"); b.title=`${count} Personen können an diesem Tag`; const badge=document.createElement("span"); badge.className="calendar-day-count"; badge.textContent=`${count}×`; b.appendChild(badge); }
+    if(count>=2){ b.classList.add("availability-common"); b.title=`${count} Personen können an diesem Tag${key < todayDateKey() ? " (vergangener Tag)" : ""}`; const badge=document.createElement("span"); badge.className="calendar-day-count"; badge.textContent=`${count}×`; b.appendChild(badge); }
     b.onclick=()=>togglePollDate(d); grid.appendChild(b);
   }
 }
@@ -6481,8 +6531,8 @@ function renderAvailabilityEntries() {
   const legend=document.getElementById("availabilityCommonLegend"); if(legend)legend.hidden=!Object.values(counts).some(count=>count>=2);
 }
 
-async function loadAppointmentPoll() { availabilityEntries=[]; try { availabilityEntries=JSON.parse(localStorage.getItem(pollStorageKey())||"[]"); } catch(_){ availabilityEntries=[]; } const result=await supabaseClient.from("appointment_availability").select("id,participant_name,dates,user_id").eq("user_id",currentUser.id).order("created_at",{ascending:true}); if(!result.error) availabilityEntries=result.data||[]; const month=document.getElementById("pollMonth"); if(month){month.value=`${pollCalendarCursor.getFullYear()}-${String(pollCalendarCursor.getMonth()+1).padStart(2,"0")}`;month.onchange=()=>{const [y,m]=month.value.split("-").map(Number);pollCalendarCursor=new Date(y,m-1,1);renderPollCalendar();};} renderPollCalendar();renderSelectedPollDates();renderAvailabilityEntries(); }
-async function saveAppointmentPoll() { const name=document.getElementById("pollName").value.trim();const status=document.getElementById("pollStatus");if(!name){status.textContent="Bitte deinen Namen eingeben.";return;}if(!selectedPollDates.length){status.textContent="Bitte mindestens einen möglichen Termin auswählen.";return;}const entry={participant_name:name,dates:[...selectedPollDates].sort(),user_id:currentUser.id};const result=await supabaseClient.from("appointment_availability").upsert(entry,{onConflict:"user_id,participant_name"}).select().single();if(result.error){const oldIndex=availabilityEntries.findIndex(x=>x.participant_name.toLowerCase()===name.toLowerCase());if(oldIndex>=0)availabilityEntries[oldIndex]=entry;else availabilityEntries.push(entry);localStorage.setItem(pollStorageKey(),JSON.stringify(availabilityEntries));status.textContent="Lokal gespeichert. Für gemeinsame Synchronisierung bitte das SQL-Schema ausführen.";}else{const oldIndex=availabilityEntries.findIndex(x=>x.participant_name.toLowerCase()===name.toLowerCase());if(oldIndex>=0)availabilityEntries[oldIndex]=result.data;else availabilityEntries.push(result.data);status.textContent="Deine Verfügbarkeit wurde gespeichert.";}renderAvailabilityEntries(); status.textContent += " Seite wird aktualisiert …"; sessionStorage.setItem("wfg-restore-view", "appointments"); setTimeout(() => window.location.reload(), 650); }
+async function loadAppointmentPoll() { availabilityEntries=[]; try { availabilityEntries=JSON.parse(localStorage.getItem(pollStorageKey())||"[]"); } catch(_){ availabilityEntries=[]; } const result=await supabaseClient.from("appointment_availability").select("id,participant_name,dates,user_id").eq("user_id",currentUser.id).order("created_at",{ascending:true}); if(!result.error) availabilityEntries=result.data||[]; const month=document.getElementById("pollMonth"); if(month){month.value=`${pollCalendarCursor.getFullYear()}-${String(pollCalendarCursor.getMonth()+1).padStart(2,"0")}`;month.onchange=()=>{const [y,m]=month.value.split("-").map(Number);const targetMonth=new Date(y,m-1,1);pollCalendarCursor=targetMonth<currentMonthStart()?currentMonthStart():targetMonth;month.value=`${pollCalendarCursor.getFullYear()}-${String(pollCalendarCursor.getMonth()+1).padStart(2,"0")}`;renderPollCalendar();};} renderPollCalendar();renderSelectedPollDates();renderAvailabilityEntries(); }
+async function saveAppointmentPoll() { const name=document.getElementById("pollName").value.trim();const status=document.getElementById("pollStatus");selectedPollDates=selectedPollDates.filter(key=>key>=todayDateKey());if(!name){status.textContent="Bitte deinen Namen eingeben.";return;}if(!selectedPollDates.length){status.textContent="Bitte mindestens einen möglichen Termin auswählen.";return;}const entry={participant_name:name,dates:[...selectedPollDates].sort(),user_id:currentUser.id};const result=await supabaseClient.from("appointment_availability").upsert(entry,{onConflict:"user_id,participant_name"}).select().single();if(result.error){const oldIndex=availabilityEntries.findIndex(x=>x.participant_name.toLowerCase()===name.toLowerCase());if(oldIndex>=0)availabilityEntries[oldIndex]=entry;else availabilityEntries.push(entry);localStorage.setItem(pollStorageKey(),JSON.stringify(availabilityEntries));status.textContent="Lokal gespeichert. Für gemeinsame Synchronisierung bitte das SQL-Schema ausführen.";}else{const oldIndex=availabilityEntries.findIndex(x=>x.participant_name.toLowerCase()===name.toLowerCase());if(oldIndex>=0)availabilityEntries[oldIndex]=result.data;else availabilityEntries.push(result.data);status.textContent="Deine Verfügbarkeit wurde gespeichert.";}renderAvailabilityEntries(); status.textContent += " Seite wird aktualisiert …"; sessionStorage.setItem("wfg-restore-view", "appointments"); setTimeout(() => window.location.reload(), 650); }
 async function removeAvailabilityEntry(index) { const entry=availabilityEntries[index]; if(!entry)return; if(!confirm(`Eintrag von ${entry.participant_name} entfernen?`))return; if(entry.id) await supabaseClient.from("appointment_availability").delete().eq("id",entry.id); availabilityEntries.splice(index,1);localStorage.setItem(pollStorageKey(),JSON.stringify(availabilityEntries));renderAvailabilityEntries(); }
 
 /* Serien & Filme */
