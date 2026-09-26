@@ -4085,6 +4085,193 @@ body.app-scene .assignment-popup-box {
   }
 }
 
+body[data-design-theme="arctic"] {
+  --design-bg: #07131f;
+  --design-glow: radial-gradient(ellipse at 20% 0%, rgba(77, 172, 219, .16), transparent 48%), radial-gradient(ellipse at 100% 70%, rgba(103, 125, 210, .10), transparent 42%);
+  --design-surface: #0d2030;
+  --design-surface-2: #143148;
+  --design-surface-3: #1d4258;
+  --design-input: #091a29;
+  --design-border: rgba(120, 185, 216, .24);
+  --design-accent: #62c8e8;
+  --design-accent-2: #9ca8ff;
+  --design-sidebar: #081a29;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 18px;
+  --shadow-card: 0 12px 30px rgba(0, 0, 0, .32);
+}
+
+body[data-design-theme="forest"] {
+  --design-bg: #0b1712;
+  --design-glow: radial-gradient(ellipse at 15% 0%, rgba(78, 153, 105, .18), transparent 48%), radial-gradient(ellipse at 100% 75%, rgba(175, 145, 77, .10), transparent 42%);
+  --design-surface: #12231a;
+  --design-surface-2: #1a3023;
+  --design-surface-3: #254131;
+  --design-input: #0c1b14;
+  --design-border: rgba(136, 190, 147, .24);
+  --design-accent: #79c99b;
+  --design-accent-2: #d8b56c;
+  --design-sidebar: #0a1a12;
+  --radius-md: 13px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+  --shadow-card: 0 14px 36px rgba(0, 0, 0, .32);
+}
+
+body[data-design-theme="amethyst"] {
+  --design-bg: #100d1a;
+  --design-glow: radial-gradient(ellipse at 18% 0%, rgba(142, 95, 190, .18), transparent 48%), radial-gradient(ellipse at 100% 72%, rgba(181, 85, 150, .12), transparent 44%);
+  --design-surface: #1a1627;
+  --design-surface-2: #27213a;
+  --design-surface-3: #362c4b;
+  --design-input: #120f1e;
+  --design-border: rgba(180, 151, 218, .25);
+  --design-accent: #c4a6ff;
+  --design-accent-2: #ee8fc3;
+  --design-sidebar: #130f20;
+  --radius-md: 14px;
+  --radius-lg: 22px;
+  --radius-xl: 30px;
+  --shadow-card: 0 16px 42px rgba(0, 0, 0, .38);
+}
+
+body[data-design-theme="ember"] {
+  --design-bg: #190e0a;
+  --design-glow: radial-gradient(ellipse at 20% 0%, rgba(192, 91, 48, .20), transparent 48%), radial-gradient(ellipse at 100% 72%, rgba(178, 118, 50, .11), transparent 44%);
+  --design-surface: #25150f;
+  --design-surface-2: #352016;
+  --design-surface-3: #482c1e;
+  --design-input: #1a100c;
+  --design-border: rgba(213, 153, 112, .25);
+  --design-accent: #ffad66;
+  --design-accent-2: #e97855;
+  --design-sidebar: #1c100b;
+  --radius-md: 9px;
+  --radius-lg: 13px;
+  --radius-xl: 19px;
+  --shadow-card: 0 12px 30px rgba(0, 0, 0, .36);
+}
+
+body:not(.color-vision-mode)[data-design-theme]:not([data-design-theme="cinematic"]) {
+  --bg: var(--design-bg);
+  --bg-glow: var(--design-glow);
+  --surface: var(--design-surface);
+  --surface-2: var(--design-surface-2);
+  --surface-3: var(--design-surface-3);
+  --surface-input: var(--design-input);
+  --border: var(--design-border);
+  --border-strong: color-mix(in srgb, var(--design-border) 65%, white);
+  --accent: var(--design-accent);
+  --accent-hover: color-mix(in srgb, var(--design-accent) 80%, white);
+  --accent-2: var(--design-accent-2);
+  --accent-2-hover: color-mix(in srgb, var(--design-accent-2) 80%, white);
+  --info: var(--design-accent);
+  --note: var(--design-accent-2);
+}
+
+body:not(.color-vision-mode)[data-design-theme]:not([data-design-theme="cinematic"]) {
+  background: var(--design-glow), var(--design-bg) !important;
+}
+
+:where(body[data-design-theme]:not([data-design-theme="cinematic"]):not(.color-vision-mode)) .dashboard-sidebar {
+  border-color: var(--design-border) !important;
+  background: var(--design-sidebar) !important;
+}
+
+:where(body[data-design-theme]:not([data-design-theme="cinematic"]):not(.color-vision-mode)) .dashboard-shell,
+:where(body[data-design-theme]:not([data-design-theme="cinematic"]):not(.color-vision-mode)) .app-panel,
+:where(body[data-design-theme]:not([data-design-theme="cinematic"]):not(.color-vision-mode)) #loginBox,
+:where(body[data-design-theme]:not([data-design-theme="cinematic"]):not(.color-vision-mode)) .calendar-card,
+:where(body[data-design-theme]:not([data-design-theme="cinematic"]):not(.color-vision-mode)) .appointment-form-card,
+:where(body[data-design-theme]:not([data-design-theme="cinematic"]):not(.color-vision-mode)) .appointment-poll-card,
+:where(body[data-design-theme]:not([data-design-theme="cinematic"]):not(.color-vision-mode)) .appointment-preview-card {
+  border-color: var(--design-border) !important;
+  background: var(--design-surface) !important;
+}
+
+:where(body[data-design-theme]:not([data-design-theme="cinematic"]):not(.color-vision-mode)) .dashboard-card,
+:where(body[data-design-theme]:not([data-design-theme="cinematic"]):not(.color-vision-mode)) .movie-item,
+:where(body[data-design-theme]:not([data-design-theme="cinematic"]):not(.color-vision-mode)) .card-item,
+:where(body[data-design-theme]:not([data-design-theme="cinematic"]):not(.color-vision-mode)) .yugioh-deck-card,
+:where(body[data-design-theme]:not([data-design-theme="cinematic"]):not(.color-vision-mode)) .games-table-wrapper,
+:where(body[data-design-theme]:not([data-design-theme="cinematic"]):not(.color-vision-mode)) .beer-grade-wrapper,
+:where(body[data-design-theme]:not([data-design-theme="cinematic"]):not(.color-vision-mode)) .dashboard-user-pill,
+:where(body[data-design-theme]:not([data-design-theme="cinematic"]):not(.color-vision-mode)) .dashboard-statusbar,
+:where(body[data-design-theme]:not([data-design-theme="cinematic"]):not(.color-vision-mode)) .next-appointment-banner,
+:where(body[data-design-theme]:not([data-design-theme="cinematic"]):not(.color-vision-mode)) .popup-box,
+:where(body[data-design-theme]:not([data-design-theme="cinematic"]):not(.color-vision-mode)) .edit-box,
+:where(body[data-design-theme]:not([data-design-theme="cinematic"]):not(.color-vision-mode)) .assignment-popup-box {
+  border-color: var(--design-border) !important;
+  background: var(--design-surface-2) !important;
+}
+
+:where(body[data-design-theme]:not([data-design-theme="cinematic"]):not(.color-vision-mode)) .dashboard-nav-item:hover,
+:where(body[data-design-theme]:not([data-design-theme="cinematic"]):not(.color-vision-mode)) .dashboard-nav-item.active {
+  border-color: var(--design-border) !important;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--design-accent) 24%, transparent), color-mix(in srgb, var(--design-accent-2) 20%, transparent)) !important;
+}
+
+:where(body[data-design-theme]:not([data-design-theme="cinematic"]):not(.color-vision-mode)) .dashboard-nav-item.active .nav-icon,
+:where(body[data-design-theme]:not([data-design-theme="cinematic"]):not(.color-vision-mode)) .dashboard-kicker,
+:where(body[data-design-theme]:not([data-design-theme="cinematic"]):not(.color-vision-mode)) .hero-eyebrow,
+:where(body[data-design-theme]:not([data-design-theme="cinematic"]):not(.color-vision-mode)) .dashboard-masthead-title strong {
+  color: var(--design-accent) !important;
+}
+
+:where(body[data-design-theme]:not([data-design-theme="cinematic"]):not(.color-vision-mode)) .dashboard-card {
+  border-radius: var(--radius-lg) !important;
+  background: linear-gradient(150deg, var(--design-surface-2), var(--design-surface)) !important;
+  box-shadow: var(--shadow-card) !important;
+}
+
+:where(body[data-design-theme]:not([data-design-theme="cinematic"]):not(.color-vision-mode)) .dashboard-card:hover,
+:where(body[data-design-theme]:not([data-design-theme="cinematic"]):not(.color-vision-mode)) .movie-item:hover,
+:where(body[data-design-theme]:not([data-design-theme="cinematic"]):not(.color-vision-mode)) .card-item:hover,
+:where(body[data-design-theme]:not([data-design-theme="cinematic"]):not(.color-vision-mode)) .yugioh-deck-card:hover {
+  border-color: var(--design-accent) !important;
+}
+
+:where(body[data-design-theme]:not([data-design-theme="cinematic"]):not(.color-vision-mode)) .dashboard-masthead-rule,
+:where(body[data-design-theme]:not([data-design-theme="cinematic"]):not(.color-vision-mode)) .progress > div {
+  background: linear-gradient(90deg, var(--design-accent), var(--design-accent-2)) !important;
+}
+
+:where(body[data-design-theme]:not([data-design-theme="cinematic"]):not(.color-vision-mode)) .dashboard-card .card-icon,
+:where(body[data-design-theme]:not([data-design-theme="cinematic"]):not(.color-vision-mode)) .dashboard-card .card-arrow {
+  border-color: var(--design-border) !important;
+  background: var(--design-surface-3) !important;
+  color: var(--design-accent) !important;
+}
+
+:where(body[data-design-theme]:not([data-design-theme="cinematic"]):not(.color-vision-mode)) #appShell input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+:where(body[data-design-theme]:not([data-design-theme="cinematic"]):not(.color-vision-mode)) #appShell select,
+:where(body[data-design-theme]:not([data-design-theme="cinematic"]):not(.color-vision-mode)) #appShell textarea {
+  border-color: var(--design-border) !important;
+  background: var(--design-input) !important;
+}
+
+:where(body[data-design-theme]:not([data-design-theme="cinematic"]):not(.color-vision-mode)) #appShell input:focus-visible,
+:where(body[data-design-theme]:not([data-design-theme="cinematic"]):not(.color-vision-mode)) #appShell select:focus-visible,
+:where(body[data-design-theme]:not([data-design-theme="cinematic"]):not(.color-vision-mode)) #appShell textarea:focus-visible {
+  border-color: var(--design-accent) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--design-accent) 20%, transparent) !important;
+}
+
+:where(body[data-design-theme]:not([data-design-theme="cinematic"]):not(.color-vision-mode)) #appShell button:not(.dashboard-nav-item):not(.sidebar-toggle-btn):not(.dashboard-card):not(.calendar-day):not(.poll-date-chip button) {
+  border-color: var(--design-border) !important;
+  background: var(--design-surface-3) !important;
+}
+
+:where(body[data-design-theme]:not([data-design-theme="cinematic"]):not(.color-vision-mode)) #appShell button:not(.dashboard-nav-item):not(.sidebar-toggle-btn):not(.dashboard-card):not(.calendar-day):not(.poll-date-chip button):hover {
+  border-color: var(--design-accent) !important;
+}
+
+:where(body[data-design-theme]:not([data-design-theme="cinematic"]):not(.color-vision-mode)) #appShell :is(.random-movie-button, .random-card-button, .appointment-save-button, .poll-save-button) {
+  border-color: var(--design-accent-2) !important;
+  background: var(--design-accent-2) !important;
+}
+
 body.color-vision-mode {
   --accent: #56b4e9;
   --accent-hover: #82c9ee;
@@ -4533,6 +4720,7 @@ body.color-vision-mode .beer-grade-slider::-moz-range-thumb {
           <button class="dashboard-nav-item" type="button" onclick="showGamesApp()" title="Spieleabend"><span class="nav-icon" aria-hidden="true">⌘</span><span class="nav-label">Spieleabend</span></button>
           <button class="dashboard-nav-item" type="button" onclick="showYugiohApp()" title="Yu-Gi-Oh! Decks"><span class="nav-icon" aria-hidden="true">◈</span><span class="nav-label">Yu-Gi-Oh! Decks</span></button>
           <button class="dashboard-nav-item" type="button" onclick="showAppointmentsApp()" title="Termine abstimmen"><span class="nav-icon" aria-hidden="true">◷</span><span class="nav-label">Termine</span></button>
+          <button id="designThemeToggle" class="dashboard-nav-item design-theme-toggle" type="button" onclick="cycleDesignTheme()" aria-label="Design wechseln" title="Design wechseln"><span class="nav-icon" aria-hidden="true">✦</span><span class="nav-label">Design: Cinematic</span></button>
           <button id="colorVisionToggle" class="dashboard-nav-item color-vision-toggle" type="button" onclick="toggleColorVisionMode()" aria-label="Farbenfreundlicher Modus" aria-pressed="false" title="Farbenfreundlicher Modus"><span class="nav-icon" aria-hidden="true">◐</span><span class="nav-label">Farbenfreundlicher Modus</span></button>
         </nav>
         <button id="sidebarLogout" class="sidebar-logout-button" type="button" onclick="logout()" aria-label="Logout" title="Logout"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M10 17l5-5-5-5"></path><path d="M15 12H3"></path><path d="M12 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6"></path></svg></span></button>
@@ -5109,6 +5297,63 @@ function setStatus(message, isError = false) {
   globalStatus.textContent = message || "";
   globalStatus.className = isError ? "status error" : "status";
 }
+
+const DESIGN_THEMES = [
+  { id: "cinematic", label: "Cinematic" },
+  { id: "arctic", label: "Arctic" },
+  { id: "forest", label: "Forest" },
+  { id: "amethyst", label: "Amethyst" },
+  { id: "ember", label: "Ember" }
+];
+const designThemeStorageKey = "wfg-design-theme";
+
+function setDesignTheme(themeId) {
+  const theme = DESIGN_THEMES.find(option => option.id === themeId);
+  if (!theme) {
+    console.error("Unbekannte Designvariante:", themeId);
+    return;
+  }
+
+  document.body.dataset.designTheme = theme.id;
+  const toggle = document.getElementById("designThemeToggle");
+  if (toggle) {
+    const label = toggle.querySelector(".nav-label");
+    if (label) {
+      label.textContent = `Design: ${theme.label}`;
+    }
+    toggle.setAttribute("aria-label", `Design wechseln; aktuell: ${theme.label}`);
+    toggle.title = `Design wechseln (aktuell: ${theme.label})`;
+  }
+}
+
+function initializeDesignTheme() {
+  try {
+    const savedTheme = localStorage.getItem(designThemeStorageKey);
+    const theme = DESIGN_THEMES.some(option => option.id === savedTheme)
+      ? savedTheme
+      : "cinematic";
+    setDesignTheme(theme);
+  } catch (error) {
+    console.error("Designvariante konnte nicht geladen werden.", error);
+    setDesignTheme("cinematic");
+  }
+}
+
+function cycleDesignTheme() {
+  const currentIndex = DESIGN_THEMES.findIndex(
+    theme => theme.id === document.body.dataset.designTheme
+  );
+  const nextTheme = DESIGN_THEMES[(currentIndex + 1) % DESIGN_THEMES.length];
+  setDesignTheme(nextTheme.id);
+  try {
+    localStorage.setItem(designThemeStorageKey, nextTheme.id);
+  } catch (error) {
+    console.error("Designvariante konnte nicht gespeichert werden.", error);
+    setStatus("Das Design ist aktiv, konnte aber nicht dauerhaft gespeichert werden.", true);
+  }
+}
+
+initializeDesignTheme();
 
 const colorVisionModeStorageKey = "wfg-color-vision-mode";
 
