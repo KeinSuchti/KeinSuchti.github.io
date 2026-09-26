@@ -2905,14 +2905,17 @@ body.app-scene .sidebar-logout-button .nav-icon svg {
 .appointment-banner-meta { display:flex; flex-wrap:wrap; gap:8px 15px; margin-top:4px; color:#b7cbe5; font-size:12px; }
 .appointment-banner-note { color:#91a8c5; font-size:11px; margin-top:4px; }
 .appointment-layout { display:grid; grid-template-columns:minmax(0,1.1fr) minmax(300px,.9fr); gap:18px; }
-.calendar-card, .appointment-form-card, .appointment-preview-card { padding:18px; border:1px solid rgba(101,141,207,.22); border-radius:16px; background:rgba(8,24,45,.64); }
+.calendar-card, .appointment-form-card, .appointment-preview-card, .availability-calendar-card, .availability-form-card { padding:18px; border:1px solid rgba(101,141,207,.22); border-radius:16px; background:rgba(8,24,45,.64); }
+.availability-layout { display:grid; grid-template-columns:minmax(0,1.1fr) minmax(300px,.9fr); gap:18px; margin-top:14px; }
+.availability-form-card { display:grid; align-content:start; gap:11px; }
+.availability-form-card .edit-field { margin:0; }
 .calendar-toolbar { display:grid; grid-template-columns:38px 1fr 38px; align-items:center; gap:8px; margin-bottom:14px; text-align:center; }
 .calendar-toolbar button { width:38px; height:34px; padding:0; margin:0; font-size:23px; }
 .calendar-toolbar strong { color:#eaf2ff; font-size:15px; }
 .calendar-weekdays, .appointment-calendar { display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:5px; }
 .calendar-weekdays { margin-bottom:5px; color:#7790b0; font-size:10px; font-weight:800; text-align:center; text-transform:uppercase; }
 .calendar-day { min-height:39px; padding:6px 2px; border:1px solid rgba(101,141,207,.15); border-radius:9px; background:rgba(14,35,62,.68); color:#c9d7e9; font:600 12px var(--font-sans); cursor:pointer; }
-.calendar-day:hover, .calendar-day.selected { border-color:#62e4d6; background:rgba(36,124,128,.45); color:#fff; }
+.calendar-day:hover, .calendar-day.selected { border-color:#4faaa4; background:rgba(36,124,128,.24); color:#e6f4f2; }
 .calendar-day.is-today { box-shadow:inset 0 0 0 1px rgba(126,161,255,.72); }
 .calendar-day.is-empty { visibility:hidden; pointer-events:none; }
 .calendar-help, .panel-subtitle, .appointment-status { color:#8fa5c1; font-size:11px; line-height:1.45; }
@@ -2927,23 +2930,23 @@ body.app-scene .sidebar-logout-button .nav-icon svg {
 .preview-countdown strong { color:#eff4ff; font-size:20px; }
 .preview-countdown span, .preview-location { color:#b6c8df; font-size:12px; }
 .preview-location { margin-top:9px; color:#71e3d8; font-weight:700; }
-@media (max-width:760px) { .appointment-layout { grid-template-columns:1fr; } .appointment-preview-card { margin-top:12px; } }
-@media (max-width:600px) { .appointment-banner-grid { align-items:flex-start; } .appointment-banner-countdown { font-size:18px; } .appointment-banner-meta { font-size:11px; } .calendar-card, .appointment-form-card, .appointment-preview-card { padding:14px; } .calendar-day { min-height:35px; } }
+@media (max-width:760px) { .appointment-layout, .availability-layout { grid-template-columns:1fr; } .appointment-preview-card { margin-top:12px; } }
+@media (max-width:600px) { .appointment-banner-grid { align-items:flex-start; } .appointment-banner-countdown { font-size:18px; } .appointment-banner-meta { font-size:11px; } .calendar-card, .appointment-form-card, .appointment-preview-card, .availability-calendar-card, .availability-form-card { padding:14px; } .calendar-day { min-height:35px; } }
 
 
 /* --- Termin-Karte, Umfrage und sichtbarer mobiler Logout --- */
 .card-appointments .appointment-card-image { display:grid; place-items:center; background:linear-gradient(135deg,rgba(30,177,176,.52),rgba(75,65,169,.72)); }
 .appointment-card-symbol { color:#d5fffb; font-size:48px; text-shadow:0 0 24px rgba(102,237,220,.55); }
-.appointment-poll-card { margin-top:18px; padding:18px; border:1px solid rgba(101,141,207,.22); border-radius:16px; background:rgba(8,24,45,.64); }
+.appointment-poll-card { margin-top:18px; }
 .appointment-poll-card h3 { margin:5px 0 4px; color:#eef5ff; }
 .poll-form-row { display:grid; grid-template-columns:minmax(0,1.3fr) minmax(180px,.7fr); gap:12px; margin-top:14px; }
-.poll-calendar-toolbar { max-width:360px; margin:16px auto 12px; }
+.poll-calendar-toolbar { margin:0 0 14px; }
 .poll-selected-dates { display:flex; flex-wrap:wrap; gap:7px; min-height:30px; margin-top:13px; }
 .poll-date-chip { display:inline-flex; align-items:center; gap:6px; padding:7px 9px; border:1px solid rgba(99,224,213,.35); border-radius:999px; background:rgba(33,111,112,.35); color:#d9fffa; font-size:11px; }
 .poll-date-chip button { width:auto; min-width:0; margin:0; padding:0; border:0; background:transparent; color:#a8f2e7; font-size:14px; }
 .poll-save-button { margin-top:12px; }
 .sidebar-logout-button { position:sticky; bottom:0; z-index:3; flex-shrink:0; box-shadow:0 -8px 18px rgba(5,14,29,.7); }
-@media (max-width:760px) { .poll-form-row { grid-template-columns:1fr; } .appointment-poll-card { margin-top:12px; padding:14px; } }
+@media (max-width:760px) { .poll-form-row { grid-template-columns:1fr; } .appointment-poll-card { margin-top:12px; } }
 
 
 /* --- Mehrpersonen-Verfügbarkeit --- */
@@ -2962,12 +2965,12 @@ body.app-scene .sidebar-logout-button .nav-icon svg {
 .poll-date-chip { gap:9px; padding:6px 7px 6px 11px; border-radius:10px; background:rgba(33,111,112,.42); }
 .poll-date-chip button { display:inline-grid; place-items:center; width:22px; height:22px; min-width:22px; padding:0; border:1px solid rgba(168,242,231,.45); border-radius:50%; background:rgba(3,25,42,.6); color:#b9fff4; font:700 15px/1 Arial,sans-serif; cursor:pointer; }
 .poll-date-chip button:hover, .poll-date-chip button:focus-visible { border-color:#fff; background:#d65d72; color:#fff; outline:none; transform:scale(1.06); }
-.calendar-day.availability-common { border-color:#58df92; background:linear-gradient(145deg,rgba(31,150,91,.82),rgba(20,101,73,.8)); color:#f2fff7; box-shadow:0 0 0 1px rgba(75,239,142,.22), 0 0 14px rgba(49,205,118,.18); }
-.calendar-day.availability-common.selected { border-color:#8affb5; background:linear-gradient(145deg,rgba(37,177,103,.96),rgba(26,122,78,.94)); }
-.calendar-day-count { display:block; margin-top:2px; color:#d5ffe4; font-size:9px; font-weight:800; line-height:1; }
+.calendar-day.availability-common { border-color:#5eaa83; background:linear-gradient(145deg,rgba(43,111,80,.72),rgba(31,82,65,.70)); color:#e5f4eb; box-shadow:0 0 0 1px rgba(88,163,121,.12); }
+.calendar-day.availability-common.selected { border-color:#78b994; background:linear-gradient(145deg,rgba(55,126,91,.82),rgba(38,96,71,.80)); }
+.calendar-day-count { display:block; margin-top:2px; color:#cbe7d5; font-size:9px; font-weight:800; line-height:1; }
 .availability-common-legend { display:flex; align-items:center; gap:7px; margin-top:10px; color:#9bb4cd; font-size:11px; }
-.availability-common-dot { width:10px; height:10px; border-radius:50%; background:#3fd27f; box-shadow:0 0 8px rgba(63,210,127,.5); }
-.availability-entry-date.is-common { border:1px solid #58df92; background:rgba(31,150,91,.7); color:#edfff4; font-weight:800; }
+.availability-common-dot { width:10px; height:10px; border-radius:50%; background:#5eaa83; }
+.availability-entry-date.is-common { border:1px solid #5eaa83; background:rgba(43,111,80,.5); color:#e0f0e6; font-weight:800; }
 
 
 /* --- Finaler Mobile-Sidebar-Fix: Logout immer vollständig sichtbar --- */
@@ -3700,6 +3703,7 @@ body.app-scene .dashboard-grid,
 body.app-scene .dashboard-card,
 body.app-scene .app-panel,
 body.app-scene .appointment-layout,
+body.app-scene .availability-layout,
 body.app-scene .appointment-poll-card,
 body.app-scene .custom-list-heading {
   min-width:0;
@@ -3781,14 +3785,16 @@ body.app-scene .assignment-popup-box {
     overflow-wrap:anywhere;
   }
 
-  body.app-scene .appointment-layout {
+  body.app-scene .appointment-layout,
+  body.app-scene .availability-layout {
     grid-template-columns:minmax(0, 1fr);
   }
 
   body.app-scene .appointment-form-card,
   body.app-scene .calendar-card,
   body.app-scene .appointment-preview-card,
-  body.app-scene .appointment-poll-card {
+  body.app-scene .availability-calendar-card,
+  body.app-scene .availability-form-card {
     padding:clamp(12px, 2.5vw, 18px);
   }
 
@@ -4153,7 +4159,8 @@ body.color-vision-mode .yugioh-deck-card,
 body.color-vision-mode .games-table-wrapper,
 body.color-vision-mode .calendar-card,
 body.color-vision-mode .appointment-form-card,
-body.color-vision-mode .appointment-poll-card,
+body.color-vision-mode .availability-calendar-card,
+body.color-vision-mode .availability-form-card,
 body.color-vision-mode .appointment-preview-card,
 body.color-vision-mode .next-appointment-banner,
 body.color-vision-mode .beer-grade-wrapper,
@@ -4729,15 +4736,21 @@ body.color-vision-mode .beer-grade-slider::-moz-range-thumb {
         <div class="dashboard-kicker">Verfügbarkeit eintragen</div>
         <h3>Wann kannst du?</h3>
         <p class="panel-subtitle">Jede Person trägt ihren Namen ein und markiert beliebig viele Tage. Die Einträge aller Personen werden gesammelt angezeigt.</p>
-        <div class="poll-form-row"><label class="edit-field"><span>Dein Name</span><input id="pollName" placeholder="z. B. Anna"></label><label class="edit-field"><span>Monat für Vorschläge</span><input id="pollMonth" type="month"></label></div>
-        <div class="calendar-toolbar poll-calendar-toolbar"><button type="button" onclick="changePollMonth(-1)" aria-label="Vorheriger Monat">‹</button><strong id="pollCalendarMonthLabel"></strong><button type="button" onclick="changePollMonth(1)" aria-label="Nächster Monat">›</button></div>
-        <div class="calendar-weekdays"><span>Mo</span><span>Di</span><span>Mi</span><span>Do</span><span>Fr</span><span>Sa</span><span>So</span></div>
-        <div id="pollCalendar" class="appointment-calendar"></div>
-        <div id="pollSelectedDates" class="poll-selected-dates" aria-live="polite"></div>
-        <div id="availabilityCommonLegend" class="availability-common-legend" hidden><span class="availability-common-dot"></span><span>Markiert: mindestens zwei Personen können an diesem Tag.</span></div>
-        <button class="poll-save-button" type="button" onclick="saveAppointmentPoll()">✅ Meine Verfügbarkeit speichern</button>
-        <p id="pollStatus" class="appointment-status" role="status"></p>
-        <div class="availability-summary"><div class="dashboard-kicker">Bisher eingetragen</div><div id="availabilityEntries" class="availability-entries"><span class="panel-subtitle">Noch keine Einträge vorhanden.</span></div></div>
+        <div class="availability-layout">
+          <section class="availability-calendar-card" aria-label="Verfügbarkeitskalender">
+            <div class="calendar-toolbar poll-calendar-toolbar"><button type="button" onclick="changePollMonth(-1)" aria-label="Vorheriger Monat">‹</button><strong id="pollCalendarMonthLabel"></strong><button type="button" onclick="changePollMonth(1)" aria-label="Nächster Monat">›</button></div>
+            <div class="calendar-weekdays"><span>Mo</span><span>Di</span><span>Mi</span><span>Do</span><span>Fr</span><span>Sa</span><span>So</span></div>
+            <div id="pollCalendar" class="appointment-calendar"></div>
+            <div id="availabilityCommonLegend" class="availability-common-legend" hidden><span class="availability-common-dot"></span><span>Markiert: mindestens zwei Personen können an diesem Tag.</span></div>
+          </section>
+          <section class="availability-form-card" aria-label="Verfügbarkeit eintragen">
+            <div class="poll-form-row"><label class="edit-field"><span>Dein Name</span><input id="pollName" placeholder="z. B. Anna"></label><label class="edit-field"><span>Monat für Vorschläge</span><input id="pollMonth" type="month"></label></div>
+            <div id="pollSelectedDates" class="poll-selected-dates" aria-live="polite"></div>
+            <button class="poll-save-button" type="button" onclick="saveAppointmentPoll()">✅ Meine Verfügbarkeit speichern</button>
+            <p id="pollStatus" class="appointment-status" role="status"></p>
+            <div class="availability-summary"><div class="dashboard-kicker">Bisher eingetragen</div><div id="availabilityEntries" class="availability-entries"><span class="panel-subtitle">Noch keine Einträge vorhanden.</span></div></div>
+          </section>
+        </div>
       </section>
       <section class="appointment-preview-card" aria-label="Beispielvorschau">
         <div class="dashboard-kicker">Beispielvorschau</div>
