@@ -54,6 +54,11 @@ erst danach per Admin-Einladung erstellt wird, das Script nach dem Erstellen des
 ausführen. Nutzer können ihr eigenes Konto im Benutzerkonto löschen; das SQL verhindert dabei, dass
 der letzte Admin sein Konto entfernt.
 
+Das Administratorkonto `1keinsuchti1@gmail.com` wird beim Ausführen des SQL-Scripts als geschützt
+markiert. Andere Konten können dessen Rolle, Zugriff und Passwort nicht über den Adminbereich ändern
+oder das Konto löschen. Im eigenen Benutzerkonto wird für dieses Konto die Kontolöschung ausgeblendet.
+Der Schutz bleibt auch dann bestehen, wenn die E-Mail-Adresse des Kontos später geändert wird.
+
 Nutzernamen dürfen 3 bis 24 Zeichen aus Groß- und Kleinbuchstaben, Zahlen, Punkt, Bindestrich und
 Unterstrich enthalten. Die Schreibweise bleibt erhalten, beim Login wird der Name unabhängig von
 Groß- und Kleinschreibung gefunden. Führe das aktualisierte SQL-Script aus, damit die Datenbank diese

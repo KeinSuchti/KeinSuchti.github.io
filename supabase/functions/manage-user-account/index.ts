@@ -68,7 +68,7 @@ Deno.serve(async request => {
   }
 
   const { data: target, error: targetError } = await adminClient.from("profiles")
-    .select("email,role,is_banned")
+    .select("email,role,is_banned,is_protected")
     .eq("id", targetUserId)
     .maybeSingle();
   if (targetError) {
@@ -76,6 +76,9 @@ Deno.serve(async request => {
     return jsonResponse({ error: "Could not load target account." }, 500);
   }
   if (!target) return jsonResponse({ error: "Account not found." }, 404);
+  if (target.is_protected) {
+    return jsonResponse({ error: "Dieses geschützte Administratorkonto kann nicht durch andere Konten verändert werden." }, 403);
+  }
 
   if (action === "password_reset") {
     const { error } = await authClient.auth.resetPasswordForEmail(target.email, { redirectTo });

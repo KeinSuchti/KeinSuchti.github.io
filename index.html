@@ -4812,7 +4812,7 @@ body.color-vision-mode .beer-grade-slider::-moz-range-thumb {
         <button type="button" id="saveAccountButton" onclick="saveAccountProfile()">Profil speichern</button>
         <button type="button" class="auth-link account-password-reset" onclick="requestAccountPasswordReset()">Passwort-Reset per E-Mail anfordern</button>
         <p id="accountStatus" class="appointment-status" role="status" aria-live="polite"></p>
-        <div class="account-danger-zone">
+        <div id="accountDangerZone" class="account-danger-zone">
           <h3>Konto löschen</h3>
           <p class="panel-subtitle">Dein Profil und dein Anmeldekonto werden dauerhaft gelöscht.</p>
           <button type="button" id="deleteAccountButton" class="danger-button" onclick="deleteOwnAccount()">Konto dauerhaft löschen</button>
@@ -6149,7 +6149,7 @@ function showLogin() {
 async function showAppShell() {
   const { data: profile, error: profileError } = await supabaseClient
     .from("profiles")
-    .select("id,username,email,role,is_banned,created_at")
+    .select("id,username,email,role,is_banned,is_protected,created_at")
     .eq("id", currentUser.id)
     .single();
   if (profileError || !profile) {
@@ -6361,6 +6361,10 @@ async function logout() {
 
 async function deleteOwnAccount() {
   if (!currentUser) return;
+  if (currentProfile?.is_protected) {
+    setAccountStatus("Dieses geschützte Administratorkonto kann nicht gelöscht werden.", true);
+    return;
+  }
   const confirmed = window.confirm(
     "Möchtest du dein Konto wirklich dauerhaft löschen? Deine Anmeldung und dein Benutzerprofil werden entfernt. Diese Aktion kann nicht rückgängig gemacht werden."
   );
@@ -6466,6 +6470,7 @@ function loadAccountPanel() {
   document.getElementById("accountEmail").textContent = currentProfile.email || currentUser.email || "";
   document.getElementById("accountRole").textContent = currentProfile.role === "admin" ? "Administrator" : "Nutzer";
   document.getElementById("accountUsername").value = currentProfile.username || "";
+  document.getElementById("accountDangerZone").style.display = currentProfile.is_protected ? "none" : "";
   setAccountStatus("");
 }
 
@@ -6485,7 +6490,7 @@ async function saveAccountProfile() {
     const { data, error } = await supabaseClient.from("profiles")
       .update({ username })
       .eq("id", currentUser.id)
-      .select("id,username,email,role,created_at")
+      .select("id,username,email,role,is_banned,is_protected,created_at")
       .single();
     if (error) {
       console.error("Profil konnte nicht gespeichert werden.", error);
@@ -6531,7 +6536,7 @@ async function loadAdminUsers() {
   host.replaceChildren();
   try {
     const { data, error } = await supabaseClient.from("profiles")
-      .select("id,username,email,role,is_banned,created_at")
+      .select("id,username,email,role,is_banned,is_protected,created_at")
       .order("created_at", { ascending: true });
     if (error) {
       console.error("Konten konnten nicht geladen werden.", error);
@@ -6547,6 +6552,7 @@ async function loadAdminUsers() {
       name.className = "admin-user-name";
       name.textContent = profile.username + (profile.is_banned ? " (gesperrt)" : "");
       if (profile.is_banned) name.classList.add("admin-user-banned");
+      if (profile.is_protected) name.textContent += " (geschützt)";
       const email = document.createElement("div");
       email.className = "admin-user-email";
       email.textContent = profile.email;
@@ -6561,8 +6567,12 @@ async function loadAdminUsers() {
         roleSelect.appendChild(option);
       });
       roleSelect.value = profile.role;
-      roleSelect.disabled = profile.id === currentUser.id;
-      roleSelect.title = roleSelect.disabled ? "Die eigene Administratorrolle kann hier nicht geändert werden." : "Rolle ändern";
+      roleSelect.disabled = profile.id === currentUser.id || profile.is_protected;
+      roleSelect.title = profile.is_protected
+        ? "Dieses geschützte Administratorkonto kann nicht verändert werden."
+        : roleSelect.disabled
+          ? "Die eigene Administratorrolle kann hier nicht geändert werden."
+          : "Rolle ändern";
       roleSelect.addEventListener("change", () => updateProfileRole(profile.id, roleSelect.value));
       const actions = document.createElement("div");
       actions.className = "admin-user-actions";
@@ -6570,19 +6580,28 @@ async function loadAdminUsers() {
       resetButton.type = "button";
       resetButton.textContent = "Passwort-Reset";
       resetButton.title = `Passwort-Reset-E-Mail an ${profile.email} senden`;
+      resetButton.disabled = profile.is_protected;
       resetButton.addEventListener("click", () => manageUserAccount(profile.id, "password_reset"));
       const banButton = document.createElement("button");
       banButton.type = "button";
       banButton.textContent = profile.is_banned ? "Entsperren" : "Sperren";
-      banButton.disabled = profile.id === currentUser.id;
-      banButton.title = banButton.disabled ? "Das eigene Konto kann nicht gesperrt werden." : "Anmeldung sperren bzw. wieder erlauben";
+      banButton.disabled = profile.id === currentUser.id || profile.is_protected;
+      banButton.title = profile.is_protected
+        ? "Dieses geschützte Administratorkonto kann nicht verändert werden."
+        : banButton.disabled
+          ? "Das eigene Konto kann nicht gesperrt werden."
+          : "Anmeldung sperren bzw. wieder erlauben";
       banButton.addEventListener("click", () => manageUserAccount(profile.id, profile.is_banned ? "unban" : "ban"));
       const deleteButton = document.createElement("button");
       deleteButton.type = "button";
       deleteButton.className = "danger-button";
       deleteButton.textContent = "Konto löschen";
-      deleteButton.disabled = profile.id === currentUser.id;
-      deleteButton.title = deleteButton.disabled ? "Das eigene Konto kann hier nicht gelöscht werden." : "Konto dauerhaft löschen";
+      deleteButton.disabled = profile.id === currentUser.id || profile.is_protected;
+      deleteButton.title = profile.is_protected
+        ? "Dieses geschützte Administratorkonto kann nicht gelöscht werden."
+        : deleteButton.disabled
+          ? "Das eigene Konto kann hier nicht gelöscht werden."
+          : "Konto dauerhaft löschen";
       deleteButton.addEventListener("click", () => manageUserAccount(profile.id, "delete", profile.username));
       actions.append(resetButton, banButton, deleteButton);
       row.append(details, roleSelect, actions);
