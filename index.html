@@ -4524,10 +4524,7 @@ body.color-vision-mode .beer-grade-slider::-moz-range-thumb {
     </div>
 <p id="loginError" class="auth-error" role="alert"></p>
 
-    <div class="auth-footer-line">
-      <span aria-hidden="true">🎮</span>
-      <span>Mehr als nur eine Liste.</span>
-    </div>
+   
   </div>
 
   <!-- App -->
@@ -4558,7 +4555,7 @@ body.color-vision-mode .beer-grade-slider::-moz-range-thumb {
           <button class="dashboard-nav-item" type="button" onclick="showMoviesApp()" title="Serien &amp; Filme"><span class="nav-icon" aria-hidden="true">▣</span><span class="nav-label">Serien &amp; Filme</span></button>
           <button class="dashboard-nav-item" type="button" onclick="showFeastApp()" title="Feast Table"><span class="nav-icon" aria-hidden="true">♜</span><span class="nav-label">Feast Table</span></button>
           <button class="dashboard-nav-item" type="button" onclick="showSaufiMenu()" title="Bier &amp; Cocktails"><span class="nav-icon" aria-hidden="true">♧</span><span class="nav-label">Bier &amp; Cocktails</span></button>
-          <button class="dashboard-nav-item" type="button" onclick="showGamesApp()" title="Spieleabend"><span class="nav-icon" aria-hidden="true">⌘</span><span class="nav-label">Spieleabend</span></button>
+          <button class="dashboard-nav-item" type="button" onclick="showGamesApp()" title="Games"><span class="nav-icon" aria-hidden="true">⌘</span><span class="nav-label">Games</span></button>
           <button class="dashboard-nav-item" type="button" onclick="showYugiohApp()" title="Yu-Gi-Oh! Decks"><span class="nav-icon" aria-hidden="true">◈</span><span class="nav-label">Yu-Gi-Oh! Decks</span></button>
           <button class="dashboard-nav-item" type="button" onclick="showAppointmentsApp()" title="Termine abstimmen"><span class="nav-icon" aria-hidden="true">◷</span><span class="nav-label">Termine</span></button>
           <button id="colorVisionToggle" class="dashboard-nav-item color-vision-toggle" type="button" onclick="toggleColorVisionMode()" aria-label="Farbenblöden Modus" aria-pressed="false" title="Farbenblöden Modus"><span class="nav-icon" aria-hidden="true">◐</span><span class="nav-label">Farbenblöden Modus</span></button>
@@ -4596,7 +4593,7 @@ body.color-vision-mode .beer-grade-slider::-moz-range-thumb {
           <button class="dashboard-card card-games" type="button" onclick="showGamesApp()">
             <div class="dashboard-card-image" data-overview-image="games">
             </div>
-            <div class="dashboard-card-body"><span class="card-icon">⌘</span><div><h3>Spieleabend</h3><p>Spiele, Teilnehmer, Kolonnen und Bewertungen im Überblick.</p></div><span class="card-arrow">→</span></div>
+            <div class="dashboard-card-body"><span class="card-icon">⌘</span><div><h3>Games</h3><p>Spiele, Teilnehmer, Kolonnen und Bewertungen im Überblick.</p></div><span class="card-arrow">→</span></div>
           </button>
           <button class="dashboard-card card-yugioh" type="button" onclick="showYugiohApp()">
             <div class="dashboard-card-image" data-overview-image="yugioh">
@@ -4629,7 +4626,7 @@ body.color-vision-mode .beer-grade-slider::-moz-range-thumb {
 
     <!-- Spiele -->
     <div id="gamesApp" class="app-panel" style="display:none;">
-      <div class="list-panel-heading"><h2>🎮 Spiele</h2><button class="list-settings-button" type="button" onclick="openListSettings('games')" aria-label="Einstellungen für Spieleabend" title="Listeneinstellungen">⚙</button></div>
+      <div class="list-panel-heading"><h2>🎮 Spiele</h2><button class="list-settings-button" type="button" onclick="openListSettings('games')" aria-label="Einstellungen für Games" title="Listeneinstellungen">⚙</button></div>
 
       <div class="games-column-form">
         <input
@@ -4726,7 +4723,7 @@ body.color-vision-mode .beer-grade-slider::-moz-range-thumb {
         </section>
         <section class="appointment-form-card">
           <div class="dashboard-kicker">Nächsten Termin festlegen</div>
-          <label class="edit-field"><span>Titel</span><input id="appointmentTitle" placeholder="z. B. Spieleabend"></label>
+          <label class="edit-field"><span>Titel</span><input id="appointmentTitle" placeholder="z. B. Games"></label>
           <label class="edit-field"><span>Datum und Uhrzeit</span><input id="appointmentDate" type="datetime-local"></label>
           <label class="edit-field"><span>Ort</span><input id="appointmentLocation" placeholder="z. B. Bei Anna, Café oder online"></label>
           <label class="edit-field"><span>Freitext / Notiz</span><textarea id="appointmentNote" rows="3" placeholder="Was soll mitgebracht werden? Wer kommt mit?"></textarea></label>
@@ -5724,7 +5721,7 @@ function handleOverviewImage(event, key) {
   event.target.value = "";
 }
 let activeSettingsKey = "";
-const listSettingsNames = { movies: "Serien & Filme", feast: "Feast Table", beer: "Bier", cocktail: "Cocktail", games: "Spieleabend", yugioh: "Yu-Gi-Oh!-Decks", custom: "Eigene Liste" };
+const listSettingsNames = { movies: "Serien & Filme", feast: "Feast Table", beer: "Bier", cocktail: "Cocktail", games: "Games", yugioh: "Yu-Gi-Oh!-Decks", custom: "Eigene Liste" };
 function listSettingsStorageKey(key, suffix) { return `wfg-list-setting:${currentUser?.id || "guest"}:${key}:${suffix}`; }
 function getListSetting(key, suffix, fallback) { return localStorage.getItem(listSettingsStorageKey(key, suffix)) || fallback; }
 function openListSettings(key) {
