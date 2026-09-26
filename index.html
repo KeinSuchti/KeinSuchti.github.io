@@ -997,6 +997,24 @@ input[type="checkbox"] {
   gap: 8px;
 }
 
+.yugioh-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.yugioh-filter-bar label {
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.yugioh-filter-bar select {
+  flex: 1 1 180px;
+  width: min(100%, 320px);
+}
+
 .yugioh-list {
   margin-top: 18px;
   display: grid;
@@ -4673,6 +4691,13 @@ body.color-vision-mode .beer-grade-slider::-moz-range-thumb {
         <div id="yugiohAssignmentResults" class="yugioh-assignment-results"></div>
       </div>
 
+      <div class="yugioh-filter-bar">
+        <label for="yugiohOwnerFilter">Besitzer filtern:</label>
+        <select id="yugiohOwnerFilter" onchange="renderYugiohDecks()">
+          <option value="">Alle Besitzer</option>
+        </select>
+      </div>
+
       <div id="yugiohDeckList" class="yugioh-list"></div>
 
     </div>
@@ -5039,6 +5064,7 @@ const gamesCheckSortSelect = document.getElementById("gamesCheckSort");
 const gamesCheckFilterSelect = document.getElementById("gamesCheckFilter");
 
 const yugiohDeckList = document.getElementById("yugiohDeckList");
+const yugiohOwnerFilter = document.getElementById("yugiohOwnerFilter");
 const newYugiohThemeInput = document.getElementById("newYugiohTheme");
 const newYugiohSleeveColorInput = document.getElementById("newYugiohSleeveColor");
 const newYugiohOwnerInput = document.getElementById("newYugiohOwner");
@@ -8366,6 +8392,7 @@ async function loadYugiohDecks() {
 
 function renderYugiohDecks() {
   yugiohDeckList.innerHTML = "";
+  updateYugiohOwnerFilter();
 
   if (!Array.isArray(yugiohDecks) || yugiohDecks.length === 0) {
     const empty = document.createElement("div");
@@ -8375,7 +8402,16 @@ function renderYugiohDecks() {
     return;
   }
 
-  yugiohDecks.forEach(deck => {
+  const filteredDecks = getFilteredYugiohDecks();
+  if (filteredDecks.length === 0) {
+    const empty = document.createElement("div");
+    empty.className = "yugioh-empty";
+    empty.textContent = "Für diesen Besitzer sind keine Decks vorhanden.";
+    yugiohDeckList.appendChild(empty);
+    return;
+  }
+
+  filteredDecks.forEach(deck => {
     const card = document.createElement("div");
     card.className = "yugioh-deck-card";
 
@@ -8457,6 +8493,60 @@ function renderYugiohDecks() {
   });
 }
 
+function updateYugiohOwnerFilter() {
+  const selectedOwner = yugiohOwnerFilter.value;
+  const owners = [...new Set(
+    yugiohDecks
+      .map(deck => String(deck.owner || "").trim())
+      .filter(Boolean)
+  )].sort((a, b) => a.localeCompare(b, "de"));
+  const hasUnassignedDecks = yugiohDecks.some(
+    deck => !String(deck.owner || "").trim()
+  );
+
+  yugiohOwnerFilter.replaceChildren();
+
+  const allOwnersOption = document.createElement("option");
+  allOwnersOption.value = "";
+  allOwnersOption.textContent = "Alle Besitzer";
+  yugiohOwnerFilter.appendChild(allOwnersOption);
+
+  owners.forEach(owner => {
+    const option = document.createElement("option");
+    option.value = `owner:${encodeURIComponent(owner)}`;
+    option.textContent = owner;
+    yugiohOwnerFilter.appendChild(option);
+  });
+
+  if (hasUnassignedDecks) {
+    const unassignedOption = document.createElement("option");
+    unassignedOption.value = "unassigned";
+    unassignedOption.textContent = "Nicht angegeben";
+    yugiohOwnerFilter.appendChild(unassignedOption);
+  }
+
+  yugiohOwnerFilter.value = Array.from(yugiohOwnerFilter.options)
+    .some(option => option.value === selectedOwner)
+    ? selectedOwner
+    : "";
+}
+
+function getFilteredYugiohDecks() {
+  const selectedOwner = yugiohOwnerFilter.value;
+  if (!selectedOwner) {
+    return yugiohDecks;
+  }
+
+  if (selectedOwner === "unassigned") {
+    return yugiohDecks.filter(deck => !String(deck.owner || "").trim());
+  }
+
+  const owner = decodeURIComponent(selectedOwner.slice("owner:".length));
+  return yugiohDecks.filter(
+    deck => String(deck.owner || "").trim() === owner
+  );
+}
+
 function parseYugiohPlayerCount() {
   const value = Number(yugiohPlayerCountInput.value || 0);
 
@@ -8511,12 +8601,18 @@ function assignRandomYugiohDecks() {
     return;
   }
 
-  if (players.length > yugiohDecks.length) {
+  const availableDecks = getFilteredYugiohDecks();
+  if (availableDecks.length === 0) {
+    showRandomPopup("Für den ausgewählten Besitzer sind keine Decks vorhanden.");
+    return;
+  }
+
+  if (players.length > availableDecks.length) {
     showRandomPopup("Es gibt weniger Decks als Spieler.");
     return;
   }
 
-  const shuffledDecks = [...yugiohDecks]
+  const shuffledDecks = [...availableDecks]
     .sort(() => Math.random() - 0.5);
 
   const assignments = players.map((playerName, index) => {
