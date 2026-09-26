@@ -68,6 +68,15 @@ Deno.serve(async request => {
   });
   if (insertError) {
     console.error("Could not store registration invitation.", insertError);
+    if (
+      insertError.code === "42P01" ||
+      insertError.code === "PGRST205" ||
+      insertError.code === "42501"
+    ) {
+      return jsonResponse({
+        error: "Die Registrierungstabelle oder ihre Berechtigungen fehlen. Führe das aktualisierte supabase-account-setup.sql im Supabase SQL Editor aus."
+      }, 500);
+    }
     return jsonResponse({ error: "Could not create a registration link." }, 500);
   }
 
