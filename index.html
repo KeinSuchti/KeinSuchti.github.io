@@ -2371,13 +2371,14 @@ body.app-scene #menuBox {
 .dashboard-brand > span:last-child span { color:#48dfd0; } .dashboard-brand > span:last-child b { color:#8a6df4; }
 .brand-mark { width:34px; height:34px; border-radius:11px; display:grid; place-items:center; background:linear-gradient(135deg,#35e4d0,#5968ff 60%,#8c4cf5); color:#fff; box-shadow:0 8px 22px rgba(81,99,245,.25); }
 .dashboard-nav { display:flex; flex-direction:column; gap:6px; }
-.dashboard-current-user { display:block; min-width:0; margin:0 0 8px; padding:10px 12px; overflow:hidden; border:1px solid rgba(86,207,220,.20); border-radius:11px; background:rgba(28,203,195,.08); color:#8fa5c1; font-size:11px; text-overflow:ellipsis; white-space:nowrap; }
-.dashboard-current-user strong { display:block; overflow:hidden; color:#eef5ff; font-size:13px; text-overflow:ellipsis; }
+.dashboard-current-user { display:block; min-width:0; margin:0 0 8px; padding:10px 10px; overflow:hidden; border:1px solid rgba(86,207,220,.20); border-radius:11px; background:rgba(28,203,195,.08); color:#8fa5c1; font-size:10px; font-weight:700; letter-spacing:.04em; text-align:center; text-overflow:ellipsis; white-space:nowrap; }
+.dashboard-current-user strong { display:block; margin-top:4px; overflow:hidden; color:#eef5ff; font-size:13px; letter-spacing:0; text-overflow:ellipsis; }
 .dashboard-nav-item { width:100% !important; margin:0 !important; padding:11px 12px !important; display:flex; align-items:center; gap:12px; text-align:left; border:1px solid transparent !important; border-radius:11px !important; background:transparent !important; color:#b7c7df !important; font-size:13px !important; font-weight:600 !important; box-shadow:none !important; }
 .dashboard-nav-item span { width:20px; text-align:center; color:#91aef4; font-size:16px; }
 .dashboard-nav-item .nav-icon svg { display:block; width:20px; height:20px; fill:none; stroke:currentColor; stroke-linecap:round; stroke-linejoin:round; stroke-width:1.8; }
 .dashboard-nav-item:hover, .dashboard-nav-item.active { color:#f2f7ff !important; background:linear-gradient(90deg, rgba(28,203,195,.18), rgba(91,77,224,.28)) !important; border-color:rgba(86,207,220,.20) !important; transform:none !important; }
 .dashboard-nav-item.active span { color:#57e1d5; }
+.dashboard-nav-item.dashboard-nav-subitem { width:calc(100% - 14px) !important; margin-left:14px !important; padding-top:9px !important; padding-bottom:9px !important; font-size:12px !important; }
 .dashboard-sidebar-footer { margin-top:auto; border-top:1px solid rgba(118,145,199,.13); padding-top:14px; }
 .sidebar-motto { color:#6f83a3; font-family:var(--font-display); font-size:12px; line-height:1.55; text-align:center; padding:28px 12px 4px; }
 .dashboard-main {margin-left: var(--sidebar-width); transition: margin-left 360ms cubic-bezier(.22,.61,.36,1); padding:28px 30px 22px; min-width:0; }
@@ -2945,9 +2946,6 @@ body.app-scene .sidebar-logout-button .nav-icon svg {
 .account-danger-zone .panel-subtitle { margin:0; }
 .danger-button { border-color:rgba(255,115,115,.42) !important; background:rgba(114,29,39,.42) !important; color:#ffd7d3 !important; }
 .danger-button:hover { background:rgba(145,37,48,.62) !important; }
-.account-admin-menu { display:grid; gap:8px; padding-top:14px; border-top:1px solid rgba(101,141,207,.2); }
-.account-admin-menu h3 { margin:0; color:#eef5ff; font-size:15px; }
-.account-admin-menu .panel-subtitle { margin:0; }
 .admin-users { display:grid; gap:10px; }
 .admin-user-row { display:grid; grid-template-columns:minmax(0,1fr) minmax(140px,180px) minmax(240px,auto); align-items:center; gap:12px; padding:13px 15px; border:1px solid rgba(101,141,207,.2); border-radius:12px; background:rgba(8,24,45,.56); }
 .admin-user-name { color:#eef5ff; font-size:13px; font-weight:800; }
@@ -4605,6 +4603,7 @@ body.color-vision-mode .beer-grade-slider::-moz-range-thumb {
           <button class="dashboard-nav-item" type="button" onclick="showYugiohApp()" title="Yu-Gi-Oh! Decks"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="6" y="3" width="13" height="17" rx="2" transform="rotate(8 6 3)"></rect><rect x="4" y="5" width="13" height="17" rx="2"></rect><path d="m10.5 9 1.5-2 1.5 2-.5 2h-2l-.5-2Zm1.5 2v3m-2 2h4"></path></svg></span><span class="nav-label">Yu-Gi-Oh! Decks</span></button>
           <button class="dashboard-nav-item" type="button" onclick="showAppointmentsApp()" title="Termine abstimmen"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M7 3v4m10-4v4M3 10h18m-12 4h6"></path></svg></span><span class="nav-label">Termine</span></button>
           <button class="dashboard-nav-item" type="button" onclick="showAccountApp()" title="Benutzerkonto"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"></circle><path d="M4 21a8 8 0 0 1 16 0"></path></svg></span><span class="nav-label">Benutzerkonto</span></button>
+          <button id="sidebarAdminNavItem" class="dashboard-nav-item dashboard-nav-subitem" type="button" onclick="showAdminApp()" style="display:none;" title="Administration"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3 20 6v5c0 5-3.4 8.2-8 10-4.6-1.8-8-5-8-10V6l8-3Z"></path><path d="m9 12 2 2 4-4"></path></svg></span><span class="nav-label">Administration</span></button>
           <button id="colorVisionToggle" class="dashboard-nav-item color-vision-toggle" type="button" onclick="toggleColorVisionMode()" aria-label="Farbenfreundlichen Modus" aria-pressed="false" title="Farbenfreundlichen Modus"><span class="nav-icon" aria-hidden="true">◐</span><span class="nav-label">Farbenfreundlicher Modus</span></button>
         </nav>
         <button id="sidebarLogout" class="sidebar-logout-button" type="button" onclick="logout()" aria-label="Logout" title="Logout"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M10 17l5-5-5-5"></path><path d="M15 12H3"></path><path d="M12 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6"></path></svg></span></button>
@@ -4813,11 +4812,6 @@ body.color-vision-mode .beer-grade-slider::-moz-range-thumb {
         <button type="button" id="saveAccountButton" onclick="saveAccountProfile()">Profil speichern</button>
         <button type="button" class="auth-link account-password-reset" onclick="requestAccountPasswordReset()">Passwort-Reset per E-Mail anfordern</button>
         <p id="accountStatus" class="appointment-status" role="status" aria-live="polite"></p>
-        <div id="accountAdminMenu" class="account-admin-menu" style="display:none;">
-          <h3>Administration</h3>
-          <p class="panel-subtitle">Konten und Registrierungslinks verwalten.</p>
-          <button type="button" onclick="showAdminApp()">Administratorbereich öffnen</button>
-        </div>
         <div class="account-danger-zone">
           <h3>Konto löschen</h3>
           <p class="panel-subtitle">Dein Profil und dein Anmeldekonto werden dauerhaft gelöscht.</p>
@@ -6113,6 +6107,7 @@ async function resetPassword() {
 
 
 function showLogin() {
+  closeMobileSidebar();
   document.body.classList.add("login-scene");
   document.body.classList.remove("app-scene");
   currentUser = null;
@@ -6140,7 +6135,7 @@ function showLogin() {
   loginError.textContent = "";
   loginError.classList.remove("auth-success");
   userInfo.textContent = "";
-  document.getElementById("accountAdminMenu").style.display = "none";
+  document.getElementById("sidebarAdminNavItem").style.display = "none";
   document.getElementById("sidebarCurrentUsername").textContent = "";
   setStatus("");
   closeRandomPopup();
@@ -6183,7 +6178,7 @@ async function showAppShell() {
     if (dashboardUserLabel) dashboardUserLabel.textContent = displayName;
   }
 
-  document.getElementById("accountAdminMenu").style.display = currentProfile.role === "admin" ? "grid" : "none";
+  document.getElementById("sidebarAdminNavItem").style.display = isCurrentUserAdmin() ? "flex" : "none";
   showMenu(false);
   loadCustomLists();
   loadNextAppointment();
@@ -6287,7 +6282,7 @@ async function login() {
 
 async function completeInvitation() {
   const email = inviteEmailInput.value.trim().toLowerCase();
-  const username = inviteUsernameInput.value.trim().toLowerCase();
+  const username = inviteUsernameInput.value.trim();
   const password = invitePasswordInput.value;
   if (!currentRegistrationToken) {
     setAuthMessage("Dieser Registrierungslink ist ungültig oder abgelaufen. Bitte einen Admin um einen neuen Link.");
@@ -6298,7 +6293,7 @@ async function completeInvitation() {
     inviteEmailInput.focus();
     return;
   }
-  if (!/^[a-z0-9][a-z0-9_.-]{2,23}$/.test(username)) {
+  if (!/^[A-Za-z0-9][A-Za-z0-9_.-]{2,23}$/.test(username)) {
     setAuthMessage("Der Nutzername muss 3-24 Zeichen lang sein und darf Buchstaben, Zahlen, Punkt, Bindestrich und Unterstrich enthalten.");
     inviteUsernameInput.focus();
     return;
@@ -6354,7 +6349,13 @@ async function completeInvitation() {
 
 async function logout() {
   closeMobileSidebar();
-  await supabaseClient.auth.signOut();
+  const { error } = await supabaseClient.auth.signOut();
+  closeMobileSidebar();
+  if (error) {
+    console.error("Abmeldung fehlgeschlagen.", error);
+    setStatus("Abmeldung fehlgeschlagen. Bitte erneut versuchen.");
+    return;
+  }
   showLogin();
 }
 
@@ -6471,8 +6472,8 @@ function loadAccountPanel() {
 async function saveAccountProfile() {
   if (!currentUser || !currentProfile) return;
   const usernameInput = document.getElementById("accountUsername");
-  const username = usernameInput.value.trim().toLowerCase();
-  if (!/^[a-z0-9][a-z0-9_.-]{2,23}$/.test(username)) {
+  const username = usernameInput.value.trim();
+  if (!/^[A-Za-z0-9][A-Za-z0-9_.-]{2,23}$/.test(username)) {
     setAccountStatus("Der Nutzername muss 3-24 Zeichen lang sein und darf Buchstaben, Zahlen, Punkt, Bindestrich und Unterstrich enthalten.", true);
     usernameInput.focus();
     return;

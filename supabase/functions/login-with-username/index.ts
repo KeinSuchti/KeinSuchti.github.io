@@ -38,16 +38,16 @@ Deno.serve(async request => {
     return jsonResponse({ error: "Invalid request." }, 400);
   }
 
-  const username = typeof body.username === "string" ? body.username.trim().toLowerCase() : "";
+  const username = typeof body.username === "string" ? body.username.trim() : "";
   const password = typeof body.password === "string" ? body.password : "";
-  if (!/^[a-z0-9][a-z0-9_.-]{2,23}$/.test(username) || !password || password.length > 256) {
+  if (!/^[A-Za-z0-9][A-Za-z0-9_.-]{2,23}$/.test(username) || !password || password.length > 256) {
     return jsonResponse({ error: "Invalid credentials." }, 401);
   }
 
   const { data: profile, error: profileError } = await adminClient
     .from("profiles")
     .select("email,is_banned")
-    .eq("username", username)
+    .ilike("username", username.replace(/[\\%_]/g, "\\$&"))
     .maybeSingle();
   if (profileError || !profile?.email || profile.is_banned) {
     return jsonResponse({ error: "Invalid credentials." }, 401);
