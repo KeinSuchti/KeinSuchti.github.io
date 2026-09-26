@@ -4502,15 +4502,6 @@ body.color-vision-mode .beer-grade-slider::-moz-range-thumb {
       </div>
     </div>
 
-    <div class="auth-tabs" role="tablist" aria-label="Authentifizierung">
-      <button type="button" id="loginTab" class="auth-tab active" onclick="switchAuthMode('login')" role="tab" aria-selected="true">
-        Login
-      </button>
-      <button type="button" id="registerTab" class="auth-tab" onclick="switchAuthMode('register')" role="tab" aria-selected="false">
-        Registrieren
-      </button>
-    </div>
-
     <div id="loginForm" class="auth-form">
       <div class="auth-heading">
         <h2>Willkommen zurück</h2>
@@ -4538,29 +4529,21 @@ body.color-vision-mode .beer-grade-slider::-moz-range-thumb {
         <span>Einloggen</span><span aria-hidden="true">→</span>
       </button>
 
-      <p class="auth-legal">Mit dem Login stimmst du unseren Nutzungsbedingungen und der Datenschutzerklärung zu.</p>
+      <p class="auth-legal">Mit dem Login stimmst du unseren Nutzungsbedingungen und der Datenschutzerklärung zu. Noch kein Konto? Bitte einen Admin um einen Einladungslink.</p>
     </div>
-    <div id="registerForm" class="auth-form" style="display:none;">
+
+    <div id="inviteSetup" class="auth-form" style="display:none;">
       <div class="auth-heading">
-        <h2>Account erstellen</h2>
-        <p>Registriere dich mit E-Mail-Adresse, Nutzernamen und Passwort.</p>
+        <h2>Einladung annehmen</h2>
+        <p>Lege ein Passwort fest, um dein eingeladenes Konto zu aktivieren.</p>
       </div>
       <label class="auth-field">
-        <span class="auth-field-icon" aria-hidden="true">◎</span>
-        <input type="text" id="registerUsername" placeholder="Nutzername (3-24 Zeichen)" autocomplete="username" aria-label="Nutzername" maxlength="24">
-      </label>
-      <label class="auth-field">
-        <span class="auth-field-icon" aria-hidden="true">✉</span>
-        <input type="email" id="registerEmail" placeholder="E-Mail-Adresse" autocomplete="email" aria-label="E-Mail-Adresse">
-      </label>
-      <label class="auth-field">
         <span class="auth-field-icon password-field-icon" aria-hidden="true">●</span>
-        <input type="password" id="registerPassword" placeholder="Passwort (mindestens 8 Zeichen)" autocomplete="new-password" aria-label="Passwort" minlength="8">
+        <input type="password" id="invitePassword" placeholder="Passwort (mindestens 8 Zeichen)" autocomplete="new-password" aria-label="Neues Passwort" minlength="8">
       </label>
-      <button type="button" id="registerButton" class="auth-primary" onclick="registerAccount()">
-        <span>Account erstellen</span><span aria-hidden="true">→</span>
+      <button type="button" id="inviteAcceptButton" class="auth-primary" onclick="completeInvitation()">
+        <span>Passwort festlegen</span><span aria-hidden="true">→</span>
       </button>
-      <p class="auth-legal">Nach der Registrierung erhältst du eine E-Mail zur Bestätigung deines Accounts.</p>
     </div>
     <p id="loginError" class="auth-error" role="status" aria-live="polite"></p>
   </div>
@@ -4810,7 +4793,16 @@ body.color-vision-mode .beer-grade-slider::-moz-range-thumb {
     </section>
 
     <section id="adminApp" class="app-panel account-panel" style="display:none;" aria-labelledby="adminTitle">
-      <div class="list-panel-heading"><div><h2 id="adminTitle">Administration</h2><p class="panel-subtitle">Konten ansehen und Rollen verwalten. Rollenänderungen wirken sofort.</p></div></div>
+      <div class="list-panel-heading"><div><h2 id="adminTitle">Administration</h2><p class="panel-subtitle">Konten verwalten und neue Nutzer einladen. Nur Admins können Einladungen erstellen.</p></div></div>
+      <div class="account-card">
+        <h3>Nutzer einladen</h3>
+        <label class="edit-field"><span>E-Mail-Adresse</span><input id="inviteEmail" type="email" autocomplete="email" required></label>
+        <label class="edit-field"><span>Nutzername</span><input id="inviteUsername" type="text" maxlength="24" autocomplete="off" required></label>
+        <button type="button" id="createInviteButton" onclick="createUserInvitation()">Einladungslink erstellen</button>
+        <label id="inviteLinkField" class="edit-field" style="display:none;"><span>Einmaliger Einladungslink</span><input id="generatedInviteLink" type="url" readonly></label>
+        <button type="button" id="copyInviteLinkButton" style="display:none;" onclick="copyInvitationLink()">Link kopieren</button>
+        <p id="inviteStatus" class="appointment-status" role="status" aria-live="polite"></p>
+      </div>
       <p id="adminStatus" class="appointment-status" role="status" aria-live="polite"></p>
       <div id="adminUsers" class="admin-users"></div>
     </section>
@@ -5119,9 +5111,7 @@ let availabilityEntries = [];
 const emailInput = document.getElementById("email");
 const passwordInput = document.getElementById("password");
 const loginError = document.getElementById("loginError");
-const registerUsernameInput = document.getElementById("registerUsername");
-const registerEmailInput = document.getElementById("registerEmail");
-const registerPasswordInput = document.getElementById("registerPassword");
+const invitePasswordInput = document.getElementById("invitePassword");
 const userInfo = document.getElementById("userInfo");
 const globalStatus = document.getElementById("globalStatus");
 const editEntryModal = document.getElementById("editEntryModal");
@@ -6046,22 +6036,6 @@ function closeYugiohAssignmentPopupOnOverlay(event) {
 
 /* Auth */
 
-function switchAuthMode(mode = "login") {
-  const loginForm = document.getElementById("loginForm");
-  const loginTab = document.getElementById("loginTab");
-  const registerForm = document.getElementById("registerForm");
-  const registerTab = document.getElementById("registerTab");
-  const isRegister = mode === "register";
-  loginForm.style.display = isRegister ? "none" : "block";
-  registerForm.style.display = isRegister ? "block" : "none";
-  loginTab.classList.toggle("active", !isRegister);
-  loginTab.setAttribute("aria-selected", String(!isRegister));
-  registerTab.classList.toggle("active", isRegister);
-  registerTab.setAttribute("aria-selected", String(isRegister));
-  loginError.textContent = "";
-  loginError.classList.remove("auth-success");
-}
-
 function setAuthMessage(message, isError = true) {
   loginError.textContent = message;
   loginError.classList.toggle("auth-success", !isError);
@@ -6136,7 +6110,8 @@ function showLogin() {
   closeYugiohAssignmentPopup();
   closeEditEntryModal();
 
-  switchAuthMode("login");
+  document.getElementById("loginForm").style.display = "block";
+  document.getElementById("inviteSetup").style.display = "none";
 }
 
 async function showAppShell() {
@@ -6170,6 +6145,16 @@ async function showAppShell() {
   return true;
 }
 
+function showInviteSetup() {
+  document.body.classList.add("login-scene");
+  document.body.classList.remove("app-scene");
+  loginBox.style.display = "block";
+  appShell.style.display = "none";
+  document.getElementById("loginForm").style.display = "none";
+  document.getElementById("inviteSetup").style.display = "block";
+  setAuthMessage("");
+}
+
 async function initAuth() {
   const { data, error } = await supabaseClient.auth.getSession();
 
@@ -6181,9 +6166,16 @@ async function initAuth() {
 
   if (data.session && data.session.user) {
     currentUser = data.session.user;
-    await showAppShell();
+    if (new URLSearchParams(window.location.search).get("invite") === "1") {
+      showInviteSetup();
+    } else {
+      await showAppShell();
+    }
   } else {
     showLogin();
+    if (new URLSearchParams(window.location.search).get("invite") === "1") {
+      setAuthMessage("Dieser Einladungslink ist ungültig oder abgelaufen. Bitte einen Admin um einen neuen Link.");
+    }
   }
 }
 
@@ -6237,49 +6229,31 @@ async function login() {
   }
 }
 
-async function registerAccount() {
-  const username = registerUsernameInput.value.trim().toLowerCase();
-  const email = registerEmailInput.value.trim().toLowerCase();
-  const password = registerPasswordInput.value;
-  if (!/^[a-z0-9][a-z0-9_.-]{2,23}$/.test(username)) {
-    setAuthMessage("Der Nutzername muss 3-24 Zeichen lang sein und darf Buchstaben, Zahlen, Punkt, Bindestrich und Unterstrich enthalten.");
-    registerUsernameInput.focus();
-    return;
-  }
-  if (!registerEmailInput.checkValidity()) {
-    setAuthMessage("Bitte eine gültige E-Mail-Adresse eingeben.");
-    registerEmailInput.focus();
-    return;
-  }
+async function completeInvitation() {
+  const password = invitePasswordInput.value;
   if (password.length < 8) {
     setAuthMessage("Das Passwort muss mindestens 8 Zeichen lang sein.");
-    registerPasswordInput.focus();
+    invitePasswordInput.focus();
     return;
   }
 
-  const button = document.getElementById("registerButton");
+  const button = document.getElementById("inviteAcceptButton");
   button.disabled = true;
-  setAuthMessage("Registrierung läuft …", false);
+  setAuthMessage("Passwort wird festgelegt …", false);
   try {
-    const { data, error } = await supabaseClient.auth.signUp({
-      email,
-      password,
-      options: { data: { username } }
-    });
+    const { data, error } = await supabaseClient.auth.updateUser({ password });
     if (error) {
-      setAuthMessage(error.message || "Registrierung fehlgeschlagen. Bitte Eingaben prüfen.");
+      console.error("Einladung konnte nicht abgeschlossen werden.", error);
+      setAuthMessage("Passwort konnte nicht festgelegt werden. Bitte Einladungslink erneut öffnen.");
       return;
     }
-    registerPasswordInput.value = "";
-    if (data.session && data.user) {
-      currentUser = data.user;
-      await showAppShell();
-      return;
-    }
-    setAuthMessage("Registrierung eingegangen. Bitte bestätige deine E-Mail-Adresse über den zugesandten Link, bevor du dich anmeldest.", false);
+    currentUser = data.user;
+    invitePasswordInput.value = "";
+    window.history.replaceState({}, document.title, window.location.pathname);
+    await showAppShell();
   } catch (error) {
-    console.error("Registrierung fehlgeschlagen.", error);
-    setAuthMessage("Registrierung momentan nicht möglich. Bitte Verbindung prüfen und erneut versuchen.");
+    console.error("Einladung konnte nicht abgeschlossen werden.", error);
+    setAuthMessage("Einladung momentan nicht erreichbar. Bitte Verbindung prüfen und erneut versuchen.");
   } finally {
     button.disabled = false;
   }
@@ -6293,6 +6267,65 @@ async function logout() {
 
 function isCurrentUserAdmin() {
   return currentProfile?.role === "admin";
+}
+
+async function createUserInvitation() {
+  if (!isCurrentUserAdmin()) return;
+  const emailInput = document.getElementById("inviteEmail");
+  const usernameInput = document.getElementById("inviteUsername");
+  const email = emailInput.value.trim().toLowerCase();
+  const username = usernameInput.value.trim().toLowerCase();
+  const status = document.getElementById("inviteStatus");
+  const button = document.getElementById("createInviteButton");
+  const linkField = document.getElementById("inviteLinkField");
+  const copyButton = document.getElementById("copyInviteLinkButton");
+  linkField.style.display = "none";
+  copyButton.style.display = "none";
+
+  if (!emailInput.checkValidity()) {
+    status.textContent = "Bitte eine gültige E-Mail-Adresse eingeben.";
+    emailInput.focus();
+    return;
+  }
+  if (!/^[a-z0-9][a-z0-9_.-]{2,23}$/.test(username)) {
+    status.textContent = "Der Nutzername muss 3-24 Zeichen lang sein und darf Buchstaben, Zahlen, Punkt, Bindestrich und Unterstrich enthalten.";
+    usernameInput.focus();
+    return;
+  }
+
+  button.disabled = true;
+  status.textContent = "Einladungslink wird erstellt …";
+  try {
+    const { data, error } = await supabaseClient.functions.invoke("create-user-invite", {
+      body: { email, username }
+    });
+    if (error || !data?.action_link) {
+      if (error) console.error("Einladungslink konnte nicht erstellt werden.", error);
+      status.textContent = data?.error || "Einladung konnte nicht erstellt werden. E-Mail und Nutzername prüfen.";
+      return;
+    }
+    document.getElementById("generatedInviteLink").value = data.action_link;
+    linkField.style.display = "grid";
+    copyButton.style.display = "inline-block";
+    status.textContent = "Einladung erstellt. Der Link ist einmalig und kann nur für dieses Konto verwendet werden.";
+  } catch (error) {
+    console.error("Einladungslink konnte nicht erstellt werden.", error);
+    status.textContent = "Einladungslink momentan nicht verfügbar.";
+  } finally {
+    button.disabled = false;
+  }
+}
+
+async function copyInvitationLink() {
+  const link = document.getElementById("generatedInviteLink").value;
+  const status = document.getElementById("inviteStatus");
+  try {
+    await navigator.clipboard.writeText(link);
+    status.textContent = "Einladungslink in die Zwischenablage kopiert.";
+  } catch (error) {
+    console.error("Einladungslink konnte nicht kopiert werden.", error);
+    status.textContent = "Kopieren nicht möglich. Bitte den Link aus dem Feld manuell kopieren.";
+  }
 }
 
 function setAccountStatus(message, isError = false) {
