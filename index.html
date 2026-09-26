@@ -2379,6 +2379,11 @@ body.app-scene #menuBox {
 .dashboard-nav-item:hover, .dashboard-nav-item.active { color:#f2f7ff !important; background:linear-gradient(90deg, rgba(28,203,195,.18), rgba(91,77,224,.28)) !important; border-color:rgba(86,207,220,.20) !important; transform:none !important; }
 .dashboard-nav-item.active span { color:#57e1d5; }
 .dashboard-nav-item.dashboard-nav-subitem { width:calc(100% - 14px) !important; margin-left:14px !important; padding-top:9px !important; padding-bottom:9px !important; font-size:12px !important; }
+.dashboard-account-nav-group { display:flex; flex-direction:column; gap:6px; }
+.dashboard-account-nav-group #sidebarAdminNavItem[hidden] { display:none !important; }
+.dashboard-account-nav-group #sidebarAdminNavItem:not([hidden]) { display:none !important; }
+.dashboard-account-nav-group:hover #sidebarAdminNavItem:not([hidden]),
+.dashboard-account-nav-group:focus-within #sidebarAdminNavItem:not([hidden]) { display:flex !important; }
 .dashboard-sidebar-footer { margin-top:auto; border-top:1px solid rgba(118,145,199,.13); padding-top:14px; }
 .sidebar-motto { color:#6f83a3; font-family:var(--font-display); font-size:12px; line-height:1.55; text-align:center; padding:28px 12px 4px; }
 .dashboard-main {margin-left: var(--sidebar-width); transition: margin-left 360ms cubic-bezier(.22,.61,.36,1); padding:28px 30px 22px; min-width:0; }
@@ -2763,6 +2768,7 @@ button, input, select, textarea { max-width: 100%; }
   body.app-scene .dashboard-sidebar { position:static; width:100%; height:auto; min-height:0; padding:10px; border-right:0; border-bottom:1px solid rgba(118,145,199,.16); overflow:visible; display:block; }
   body.app-scene .dashboard-sidebar > .sidebar-toggle-floating { display:none; }
   body.app-scene .dashboard-sidebar > .dashboard-nav { margin:0; display:flex; flex-direction:row; gap:7px; overflow-x:auto; overflow-y:hidden; padding:2px 0 4px; scrollbar-width:thin; }
+  body.app-scene .dashboard-account-nav-group { flex:0 0 auto; }
   body.app-scene .dashboard-nav-item { flex:0 0 auto; width:auto !important; min-height:42px; padding:9px 12px !important; justify-content:center; white-space:nowrap; }
   body.app-scene .dashboard-nav-item .nav-label { max-width:180px; opacity:1; pointer-events:auto; }
   body.app-scene .dashboard-main, body.app-scene .sidebar-collapsed .dashboard-main { width:100%; min-width:0; margin-left:0; padding:18px 14px 22px; }
@@ -4639,8 +4645,10 @@ body.color-vision-mode .beer-grade-slider::-moz-range-thumb {
           <button class="dashboard-nav-item" type="button" onclick="showGamesApp()" title="Games"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 8h10a4 4 0 0 1 3.8 2.8l1.1 4a2.5 2.5 0 0 1-4.1 2.5l-2.3-2H8.5l-2.3 2a2.5 2.5 0 0 1-4.1-2.5l1.1-4A4 4 0 0 1 7 8Z"></path><path d="M7 11v4m-2-2h4m7-.5h.01M18 14.5h.01"></path></svg></span><span class="nav-label">Games</span></button>
           <button class="dashboard-nav-item" type="button" onclick="showYugiohApp()" title="Yu-Gi-Oh! Decks"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="6" y="3" width="13" height="17" rx="2" transform="rotate(8 6 3)"></rect><rect x="4" y="5" width="13" height="17" rx="2"></rect><path d="m10.5 9 1.5-2 1.5 2-.5 2h-2l-.5-2Zm1.5 2v3m-2 2h4"></path></svg></span><span class="nav-label">Yu-Gi-Oh! Decks</span></button>
           <button class="dashboard-nav-item" type="button" onclick="showAppointmentsApp()" title="Termine abstimmen"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M7 3v4m10-4v4M3 10h18m-12 4h6"></path></svg></span><span class="nav-label">Termine</span></button>
-          <button class="dashboard-nav-item" type="button" onclick="showAccountApp()" title="Benutzerkonto"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"></circle><path d="M4 21a8 8 0 0 1 16 0"></path></svg></span><span class="nav-label">Benutzerkonto</span></button>
-          <button id="sidebarAdminNavItem" class="dashboard-nav-item dashboard-nav-subitem" type="button" onclick="showAdminApp()" style="display:none;" title="Administration"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3 20 6v5c0 5-3.4 8.2-8 10-4.6-1.8-8-5-8-10V6l8-3Z"></path><path d="m9 12 2 2 4-4"></path></svg></span><span class="nav-label">Administration</span></button>
+          <div class="dashboard-account-nav-group">
+            <button id="sidebarAccountNavItem" class="dashboard-nav-item" type="button" onclick="showAccountApp()" title="Benutzerkonto"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"></circle><path d="M4 21a8 8 0 0 1 16 0"></path></svg></span><span class="nav-label">Benutzerkonto</span></button>
+            <button id="sidebarAdminNavItem" class="dashboard-nav-item dashboard-nav-subitem" type="button" onclick="showAdminApp()" hidden title="Administration"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3 20 6v5c0 5-3.4 8.2-8 10-4.6-1.8-8-5-8-10V6l8-3Z"></path><path d="m9 12 2 2 4-4"></path></svg></span><span class="nav-label">Administration</span></button>
+          </div>
           <button id="colorVisionToggle" class="dashboard-nav-item color-vision-toggle" type="button" onclick="toggleColorVisionMode()" aria-label="Farbenfreundlichen Modus" aria-pressed="false" title="Farbenfreundlichen Modus"><span class="nav-icon" aria-hidden="true">◐</span><span class="nav-label">Farbenblöder Modus</span></button>
         </nav>
         <button id="sidebarLogout" class="sidebar-logout-button" type="button" onclick="logout()" aria-label="Logout" title="Logout"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M10 17l5-5-5-5"></path><path d="M15 12H3"></path><path d="M12 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6"></path></svg></span></button>
@@ -6199,6 +6207,7 @@ async function resetPassword() {
 
 function showLogin() {
   closeMobileSidebar();
+  setMobileSidebarPortal(false);
   const mobileMenuToggle = document.getElementById("mobileMenuToggle");
   if (mobileMenuToggle) {
     mobileMenuToggle.disabled = true;
@@ -6244,7 +6253,9 @@ function showLogin() {
   loginError.textContent = "";
   loginError.classList.remove("auth-success");
   userInfo.textContent = "";
-  document.getElementById("sidebarAdminNavItem").style.display = "none";
+  const adminNavItem = document.getElementById("sidebarAdminNavItem");
+  adminNavItem.hidden = true;
+  adminNavItem.style.removeProperty("display");
   document.getElementById("sidebarCurrentUsername").textContent = "";
   setStatus("");
   closeRandomPopup();
@@ -6453,7 +6464,9 @@ async function showAppShell() {
     if (dashboardUserLabel) dashboardUserLabel.textContent = displayName;
   }
 
-  document.getElementById("sidebarAdminNavItem").style.display = isCurrentUserAdmin() ? "flex" : "none";
+  const adminNavItem = document.getElementById("sidebarAdminNavItem");
+  adminNavItem.hidden = !isCurrentUserAdmin();
+  adminNavItem.style.removeProperty("display");
   showMenu(false);
   loadCustomLists();
   loadNextAppointment();
