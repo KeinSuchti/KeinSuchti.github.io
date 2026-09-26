@@ -3490,14 +3490,48 @@ body.app-scene .sidebar-logout-button .nav-icon svg {
     top:auto !important;
     right:auto !important;
     left:auto !important;
+    align-self:stretch !important;
+    justify-self:stretch !important;
+    display:flex !important;
+    align-items:center;
+    justify-content:flex-start;
+    box-sizing:border-box;
+    width:100% !important;
+    height:44px !important;
+    min-height:44px !important;
+    margin:0 0 6px !important;
+    padding:11px 12px !important;
+    gap:12px;
+    border:1px solid transparent !important;
+    border-radius:11px !important;
+    background:transparent !important;
+    color:#b7c7df !important;
+    transform:none !important;
+  }
+  body.app-scene.dashboard-home-view .dashboard-sidebar > #sidebarToggle:hover,
+  body.app-scene.dashboard-home-view .dashboard-sidebar > #sidebarToggle:focus-visible {
+    color:#f2f7ff !important;
+    background:linear-gradient(90deg, rgba(28,203,195,.18), rgba(91,77,224,.28)) !important;
+    border-color:rgba(86,207,220,.20) !important;
+    box-shadow:none !important;
+  }
+  body.app-scene.dashboard-home-view .dashboard-sidebar > #sidebarToggle svg {
+    flex:0 0 20px;
+    margin:0;
+  }
+  body.app-scene.dashboard-home-view.sidebar-collapsed .dashboard-sidebar > #sidebarToggle {
     align-self:center !important;
     justify-self:center !important;
-    display:grid !important;
-    place-items:center;
-    width:50px !important;
-    height:50px !important;
-    margin:0 0 8px !important;
-    transform:none !important;
+    width:40px !important;
+    height:44px !important;
+    min-height:44px !important;
+    justify-content:center;
+    margin:0 0 6px !important;
+    padding:0 !important;
+    gap:0;
+  }
+  body.app-scene.dashboard-home-view.sidebar-collapsed .dashboard-sidebar > #sidebarToggle svg {
+    margin:auto;
   }
   body.app-scene.dashboard-home-view .dashboard-sidebar > .dashboard-nav {
     margin-top:0 !important;
