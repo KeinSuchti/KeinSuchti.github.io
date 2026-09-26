@@ -2423,6 +2423,17 @@ body.app-scene #menuBox {
   cursor: pointer;
   transition: background 220ms ease, border-color 220ms ease, transform 360ms cubic-bezier(.22,.61,.36,1), box-shadow 220ms ease;
 }
+.sidebar-toggle-btn svg {
+  display:block;
+  width:20px;
+  height:20px;
+  margin:auto;
+  fill:none;
+  stroke:currentColor;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+  stroke-width:2;
+}
 .sidebar-toggle-btn:hover,
 .sidebar-toggle-btn:focus-visible {
   background: rgba(45,83,137,.48);
@@ -3290,6 +3301,38 @@ body.app-scene .sidebar-logout-button .nav-icon svg {
     transform:translate3d(0,0,0) !important;
     transition:transform .34s cubic-bezier(.22,.61,.36,1), opacity .22s ease, visibility 0s linear 0s;
   }
+  body.app-scene.mobile-sidebar-open .dashboard-sidebar > .sidebar-toggle-floating {
+    top:16px !important;
+    right:auto !important;
+    left:50% !important;
+    width:40px !important;
+    height:40px !important;
+    transform:translateX(-50%) !important;
+  }
+  body.app-scene.mobile-sidebar-open .dashboard-sidebar > .sidebar-toggle-floating svg {
+    transform:rotate(180deg);
+  }
+  body.app-scene .mobile-menu-toggle .mobile-menu-glyph { display:none !important; }
+  body.app-scene .mobile-menu-toggle .desktop-sidebar-arrow {
+    display:grid;
+    place-items:center;
+    width:20px;
+    height:20px;
+  }
+  body.app-scene .mobile-menu-toggle .desktop-sidebar-arrow svg {
+    display:block;
+    width:20px;
+    height:20px;
+    fill:none;
+    stroke:currentColor;
+    stroke-linecap:round;
+    stroke-linejoin:round;
+    stroke-width:2;
+  }
+  body.app-scene .mobile-menu-toggle .desktop-sidebar-arrow,
+  body.app-scene:not(.sidebar-collapsed) .mobile-menu-toggle .desktop-sidebar-arrow {
+    transform:none;
+  }
   body.app-scene .mobile-menu-toggle {
     z-index:2147483647 !important;
     transition:opacity .2s ease, transform .2s ease;
@@ -3629,7 +3672,7 @@ body.app-scene .sidebar-logout-button .nav-icon svg {
     <!-- Hauptmenü -->
     <div id="menuBox" class="dashboard-shell">
       <aside id="menuSidebar" class="dashboard-sidebar" aria-label="Hauptnavigation">
-        <button id="sidebarToggle" type="button" class="sidebar-toggle-btn sidebar-toggle-floating" onclick="toggleSidebar()" aria-label="Sidebar einklappen" aria-expanded="true" title="Sidebar ein- oder ausklappen">‹</button>
+        <button id="sidebarToggle" type="button" class="sidebar-toggle-btn sidebar-toggle-floating" onclick="toggleSidebar()" aria-label="Sidebar einklappen" aria-expanded="true" title="Sidebar ein- oder ausklappen"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"></path></svg></button>
         <nav class="dashboard-nav">
           <button class="dashboard-nav-item active" type="button" onclick="showMenu()" aria-current="page" title="Übersicht"><span class="nav-icon" aria-hidden="true">⌂</span><span class="nav-label">Übersicht</span></button>
           <button class="dashboard-nav-item" type="button" onclick="showMoviesApp()" title="Serien &amp; Filme"><span class="nav-icon" aria-hidden="true">▣</span><span class="nav-label">Serien &amp; Filme</span></button>
