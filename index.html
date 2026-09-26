@@ -2244,6 +2244,7 @@ body > .container > h1 {
   white-space: pre-line;
   font-size: 12px;
 }
+.auth-error.auth-success { color:#8ce6cb; }
 
 .auth-footer-line {
   display: flex;
@@ -2929,6 +2930,18 @@ body.app-scene .sidebar-logout-button .nav-icon svg {
 .appointment-form-card textarea { resize:vertical; min-height:76px; }
 .appointment-save-button, .appointment-clear-button { margin-top:3px; width:100%; }
 .appointment-status { margin:0; min-height:16px; }
+.appointment-status.status-error { color:#ff9188; }
+.account-card { display:grid; gap:14px; max-width:620px; padding:18px; border:1px solid rgba(101,141,207,.22); border-radius:16px; background:rgba(8,24,45,.64); }
+.account-field { display:grid; gap:5px; padding-bottom:12px; border-bottom:1px solid rgba(101,141,207,.16); }
+.account-field span { color:#8fa5c1; font-size:11px; }
+.account-field strong { color:#eef5ff; font-size:14px; overflow-wrap:anywhere; }
+.account-card .edit-field { display:grid; gap:7px; margin:0; color:#c7d4e8; font-size:12px; font-weight:700; }
+.account-password-reset { justify-self:start; }
+.admin-users { display:grid; gap:10px; }
+.admin-user-row { display:grid; grid-template-columns:minmax(0,1fr) minmax(150px,220px); align-items:center; gap:16px; padding:13px 15px; border:1px solid rgba(101,141,207,.2); border-radius:12px; background:rgba(8,24,45,.56); }
+.admin-user-name { color:#eef5ff; font-size:13px; font-weight:800; }
+.admin-user-email { margin-top:3px; color:#8fa5c1; font-size:11px; overflow-wrap:anywhere; }
+.admin-user-row select { width:100%; margin:0; }
 .appointment-preview-card { margin-top:18px; border-color:rgba(140,109,244,.32); background:linear-gradient(135deg,rgba(47,40,92,.48),rgba(11,33,56,.72)); }
 .preview-countdown { display:flex; align-items:baseline; flex-wrap:wrap; gap:12px; margin-top:7px; }
 .preview-countdown strong { color:#eff4ff; font-size:20px; }
@@ -2936,6 +2949,7 @@ body.app-scene .sidebar-logout-button .nav-icon svg {
 .preview-location { margin-top:9px; color:#71e3d8; font-weight:700; }
 @media (max-width:760px) { .appointment-layout, .availability-layout { grid-template-columns:1fr; } .appointment-preview-card { margin-top:12px; } }
 @media (max-width:600px) { .appointment-banner-grid { align-items:flex-start; } .appointment-banner-countdown { font-size:18px; } .appointment-banner-meta { font-size:11px; } .calendar-card, .appointment-form-card, .appointment-preview-card, .availability-calendar-card, .availability-form-card { padding:14px; } .calendar-day { min-height:35px; } }
+@media (max-width:600px) { .account-card { padding:14px; } .admin-user-row { grid-template-columns:1fr; gap:9px; } }
 
 
 /* --- Termin-Karte, Umfrage und sichtbarer mobiler Logout --- */
@@ -4492,17 +4506,20 @@ body.color-vision-mode .beer-grade-slider::-moz-range-thumb {
       <button type="button" id="loginTab" class="auth-tab active" onclick="switchAuthMode('login')" role="tab" aria-selected="true">
         Login
       </button>
+      <button type="button" id="registerTab" class="auth-tab" onclick="switchAuthMode('register')" role="tab" aria-selected="false">
+        Registrieren
+      </button>
     </div>
 
     <div id="loginForm" class="auth-form">
       <div class="auth-heading">
         <h2>Willkommen zurück</h2>
-        <p>Mit deinem Account hast du Zugriff auf alle Funktionen.</p>
+        <p>Melde dich mit deinem Nutzernamen oder deiner E-Mail-Adresse an.</p>
       </div>
 
       <label class="auth-field">
-        <span class="auth-field-icon" aria-hidden="true">✉</span>
-        <input type="email" id="email" placeholder="E-Mail-Adresse" autocomplete="email" aria-label="E-Mail-Adresse">
+        <span class="auth-field-icon" aria-hidden="true">◎</span>
+        <input type="text" id="email" placeholder="Nutzername oder E-Mail-Adresse" autocomplete="username" aria-label="Nutzername oder E-Mail-Adresse">
       </label>
 
       <label class="auth-field">
@@ -4523,7 +4540,29 @@ body.color-vision-mode .beer-grade-slider::-moz-range-thumb {
 
       <p class="auth-legal">Mit dem Login stimmst du unseren Nutzungsbedingungen und der Datenschutzerklärung zu.</p>
     </div>
-  <p id="loginError" class="auth-error" role="alert"></p>
+    <div id="registerForm" class="auth-form" style="display:none;">
+      <div class="auth-heading">
+        <h2>Account erstellen</h2>
+        <p>Registriere dich mit E-Mail-Adresse, Nutzernamen und Passwort.</p>
+      </div>
+      <label class="auth-field">
+        <span class="auth-field-icon" aria-hidden="true">◎</span>
+        <input type="text" id="registerUsername" placeholder="Nutzername (3-24 Zeichen)" autocomplete="username" aria-label="Nutzername" maxlength="24">
+      </label>
+      <label class="auth-field">
+        <span class="auth-field-icon" aria-hidden="true">✉</span>
+        <input type="email" id="registerEmail" placeholder="E-Mail-Adresse" autocomplete="email" aria-label="E-Mail-Adresse">
+      </label>
+      <label class="auth-field">
+        <span class="auth-field-icon password-field-icon" aria-hidden="true">●</span>
+        <input type="password" id="registerPassword" placeholder="Passwort (mindestens 8 Zeichen)" autocomplete="new-password" aria-label="Passwort" minlength="8">
+      </label>
+      <button type="button" id="registerButton" class="auth-primary" onclick="registerAccount()">
+        <span>Account erstellen</span><span aria-hidden="true">→</span>
+      </button>
+      <p class="auth-legal">Nach der Registrierung erhältst du eine E-Mail zur Bestätigung deines Accounts.</p>
+    </div>
+    <p id="loginError" class="auth-error" role="status" aria-live="polite"></p>
   </div>
 
   <!-- App -->
@@ -4557,6 +4596,8 @@ body.color-vision-mode .beer-grade-slider::-moz-range-thumb {
           <button class="dashboard-nav-item" type="button" onclick="showGamesApp()" title="Games"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 8h10a4 4 0 0 1 3.8 2.8l1.1 4a2.5 2.5 0 0 1-4.1 2.5l-2.3-2H8.5l-2.3 2a2.5 2.5 0 0 1-4.1-2.5l1.1-4A4 4 0 0 1 7 8Z"></path><path d="M7 11v4m-2-2h4m7-.5h.01M18 14.5h.01"></path></svg></span><span class="nav-label">Games</span></button>
           <button class="dashboard-nav-item" type="button" onclick="showYugiohApp()" title="Yu-Gi-Oh! Decks"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="6" y="3" width="13" height="17" rx="2" transform="rotate(8 6 3)"></rect><rect x="4" y="5" width="13" height="17" rx="2"></rect><path d="m10.5 9 1.5-2 1.5 2-.5 2h-2l-.5-2Zm1.5 2v3m-2 2h4"></path></svg></span><span class="nav-label">Yu-Gi-Oh! Decks</span></button>
           <button class="dashboard-nav-item" type="button" onclick="showAppointmentsApp()" title="Termine abstimmen"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M7 3v4m10-4v4M3 10h18m-12 4h6"></path></svg></span><span class="nav-label">Termine</span></button>
+          <button class="dashboard-nav-item" type="button" onclick="showAccountApp()" title="Benutzerkonto"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"></circle><path d="M4 21a8 8 0 0 1 16 0"></path></svg></span><span class="nav-label">Benutzerkonto</span></button>
+          <button id="adminNavItem" class="dashboard-nav-item" type="button" onclick="showAdminApp()" title="Administration" style="display:none;"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3 20 6v5c0 5-3.4 8.3-8 10-4.6-1.7-8-5-8-10V6l8-3Z"></path><path d="m9 12 2 2 4-4"></path></svg></span><span class="nav-label">Administration</span></button>
           <button id="colorVisionToggle" class="dashboard-nav-item color-vision-toggle" type="button" onclick="toggleColorVisionMode()" aria-label="Farbenfreundlichen Modus" aria-pressed="false" title="Farbenfreundlichen Modus"><span class="nav-icon" aria-hidden="true">◐</span><span class="nav-label">Farbenfreundlicher Modus</span></button>
         </nav>
         <button id="sidebarLogout" class="sidebar-logout-button" type="button" onclick="logout()" aria-label="Logout" title="Logout"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M10 17l5-5-5-5"></path><path d="M15 12H3"></path><path d="M12 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6"></path></svg></span></button>
@@ -4755,6 +4796,24 @@ body.color-vision-mode .beer-grade-slider::-moz-range-thumb {
         </div>
       </section>
     </div>
+
+    <section id="accountApp" class="app-panel account-panel" style="display:none;" aria-labelledby="accountTitle">
+      <div class="list-panel-heading"><div><h2 id="accountTitle">Benutzerkonto</h2><p class="panel-subtitle">Verwalte deine Kontodaten und Sicherheitsoptionen.</p></div></div>
+      <div class="account-card">
+        <div class="account-field"><span>E-Mail-Adresse</span><strong id="accountEmail"></strong></div>
+        <div class="account-field"><span>Rolle</span><strong id="accountRole"></strong></div>
+        <label class="edit-field"><span>Nutzername</span><input id="accountUsername" type="text" maxlength="24" autocomplete="username"></label>
+        <button type="button" id="saveAccountButton" onclick="saveAccountProfile()">Profil speichern</button>
+        <button type="button" class="auth-link account-password-reset" onclick="requestAccountPasswordReset()">Passwort-Reset per E-Mail anfordern</button>
+        <p id="accountStatus" class="appointment-status" role="status" aria-live="polite"></p>
+      </div>
+    </section>
+
+    <section id="adminApp" class="app-panel account-panel" style="display:none;" aria-labelledby="adminTitle">
+      <div class="list-panel-heading"><div><h2 id="adminTitle">Administration</h2><p class="panel-subtitle">Konten ansehen und Rollen verwalten. Rollenänderungen wirken sofort.</p></div></div>
+      <p id="adminStatus" class="appointment-status" role="status" aria-live="polite"></p>
+      <div id="adminUsers" class="admin-users"></div>
+    </section>
 
     <!-- Serien & Filme -->
     <div id="moviesApp" class="app-panel" style="display:none;">
@@ -5045,8 +5104,11 @@ const cocktailApp = document.getElementById("cocktailApp");
 const gamesApp = document.getElementById("gamesApp");
 const yugiohApp = document.getElementById("yugiohApp");
 const appointmentsApp = document.getElementById("appointmentsApp");
+const accountApp = document.getElementById("accountApp");
+const adminApp = document.getElementById("adminApp");
 const nextAppointmentBanner = document.getElementById("nextAppointmentBanner");
 let nextAppointment = null;
+let currentProfile = null;
 let calendarCursor = new Date();
 let appointmentCountdownTimer = null;
 let pollCalendarCursor = new Date();
@@ -5057,6 +5119,9 @@ let availabilityEntries = [];
 const emailInput = document.getElementById("email");
 const passwordInput = document.getElementById("password");
 const loginError = document.getElementById("loginError");
+const registerUsernameInput = document.getElementById("registerUsername");
+const registerEmailInput = document.getElementById("registerEmail");
+const registerPasswordInput = document.getElementById("registerPassword");
 const userInfo = document.getElementById("userInfo");
 const globalStatus = document.getElementById("globalStatus");
 const editEntryModal = document.getElementById("editEntryModal");
@@ -5984,12 +6049,22 @@ function closeYugiohAssignmentPopupOnOverlay(event) {
 function switchAuthMode(mode = "login") {
   const loginForm = document.getElementById("loginForm");
   const loginTab = document.getElementById("loginTab");
-
-  loginForm.style.display = "block";
-  loginTab.classList.add("active");
-  loginTab.setAttribute("aria-selected", "true");
-
+  const registerForm = document.getElementById("registerForm");
+  const registerTab = document.getElementById("registerTab");
+  const isRegister = mode === "register";
+  loginForm.style.display = isRegister ? "none" : "block";
+  registerForm.style.display = isRegister ? "block" : "none";
+  loginTab.classList.toggle("active", !isRegister);
+  loginTab.setAttribute("aria-selected", String(!isRegister));
+  registerTab.classList.toggle("active", isRegister);
+  registerTab.setAttribute("aria-selected", String(isRegister));
   loginError.textContent = "";
+  loginError.classList.remove("auth-success");
+}
+
+function setAuthMessage(message, isError = true) {
+  loginError.textContent = message;
+  loginError.classList.toggle("auth-success", !isError);
 }
 
 function togglePasswordVisibility() {
@@ -6005,7 +6080,7 @@ function togglePasswordVisibility() {
 async function resetPassword() {
   const email = emailInput.value.trim();
 
-  if (!email) {
+  if (!email || !email.includes("@")) {
     loginError.textContent = "Bitte zuerst deine E-Mail-Adresse eingeben.";
     emailInput.focus();
     return;
@@ -6031,6 +6106,7 @@ function showLogin() {
   document.body.classList.add("login-scene");
   document.body.classList.remove("app-scene");
   currentUser = null;
+  currentProfile = null;
   movieItems = [];
   gameItems = [];
   gameColumns = [];
@@ -6052,7 +6128,9 @@ function showLogin() {
   yugiohDeckList.innerHTML = "";
   yugiohAssignmentResults.innerHTML = "";
   loginError.textContent = "";
+  loginError.classList.remove("auth-success");
   userInfo.textContent = "";
+  document.getElementById("adminNavItem").style.display = "none";
   setStatus("");
   closeRandomPopup();
   closeYugiohAssignmentPopup();
@@ -6061,21 +6139,35 @@ function showLogin() {
   switchAuthMode("login");
 }
 
-function showAppShell() {
+async function showAppShell() {
+  const { data: profile, error: profileError } = await supabaseClient
+    .from("profiles")
+    .select("id,username,email,role,created_at")
+    .eq("id", currentUser.id)
+    .single();
+  if (profileError || !profile) {
+    console.error("Das Benutzerprofil konnte nicht geladen werden.", profileError);
+    showLogin();
+    setAuthMessage("Das Kontoschema fehlt oder ist nicht erreichbar. Führe zuerst supabase-account-setup.sql im Supabase SQL Editor aus.", true);
+    return false;
+  }
+  currentProfile = profile;
   document.body.classList.remove("login-scene");
   document.body.classList.add("app-scene");
   loginBox.style.display = "none";
   appShell.style.display = "block";
 
   if (currentUser && currentUser.email) {
-    userInfo.textContent = "Eingeloggt als: " + currentUser.email;
+    userInfo.textContent = "Eingeloggt als: " + (currentProfile.username || currentUser.email);
     const dashboardUserLabel = document.getElementById("dashboardUserLabel");
-    if (dashboardUserLabel) dashboardUserLabel.textContent = currentUser.email;
+    if (dashboardUserLabel) dashboardUserLabel.textContent = currentProfile.username || currentUser.email;
   }
 
+  document.getElementById("adminNavItem").style.display = currentProfile.role === "admin" ? "flex" : "none";
   showMenu(false);
   loadCustomLists();
   loadNextAppointment();
+  return true;
 }
 
 async function initAuth() {
@@ -6089,45 +6181,253 @@ async function initAuth() {
 
   if (data.session && data.session.user) {
     currentUser = data.session.user;
-    showAppShell();
+    await showAppShell();
   } else {
     showLogin();
   }
 }
 
 async function login() {
-  const email = emailInput.value.trim();
+  const identifier = emailInput.value.trim();
   const password = passwordInput.value;
-
   loginError.textContent = "";
-
-  if (!email || !password) {
-    loginError.textContent = "Bitte E-Mail und Passwort eingeben.";
+  if (!identifier || !password) {
+    setAuthMessage("Bitte Nutzernamen oder E-Mail-Adresse und Passwort eingeben.");
     return;
   }
 
-  const { data, error } = await supabaseClient.auth.signInWithPassword({
-    email,
-    password
-  });
+  const button = document.querySelector("#loginForm .auth-primary");
+  button.disabled = true;
+  setAuthMessage("Anmeldung läuft …", false);
+  try {
+    const email = identifier;
+    if (!identifier.includes("@")) {
+      const { data: loginData, error: usernameLoginError } = await supabaseClient.functions.invoke(
+        "login-with-username",
+        { body: { username: identifier, password } }
+      );
+      if (usernameLoginError || !loginData?.session) {
+        if (usernameLoginError) console.error("Nutzername-Login fehlgeschlagen.", usernameLoginError);
+        setAuthMessage("Anmeldung fehlgeschlagen. Zugangsdaten prüfen und erneut versuchen.");
+        return;
+      }
+      const { data: sessionData, error: sessionError } = await supabaseClient.auth.setSession(loginData.session);
+      if (sessionError || !sessionData.user) {
+        if (sessionError) console.error("Username-Session konnte nicht übernommen werden.", sessionError);
+        setAuthMessage("Anmeldung fehlgeschlagen. Zugangsdaten prüfen und erneut versuchen.");
+        return;
+      }
+      currentUser = sessionData.user;
+    } else {
+      const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+      if (error) {
+        setAuthMessage("Anmeldung fehlgeschlagen. Zugangsdaten prüfen und erneut versuchen.");
+        return;
+      }
+      currentUser = data.user;
+    }
+    emailInput.value = "";
+    passwordInput.value = "";
+    await showAppShell();
+  } catch (error) {
+    console.error("Anmeldung fehlgeschlagen.", error);
+    setAuthMessage("Anmeldung momentan nicht möglich. Bitte Verbindung prüfen und erneut versuchen.");
+  } finally {
+    button.disabled = false;
+  }
+}
 
-  if (error) {
-    loginError.textContent = "Login fehlgeschlagen: " + error.message;
+async function registerAccount() {
+  const username = registerUsernameInput.value.trim().toLowerCase();
+  const email = registerEmailInput.value.trim().toLowerCase();
+  const password = registerPasswordInput.value;
+  if (!/^[a-z0-9][a-z0-9_.-]{2,23}$/.test(username)) {
+    setAuthMessage("Der Nutzername muss 3-24 Zeichen lang sein und darf Buchstaben, Zahlen, Punkt, Bindestrich und Unterstrich enthalten.");
+    registerUsernameInput.focus();
+    return;
+  }
+  if (!registerEmailInput.checkValidity()) {
+    setAuthMessage("Bitte eine gültige E-Mail-Adresse eingeben.");
+    registerEmailInput.focus();
+    return;
+  }
+  if (password.length < 8) {
+    setAuthMessage("Das Passwort muss mindestens 8 Zeichen lang sein.");
+    registerPasswordInput.focus();
     return;
   }
 
-  currentUser = data.user;
-
-  emailInput.value = "";
-  passwordInput.value = "";
-
-  showAppShell();
+  const button = document.getElementById("registerButton");
+  button.disabled = true;
+  setAuthMessage("Registrierung läuft …", false);
+  try {
+    const { data, error } = await supabaseClient.auth.signUp({
+      email,
+      password,
+      options: { data: { username } }
+    });
+    if (error) {
+      setAuthMessage(error.message || "Registrierung fehlgeschlagen. Bitte Eingaben prüfen.");
+      return;
+    }
+    registerPasswordInput.value = "";
+    if (data.session && data.user) {
+      currentUser = data.user;
+      await showAppShell();
+      return;
+    }
+    setAuthMessage("Registrierung eingegangen. Bitte bestätige deine E-Mail-Adresse über den zugesandten Link, bevor du dich anmeldest.", false);
+  } catch (error) {
+    console.error("Registrierung fehlgeschlagen.", error);
+    setAuthMessage("Registrierung momentan nicht möglich. Bitte Verbindung prüfen und erneut versuchen.");
+  } finally {
+    button.disabled = false;
+  }
 }
 
 async function logout() {
   closeMobileSidebar();
   await supabaseClient.auth.signOut();
   showLogin();
+}
+
+function isCurrentUserAdmin() {
+  return currentProfile?.role === "admin";
+}
+
+function setAccountStatus(message, isError = false) {
+  const status = document.getElementById("accountStatus");
+  if (!status) return;
+  status.textContent = message;
+  status.classList.toggle("status-error", isError);
+}
+
+function loadAccountPanel() {
+  if (!currentProfile) return;
+  document.getElementById("accountEmail").textContent = currentProfile.email || currentUser.email || "";
+  document.getElementById("accountRole").textContent = currentProfile.role === "admin" ? "Administrator" : "Nutzer";
+  document.getElementById("accountUsername").value = currentProfile.username || "";
+  setAccountStatus("");
+}
+
+async function saveAccountProfile() {
+  if (!currentUser || !currentProfile) return;
+  const usernameInput = document.getElementById("accountUsername");
+  const username = usernameInput.value.trim().toLowerCase();
+  if (!/^[a-z0-9][a-z0-9_.-]{2,23}$/.test(username)) {
+    setAccountStatus("Der Nutzername muss 3-24 Zeichen lang sein und darf Buchstaben, Zahlen, Punkt, Bindestrich und Unterstrich enthalten.", true);
+    usernameInput.focus();
+    return;
+  }
+  const button = document.getElementById("saveAccountButton");
+  button.disabled = true;
+  setAccountStatus("Profil wird gespeichert …");
+  try {
+    const { data, error } = await supabaseClient.from("profiles")
+      .update({ username })
+      .eq("id", currentUser.id)
+      .select("id,username,email,role,created_at")
+      .single();
+    if (error) {
+      console.error("Profil konnte nicht gespeichert werden.", error);
+      setAccountStatus(error.code === "23505" ? "Dieser Nutzername ist bereits vergeben." : "Profil konnte nicht gespeichert werden.", true);
+      return;
+    }
+    currentProfile = data;
+    userInfo.textContent = "Eingeloggt als: " + currentProfile.username;
+    const dashboardUserLabel = document.getElementById("dashboardUserLabel");
+    if (dashboardUserLabel) dashboardUserLabel.textContent = currentProfile.username;
+    setAccountStatus("Profil gespeichert.");
+  } catch (error) {
+    console.error("Profil konnte nicht gespeichert werden.", error);
+    setAccountStatus("Profil momentan nicht erreichbar. Bitte erneut versuchen.", true);
+  } finally {
+    button.disabled = false;
+  }
+}
+
+async function requestAccountPasswordReset() {
+  if (!currentUser?.email) return;
+  setAccountStatus("Passwort-Reset wird angefordert …");
+  const { error } = await supabaseClient.auth.resetPasswordForEmail(currentUser.email, {
+    redirectTo: window.location.origin + window.location.pathname
+  });
+  if (error) {
+    console.error("Passwort-Reset konnte nicht angefordert werden.", error);
+    setAccountStatus("Passwort-Reset konnte nicht angefordert werden.", true);
+    return;
+  }
+  setAccountStatus("Falls für dieses Konto ein Reset-Link verfügbar ist, wurde er per E-Mail versendet.");
+}
+
+async function loadAdminUsers() {
+  if (!isCurrentUserAdmin()) {
+    await navigateToView("menu", "replace");
+    return;
+  }
+  const status = document.getElementById("adminStatus");
+  const host = document.getElementById("adminUsers");
+  status.textContent = "Konten werden geladen …";
+  host.replaceChildren();
+  try {
+    const { data, error } = await supabaseClient.from("profiles")
+      .select("id,username,email,role,created_at")
+      .order("created_at", { ascending: true });
+    if (error) {
+      console.error("Konten konnten nicht geladen werden.", error);
+      status.textContent = "Konten konnten nicht geladen werden.";
+      return;
+    }
+    status.textContent = data.length ? `${data.length} Konto${data.length === 1 ? "" : "en"}` : "Keine Konten vorhanden.";
+    data.forEach(profile => {
+      const row = document.createElement("div");
+      row.className = "admin-user-row";
+      const details = document.createElement("div");
+      const name = document.createElement("div");
+      name.className = "admin-user-name";
+      name.textContent = profile.username;
+      const email = document.createElement("div");
+      email.className = "admin-user-email";
+      email.textContent = profile.email;
+      details.append(name, email);
+
+      const roleSelect = document.createElement("select");
+      roleSelect.setAttribute("aria-label", `Rolle für ${profile.username}`);
+      [["user", "Nutzer"], ["admin", "Administrator"]].forEach(([value, label]) => {
+        const option = document.createElement("option");
+        option.value = value;
+        option.textContent = label;
+        roleSelect.appendChild(option);
+      });
+      roleSelect.value = profile.role;
+      roleSelect.disabled = profile.id === currentUser.id;
+      roleSelect.title = roleSelect.disabled ? "Die eigene Administratorrolle kann hier nicht geändert werden." : "Rolle ändern";
+      roleSelect.addEventListener("change", () => updateProfileRole(profile.id, roleSelect.value));
+      row.append(details, roleSelect);
+      host.appendChild(row);
+    });
+  } catch (error) {
+    console.error("Konten konnten nicht geladen werden.", error);
+    status.textContent = "Konten momentan nicht erreichbar.";
+  }
+}
+
+async function updateProfileRole(profileId, role) {
+  if (!isCurrentUserAdmin() || !["user", "admin"].includes(role)) return;
+  const status = document.getElementById("adminStatus");
+  status.textContent = "Rolle wird aktualisiert …";
+  const { error } = await supabaseClient.rpc("set_profile_role", {
+    target_user_id: profileId,
+    target_role: role
+  });
+  if (error) {
+    console.error("Rolle konnte nicht aktualisiert werden.", error);
+    const errorMessage = error.message || "Rolle konnte nicht aktualisiert werden.";
+    await loadAdminUsers();
+    status.textContent = errorMessage;
+    return;
+  }
+  await loadAdminUsers();
 }
 
 /* Navigation */
@@ -6137,6 +6437,8 @@ let suppressHistoryPush = false;
 
 const appViewLoaders = {
   menu: null,
+  account: loadAccountPanel,
+  admin: loadAdminUsers,
   saufi: null,
   movies: loadMovieItems,
   feast: () => loadCardItems("feast"),
@@ -6164,6 +6466,8 @@ function hideAllPanels() {
   yugiohApp.style.display = "none";
   customListApp.style.display = "none";
   appointmentsApp.style.display = "none";
+  accountApp.style.display = "none";
+  adminApp.style.display = "none";
   setStatus("");
 }
 
@@ -6196,6 +6500,10 @@ function showPanelForView(view) {
     appointmentsApp.style.display = "block";
     renderAppointmentCalendar();
     fillAppointmentFormFromCurrent();
+  } else if (view === "account") {
+    accountApp.style.display = "block";
+  } else if (view === "admin" && isCurrentUserAdmin()) {
+    adminApp.style.display = "block";
   } else {
     currentView = "menu";
     menuBox.style.display = "block";
@@ -6231,6 +6539,10 @@ function writeAppHistory(view, mode) {
 async function navigateToView(view, historyMode = "push") {
   if (!currentUser && view !== "menu") {
     showLogin();
+    return;
+  }
+  if (view === "admin" && !isCurrentUserAdmin()) {
+    await navigateToView("menu", historyMode);
     return;
   }
 
@@ -6340,6 +6652,12 @@ function showYugiohApp() {
 }
 function showAppointmentsApp() {
   return navigateToView("appointments", "push");
+}
+function showAccountApp() {
+  return navigateToView("account", "push");
+}
+function showAdminApp() {
+  return navigateToView("admin", "push");
 }
 
 
