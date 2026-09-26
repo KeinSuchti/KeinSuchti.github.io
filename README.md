@@ -43,7 +43,9 @@ ein. Der Link wird serverseitig einmalig eingelöst; in der Datenbank wird nur s
 Setze in Supabase **Authentication > URL Configuration > Site URL** auf
 `https://keinsuchti.github.io/` und erlaube dieselbe Adresse als Redirect-URL für Passwort-Resets.
 Der Reset-Link öffnet auf der Webseite ein Formular zum Festlegen eines neuen Passworts; nach dem
-Speichern kann sich der Nutzer mit dem neuen Passwort anmelden.
+Speichern kann sich der Nutzer mit dem neuen Passwort anmelden. Ist der E-Mail-Link bereits
+abgelaufen oder verwendet, zeigt die Webseite den Fehler an und ermöglicht direkt das Anfordern
+eines neuen Reset-Links.
 
 Das SQL-Script legt die Rollen `user` und `admin` an, schützt Profile per Row Level Security und
 erstellt den Admin-Bereich für Rollenverwaltung. Normale Nutzer können ihr eigenes Profil verwalten;
