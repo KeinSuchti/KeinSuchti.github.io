@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="440" viewBox="0 0 1200 440" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="73" y1="0" x2="1115" y2="440" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#101A3C"/>
+      <stop offset=".48" stop-color="#233064"/>
+      <stop offset="1" stop-color="#073C4B"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0" cy="0" r="1" gradientTransform="matrix(368 0 0 230 872 235)" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#37D7CC" stop-opacity=".34"/>
+      <stop offset="1" stop-color="#37D7CC" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="sheet" x1="665" y1="59" x2="960" y2="374" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F6F1E5"/>
+      <stop offset="1" stop-color="#B8C9D0"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="744" y1="138" x2="980" y2="140" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#20C6B8"/>
+      <stop offset="1" stop-color="#6472E2"/>
+    </linearGradient>
+    <filter id="shadow" x="537" y="18" width="543" height="479" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse">
+      <feGaussianBlur stdDeviation="21"/>
+    </filter>
+  </defs>
+  <path fill="url(#bg)" d="M0 0h1200v440H0z"/>
+  <path fill="url(#glow)" d="M0 0h1200v440H0z"/>
+  <g opacity=".42" fill="#E4F5FF">
+    <circle cx="132" cy="68" r="2"/><circle cx="249" cy="116" r="1.5"/><circle cx="407" cy="59" r="1.5"/>
+    <circle cx="1093" cy="78" r="2"/><circle cx="1114" cy="284" r="1.5"/><circle cx="227" cy="341" r="1.5"/>
+    <circle cx="463" cy="282" r="2"/><circle cx="560" cy="178" r="1"/>
+  </g>
+  <path d="M0 369c173-55 290-42 429-4 139 37 246 51 371-7 116-54 248-83 400-28v110H0V369Z" fill="#06162A" fill-opacity=".63"/>
+  <path d="M0 405c177-37 282-22 423 11 140 33 260 12 388-34 141-51 253-56 389-34" stroke="#50D6C8" stroke-opacity=".2" stroke-width="2"/>
+  <ellipse cx="808" cy="396" rx="239" ry="29" fill="#000" fill-opacity=".38" filter="url(#shadow)"/>
+  <g transform="rotate(-11 799 220)">
+    <rect x="656" y="78" width="292" height="274" rx="20" fill="#665EE2" fill-opacity=".72"/>
+    <path d="M676 101h252v213H676z" fill="#A9A9F2" fill-opacity=".45"/>
+  </g>
+  <g transform="rotate(7 839 216)">
+    <rect x="675" y="64" width="302" height="300" rx="22" fill="#071429" fill-opacity=".3"/>
+    <rect x="659" y="48" width="302" height="300" rx="22" fill="url(#sheet)" stroke="#F4FFFF" stroke-opacity=".68" stroke-width="2"/>
+    <path d="M659 71c0-12.703 10.297-23 23-23h256c12.703 0 23 10.297 23 23v55H659V71Z" fill="url(#accent)"/>
+    <text x="692" y="102" fill="#F5FFFF" font-family="Arial,sans-serif" font-size="16" font-weight="700" letter-spacing="3">DEINE IDEEN</text>
+    <circle cx="704" cy="164" r="12" fill="#17AAA4"/>
+    <path d="m699 164 4 4 7-8" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"/>
+    <rect x="728" y="158" width="177" height="10" rx="5" fill="#31516B" fill-opacity=".82"/>
+    <rect x="728" y="176" width="114" height="6" rx="3" fill="#74909E" fill-opacity=".48"/>
+    <circle cx="704" cy="220" r="12" stroke="#6E8793" stroke-width="2"/>
+    <rect x="728" y="214" width="155" height="10" rx="5" fill="#31516B" fill-opacity=".72"/>
+    <rect x="728" y="232" width="127" height="6" rx="3" fill="#74909E" fill-opacity=".4"/>
+    <circle cx="704" cy="276" r="12" stroke="#6E8793" stroke-width="2"/>
+    <rect x="728" y="270" width="184" height="10" rx="5" fill="#31516B" fill-opacity=".72"/>
+    <rect x="728" y="288" width="94" height="6" rx="3" fill="#74909E" fill-opacity=".4"/>
+  </g>
+  <g transform="translate(550 253)">
+    <path d="M58 117c-8-20 2-46 21-59 14-9 31-12 45-5 16 8 23 25 18 42-6 18-24 31-44 32l-40-10Z" fill="#F1B47D"/>
+    <path d="M51 123c0-27 13-49 37-60 17-8 35-8 49-1 9 5 16 13 19 23 4 10 0 20-8 26l-21 14-76-2Z" fill="#132743"/>
+    <path d="M48 124c-25 3-43 18-47 37h116c-4-22-22-37-47-37H48Z" fill="#36C9BD"/>
+    <path d="M114 124c-21 2-35 16-39 37h96c-3-21-18-36-39-37h-18Z" fill="#7671DF"/>
+    <circle cx="75" cy="87" r="4" fill="#F7F3E9"/><circle cx="126" cy="87" r="4" fill="#F7F3E9"/>
+  </g>
+  <path d="m1041 116 10 21 23 3-17 16 4 23-20-11-20 11 4-23-17-16 23-3 10-21Z" fill="#F4C66E" fill-opacity=".9"/>
+  <path d="m523 108 6 12 13 2-9 9 2 13-12-6-11 6 2-13-10-9 14-2 5-12Z" fill="#83E6DE" fill-opacity=".68"/>
+  <circle cx="1015" cy="323" r="10" fill="#F4C66E" fill-opacity=".76"/>
+</svg>
