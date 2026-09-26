@@ -3465,11 +3465,33 @@ body.app-scene .sidebar-logout-button .nav-icon svg {
     left:calc(var(--sidebar-collapsed-width) - 50px) !important;
   }
   body.app-scene .mobile-menu-toggle > span:first-child {
+    display:none !important;
+  }
+  body.app-scene .mobile-menu-toggle .desktop-sidebar-arrow {
     display:grid;
     place-items:center;
-    gap:4px;
-    width:22px;
-    height:18px;
+    width:20px;
+    height:20px;
+    color:#91aef4;
+    transform:none;
+    transition:transform 360ms cubic-bezier(.22,.61,.36,1), color 220ms ease;
+  }
+  body.app-scene .mobile-menu-toggle .desktop-sidebar-arrow svg {
+    display:block;
+    width:20px;
+    height:20px;
+    fill:none;
+    stroke:currentColor;
+    stroke-linecap:round;
+    stroke-linejoin:round;
+    stroke-width:2;
+  }
+  body.app-scene:not(.sidebar-collapsed) .mobile-menu-toggle .desktop-sidebar-arrow {
+    transform:rotate(180deg);
+  }
+  body.app-scene .mobile-menu-toggle:hover .desktop-sidebar-arrow,
+  body.app-scene .mobile-menu-toggle:focus-visible .desktop-sidebar-arrow {
+    color:#71e5d8;
   }
   body.app-scene .mobile-menu-toggle i {
     display:block;
@@ -3602,7 +3624,7 @@ body.app-scene .sidebar-logout-button .nav-icon svg {
     </div>
 
     <div id="globalStatus" class="status"></div>
-    <button id="mobileMenuToggle" class="mobile-menu-toggle" type="button" onclick="toggleSidebar()" aria-label="Navigation öffnen" aria-expanded="false" aria-controls="menuSidebar" title="Navigation öffnen"><span aria-hidden="true"><i></i><i></i><i></i></span><span class="mobile-menu-label">Menü</span></button>
+    <button id="mobileMenuToggle" class="mobile-menu-toggle" type="button" onclick="toggleSidebar()" aria-label="Navigation öffnen" aria-expanded="false" aria-controls="menuSidebar" title="Navigation öffnen"><span class="mobile-menu-glyph" aria-hidden="true"><i></i><i></i><i></i></span><span class="desktop-sidebar-arrow" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"></path></svg></span><span class="mobile-menu-label">Menü</span></button>
     <div id="mobileSidebarBackdrop" class="mobile-sidebar-backdrop" aria-hidden="true" onclick="closeMobileSidebar()"></div>
     <!-- Hauptmenü -->
     <div id="menuBox" class="dashboard-shell">
