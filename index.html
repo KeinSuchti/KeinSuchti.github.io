@@ -602,6 +602,49 @@ input[type="checkbox"] {
 .beer-grade-slider {
   width: 100%;
   accent-color: var(--accent);
+  height: 24px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.beer-grade-slider::-webkit-slider-runnable-track {
+  height: 8px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #45c987 0%, #e8c33f 50%, #e35f5f 100%);
+}
+
+.beer-grade-slider::-webkit-slider-thumb {
+  width: 18px;
+  height: 18px;
+  margin-top: -5px;
+  border: 2px solid var(--surface);
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, .4);
+  -webkit-appearance: none;
+}
+
+.beer-grade-slider::-moz-range-track {
+  height: 8px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #45c987 0%, #e8c33f 50%, #e35f5f 100%);
+}
+
+.beer-grade-slider::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--surface);
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, .4);
+}
+
+.beer-grade-slider:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
 }
 
 .beer-grade-number {
@@ -3237,12 +3280,12 @@ button, input, select, textarea { max-width: 100%; }
   }
   body.app-scene .dashboard-shell .dashboard-sidebar {
     position:fixed !important;
-    top:0 !important;
+    top:var(--mobile-drawer-top, 0px) !important;
     left:0 !important;
     z-index:10002 !important;
     box-sizing:border-box;
     width:min(86vw,310px);
-    height:100dvh;
+    height:calc(100dvh - var(--mobile-drawer-top, 0px));
     max-height:none;
     visibility:hidden;
     opacity:0;
@@ -7658,6 +7701,11 @@ function toggleSidebar() {
     if (o) o.setAttribute("aria-hidden",String(!open));
     const drawer=document.getElementById("menuSidebar");
     if (drawer) {
+      if (open && b) {
+        drawer.style.setProperty("--mobile-drawer-top", `${Math.max(0, b.getBoundingClientRect().top)}px`);
+      } else {
+        drawer.style.removeProperty("--mobile-drawer-top");
+      }
       if (drawer.getAnimations) drawer.getAnimations().forEach(animation => animation.cancel());
       drawer.style.setProperty("transition", "none", "important");
       drawer.style.setProperty("transform", open ? "translate3d(0,0,0)" : "translate3d(-105%,0,0)", "important");
