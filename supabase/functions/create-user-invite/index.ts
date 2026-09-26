@@ -17,7 +17,14 @@ if (!supabaseUrl || !serviceRoleKey || !appOrigin) {
 }
 
 const parsedAppOrigin = new URL(appOrigin);
-if (parsedAppOrigin.protocol !== "https:" || parsedAppOrigin.pathname !== "/") {
+if (
+  parsedAppOrigin.protocol !== "https:" ||
+  parsedAppOrigin.pathname !== "/" ||
+  parsedAppOrigin.search ||
+  parsedAppOrigin.hash ||
+  parsedAppOrigin.username ||
+  parsedAppOrigin.password
+) {
   throw new Error("APP_ORIGIN must be an HTTPS origin without a path.");
 }
 
@@ -51,43 +58,20 @@ Deno.serve(async request => {
   }
   if (profile?.role !== "admin") return jsonResponse({ error: "Administrator role required." }, 403);
 
-  let body: { email?: unknown; username?: unknown };
-  try {
-    body = await request.json();
-  } catch {
-    return jsonResponse({ error: "Invalid request." }, 400);
-  }
-
-  const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
-  const username = typeof body.username === "string" ? body.username.trim().toLowerCase() : "";
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 254) {
-    return jsonResponse({ error: "Please provide a valid email address." }, 400);
-  }
-  if (!/^[a-z0-9][a-z0-9_.-]{2,23}$/.test(username)) {
-    return jsonResponse({ error: "Username must be 3-24 characters using letters, numbers, dot, dash, or underscore." }, 400);
-  }
-
-  const { data: existingUsername, error: usernameError } = await adminClient
-    .from("profiles")
-    .select("id")
-    .eq("username", username)
-    .maybeSingle();
-  if (usernameError) {
-    console.error("Could not check invitation username.", usernameError);
-    return jsonResponse({ error: "Username availability could not be checked." }, 500);
-  }
-  if (existingUsername) return jsonResponse({ error: "This username is already in use." }, 409);
-
-  const redirectTo = new URL("/?invite=1", parsedAppOrigin.origin).toString();
-  const { data, error } = await adminClient.auth.admin.generateLink({
-    type: "invite",
-    email,
-    options: { data: { username }, redirectTo }
+  const tokenBytes = crypto.getRandomValues(new Uint8Array(32));
+  const token = Array.from(tokenBytes, byte => byte.toString(16).padStart(2, "0")).join("");
+  const tokenHashBuffer = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(token));
+  const tokenHash = Array.from(new Uint8Array(tokenHashBuffer), byte => byte.toString(16).padStart(2, "0")).join("");
+  const { error: insertError } = await adminClient.from("registration_invites").insert({
+    token_hash: tokenHash,
+    created_by: authData.user.id
   });
-  if (error || !data.properties?.action_link) {
-    console.error("Supabase could not generate an invitation link.", error);
-    return jsonResponse({ error: "Could not create an invitation. The email may already have an account." }, 409);
+  if (insertError) {
+    console.error("Could not store registration invitation.", insertError);
+    return jsonResponse({ error: "Could not create a registration link." }, 500);
   }
 
-  return jsonResponse({ action_link: data.properties.action_link });
+  const registrationUrl = new URL("/", parsedAppOrigin.origin);
+  registrationUrl.searchParams.set("invite", token);
+  return jsonResponse({ registration_url: registrationUrl.toString() });
 });

@@ -3,3 +3,6 @@ verify_jwt = false
 
 [functions.create-user-invite]
 verify_jwt = true
+
+[functions.complete-user-registration]
+verify_jwt = false

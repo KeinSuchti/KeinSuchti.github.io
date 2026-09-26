@@ -4534,15 +4534,23 @@ body.color-vision-mode .beer-grade-slider::-moz-range-thumb {
 
     <div id="inviteSetup" class="auth-form" style="display:none;">
       <div class="auth-heading">
-        <h2>Einladung annehmen</h2>
-        <p>Lege ein Passwort fest, um dein eingeladenes Konto zu aktivieren.</p>
+        <h2>Konto erstellen</h2>
+        <p>Erstelle über deine persönliche Einladung ein Konto.</p>
       </div>
       <label class="auth-field">
+        <span class="auth-field-icon" aria-hidden="true">◎</span>
+        <input type="email" id="inviteEmail" placeholder="E-Mail-Adresse" autocomplete="email" aria-label="E-Mail-Adresse">
+      </label>
+      <label class="auth-field">
+        <span class="auth-field-icon" aria-hidden="true">◎</span>
+        <input type="text" id="inviteUsername" placeholder="Nutzername (3-24 Zeichen)" autocomplete="username" aria-label="Nutzername" maxlength="24">
+      </label>
+      <label class="auth-field">
         <span class="auth-field-icon password-field-icon" aria-hidden="true">●</span>
-        <input type="password" id="invitePassword" placeholder="Passwort (mindestens 8 Zeichen)" autocomplete="new-password" aria-label="Neues Passwort" minlength="8">
+        <input type="password" id="invitePassword" placeholder="Passwort (mindestens 8 Zeichen)" autocomplete="new-password" aria-label="Passwort" minlength="8">
       </label>
       <button type="button" id="inviteAcceptButton" class="auth-primary" onclick="completeInvitation()">
-        <span>Passwort festlegen</span><span aria-hidden="true">→</span>
+        <span>Konto erstellen</span><span aria-hidden="true">→</span>
       </button>
     </div>
     <p id="loginError" class="auth-error" role="status" aria-live="polite"></p>
@@ -4795,11 +4803,10 @@ body.color-vision-mode .beer-grade-slider::-moz-range-thumb {
     <section id="adminApp" class="app-panel account-panel" style="display:none;" aria-labelledby="adminTitle">
       <div class="list-panel-heading"><div><h2 id="adminTitle">Administration</h2><p class="panel-subtitle">Konten verwalten und neue Nutzer einladen. Nur Admins können Einladungen erstellen.</p></div></div>
       <div class="account-card">
-        <h3>Nutzer einladen</h3>
-        <label class="edit-field"><span>E-Mail-Adresse</span><input id="inviteEmail" type="email" autocomplete="email" required></label>
-        <label class="edit-field"><span>Nutzername</span><input id="inviteUsername" type="text" maxlength="24" autocomplete="off" required></label>
-        <button type="button" id="createInviteButton" onclick="createUserInvitation()">Einladungslink erstellen</button>
-        <label id="inviteLinkField" class="edit-field" style="display:none;"><span>Einmaliger Einladungslink</span><input id="generatedInviteLink" type="url" readonly></label>
+        <h3>Registrierungslink erstellen</h3>
+        <p class="panel-subtitle">Der Link ist einmalig verwendbar und läuft nach sieben Tagen ab.</p>
+        <button type="button" id="createInviteButton" onclick="createUserInvitation()">Registrierungslink erstellen</button>
+        <label id="inviteLinkField" class="edit-field" style="display:none;"><span>Einmaliger Registrierungslink</span><input id="generatedInviteLink" type="url" readonly></label>
         <button type="button" id="copyInviteLinkButton" style="display:none;" onclick="copyInvitationLink()">Link kopieren</button>
         <p id="inviteStatus" class="appointment-status" role="status" aria-live="polite"></p>
       </div>
@@ -5081,6 +5088,7 @@ const supabaseClient = supabase.createClient(
 const MOVIE_TABLE = "items";
 
 let currentUser = null;
+let currentRegistrationToken = null;
 let movieItems = [];
 let pendingRandomUrl = "";
 let editEntryState = null;
@@ -5111,6 +5119,8 @@ let availabilityEntries = [];
 const emailInput = document.getElementById("email");
 const passwordInput = document.getElementById("password");
 const loginError = document.getElementById("loginError");
+const inviteEmailInput = document.getElementById("inviteEmail");
+const inviteUsernameInput = document.getElementById("inviteUsername");
 const invitePasswordInput = document.getElementById("invitePassword");
 const userInfo = document.getElementById("userInfo");
 const globalStatus = document.getElementById("globalStatus");
@@ -6152,10 +6162,19 @@ function showInviteSetup() {
   appShell.style.display = "none";
   document.getElementById("loginForm").style.display = "none";
   document.getElementById("inviteSetup").style.display = "block";
+  currentUser = null;
+  currentProfile = null;
   setAuthMessage("");
 }
 
 async function initAuth() {
+  currentRegistrationToken = new URLSearchParams(window.location.search).get("invite");
+  if (currentRegistrationToken) {
+    window.history.replaceState({}, document.title, window.location.pathname);
+    showInviteSetup();
+    return;
+  }
+
   const { data, error } = await supabaseClient.auth.getSession();
 
   if (error) {
@@ -6166,16 +6185,9 @@ async function initAuth() {
 
   if (data.session && data.session.user) {
     currentUser = data.session.user;
-    if (new URLSearchParams(window.location.search).get("invite") === "1") {
-      showInviteSetup();
-    } else {
-      await showAppShell();
-    }
+    await showAppShell();
   } else {
     showLogin();
-    if (new URLSearchParams(window.location.search).get("invite") === "1") {
-      setAuthMessage("Dieser Einladungslink ist ungültig oder abgelaufen. Bitte einen Admin um einen neuen Link.");
-    }
   }
 }
 
@@ -6230,7 +6242,23 @@ async function login() {
 }
 
 async function completeInvitation() {
+  const email = inviteEmailInput.value.trim().toLowerCase();
+  const username = inviteUsernameInput.value.trim().toLowerCase();
   const password = invitePasswordInput.value;
+  if (!currentRegistrationToken) {
+    setAuthMessage("Dieser Registrierungslink ist ungültig oder abgelaufen. Bitte einen Admin um einen neuen Link.");
+    return;
+  }
+  if (!inviteEmailInput.checkValidity()) {
+    setAuthMessage("Bitte eine gültige E-Mail-Adresse eingeben.");
+    inviteEmailInput.focus();
+    return;
+  }
+  if (!/^[a-z0-9][a-z0-9_.-]{2,23}$/.test(username)) {
+    setAuthMessage("Der Nutzername muss 3-24 Zeichen lang sein und darf Buchstaben, Zahlen, Punkt, Bindestrich und Unterstrich enthalten.");
+    inviteUsernameInput.focus();
+    return;
+  }
   if (password.length < 8) {
     setAuthMessage("Das Passwort muss mindestens 8 Zeichen lang sein.");
     invitePasswordInput.focus();
@@ -6239,17 +6267,38 @@ async function completeInvitation() {
 
   const button = document.getElementById("inviteAcceptButton");
   button.disabled = true;
-  setAuthMessage("Passwort wird festgelegt …", false);
+  setAuthMessage("Konto wird erstellt …", false);
   try {
-    const { data, error } = await supabaseClient.auth.updateUser({ password });
-    if (error) {
-      console.error("Einladung konnte nicht abgeschlossen werden.", error);
-      setAuthMessage("Passwort konnte nicht festgelegt werden. Bitte Einladungslink erneut öffnen.");
+    const { data, error } = await supabaseClient.functions.invoke("complete-user-registration", {
+      body: { invitation_token: currentRegistrationToken, email, username, password }
+    });
+    if (error || !data?.registered) {
+      if (error) console.error("Registrierungseinladung konnte nicht abgeschlossen werden.", error);
+      setAuthMessage(data?.error || "Registrierung fehlgeschlagen. Der Link könnte ungültig oder bereits verwendet sein.");
       return;
     }
-    currentUser = data.user;
-    invitePasswordInput.value = "";
     window.history.replaceState({}, document.title, window.location.pathname);
+    currentRegistrationToken = null;
+    if (!data.session) {
+      invitePasswordInput.value = "";
+      showLogin();
+      emailInput.value = email;
+      setAuthMessage("Konto erstellt. Bitte melde dich mit deiner E-Mail-Adresse und deinem Passwort an.", false);
+      return;
+    }
+    const { data: sessionData, error: sessionError } = await supabaseClient.auth.setSession(data.session);
+    if (sessionError || !sessionData.user) {
+      if (sessionError) console.error("Registrierungs-Session konnte nicht übernommen werden.", sessionError);
+      invitePasswordInput.value = "";
+      showLogin();
+      emailInput.value = email;
+      setAuthMessage("Konto wurde erstellt, aber die Anmeldung ist fehlgeschlagen. Bitte melde dich mit deinen Zugangsdaten an.");
+      return;
+    }
+    currentUser = sessionData.user;
+    inviteEmailInput.value = "";
+    inviteUsernameInput.value = "";
+    invitePasswordInput.value = "";
     await showAppShell();
   } catch (error) {
     console.error("Einladung konnte nicht abgeschlossen werden.", error);
@@ -6271,10 +6320,6 @@ function isCurrentUserAdmin() {
 
 async function createUserInvitation() {
   if (!isCurrentUserAdmin()) return;
-  const emailInput = document.getElementById("inviteEmail");
-  const usernameInput = document.getElementById("inviteUsername");
-  const email = emailInput.value.trim().toLowerCase();
-  const username = usernameInput.value.trim().toLowerCase();
   const status = document.getElementById("inviteStatus");
   const button = document.getElementById("createInviteButton");
   const linkField = document.getElementById("inviteLinkField");
@@ -6282,35 +6327,22 @@ async function createUserInvitation() {
   linkField.style.display = "none";
   copyButton.style.display = "none";
 
-  if (!emailInput.checkValidity()) {
-    status.textContent = "Bitte eine gültige E-Mail-Adresse eingeben.";
-    emailInput.focus();
-    return;
-  }
-  if (!/^[a-z0-9][a-z0-9_.-]{2,23}$/.test(username)) {
-    status.textContent = "Der Nutzername muss 3-24 Zeichen lang sein und darf Buchstaben, Zahlen, Punkt, Bindestrich und Unterstrich enthalten.";
-    usernameInput.focus();
-    return;
-  }
-
   button.disabled = true;
-  status.textContent = "Einladungslink wird erstellt …";
+  status.textContent = "Registrierungslink wird erstellt …";
   try {
-    const { data, error } = await supabaseClient.functions.invoke("create-user-invite", {
-      body: { email, username }
-    });
-    if (error || !data?.action_link) {
-      if (error) console.error("Einladungslink konnte nicht erstellt werden.", error);
-      status.textContent = data?.error || "Einladung konnte nicht erstellt werden. E-Mail und Nutzername prüfen.";
+    const { data, error } = await supabaseClient.functions.invoke("create-user-invite");
+    if (error || !data?.registration_url) {
+      if (error) console.error("Registrierungslink konnte nicht erstellt werden.", error);
+      status.textContent = "Registrierungslink konnte nicht erstellt werden. Bitte erneut versuchen.";
       return;
     }
-    document.getElementById("generatedInviteLink").value = data.action_link;
+    document.getElementById("generatedInviteLink").value = data.registration_url;
     linkField.style.display = "grid";
     copyButton.style.display = "inline-block";
-    status.textContent = "Einladung erstellt. Der Link ist einmalig und kann nur für dieses Konto verwendet werden.";
+    status.textContent = "Registrierungslink erstellt. Er ist einmalig verwendbar und läuft nach sieben Tagen ab.";
   } catch (error) {
-    console.error("Einladungslink konnte nicht erstellt werden.", error);
-    status.textContent = "Einladungslink momentan nicht verfügbar.";
+    console.error("Registrierungslink konnte nicht erstellt werden.", error);
+    status.textContent = "Registrierungslink momentan nicht verfügbar.";
   } finally {
     button.disabled = false;
   }
@@ -6321,9 +6353,9 @@ async function copyInvitationLink() {
   const status = document.getElementById("inviteStatus");
   try {
     await navigator.clipboard.writeText(link);
-    status.textContent = "Einladungslink in die Zwischenablage kopiert.";
+    status.textContent = "Registrierungslink in die Zwischenablage kopiert.";
   } catch (error) {
-    console.error("Einladungslink konnte nicht kopiert werden.", error);
+    console.error("Registrierungslink konnte nicht kopiert werden.", error);
     status.textContent = "Kopieren nicht möglich. Bitte den Link aus dem Feld manuell kopieren.";
   }
 }

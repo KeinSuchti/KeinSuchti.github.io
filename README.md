@@ -2,31 +2,37 @@
 
 ## Supabase-Konten einrichten
 
-Für Registrierung, Nutzernamen-Login, Kontoverwaltung und Rollenverwaltung zuerst
+Für Registrierungslinks, Nutzernamen-Login, Kontoverwaltung und Rollenverwaltung zuerst
 [`supabase-account-setup.sql`](supabase-account-setup.sql) vollständig im Supabase SQL Editor ausführen.
+Falls das Kontoschema bereits eingerichtet wurde, führe das aktualisierte SQL-Script erneut aus,
+damit die Tabelle und Funktion für einmalige Registrierungslinks angelegt werden.
+
 Deaktiviere in Supabase unter **Authentication > Settings > User Signups** öffentliche Registrierungen,
 damit niemand die Login-Maske oder die öffentliche Auth-API zur Kontoerstellung verwenden kann.
-Admin-Einladungen werden weiterhin über die serverseitige Admin-API erstellt.
+Admin-Registrierungslinks werden weiterhin serverseitig erstellt; das aktualisierte SQL-Script legt
+dafür eine Tabelle mit gehashten, einmalig nutzbaren Tokens an.
 
-Die Funktionen für Username-Login und Admin-Einladungen mit der Supabase CLI bereitstellen:
+Die Funktionen für Username-Login, Registrierungslinks und Kontoerstellung mit der Supabase CLI bereitstellen:
 
 ```sh
 supabase link --project-ref tqxyofqzlflnpfomslky
 supabase functions deploy login-with-username
 supabase functions deploy create-user-invite
+supabase functions deploy complete-user-registration
 supabase secrets set APP_ORIGIN=https://keinsuchti.github.io
 ```
 
-Für beide Edge Functions stellt Supabase `SUPABASE_URL` und `SUPABASE_SERVICE_ROLE_KEY` bereit;
-`login-with-username` verwendet zusätzlich `SUPABASE_ANON_KEY`. `APP_ORIGIN` muss auf die HTTPS-
-Ursprungsadresse der Webseite zeigen. Der Service-Role-Key bleibt serverseitig und darf nicht in
-`index.html` veröffentlicht werden.
+Supabase stellt `SUPABASE_URL` und `SUPABASE_SERVICE_ROLE_KEY` für die Edge Functions bereit;
+Username-Login und Registrierung verwenden zusätzlich `SUPABASE_ANON_KEY`. `APP_ORIGIN` muss auf
+die HTTPS-Ursprungsadresse der Webseite zeigen. Der Service-Role-Key bleibt serverseitig und darf
+nicht in `index.html` veröffentlicht werden.
 
-Neue Konten können nur Admins im Administratorbereich einladen. Der Admin gibt E-Mail-Adresse und
-Nutzernamen an und erstellt einen einmaligen Einladungslink. Der eingeladene Nutzer öffnet den Link
-und legt ein Passwort fest. In Supabase Auth muss die Redirect-URL `https://keinsuchti.github.io/`
-mit dem Einladungsparameter `https://keinsuchti.github.io/?invite=1` als erlaubte Redirect-URL
-eingetragen sein.
+Neue Konten können nur Admins im Administratorbereich ermöglichen. Der Admin erstellt einen
+einmaligen Registrierungslink und kopiert ihn über den Copy-Button. Der Link läuft nach sieben Tagen
+ab; der eingeladene Nutzer trägt auf der Registrierungsseite E-Mail-Adresse, Nutzernamen und Passwort
+ein. Der Link wird serverseitig einmalig eingelöst; in der Datenbank wird nur sein Hash gespeichert.
+Setze in Supabase **Authentication > URL Configuration > Site URL** auf
+`https://keinsuchti.github.io/` und erlaube dieselbe Adresse als Redirect-URL für Passwort-Resets.
 
 Das SQL-Script legt die Rollen `user` und `admin` an, schützt Profile per Row Level Security und
 erstellt den Admin-Bereich für Rollenverwaltung. Normale Nutzer können ihr eigenes Profil verwalten;

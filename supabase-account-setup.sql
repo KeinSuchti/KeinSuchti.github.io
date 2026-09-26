@@ -146,7 +146,8 @@ on conflict (id) do update
       updated_at = now();
 
 -- Promote only this existing, verified account. If it does not exist yet,
--- register and verify it first, then run this statement again.
+-- create it through an administrator-issued registration link, then run this
+-- script again.
 update public.profiles p
 set role = 'admin',
     updated_at = now()
@@ -202,6 +203,40 @@ $$;
 
 revoke all on function public.set_profile_role(uuid, text) from public, anon;
 grant execute on function public.set_profile_role(uuid, text) to authenticated;
+
+create table if not exists public.registration_invites (
+  id uuid primary key default gen_random_uuid(),
+  token_hash text not null unique
+    check (token_hash ~ '^[0-9a-f]{64}$'),
+  created_by uuid references auth.users(id) on delete set null,
+  created_at timestamptz not null default now(),
+  expires_at timestamptz not null default (now() + interval '7 days'),
+  consumed_at timestamptz
+);
+
+alter table public.registration_invites enable row level security;
+revoke all on table public.registration_invites from public, anon, authenticated;
+grant select, insert on table public.registration_invites to service_role;
+
+create or replace function public.consume_registration_invite(invitation_token_hash text)
+returns boolean
+language plpgsql
+security definer
+set search_path = ''
+as $$
+begin
+  update public.registration_invites
+  set consumed_at = now()
+  where token_hash = invitation_token_hash
+    and expires_at > now()
+    and consumed_at is null;
+
+  return found;
+end;
+$$;
+
+revoke all on function public.consume_registration_invite(text) from public, anon, authenticated;
+grant execute on function public.consume_registration_invite(text) to service_role;
 
 commit;
 
