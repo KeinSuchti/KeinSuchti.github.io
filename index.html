@@ -602,6 +602,49 @@ input[type="checkbox"] {
 .beer-grade-slider {
   width: 100%;
   accent-color: var(--accent);
+  height: 24px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.beer-grade-slider::-webkit-slider-runnable-track {
+  height: 8px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #45c987 0%, #e8c33f 50%, #e35f5f 100%);
+}
+
+.beer-grade-slider::-webkit-slider-thumb {
+  width: 18px;
+  height: 18px;
+  margin-top: -5px;
+  border: 2px solid var(--surface);
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, .4);
+  -webkit-appearance: none;
+}
+
+.beer-grade-slider::-moz-range-track {
+  height: 8px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #45c987 0%, #e8c33f 50%, #e35f5f 100%);
+}
+
+.beer-grade-slider::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--surface);
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, .4);
+}
+
+.beer-grade-slider:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
 }
 
 .beer-grade-number {
@@ -3236,13 +3279,13 @@ button, input, select, textarea { max-width: 100%; }
     transition:opacity .28s ease, visibility 0s linear .28s;
   }
   body.app-scene .dashboard-shell .dashboard-sidebar {
-    position:fixed !important;
-    top:0 !important;
+    position:absolute !important;
+    top:var(--mobile-drawer-top, 0px) !important;
     left:0 !important;
     z-index:10002 !important;
     box-sizing:border-box;
     width:min(86vw,310px);
-    height:100dvh;
+    height:calc(100dvh - var(--mobile-drawer-top, 0px));
     max-height:none;
     visibility:hidden;
     opacity:0;
@@ -3386,57 +3429,6 @@ button, input, select, textarea { max-width: 100%; }
     top:max(8px, env(safe-area-inset-top, 0px) + 6px) !important;
     left:10px !important;
     bottom:auto !important;
-  }
-}
-
-
-/* --- Mobiles Flyout öffnet sich direkt am aktuellen Burger-Button --- */
-@media (max-width:900px) {
-  body.app-scene .dashboard-shell .dashboard-sidebar {
-    top:var(--mobile-flyout-top, 76px) !important;
-    height:calc(100dvh - var(--mobile-flyout-top, 76px) - 12px) !important;
-    max-height:calc(100dvh - var(--mobile-flyout-top, 76px) - 12px) !important;
-  }
-  body.app-scene.mobile-sidebar-open .mobile-sidebar-backdrop {
-    top:var(--mobile-flyout-viewport-top, 76px) !important;
-  }
-}
-/* Bier-Liste: invertierte Slider-Farbwelt */
-.beer-grade-slider {
-  accent-color:#ffb36b !important;
-  filter:invert(1) hue-rotate(180deg) saturate(1.15);
-}
-.beer-grade-slider::-webkit-slider-runnable-track {
-  background:linear-gradient(90deg,#ffb36b,#ff6b9d) !important;
-}
-.beer-grade-slider::-webkit-slider-thumb {
-  background:#16243d !important;
-  border:2px solid #ffcf8a !important;
-}
-.beer-grade-slider::-moz-range-track {
-  background:linear-gradient(90deg,#ffb36b,#ff6b9d) !important;
-}
-.beer-grade-slider::-moz-range-progress {
-  background:#ff6b9d !important;
-}
-.beer-grade-slider::-moz-range-thumb {
-  background:#16243d !important;
-  border:2px solid #ffcf8a !important;
-}
-
-
-/* --- Fix: mobiles Flyout bleibt im Viewport und folgt dem Button --- */
-@media (max-width:900px) {
-  body.app-scene .dashboard-shell .dashboard-sidebar {
-    position:absolute !important;
-    left:0 !important;
-    right:auto !important;
-    top:var(--mobile-flyout-top, 76px) !important;
-    margin:0 !important;
-    transform:translate3d(-105%,0,0) !important;
-  }
-  body.app-scene.mobile-sidebar-open .dashboard-shell .dashboard-sidebar {
-    transform:translate3d(0,0,0) !important;
   }
 }
 
@@ -3586,8 +3578,6 @@ button, input, select, textarea { max-width: 100%; }
             <div class="dashboard-card-body"><span class="card-icon">✦</span><div><h3>Neue Liste</h3><p>Eigene Liste mit Sortierung, Filtern und Zufallsauswahl anlegen.</p></div><span class="card-arrow">→</span></div>
           </button>
         </div>
-
-        <div class="dashboard-statusbar"><span class="online-dot"></span><strong>Online</strong><span>Bereit für den nächsten gemeinsamen Abend.</span><span class="dashboard-status-badge">CINEMATIC UI</span></div>
       </main>
     </div>
 
@@ -5090,6 +5080,8 @@ const appViewLoaders = {
 
 function hideAllPanels() {
   menuBox.style.display = "none";
+  const dashboardMain = menuBox.querySelector(".dashboard-main");
+  if (dashboardMain) dashboardMain.style.removeProperty("display");
   saufiMenuBox.style.display = "none";
   moviesApp.style.display = "none";
   feastApp.style.display = "none";
@@ -5275,7 +5267,7 @@ function renderNextAppointment() {
     nextAppointmentBanner.hidden = true;
     return;
   }
-  const title = nextAppointment.title || "Nächster gemeinsamer Termin";
+  const title = nextAppointment.title || "Wo und wann?";
   nextAppointmentBanner.hidden = false;
   nextAppointmentBanner.innerHTML = `<div class="appointment-banner-grid"><div class="appointment-banner-icon">◷</div><div class="appointment-banner-copy"><div class="appointment-banner-kicker">Nächster gemeinsamer Termin</div><div class="appointment-banner-countdown">${escapeHtml(title)} · ${appointmentCountdown(nextAppointment.start_at)}</div><div class="appointment-banner-meta"><span>📅 ${formatAppointmentDate(nextAppointment.start_at)}</span>${nextAppointment.location ? `<span>⌖ ${escapeHtml(nextAppointment.location)}</span>` : ""}</div>${nextAppointment.note ? `<div class="appointment-banner-note">${escapeHtml(nextAppointment.note)}</div>` : ""}</div></div>`;
 }
@@ -7696,22 +7688,41 @@ renderYugiohPlayerInputs();
 initAuth();
 
 function isMobileSidebar() { return window.matchMedia && window.matchMedia("(max-width: 900px)").matches; }
+function setMobileSidebarHostVisibility(visible) {
+  if (currentView === "menu") return;
+  menuBox.style.display = visible ? "block" : "none";
+  const dashboardMain = menuBox.querySelector(".dashboard-main");
+  if (dashboardMain) dashboardMain.style.display = visible ? "none" : "";
+}
 function closeMobileSidebar() {
   if (!isMobileSidebar()) return;
   document.body.classList.remove("mobile-sidebar-open");
+  setMobileSidebarHostVisibility(false);
   const b=document.getElementById("mobileMenuToggle"), o=document.getElementById("mobileSidebarBackdrop");
+  const drawer=document.getElementById("menuSidebar");
+  if (drawer) drawer.style.removeProperty("--mobile-drawer-top");
   if (b) { b.setAttribute("aria-expanded","false"); b.setAttribute("aria-label","Navigation öffnen"); b.title="Navigation öffnen"; }
   if (o) o.setAttribute("aria-hidden","true");
 }
 function toggleSidebar() {
   if (isMobileSidebar()) {
-    const open=document.body.classList.toggle("mobile-sidebar-open");
     const b=document.getElementById("mobileMenuToggle"), o=document.getElementById("mobileSidebarBackdrop");
+    const drawer=document.getElementById("menuSidebar");
+    const drawerTop = b?.getBoundingClientRect().bottom;
+    const open=document.body.classList.toggle("mobile-sidebar-open");
+    setMobileSidebarHostVisibility(open);
     if (b) { b.setAttribute("aria-expanded",String(open)); b.setAttribute("aria-label",open?"Navigation schließen":"Navigation öffnen"); b.title=open?"Navigation schließen":"Navigation öffnen"; }
     if (o) o.setAttribute("aria-hidden",String(!open));
-    const drawer=document.getElementById("menuSidebar");
     if (drawer) {
-      positionMobileFlyout(drawer, b);
+      if (open && drawerTop !== undefined) {
+        const parent = drawer.offsetParent;
+        const parentRect = parent && parent.getBoundingClientRect ? parent.getBoundingClientRect() : null;
+        const parentDocumentTop = parentRect ? parentRect.top + window.scrollY : 0;
+        const localTop = Math.max(8, Math.round(window.scrollY + drawerTop + 8 - parentDocumentTop));
+        drawer.style.setProperty("--mobile-drawer-top", `${localTop}px`);
+      } else {
+        drawer.style.removeProperty("--mobile-drawer-top");
+      }
       if (drawer.getAnimations) drawer.getAnimations().forEach(animation => animation.cancel());
       drawer.style.setProperty("transition", "none", "important");
       drawer.style.setProperty("transform", open ? "translate3d(0,0,0)" : "translate3d(-105%,0,0)", "important");
@@ -7728,30 +7739,21 @@ function toggleSidebar() {
   if (toggleButton) { toggleButton.setAttribute('aria-expanded',String(!isCollapsed)); toggleButton.setAttribute('aria-label',isCollapsed?'Sidebar ausklappen':'Sidebar einklappen'); toggleButton.title=isCollapsed?'Sidebar ausklappen':'Sidebar einklappen'; }
 }
 document.querySelectorAll(".dashboard-nav-item").forEach(item => item.addEventListener("click", closeMobileSidebar));
-window.addEventListener("resize", () => { if (!isMobileSidebar()) document.body.classList.remove("mobile-sidebar-open"); });
+window.addEventListener("resize", () => {
+  if (!isMobileSidebar()) {
+    document.body.classList.remove("mobile-sidebar-open");
+    setMobileSidebarHostVisibility(false);
+  }
+});
 </script>
 <script>
 /* Stabilisiert den mobilen Drawer auch nach Auth-/Navigationsupdates. */
 (function () {
-  function positionMobileFlyout(drawer, button) {
-    if (!drawer || !button) return;
-    const buttonRect = button.getBoundingClientRect();
-    const parent = drawer.offsetParent;
-    const parentRect = parent && parent.getBoundingClientRect ? parent.getBoundingClientRect() : null;
-    const parentDocumentTop = parentRect ? parentRect.top + window.scrollY : 0;
-    const desiredDocumentTop = window.scrollY + buttonRect.bottom + 16;
-    const localTop = Math.max(0, Math.round(desiredDocumentTop - parentDocumentTop));
-    document.documentElement.style.setProperty("--mobile-flyout-top", `${localTop}px`);
-    document.documentElement.style.setProperty("--mobile-flyout-viewport-top", `${Math.max(8, Math.round(buttonRect.bottom + 8))}px`);
-  }
-
   function syncMobileDrawer() {
     if (!window.matchMedia || !window.matchMedia("(max-width: 900px)").matches) return;
     const drawer = document.querySelector("#menuSidebar");
     if (!drawer) return;
     const open = document.body.classList.contains("mobile-sidebar-open");
-    const button = document.getElementById("mobileMenuToggle");
-    positionMobileFlyout(drawer, button);
     if (drawer.getAnimations) drawer.getAnimations().forEach(animation => animation.cancel());
     drawer.style.setProperty("transition", "none", "important");
     drawer.style.setProperty("transform", open ? "translate3d(0,0,0)" : "translate3d(-105%,0,0)", "important");
