@@ -7,7 +7,7 @@ begin;
 create table if not exists public.profiles (
   id uuid primary key references auth.users(id) on delete cascade,
   username text not null
-    check (username ~ '^[a-z0-9][a-z0-9_.-]{2,23}$'),
+    check (username ~ '^[A-Za-z0-9][A-Za-z0-9_.-]{2,23}$'),
   email text not null,
   role text not null default 'user'
     check (role in ('user', 'admin')),
@@ -18,6 +18,13 @@ create table if not exists public.profiles (
 
 alter table public.profiles
   add column if not exists is_banned boolean not null default false;
+
+alter table public.profiles
+  drop constraint if exists profiles_username_check;
+
+alter table public.profiles
+  add constraint profiles_username_check
+  check (username ~ '^[A-Za-z0-9][A-Za-z0-9_.-]{2,23}$');
 
 create unique index if not exists profiles_username_lower_unique
   on public.profiles (lower(username));
@@ -75,13 +82,13 @@ declare
   base_username text;
 begin
   if tg_op = 'INSERT' then
-    base_username := lower(btrim(coalesce(new.raw_user_meta_data ->> 'username', '')));
-    if base_username is null or base_username !~ '^[a-z0-9][a-z0-9_.-]{2,23}$' then
+    base_username := btrim(coalesce(new.raw_user_meta_data ->> 'username', ''));
+    if base_username is null or base_username !~ '^[A-Za-z0-9][A-Za-z0-9_.-]{2,23}$' then
       base_username := lower(regexp_replace(
         split_part(coalesce(new.email, ''), '@', 1),
         '[^a-z0-9_.-]', '', 'g'
       ));
-      base_username := regexp_replace(base_username, '^[^a-z0-9]+', '', 'g');
+      base_username := regexp_replace(base_username, '^[^A-Za-z0-9]+', '', 'g');
       if length(base_username) < 3 then
         base_username := 'user';
       end if;

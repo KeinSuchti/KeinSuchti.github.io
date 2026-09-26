@@ -45,7 +45,7 @@ Deno.serve(async request => {
 
   const token = typeof body.invitation_token === "string" ? body.invitation_token : "";
   const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
-  const username = typeof body.username === "string" ? body.username.trim().toLowerCase() : "";
+  const username = typeof body.username === "string" ? body.username.trim() : "";
   const password = typeof body.password === "string" ? body.password : "";
   if (!/^[a-f0-9]{64}$/.test(token)) {
     return jsonResponse({ error: "Registration link is invalid, expired, or already used." }, 400);
@@ -53,7 +53,7 @@ Deno.serve(async request => {
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 254) {
     return jsonResponse({ error: "Please provide a valid email address." }, 400);
   }
-  if (!/^[a-z0-9][a-z0-9_.-]{2,23}$/.test(username)) {
+  if (!/^[A-Za-z0-9][A-Za-z0-9_.-]{2,23}$/.test(username)) {
     return jsonResponse({ error: "Username must be 3-24 characters using letters, numbers, dot, dash, or underscore." }, 400);
   }
   if (password.length < 8 || password.length > 256) {
@@ -62,7 +62,9 @@ Deno.serve(async request => {
 
   const [emailProfile, usernameProfile] = await Promise.all([
     adminClient.from("profiles").select("id").eq("email", email).maybeSingle(),
-    adminClient.from("profiles").select("id").eq("username", username).maybeSingle()
+    adminClient.from("profiles").select("id")
+      .ilike("username", username.replace(/[\\%_]/g, "\\$&"))
+      .maybeSingle()
   ]);
   if (emailProfile.error || usernameProfile.error) {
     console.error("Could not validate registration details.", emailProfile.error || usernameProfile.error);
