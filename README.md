@@ -42,6 +42,8 @@ ab; der eingeladene Nutzer trägt auf der Registrierungsseite E-Mail-Adresse, Nu
 ein. Der Link wird serverseitig einmalig eingelöst; in der Datenbank wird nur sein Hash gespeichert.
 Setze in Supabase **Authentication > URL Configuration > Site URL** auf
 `https://keinsuchti.github.io/` und erlaube dieselbe Adresse als Redirect-URL für Passwort-Resets.
+Der Reset-Link öffnet auf der Webseite ein Formular zum Festlegen eines neuen Passworts; nach dem
+Speichern kann sich der Nutzer mit dem neuen Passwort anmelden.
 
 Das SQL-Script legt die Rollen `user` und `admin` an, schützt Profile per Row Level Security und
 erstellt den Admin-Bereich für Rollenverwaltung. Normale Nutzer können ihr eigenes Profil verwalten;

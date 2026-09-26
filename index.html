@@ -4543,6 +4543,7 @@ body.color-vision-mode .beer-grade-slider::-moz-range-thumb {
         <span>Einloggen</span><span aria-hidden="true">→</span>
       </button>
 
+      <button type="button" class="auth-link" onclick="resetPassword()">Passwort vergessen?</button>
       <p class="auth-legal">Mit dem Login stimmst du unseren Nutzungsbedingungen und der Datenschutzerklärung zu. Noch kein Konto? Bitte einen Admin um einen Einladungslink.</p>
     </div>
 
@@ -4566,6 +4567,24 @@ body.color-vision-mode .beer-grade-slider::-moz-range-thumb {
       <button type="button" id="inviteAcceptButton" class="auth-primary" onclick="completeInvitation()">
         <span>Konto erstellen</span><span aria-hidden="true">→</span>
       </button>
+    </div>
+    <div id="passwordRecoveryForm" class="auth-form" style="display:none;">
+      <div class="auth-heading">
+        <h2>Neues Passwort festlegen</h2>
+        <p>Wähle ein neues Passwort für dein Konto.</p>
+      </div>
+      <label class="auth-field">
+        <span class="auth-field-icon password-field-icon" aria-hidden="true">●</span>
+        <input type="password" id="recoveryPassword" placeholder="Neues Passwort (mindestens 8 Zeichen)" autocomplete="new-password" aria-label="Neues Passwort" minlength="8" maxlength="256">
+      </label>
+      <label class="auth-field">
+        <span class="auth-field-icon password-field-icon" aria-hidden="true">●</span>
+        <input type="password" id="recoveryPasswordConfirm" placeholder="Neues Passwort wiederholen" autocomplete="new-password" aria-label="Neues Passwort wiederholen" minlength="8" maxlength="256">
+      </label>
+      <button type="button" id="saveRecoveryPasswordButton" class="auth-primary" onclick="saveRecoveryPassword()">
+        <span>Passwort speichern</span><span aria-hidden="true">→</span>
+      </button>
+      <button type="button" class="auth-link" onclick="showLogin()">Zurück zur Anmeldung</button>
     </div>
     <p id="loginError" class="auth-error" role="status" aria-live="polite"></p>
   </div>
@@ -5109,6 +5128,9 @@ const MOVIE_TABLE = "items";
 
 let currentUser = null;
 let currentRegistrationToken = null;
+let passwordRecoveryPending = new URLSearchParams(window.location.hash.slice(1)).get("type") === "recovery"
+  || new URLSearchParams(window.location.search).get("type") === "recovery";
+let passwordRecoveryAuthorized = false;
 let movieItems = [];
 let pendingRandomUrl = "";
 let editEntryState = null;
@@ -6091,23 +6113,28 @@ async function resetPassword() {
   }
 
   loginError.textContent = "Sende Link zum Zurücksetzen des Passworts …";
-
-  const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
-    redirectTo: window.location.origin + window.location.pathname
-  });
-
-  if (error) {
-    loginError.textContent = "Passwort-Reset fehlgeschlagen: " + error.message;
-    return;
+  try {
+    const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.origin + window.location.pathname
+    });
+    if (error) {
+      console.error("Passwort-Reset konnte nicht angefordert werden.", error);
+      loginError.textContent = "Passwort-Reset fehlgeschlagen: " + error.message;
+      return;
+    }
+    setAuthMessage("Falls für diese Adresse ein Konto existiert, wurde ein Link zum Zurücksetzen des Passworts versendet.", false);
+  } catch (error) {
+    console.error("Passwort-Reset konnte nicht angefordert werden.", error);
+    loginError.textContent = "Passwort-Reset momentan nicht erreichbar. Bitte Verbindung prüfen und erneut versuchen.";
   }
-
-  loginError.textContent = "Falls für diese Adresse ein Account existiert, wurde ein Reset-Link versendet.";
 }
 
 
 
 function showLogin() {
   closeMobileSidebar();
+  passwordRecoveryPending = false;
+  passwordRecoveryAuthorized = false;
   document.body.classList.add("login-scene");
   document.body.classList.remove("app-scene");
   currentUser = null;
@@ -6144,6 +6171,71 @@ function showLogin() {
 
   document.getElementById("loginForm").style.display = "block";
   document.getElementById("inviteSetup").style.display = "none";
+  document.getElementById("passwordRecoveryForm").style.display = "none";
+  document.getElementById("recoveryPassword").value = "";
+  document.getElementById("recoveryPasswordConfirm").value = "";
+}
+
+function showPasswordRecovery(session) {
+  passwordRecoveryPending = true;
+  currentUser = passwordRecoveryAuthorized ? session?.user || currentUser : null;
+  document.body.classList.add("login-scene");
+  document.body.classList.remove("app-scene");
+  loginBox.style.display = "block";
+  appShell.style.display = "none";
+  document.getElementById("loginForm").style.display = "none";
+  document.getElementById("inviteSetup").style.display = "none";
+  document.getElementById("passwordRecoveryForm").style.display = "block";
+  document.getElementById("recoveryPassword").value = "";
+  document.getElementById("recoveryPasswordConfirm").value = "";
+  loginError.textContent = currentUser
+    ? "Der Link ist bestätigt. Lege jetzt dein neues Passwort fest."
+    : "Der Passwort-Reset-Link ist ungültig oder abgelaufen. Fordere einen neuen Link an.";
+  loginError.classList.toggle("auth-success", Boolean(currentUser));
+  if (window.location.search || window.location.hash) {
+    window.history.replaceState({}, document.title, window.location.pathname);
+  }
+}
+
+async function saveRecoveryPassword() {
+  if (!currentUser || !passwordRecoveryPending || !passwordRecoveryAuthorized) {
+    setAuthMessage("Der Passwort-Reset-Link ist ungültig oder abgelaufen. Fordere einen neuen Link an.");
+    return;
+  }
+  const passwordInput = document.getElementById("recoveryPassword");
+  const confirmInput = document.getElementById("recoveryPasswordConfirm");
+  const password = passwordInput.value;
+  if (password.length < 8 || password.length > 256) {
+    setAuthMessage("Das Passwort muss 8 bis 256 Zeichen lang sein.");
+    passwordInput.focus();
+    return;
+  }
+  if (password !== confirmInput.value) {
+    setAuthMessage("Die eingegebenen Passwörter stimmen nicht überein.");
+    confirmInput.focus();
+    return;
+  }
+
+  const button = document.getElementById("saveRecoveryPasswordButton");
+  button.disabled = true;
+  setAuthMessage("Passwort wird gespeichert …", false);
+  try {
+    const { error } = await supabaseClient.auth.updateUser({ password });
+    if (error) {
+      console.error("Neues Passwort konnte nicht gespeichert werden.", error);
+      setAuthMessage("Passwort konnte nicht geändert werden: " + error.message);
+      return;
+    }
+    passwordRecoveryPending = false;
+    await supabaseClient.auth.signOut({ scope: "local" });
+    showLogin();
+    setAuthMessage("Passwort erfolgreich geändert. Bitte melde dich mit deinem neuen Passwort an.", false);
+  } catch (error) {
+    console.error("Neues Passwort konnte nicht gespeichert werden.", error);
+    setAuthMessage("Passwort konnte nicht geändert werden. Bitte fordere einen neuen Reset-Link an.");
+  } finally {
+    button.disabled = false;
+  }
 }
 
 async function showAppShell() {
@@ -6192,6 +6284,7 @@ function showInviteSetup() {
   appShell.style.display = "none";
   document.getElementById("loginForm").style.display = "none";
   document.getElementById("inviteSetup").style.display = "block";
+  document.getElementById("passwordRecoveryForm").style.display = "none";
   currentUser = null;
   currentProfile = null;
   setAuthMessage("");
@@ -6209,7 +6302,18 @@ async function initAuth() {
 
   if (error) {
     console.error(error);
+    if (passwordRecoveryPending) {
+      showPasswordRecovery(null);
+      return;
+    }
     showLogin();
+    return;
+  }
+
+  if (passwordRecoveryPending) {
+    if (document.getElementById("passwordRecoveryForm").style.display !== "block") {
+      showPasswordRecovery(passwordRecoveryAuthorized ? data.session : null);
+    }
     return;
   }
 
@@ -6349,14 +6453,19 @@ async function completeInvitation() {
 
 async function logout() {
   closeMobileSidebar();
-  const { error } = await supabaseClient.auth.signOut();
-  closeMobileSidebar();
-  if (error) {
-    console.error("Abmeldung fehlgeschlagen.", error);
-    setStatus("Abmeldung fehlgeschlagen. Bitte erneut versuchen.");
-    return;
-  }
   showLogin();
+  try {
+    const { error } = await supabaseClient.auth.signOut();
+    if (error) throw error;
+  } catch (error) {
+    console.error("Abmeldung fehlgeschlagen.", error);
+    const { data, error: sessionError } = await supabaseClient.auth.getSession();
+    if (!sessionError && data.session?.user) {
+      currentUser = data.session.user;
+      await showAppShell();
+    }
+    setAuthMessage("Abmeldung fehlgeschlagen. Bitte erneut versuchen.");
+  }
 }
 
 async function deleteOwnAccount() {
@@ -9576,6 +9685,13 @@ document.addEventListener("keydown", event => {
 });
 
 renderYugiohPlayerInputs();
+supabaseClient.auth.onAuthStateChange((event, session) => {
+  if (event === "PASSWORD_RECOVERY") {
+    passwordRecoveryPending = true;
+    passwordRecoveryAuthorized = true;
+    showPasswordRecovery(session);
+  }
+});
 initAuth();
 
 function isMobileSidebar() { return window.matchMedia && window.matchMedia("(max-width: 900px)").matches; }
