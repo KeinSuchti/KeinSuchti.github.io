@@ -6318,6 +6318,19 @@ function isCurrentUserAdmin() {
   return currentProfile?.role === "admin";
 }
 
+async function getEdgeFunctionErrorMessage(error) {
+  const response = error?.context;
+  if (response && typeof response.clone === "function") {
+    try {
+      const result = await response.clone().json();
+      if (typeof result?.error === "string" && result.error) return result.error;
+    } catch {
+      // Use the SDK error message when the response does not contain JSON.
+    }
+  }
+  return error?.message || "Bitte prüfe die Edge-Function-Konfiguration in Supabase.";
+}
+
 async function createUserInvitation() {
   if (!isCurrentUserAdmin()) return;
   const status = document.getElementById("inviteStatus");
@@ -6333,7 +6346,9 @@ async function createUserInvitation() {
     const { data, error } = await supabaseClient.functions.invoke("create-user-invite");
     if (error || !data?.registration_url) {
       if (error) console.error("Registrierungslink konnte nicht erstellt werden.", error);
-      status.textContent = "Registrierungslink konnte nicht erstellt werden. Bitte erneut versuchen.";
+      status.textContent = error
+        ? await getEdgeFunctionErrorMessage(error)
+        : "Registrierungslink konnte nicht erstellt werden. Bitte prüfe die Edge Function in Supabase.";
       return;
     }
     document.getElementById("generatedInviteLink").value = data.registration_url;

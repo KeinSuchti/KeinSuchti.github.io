@@ -6,6 +6,9 @@ Für Registrierungslinks, Nutzernamen-Login, Kontoverwaltung und Rollenverwaltun
 [`supabase-account-setup.sql`](supabase-account-setup.sql) vollständig im Supabase SQL Editor ausführen.
 Falls das Kontoschema bereits eingerichtet wurde, führe das aktualisierte SQL-Script erneut aus,
 damit die Tabelle und Funktion für einmalige Registrierungslinks angelegt werden.
+Wenn beim Erstellen eines Registrierungslinks eine Datenbankfehlermeldung erscheint, prüfe, ob
+dieses aktualisierte Script erfolgreich ausgeführt wurde; der Admin-Link wird in
+`public.registration_invites` gespeichert.
 
 Deaktiviere in Supabase unter **Authentication > Settings > User Signups** öffentliche Registrierungen,
 damit niemand die Login-Maske oder die öffentliche Auth-API zur Kontoerstellung verwenden kann.
