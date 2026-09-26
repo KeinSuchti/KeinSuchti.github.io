@@ -2915,10 +2915,11 @@ body.app-scene .sidebar-logout-button .nav-icon svg {
 .calendar-toolbar strong { color:#eaf2ff; font-size:15px; }
 .calendar-weekdays, .appointment-calendar { display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:5px; }
 .calendar-weekdays { margin-bottom:5px; color:#7790b0; font-size:10px; font-weight:800; text-align:center; text-transform:uppercase; }
-.calendar-day { min-height:39px; padding:6px 2px; border:1px solid rgba(101,141,207,.15); border-radius:9px; background:rgba(14,35,62,.68); color:#c9d7e9; font:600 12px var(--font-sans); cursor:pointer; }
-.calendar-day:hover:not(:disabled), .calendar-day.selected { border-color:#4faaa4; background:rgba(36,124,128,.24); color:#e6f4f2; }
+.calendar-day { min-height:39px; padding:6px 2px; border:1px solid rgba(130,151,180,.12); border-radius:9px; background:rgba(30,43,62,.54); color:#bdc9d8; font:600 12px var(--font-sans); cursor:pointer; }
+.calendar-day:hover:not(:disabled) { border-color:rgba(132,164,178,.46); background:rgba(63,84,104,.42); color:#e1e9ef; }
+.calendar-day.selected { border-color:#718e9a; background:rgba(68,99,113,.52); color:#eef3f5; }
 .calendar-day:disabled { cursor:not-allowed; opacity:.42; }
-.calendar-day.is-today { box-shadow:inset 0 0 0 1px rgba(126,161,255,.72); }
+.calendar-day.is-today { box-shadow:inset 0 0 0 1px rgba(151,169,194,.46); }
 .calendar-day.is-empty { visibility:hidden; pointer-events:none; }
 .calendar-help, .panel-subtitle, .appointment-status { color:#8fa5c1; font-size:11px; line-height:1.45; }
 .calendar-help { margin:13px 0 0; }
@@ -2967,12 +2968,12 @@ body.app-scene .sidebar-logout-button .nav-icon svg {
 .poll-date-chip { gap:9px; padding:6px 7px 6px 11px; border-radius:10px; background:rgba(33,111,112,.42); }
 .poll-date-chip button { display:inline-grid; place-items:center; width:22px; height:22px; min-width:22px; padding:0; border:1px solid rgba(168,242,231,.45); border-radius:50%; background:rgba(3,25,42,.6); color:#b9fff4; font:700 15px/1 Arial,sans-serif; cursor:pointer; }
 .poll-date-chip button:hover, .poll-date-chip button:focus-visible { border-color:#fff; background:#d65d72; color:#fff; outline:none; transform:scale(1.06); }
-.calendar-day.availability-common { border-color:#5eaa83; background:linear-gradient(145deg,rgba(43,111,80,.72),rgba(31,82,65,.70)); color:#e5f4eb; box-shadow:0 0 0 1px rgba(88,163,121,.12); }
-.calendar-day.availability-common.selected { border-color:#78b994; background:linear-gradient(145deg,rgba(55,126,91,.82),rgba(38,96,71,.80)); }
-.calendar-day-count { display:block; margin-top:2px; color:#cbe7d5; font-size:9px; font-weight:800; line-height:1; }
+.calendar-day.availability-common { border-color:#748f7d; background:rgba(58,82,66,.62); color:#dce7de; box-shadow:none; }
+.calendar-day.availability-common.selected { border-color:#8ca69a; background:rgba(67,94,83,.72); }
+.calendar-day-count { display:block; margin-top:2px; color:#c4d5c9; font-size:9px; font-weight:800; line-height:1; }
 .availability-common-legend { display:flex; align-items:center; gap:7px; margin-top:10px; color:#9bb4cd; font-size:11px; }
-.availability-common-dot { width:10px; height:10px; border-radius:50%; background:#5eaa83; }
-.availability-entry-date.is-common { border:1px solid #5eaa83; background:rgba(43,111,80,.5); color:#e0f0e6; font-weight:800; }
+.availability-common-dot { width:10px; height:10px; border-radius:50%; background:#748f7d; }
+.availability-entry-date.is-common { border:1px solid #748f7d; background:rgba(58,82,66,.42); color:#dce7de; font-weight:800; }
 
 
 /* --- Finaler Mobile-Sidebar-Fix: Logout immer vollständig sichtbar --- */
@@ -4730,9 +4731,12 @@ body.color-vision-mode .beer-grade-slider::-moz-range-thumb {
           <label class="edit-field"><span>Ort</span><input id="appointmentLocation" placeholder="z. B. Bei Anna, Café oder online"></label>
           <label class="edit-field"><span>Freitext / Notiz</span><textarea id="appointmentNote" rows="3" placeholder="Was soll mitgebracht werden? Wer kommt mit?"></textarea></label>
           <button class="appointment-save-button" type="button" onclick="saveNextAppointment()">📅 Nächsten Termin festlegen</button>
-          <button class="appointment-clear-button" type="button" onclick="clearNextAppointment()">Nächsten Termin entfernen</button>
           <p id="appointmentStatus" class="appointment-status" role="status"></p>
         </section>
+      </div>
+      <div id="nextAppointmentSummary" class="availability-summary" hidden>
+        <div class="dashboard-kicker">Bisher eingetragen</div>
+        <div id="nextAppointmentEntry" class="availability-entries"></div>
       </div>
       <section class="appointment-poll-card" aria-label="Termin-Umfrage">
         <div class="dashboard-kicker">Verfügbarkeit eintragen</div>
@@ -6376,6 +6380,54 @@ function renderNextAppointment() {
   nextAppointmentBanner.hidden = false;
   nextAppointmentBanner.innerHTML = `<div class="appointment-banner-grid"><div class="appointment-banner-icon">◷</div><div class="appointment-banner-copy"><div class="appointment-banner-kicker">Nächster gemeinsamer Termin</div><div class="appointment-banner-countdown">${escapeHtml(title)} · ${appointmentCountdown(nextAppointment.start_at)}</div><div class="appointment-banner-meta"><span>📅 ${formatAppointmentDate(nextAppointment.start_at)}</span>${nextAppointment.location ? `<span>⌖ ${escapeHtml(nextAppointment.location)}</span>` : ""}</div>${nextAppointment.note ? `<div class="appointment-banner-note">${escapeHtml(nextAppointment.note)}</div>` : ""}</div></div>`;
 }
+function renderSavedAppointment() {
+  const summary = document.getElementById("nextAppointmentSummary");
+  const entryHost = document.getElementById("nextAppointmentEntry");
+  if (!summary || !entryHost) return;
+  entryHost.replaceChildren();
+  if (!nextAppointment || !nextAppointment.start_at || new Date(nextAppointment.start_at) < new Date()) {
+    summary.hidden = true;
+    return;
+  }
+
+  summary.hidden = false;
+  const entry = document.createElement("div");
+  entry.className = "availability-entry";
+
+  const details = document.createElement("div");
+  const title = document.createElement("div");
+  title.className = "availability-entry-name";
+  title.textContent = nextAppointment.title || "Gemeinsamer Termin";
+  const date = document.createElement("div");
+  date.className = "panel-subtitle";
+  date.textContent = formatAppointmentDate(nextAppointment.start_at);
+  details.append(title, date);
+
+  const metadata = document.createElement("div");
+  metadata.className = "availability-entry-dates";
+  if (nextAppointment.location) {
+    const location = document.createElement("span");
+    location.className = "availability-entry-date";
+    location.textContent = `⌖ ${nextAppointment.location}`;
+    metadata.appendChild(location);
+  }
+  if (nextAppointment.note) {
+    const note = document.createElement("span");
+    note.className = "availability-entry-date";
+    note.textContent = nextAppointment.note;
+    metadata.appendChild(note);
+  }
+  const removeButton = document.createElement("button");
+  removeButton.className = "availability-entry-remove";
+  removeButton.type = "button";
+  removeButton.textContent = "Termin entfernen";
+  removeButton.setAttribute("aria-label", `Termin ${nextAppointment.title || "Gemeinsamer Termin"} entfernen`);
+  removeButton.addEventListener("click", clearNextAppointment);
+  metadata.appendChild(removeButton);
+
+  entry.append(details, metadata);
+  entryHost.appendChild(entry);
+}
 function tickAppointmentCountdown() { if (currentView === "menu") renderNextAppointment(); }
 async function loadNextAppointment() {
   if (!currentUser) return;
@@ -6386,6 +6438,7 @@ async function loadNextAppointment() {
     try { nextAppointment = JSON.parse(localStorage.getItem(appointmentStorageKey()) || "null"); } catch (_) { nextAppointment = null; }
   }
   renderNextAppointment();
+  renderSavedAppointment();
   renderAppointmentCalendar();
   loadAppointmentPoll();
 }
@@ -6455,13 +6508,13 @@ async function saveNextAppointment() {
   const {data,error}=await supabaseClient.from("shared_events").upsert(payload,{onConflict:"user_id"}).select().single();
   if(error){ nextAppointment={...payload,id:"local-preview"}; localStorage.setItem(appointmentStorageKey(),JSON.stringify(nextAppointment)); status.textContent="Lokal gespeichert. Für gemeinsame Synchronisierung bitte das SQL-Schema ausführen."; }
   else { nextAppointment=data; localStorage.removeItem(appointmentStorageKey()); status.textContent="Termin gespeichert und auf der Übersicht aktiviert."; }
-  renderNextAppointment(); renderAppointmentCalendar(new Date(startAt).getDate());
+  renderNextAppointment(); renderSavedAppointment(); renderAppointmentCalendar(new Date(startAt).getDate());
 }
 async function clearNextAppointment() {
   if(!currentUser) return;
   if(!confirm("Den nächsten Termin wirklich entfernen?")) return;
   const {error}=await supabaseClient.from("shared_events").delete().eq("user_id",currentUser.id);
-  localStorage.removeItem(appointmentStorageKey()); nextAppointment=null; renderNextAppointment();
+  localStorage.removeItem(appointmentStorageKey()); nextAppointment=null; renderNextAppointment(); renderSavedAppointment();
   if(currentView==="appointments") document.getElementById("appointmentStatus").textContent=error ? "Lokaler Termin entfernt." : "Termin entfernt.";
 }
 function escapeHtml(value) { return String(value).replace(/[&<>'"]/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;","\"":"&quot;"}[ch])); }
