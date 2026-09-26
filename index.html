@@ -3279,7 +3279,7 @@ button, input, select, textarea { max-width: 100%; }
     transition:opacity .28s ease, visibility 0s linear .28s;
   }
   body.app-scene .dashboard-shell .dashboard-sidebar {
-    position:absolute !important;
+    position:fixed !important;
     top:var(--mobile-drawer-top, 0px) !important;
     left:0 !important;
     z-index:10002 !important;
@@ -7704,14 +7704,7 @@ function positionMobileSidebar(drawer, toggleRect) {
   const viewportTop = opensBelow
     ? toggleRect.bottom + 8
     : toggleRect.top - drawerHeight - 8;
-  const parent = drawer.offsetParent;
-  const parentRect = parent && parent.getBoundingClientRect ? parent.getBoundingClientRect() : null;
-  const localTop = Math.max(8, Math.round(
-    viewportTop - (parentRect ? parentRect.top : 0) +
-    (parent ? parent.scrollTop - parent.clientTop : 0)
-  ));
-
-  drawer.style.setProperty("--mobile-drawer-top", `${localTop}px`);
+  drawer.style.setProperty("--mobile-drawer-top", `${Math.max(8, Math.round(viewportTop))}px`);
   drawer.style.setProperty("--mobile-drawer-height", `${drawerHeight}px`);
 }
 function closeMobileSidebar() {
