@@ -4582,6 +4582,11 @@ body.color-vision-mode .beer-grade-slider::-moz-range-thumb {
           <span>Neuen Reset-Link senden</span><span aria-hidden="true">→</span>
         </button>
       </div>
+      <div id="recoveryVerifyForm" style="display:none;">
+        <button type="button" id="verifyRecoveryLinkButton" class="auth-primary" onclick="verifyRecoveryLink()">
+          <span>Reset-Link bestätigen</span><span aria-hidden="true">→</span>
+        </button>
+      </div>
       <div id="recoveryPasswordFields" style="display:none;">
         <label class="auth-field">
           <span class="auth-field-icon password-field-icon" aria-hidden="true">●</span>
@@ -5144,12 +5149,15 @@ const passwordRecoverySearchParams = new URLSearchParams(window.location.search)
 let passwordRecoveryErrorCode = passwordRecoveryHashParams.get("error_code")
   || passwordRecoverySearchParams.get("error_code")
   || "";
+let passwordRecoveryTokenHash = passwordRecoverySearchParams.get("token_hash")
+  || passwordRecoveryHashParams.get("token_hash")
+  || "";
 const passwordRecoveryUrlError = passwordRecoveryHashParams.get("error")
   || passwordRecoverySearchParams.get("error")
   || "";
 let passwordRecoveryPending = passwordRecoveryHashParams.get("type") === "recovery"
   || passwordRecoverySearchParams.get("type") === "recovery"
-  || Boolean(passwordRecoveryErrorCode || passwordRecoveryUrlError);
+  || Boolean(passwordRecoveryErrorCode || passwordRecoveryUrlError || passwordRecoveryTokenHash);
 let passwordRecoveryAuthorized = false;
 let movieItems = [];
 let pendingRandomUrl = "";
@@ -6156,6 +6164,7 @@ function showLogin() {
   passwordRecoveryPending = false;
   passwordRecoveryAuthorized = false;
   passwordRecoveryErrorCode = "";
+  passwordRecoveryTokenHash = "";
   document.body.classList.add("login-scene");
   document.body.classList.remove("app-scene");
   currentUser = null;
@@ -6194,6 +6203,7 @@ function showLogin() {
   document.getElementById("inviteSetup").style.display = "none";
   document.getElementById("passwordRecoveryForm").style.display = "none";
   document.getElementById("recoveryResendForm").style.display = "none";
+  document.getElementById("recoveryVerifyForm").style.display = "none";
   document.getElementById("recoveryPasswordFields").style.display = "none";
   document.getElementById("recoveryPassword").value = "";
   document.getElementById("recoveryPasswordConfirm").value = "";
@@ -6214,25 +6224,64 @@ function showPasswordRecovery(session, errorCode = "") {
   document.getElementById("inviteSetup").style.display = "none";
   document.getElementById("passwordRecoveryForm").style.display = "block";
   const isAuthorized = Boolean(currentUser && passwordRecoveryAuthorized);
+  const hasPendingToken = Boolean(passwordRecoveryTokenHash && !isAuthorized);
   document.getElementById("passwordRecoveryTitle").textContent = isAuthorized
     ? "Neues Passwort festlegen"
-    : "Reset-Link nicht gültig";
+    : hasPendingToken
+      ? "Reset-Link bestätigen"
+      : "Reset-Link nicht gültig";
   document.getElementById("passwordRecoveryDescription").textContent = isAuthorized
     ? "Wähle ein neues Passwort für dein Konto."
-    : "Der Link ist abgelaufen oder wurde bereits verwendet. Fordere einen neuen Link an.";
-  document.getElementById("recoveryResendForm").style.display = isAuthorized ? "none" : "block";
+    : hasPendingToken
+      ? "Klicke auf die Schaltfläche, um den Link zu bestätigen und ein neues Passwort festzulegen."
+      : "Der Link ist abgelaufen oder wurde bereits verwendet. Fordere einen neuen Link an.";
+  document.getElementById("recoveryResendForm").style.display = isAuthorized || hasPendingToken ? "none" : "block";
+  document.getElementById("recoveryVerifyForm").style.display = hasPendingToken ? "block" : "none";
   document.getElementById("recoveryPasswordFields").style.display = isAuthorized ? "block" : "none";
   document.getElementById("recoveryEmail").value = currentUser?.email || emailInput.value.trim();
   document.getElementById("recoveryPassword").value = "";
   document.getElementById("recoveryPasswordConfirm").value = "";
   loginError.textContent = isAuthorized
     ? "Der Link ist bestätigt. Lege jetzt dein neues Passwort fest."
+    : hasPendingToken
+      ? "Der Link wird erst beim Klick bestätigt. Dadurch wird verhindert, dass ein E-Mail-Scanner ihn vorab verbraucht."
     : errorCode === "otp_expired"
       ? "Supabase meldet, dass dieser E-Mail-Link abgelaufen oder bereits verwendet wurde. Sende dir hier einen neuen Link."
       : "Der Passwort-Reset-Link ist ungültig oder abgelaufen. Du kannst hier einen neuen anfordern.";
   loginError.classList.toggle("auth-success", isAuthorized);
   if (window.location.search || window.location.hash) {
     window.history.replaceState({}, document.title, window.location.pathname);
+  }
+}
+
+async function verifyRecoveryLink() {
+  if (!passwordRecoveryTokenHash) {
+    setAuthMessage("Der Reset-Link enthält keinen Bestätigungscode. Fordere einen neuen Link an.");
+    return;
+  }
+  const button = document.getElementById("verifyRecoveryLinkButton");
+  button.disabled = true;
+  setAuthMessage("Reset-Link wird bestätigt …", false);
+  try {
+    const { data, error } = await supabaseClient.auth.verifyOtp({
+      token_hash: passwordRecoveryTokenHash,
+      type: "recovery"
+    });
+    if (error || !data.session || !data.user) {
+      if (error) console.error("Passwort-Reset-Link konnte nicht bestätigt werden.", error);
+      passwordRecoveryAuthorized = false;
+      passwordRecoveryTokenHash = "";
+      showPasswordRecovery(null, error?.code || "otp_expired");
+      return;
+    }
+    passwordRecoveryAuthorized = true;
+    passwordRecoveryTokenHash = "";
+    showPasswordRecovery(data.session);
+  } catch (error) {
+    console.error("Passwort-Reset-Link konnte nicht bestätigt werden.", error);
+    setAuthMessage("Reset-Link konnte nicht bestätigt werden. Fordere einen neuen Link an.");
+  } finally {
+    button.disabled = false;
   }
 }
 
@@ -6692,15 +6741,22 @@ async function saveAccountProfile() {
 async function requestAccountPasswordReset() {
   if (!currentUser?.email) return;
   setAccountStatus("Passwort-Reset wird angefordert …");
-  const { error } = await supabaseClient.auth.resetPasswordForEmail(currentUser.email, {
-    redirectTo: window.location.origin + window.location.pathname
-  });
-  if (error) {
+  try {
+    const { error } = await supabaseClient.auth.resetPasswordForEmail(currentUser.email, {
+      redirectTo: window.location.origin + window.location.pathname
+    });
+    if (error) {
+      console.error("Passwort-Reset konnte nicht angefordert werden.", error);
+      const errorCode = error.code ? ` (${error.code})` : "";
+      setAccountStatus(`Passwort-Reset fehlgeschlagen${errorCode}: ${error.message}`, true);
+      return;
+    }
+    setAccountStatus("Falls für dieses Konto ein Reset-Link verfügbar ist, wurde er per E-Mail versendet.");
+  } catch (error) {
     console.error("Passwort-Reset konnte nicht angefordert werden.", error);
-    setAccountStatus("Passwort-Reset konnte nicht angefordert werden.", true);
-    return;
+    const details = error instanceof Error ? error.message : String(error);
+    setAccountStatus(`Passwort-Reset fehlgeschlagen: ${details}`, true);
   }
-  setAccountStatus("Falls für dieses Konto ein Reset-Link verfügbar ist, wurde er per E-Mail versendet.");
 }
 
 async function loadAdminUsers() {

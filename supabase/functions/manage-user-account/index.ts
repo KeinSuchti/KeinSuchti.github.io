@@ -84,7 +84,11 @@ Deno.serve(async request => {
     const { error } = await authClient.auth.resetPasswordForEmail(target.email, { redirectTo });
     if (error) {
       console.error("Could not send administrator-triggered password reset.", error);
-      return jsonResponse({ error: "Password reset email could not be sent." }, 502);
+      return jsonResponse({
+        error: error.message,
+        code: error.code,
+        status: error.status
+      }, 502);
     }
     return jsonResponse({ success: true });
   }
