@@ -2997,6 +2997,29 @@ body.app-scene .sidebar-logout-button .nav-icon svg {
 @media (max-width:900px) { body.app-scene .sidebar-logout-button { flex:0 0 auto; margin-top:auto; min-height:46px; } }
 
 /* --- Termine und Kalender --- */
+/* Popup für Monat / Datum / Uhrzeit – bewusst im App-Design gehalten */
+.poll-month-field { position:relative; }
+.poll-month-field > input { cursor:pointer; }
+.poll-month-picker { position:absolute; z-index:1200; top:calc(100% + 8px); left:0; width:min(360px,calc(100vw - 32px)); padding:14px; border:1px solid rgba(101,141,207,.30); border-radius:16px; background:linear-gradient(145deg,rgba(8,24,45,.98),rgba(17,34,62,.98)); box-shadow:0 18px 45px rgba(0,0,0,.42),0 0 0 1px rgba(101,226,215,.06); backdrop-filter:blur(18px); }
+.poll-month-picker[hidden] { display:none; }
+.poll-picker-head { display:grid; grid-template-columns:38px 1fr 38px; align-items:center; gap:8px; margin-bottom:12px; text-align:center; }
+.poll-picker-head strong { color:#eaf2ff; font-size:14px; }
+.poll-picker-nav { width:38px; height:34px; padding:0; margin:0; font-size:22px; }
+.poll-picker-weekdays, .poll-picker-grid { display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:5px; }
+.poll-picker-weekdays { margin-bottom:5px; color:#7790b0; font-size:10px; font-weight:800; text-align:center; text-transform:uppercase; }
+.poll-picker-day { min-height:35px; padding:5px 2px; border:1px solid rgba(130,151,180,.12); border-radius:9px; background:rgba(30,43,62,.54); color:#bdc9d8; font:600 12px var(--font-sans); cursor:pointer; }
+.poll-picker-day:hover:not(:disabled) { border-color:rgba(101,226,215,.50); background:rgba(38,75,123,.48); color:#f1f7ff; }
+.poll-picker-day.selected { border-color:rgba(101,226,215,.70); background:rgba(47,104,105,.58); color:#f1fffd; box-shadow:inset 0 0 0 1px rgba(101,226,215,.16); }
+.poll-picker-day:disabled { cursor:not-allowed; opacity:.38; }
+.poll-picker-day.is-today { box-shadow:inset 0 0 0 1px rgba(151,169,194,.46); }
+.poll-picker-empty { visibility:hidden; pointer-events:none; }
+.poll-picker-time { display:grid; grid-template-columns:1fr auto; align-items:center; gap:10px; margin-top:13px; padding-top:12px; border-top:1px solid rgba(101,141,207,.18); }
+.poll-picker-time span { color:#9eb2cc; font-size:11px; font-weight:700; }
+.poll-picker-time input { width:120px; }
+.poll-picker-actions { display:flex; justify-content:flex-end; gap:8px; margin-top:11px; }
+.poll-picker-actions button { margin:0; }
+@media (max-width:760px) { .poll-month-picker { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); width:min(360px,calc(100vw - 24px)); max-height:calc(100vh - 24px); overflow:auto; } }
+
 .next-appointment-banner { margin:0 auto 18px; max-width:920px; padding:16px 18px; border:1px solid rgba(101,226,215,.34); border-radius:16px; background:linear-gradient(110deg,rgba(16,64,75,.80),rgba(29,38,86,.80)); box-shadow:0 12px 30px rgba(0,0,0,.18); }
 .next-appointment-banner[hidden] { display:none; }
 .appointment-banner-grid { display:flex; align-items:center; gap:14px; }
@@ -4986,7 +5009,7 @@ body.color-vision-mode .beer-grade-slider::-moz-range-thumb {
             <div id="availabilityCommonLegend" class="availability-common-legend" hidden><span class="availability-common-dot"></span><span>Markiert: mindestens zwei Personen können an diesem Tag.</span></div>
           </section>
           <section class="availability-form-card" aria-label="Verfügbarkeit eintragen">
-            <div class="poll-form-row"><label class="edit-field"><span>Dein Name</span><input id="pollName" placeholder="z. B. Anna"></label><label class="edit-field"><span>Monat für Vorschläge</span><input id="pollMonth" type="date" inputmode="numeric"></label></div>
+            <div class="poll-form-row"><label class="edit-field"><span>Dein Name</span><input id="pollName" placeholder="z. B. Anna"></label><label class="edit-field poll-month-field"><span>Monat für Vorschläge</span><input id="pollMonth" type="text" inputmode="none" autocomplete="off" readonly aria-haspopup="dialog" aria-expanded="false" placeholder="Datum und Uhrzeit auswählen"><div id="pollMonthPicker" class="poll-month-picker" hidden role="dialog" aria-label="Datum und Uhrzeit auswählen"></div></label></div>
             <div id="pollSelectedDates" class="poll-selected-dates" aria-live="polite"></div>
             <button class="poll-save-button" type="button" onclick="saveAppointmentPoll()">✅ Meine Verfügbarkeit speichern</button>
             <p id="pollStatus" class="appointment-status" role="status"></p>
@@ -7782,13 +7805,70 @@ if (!appointmentCountdownTimer) appointmentCountdownTimer=setInterval(tickAppoin
 function pollStorageKey() { return `wfg-availability:${currentUser?.id || "guest"}`; }
 function pollDateKey(date) { return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,"0")}-${String(date.getDate()).padStart(2,"0")}`; }
 function formatPollDate(key) { return new Intl.DateTimeFormat("de-DE", { weekday:"short", day:"2-digit", month:"2-digit", year:"numeric" }).format(new Date(`${key}T12:00:00`)); }
+function pollMonthValue(date, time) {
+  const d = date instanceof Date ? date : new Date(date);
+  const pad=n=>String(n).padStart(2,"0");
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${time || "19:00"}`;
+}
+function formatPollMonthInput(value) {
+  if (!value) return "";
+  const d=new Date(value); if(Number.isNaN(d.getTime())) return "";
+  return new Intl.DateTimeFormat("de-DE",{day:"2-digit",month:"2-digit",year:"numeric"}).format(d)+" · "+new Intl.DateTimeFormat("de-DE",{hour:"2-digit",minute:"2-digit"}).format(d);
+}
+function pollPickerSelectedDate() {
+  const raw=document.getElementById("pollMonth")?.dataset.value;
+  const d=raw?new Date(raw):new Date(pollCalendarCursor.getFullYear(),pollCalendarCursor.getMonth(),1,19,0,0);
+  return Number.isNaN(d.getTime())?new Date():d;
+}
+function setPollMonthValue(date,time) {
+  const input=document.getElementById("pollMonth"); if(!input) return;
+  const value=pollMonthValue(date,time); input.dataset.value=value; input.value=formatPollMonthInput(value);
+}
+function openPollMonthPicker() {
+  const input=document.getElementById("pollMonth"), picker=document.getElementById("pollMonthPicker"); if(!input||!picker)return;
+  const d=pollPickerSelectedDate();
+  pollCalendarCursor=new Date(d.getFullYear(),d.getMonth(),1);
+  input.setAttribute("aria-expanded","true"); picker.hidden=false; renderPollMonthPicker();
+}
+function closePollMonthPicker() {
+  const input=document.getElementById("pollMonth"), picker=document.getElementById("pollMonthPicker"); if(!input||!picker)return;
+  picker.hidden=true; input.setAttribute("aria-expanded","false");
+}
 function changePollMonth(delta) {
   const targetMonth = new Date(pollCalendarCursor.getFullYear(), pollCalendarCursor.getMonth()+delta, 1);
   if (targetMonth < currentMonthStart()) return;
   pollCalendarCursor = targetMonth;
-  const monthInput = document.getElementById("pollMonth");
-  if (monthInput) monthInput.value = `${pollCalendarCursor.getFullYear()}-${String(pollCalendarCursor.getMonth()+1).padStart(2,"0")}-01`;
+  const selected=pollPickerSelectedDate();
+  setPollMonthValue(new Date(targetMonth.getFullYear(),targetMonth.getMonth(),Math.min(selected.getDate(),new Date(targetMonth.getFullYear(),targetMonth.getMonth()+1,0).getDate())), `${String(selected.getHours()).padStart(2,"0")}:${String(selected.getMinutes()).padStart(2,"0")}`);
   renderPollCalendar();
+  if(!document.getElementById("pollMonthPicker")?.hidden) renderPollMonthPicker();
+}
+function renderPollMonthPicker() {
+  const picker=document.getElementById("pollMonthPicker"); if(!picker)return;
+  const y=pollCalendarCursor.getFullYear(),m=pollCalendarCursor.getMonth(),first=new Date(y,m,1),last=new Date(y,m+1,0),selected=pollPickerSelectedDate(),today=new Date();
+  const monthLabel=new Intl.DateTimeFormat("de-DE",{month:"long",year:"numeric"}).format(first);
+  const offset=(first.getDay()+6)%7;
+  let html=`<div class="poll-picker-head"><button class="poll-picker-nav" type="button" onclick="changePollMonth(-1)" aria-label="Vorheriger Monat">‹</button><strong>${monthLabel}</strong><button class="poll-picker-nav" type="button" onclick="changePollMonth(1)" aria-label="Nächster Monat">›</button></div><div class="poll-picker-weekdays"><span>Mo</span><span>Di</span><span>Mi</span><span>Do</span><span>Fr</span><span>Sa</span><span>So</span></div><div class="poll-picker-grid">`;
+  for(let i=0;i<offset;i++) html+='<span class="poll-picker-empty"></span>';
+  for(let day=1;day<=last.getDate();day++){
+    const d=new Date(y,m,day), past=d<new Date(today.getFullYear(),today.getMonth(),today.getDate()), sel=selected.getFullYear()===y&&selected.getMonth()===m&&selected.getDate()===day;
+    html+=`<button type="button" class="poll-picker-day${sel?" selected":""}${day===today.getDate()&&m===today.getMonth()&&y===today.getFullYear()?" is-today":""}" ${past?"disabled":""} onclick="selectPollPickerDate(${day})">${day}</button>`;
+  }
+  const time=`${String(selected.getHours()).padStart(2,"0")}:${String(selected.getMinutes()).padStart(2,"0")}`;
+  html+=`</div><div class="poll-picker-time"><span>Uhrzeit</span><input id="pollPickerTime" type="time" value="${time}" onchange="updatePollPickerTime(this.value)"></div><div class="poll-picker-actions"><button type="button" onclick="closePollMonthPicker()">Übernehmen</button></div>`;
+  picker.innerHTML=html;
+}
+function selectPollPickerDate(day) {
+  const selected=pollPickerSelectedDate();
+  const d=new Date(pollCalendarCursor.getFullYear(),pollCalendarCursor.getMonth(),day,selected.getHours(),selected.getMinutes(),0);
+  if(d<new Date(new Date().getFullYear(),new Date().getMonth(),new Date().getDate())) return;
+  setPollMonthValue(d,`${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`);
+  renderPollMonthPicker(); renderPollCalendar();
+}
+function updatePollPickerTime(value) {
+  const selected=pollPickerSelectedDate(), [h,min]=(value||"19:00").split(":").map(Number);
+  selected.setHours(h||0,min||0,0,0);
+  setPollMonthValue(selected,`${String(selected.getHours()).padStart(2,"0")}:${String(selected.getMinutes()).padStart(2,"0")}`);
 }
 function togglePollDate(day) {
   const key=pollDateKey(new Date(pollCalendarCursor.getFullYear(),pollCalendarCursor.getMonth(),day));
@@ -7808,11 +7888,8 @@ function renderPollCalendar() {
   if (pollCalendarCursor < minimumMonth) pollCalendarCursor = minimumMonth;
   selectedPollDates = selectedPollDates.filter(key => key >= todayDateKey());
   const monthInput = document.getElementById("pollMonth");
-  if (monthInput) {
-    const currentMonthValue = `${minimumMonth.getFullYear()}-${String(minimumMonth.getMonth()+1).padStart(2,"0")}-01`;
-    monthInput.min = currentMonthValue;
-    const selectedMonth = `${pollCalendarCursor.getFullYear()}-${String(pollCalendarCursor.getMonth()+1).padStart(2,"0")}-01`;
-    if (!monthInput.value || monthInput.value < currentMonthValue) monthInput.value = selectedMonth;
+  if (monthInput && !monthInput.dataset.value) {
+    setPollMonthValue(new Date(pollCalendarCursor.getFullYear(),pollCalendarCursor.getMonth(),1,19,0,0));
   }
   const previousMonthButton = document.getElementById("pollPreviousMonth");
   if (previousMonthButton) previousMonthButton.disabled = pollCalendarCursor <= minimumMonth;
@@ -7839,7 +7916,8 @@ function renderAvailabilityEntries() {
   const legend=document.getElementById("availabilityCommonLegend"); if(legend)legend.hidden=!Object.values(counts).some(count=>count>=2);
 }
 
-async function loadAppointmentPoll() { availabilityEntries=[]; try { availabilityEntries=JSON.parse(localStorage.getItem(pollStorageKey())||"[]"); } catch(_){ availabilityEntries=[]; } const result=await supabaseClient.from("appointment_availability").select("id,participant_name,dates,user_id").eq("user_id",currentUser.id).order("created_at",{ascending:true}); if(!result.error) availabilityEntries=result.data||[]; const month=document.getElementById("pollMonth"); if(month){month.value=`${pollCalendarCursor.getFullYear()}-${String(pollCalendarCursor.getMonth()+1).padStart(2,"0")}-01`;month.onchange=()=>{const [y,m]=month.value.split("-").map(Number);const targetMonth=new Date(y,m-1,1);pollCalendarCursor=targetMonth<currentMonthStart()?currentMonthStart():targetMonth;month.value=`${pollCalendarCursor.getFullYear()}-${String(pollCalendarCursor.getMonth()+1).padStart(2,"0")}-01`;renderPollCalendar();};} renderPollCalendar();renderSelectedPollDates();renderAvailabilityEntries(); }
+async function loadAppointmentPoll() { availabilityEntries=[]; try { availabilityEntries=JSON.parse(localStorage.getItem(pollStorageKey())||"[]"); } catch(_){ availabilityEntries=[]; } const result=await supabaseClient.from("appointment_availability").select("id,participant_name,dates,user_id").eq("user_id",currentUser.id).order("created_at",{ascending:true}); if(!result.error) availabilityEntries=result.data||[]; const month=document.getElementById("pollMonth"); if(month){ setPollMonthValue(new Date(pollCalendarCursor.getFullYear(),pollCalendarCursor.getMonth(),1,19,0,0)); month.onclick=openPollMonthPicker; month.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();openPollMonthPicker();}}; } renderPollCalendar();renderSelectedPollDates();renderAvailabilityEntries(); }
+document.addEventListener("click", event => { const picker=document.getElementById("pollMonthPicker"), field=document.querySelector(".poll-month-field"); if(picker && field && !field.contains(event.target)) closePollMonthPicker(); });
 async function saveAppointmentPoll() {
   const name = document.getElementById("pollName").value.trim();
   const status = document.getElementById("pollStatus");
