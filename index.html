@@ -4514,6 +4514,50 @@ body.color-vision-mode .beer-grade-slider::-moz-range-thumb {
   background: #f0b323 !important;
 }
 
+
+/* Yu-Gi-Oh! Dropdown, Duell-Arena und Life-Point-Anzeige */
+.yugioh-filter-dropdown { position:relative; width:min(320px,100%); }
+.yugioh-filter-dropdown-toggle { display:flex; align-items:center; justify-content:space-between; width:100%; min-height:44px; margin:0; padding:10px 12px; border:1px solid var(--border); border-radius:var(--radius-sm); background:var(--surface-input) !important; color:var(--text); font-size:13px; font-weight:600; text-align:left; box-shadow:none; transition:background var(--ease),border-color var(--ease),transform var(--ease); }
+.yugioh-filter-dropdown-toggle:hover { background:var(--surface-2) !important; border-color:var(--border-strong); transform:translateY(-1px); }
+.yugioh-filter-dropdown-toggle:focus-visible { outline:2px solid var(--accent-2); outline-offset:2px; }
+.yugioh-filter-dropdown-toggle span { margin-left:auto; margin-right:8px; color:var(--text-muted); font-size:12px; font-weight:600; }
+.yugioh-filter-dropdown-menu { position:absolute; top:calc(100% + 6px); left:0; right:0; z-index:100; display:flex; flex-direction:column; flex-wrap:nowrap; gap:5px; max-height:240px; overflow:auto; padding:8px; border:1px solid var(--border-strong); border-radius:var(--radius-md); background:var(--surface); box-shadow:var(--shadow-card); }
+.yugioh-filter-dropdown-menu[hidden] { display:none; }
+.yugioh-owner-filter-select { min-height:0; }
+.yugioh-owner-filter-option { display:inline-flex; align-items:center; gap:6px; min-height:36px; padding:7px 10px; border:1px solid transparent; border-radius:var(--radius-sm); background:var(--surface-2); color:var(--text-muted); cursor:pointer; font-size:12px; font-weight:600; transition:background var(--ease),border-color var(--ease),color var(--ease); user-select:none; }
+.yugioh-owner-filter-option:hover { background:var(--surface-3); color:var(--text); }
+.yugioh-owner-filter-option:has(input:checked) { border-color:rgba(125,211,199,.5); background:rgba(125,211,199,.12); color:var(--accent); }
+.yugioh-owner-filter-option input { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); clip-path:inset(50%); white-space:nowrap; opacity:0; pointer-events:none; }
+.duel-overlay { position:fixed; inset:0; display:none; align-items:center; justify-content:center; padding:20px; background:radial-gradient(circle at 50% 42%,rgba(64,83,190,.32),rgba(3,7,27,.93) 68%),rgba(4,8,15,.84); backdrop-filter:blur(8px); z-index:11000; }
+.duel-box { width:min(1060px,100%); max-height:calc(100vh - 40px); overflow:auto; padding:26px; border:2px solid rgba(105,158,255,.66); border-radius:8px; background:radial-gradient(circle at 50% 0%,rgba(86,94,214,.3),transparent 46%),linear-gradient(145deg,#101b53,#090d28 72%); box-shadow:0 0 0 4px rgba(25,44,122,.6),0 0 34px rgba(78,113,255,.48),0 24px 70px rgba(0,0,0,.72); }
+.duel-box h3 { margin:0; color:#f6d44e; text-align:center; font-size:30px; letter-spacing:.08em; text-transform:uppercase; }
+.duel-subtitle { margin:8px 0 20px; color:#b9c9ff; text-align:center; }
+.duel-arena { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; }
+.duel-player-card { position:relative; display:grid; gap:12px; padding:17px; overflow:hidden; border:2px solid rgba(105,158,255,.62); border-radius:5px; background:linear-gradient(145deg,rgba(27,56,142,.84),rgba(9,16,54,.92)); box-shadow:inset 0 0 0 1px rgba(255,255,255,.13),0 8px 20px rgba(0,0,0,.34); }
+.duel-player-card > * { position:relative; z-index:1; }
+.duel-player-name { color:#fff4ab; font-size:20px; font-weight:900; text-align:center; overflow-wrap:anywhere; }
+.duel-deck-name { color:#b9ccff; font-size:12px; text-align:center; overflow-wrap:anywhere; }
+.duel-life-display { cursor:pointer; outline:none; display:grid; place-items:center; min-height:142px; padding:18px 14px; border:0; border-radius:0; background:radial-gradient(ellipse at 50% 48%,rgba(141,183,223,.96) 0%,rgba(86,111,186,.94) 31%,rgba(67,49,138,.98) 63%,rgba(49,22,92,1) 100%),conic-gradient(from 210deg,rgba(154,203,238,.28),rgba(58,35,142,.4),rgba(179,118,232,.3),rgba(54,108,191,.32)); background-blend-mode:screen,multiply; text-align:center; box-shadow:inset 0 0 30px rgba(18,20,78,.82),inset 0 0 4px rgba(255,255,255,.5),0 5px 12px rgba(0,0,0,.38); transition:transform var(--ease),box-shadow var(--ease),filter var(--ease); }
+.duel-life-display:hover, .duel-life-display:focus-visible { transform:scale(1.015); filter:saturate(1.12) brightness(1.08); box-shadow:inset 0 0 32px rgba(18,20,78,.78),0 0 0 2px rgba(255,255,255,.2),0 8px 18px rgba(0,0,0,.46); }
+.duel-life-number { color:#ffe735; font-family:Impact,"Arial Black",Arial,sans-serif; font-size:clamp(54px,9vw,92px); font-style:italic; font-weight:900; letter-spacing:.035em; line-height:.86; -webkit-text-stroke:4px #050508; paint-order:stroke fill; text-shadow:4px 5px 0 #050508,0 0 2px #fff6a0; }
+.duel-life-caption, .duel-life-meter { display:none; }
+.duel-player-card.is-low .duel-life-number { color:#ffd84a; }
+.duel-player-card.is-defeated .duel-life-display { background:radial-gradient(ellipse at 50% 48%,rgba(137,74,107,.92),rgba(72,30,83,.98) 56%,rgba(28,12,42,1)); }
+.duel-player-card.is-defeated .duel-life-number { color:#ff6f61; text-shadow:3px 4px 0 #1e060b,0 0 14px rgba(255,67,67,.78); }
+.duel-status { min-height:22px; color:#68edff; font-weight:900; text-align:center; }
+.duel-player-card.is-defeated .duel-status { color:#ff8e7c; }
+.duel-history { display:grid; gap:6px; margin-top:3px; padding-top:11px; border-top:1px solid rgba(143,177,255,.34); }
+.duel-history-title { color:#f0d75e; font-size:11px; font-weight:900; letter-spacing:.08em; text-transform:uppercase; }
+.duel-history-entry { color:#c9d4ff; font-size:11px; }
+.duel-actions { display:flex; justify-content:center; margin-top:18px; }
+.calculator-overlay { position:fixed; inset:0; z-index:12000; display:none; align-items:center; justify-content:center; padding:20px; background:rgba(3,7,20,.8); backdrop-filter:blur(8px); }
+.calculator-box { width:min(420px,100%); padding:22px; border:1px solid var(--border-strong); border-radius:var(--radius-lg); background:var(--surface); box-shadow:var(--shadow-pop); }
+.calculator-box h4 { margin:0 0 14px; color:var(--text); text-align:center; }
+.calculator-display { min-height:56px; margin-bottom:12px; padding:10px; border:1px solid var(--border-strong); border-radius:var(--radius-sm); background:var(--surface-input); color:var(--accent); font-size:28px; font-weight:900; text-align:right; overflow:auto; }
+.calculator-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:7px; }
+.calculator-grid button,.calculator-actions button { min-height:42px; }
+.calculator-actions { display:grid; grid-template-columns:repeat(5,1fr); gap:7px; margin-top:10px; }
+@media (max-width:650px){.duel-arena{grid-template-columns:1fr;}.duel-box{padding:16px}.duel-life-number{font-size:clamp(52px,16vw,82px)}.calculator-actions{grid-template-columns:repeat(2,1fr)}}
 </style>
 
 <!-- Cinematic background -->
@@ -4800,10 +4844,11 @@ body.color-vision-mode .beer-grade-slider::-moz-range-thumb {
       </div>
 
       <div class="yugioh-filter-bar">
-        <label for="yugiohOwnerFilter">Besitzer filtern:</label>
-        <select id="yugiohOwnerFilter" onchange="renderYugiohDecks()">
-          <option value="">Alle Besitzer</option>
-        </select>
+        <label for="yugiohOwnerFilterToggle">Besitzer filtern:</label>
+        <div class="yugioh-filter-dropdown">
+          <button type="button" id="yugiohOwnerFilterToggle" class="yugioh-filter-dropdown-toggle" aria-expanded="false" aria-controls="yugiohOwnerFilter" onclick="toggleYugiohOwnerFilter(event)">Besitzer auswählen <span id="yugiohOwnerFilterSummary">Alle Besitzer</span> ▾</button>
+          <div id="yugiohOwnerFilter" class="yugioh-owner-filter-select yugioh-filter-dropdown-menu" role="group" aria-label="Mehrere Besitzer auswählen" hidden></div>
+        </div>
       </div>
 
       <div id="yugiohDeckList" class="yugioh-list"></div>
@@ -5134,11 +5179,35 @@ body.color-vision-mode .beer-grade-slider::-moz-range-thumb {
 
     <div class="assignment-popup-actions">
       <button onclick="assignRandomYugiohDecks()">🔄 Neu zuteilen</button>
+      <button onclick="openYugiohDuel()">⚔️ Duell</button>
       <button onclick="closeYugiohAssignmentPopup()">OK</button>
     </div>
   </div>
 </div>
 
+<!-- Yu-Gi-Oh!-Duell-Arena -->
+<div id="yugiohDuelOverlay" class="duel-overlay" role="dialog" aria-modal="true" aria-labelledby="yugiohDuelTitle" onclick="closeYugiohDuelOnOverlay(event)">
+  <div class="duel-box">
+    <h3 id="yugiohDuelTitle">⚔️ Battle Arena</h3>
+    <p class="duel-subtitle">Die zuvor zugeteilten Spieler treten gegeneinander an.</p>
+    <div id="yugiohDuelArena" class="duel-arena"></div>
+    <div class="duel-actions"><button type="button" onclick="closeYugiohDuel()">Arena schließen</button></div>
+  </div>
+</div>
+<!-- Yu-Gi-Oh!-Lebenspunkte-Rechner -->
+<div id="yugiohCalculatorOverlay" class="calculator-overlay" role="dialog" aria-modal="true" aria-labelledby="yugiohCalculatorTitle" onclick="closeYugiohCalculatorOnOverlay(event)">
+  <div class="calculator-box">
+    <h4 id="yugiohCalculatorTitle">Lebenspunkte ändern</h4>
+    <div id="yugiohCalculatorDisplay" class="calculator-display" aria-live="polite">8000</div>
+    <div class="calculator-grid">
+      <button type="button" onclick="yugiohCalcInput('7')">7</button><button type="button" onclick="yugiohCalcInput('8')">8</button><button type="button" onclick="yugiohCalcInput('9')">9</button><button type="button" onclick="yugiohCalcInput('/')">÷</button>
+      <button type="button" onclick="yugiohCalcInput('4')">4</button><button type="button" onclick="yugiohCalcInput('5')">5</button><button type="button" onclick="yugiohCalcInput('6')">6</button><button type="button" onclick="yugiohCalcInput('*')">×</button>
+      <button type="button" onclick="yugiohCalcInput('1')">1</button><button type="button" onclick="yugiohCalcInput('2')">2</button><button type="button" onclick="yugiohCalcInput('3')">3</button><button type="button" onclick="yugiohCalcInput('-')">−</button>
+      <button type="button" onclick="yugiohCalcInput('0')">0</button><button type="button" onclick="yugiohCalcInput('.')">.</button><button type="button" onclick="yugiohCalcBackspace()">⌫</button><button type="button" onclick="yugiohCalcInput('+')">+</button>
+    </div>
+    <div class="calculator-actions"><button type="button" class="calculator-reset" onclick="resetYugiohCalculator()">Reset</button><button type="button" onclick="yugiohCalcClear()">C</button><button type="button" class="calculator-equals" onclick="yugiohCalcEquals()">=</button><button type="button" onclick="applyYugiohCalculator()">Übernehmen</button><button type="button" onclick="closeYugiohCalculator()">Abbrechen</button></div>
+  </div>
+</div>
 <!-- Bearbeiten-Popup -->
 <div
   id="editEntryModal"
@@ -5247,6 +5316,10 @@ const yugiohPlayerInputs = document.getElementById("yugiohPlayerInputs");
 const yugiohAssignmentResults = document.getElementById("yugiohAssignmentResults");
 const yugiohAssignmentPopup = document.getElementById("yugiohAssignmentPopup");
 const yugiohAssignmentPopupResults = document.getElementById("yugiohAssignmentPopupResults");
+const yugiohDuelOverlay = document.getElementById("yugiohDuelOverlay");
+const yugiohDuelArena = document.getElementById("yugiohDuelArena");
+const yugiohCalculatorOverlay = document.getElementById("yugiohCalculatorOverlay");
+const yugiohCalculatorDisplay = document.getElementById("yugiohCalculatorDisplay");
 const customListApp = document.getElementById("customListApp");
 const customListTitle = document.getElementById("customListTitle");
 const customListDescription = document.getElementById("customListDescription");
@@ -5267,6 +5340,11 @@ let touchCurrentGameColumnId = null;
 
 let yugiohDecks = [];
 let yugiohPlayerNames = [];
+let activeYugiohAssignments = [];
+let activeYugiohDuelPlayers = [];
+let activeYugiohCalculatorIndex = -1;
+let activeYugiohCalculatorExpression = "";
+let selectedYugiohOwnerValues = new Set();
 
 const cardLists = {
   feast: {
@@ -6142,6 +6220,94 @@ function closeYugiohAssignmentPopupOnOverlay(event) {
     closeYugiohAssignmentPopup();
   }
 }
+
+function openYugiohDuel() {
+  if (!Array.isArray(activeYugiohAssignments) || activeYugiohAssignments.length === 0) {
+    alert("Bitte zuerst Decks zufällig zuteilen.");
+    return;
+  }
+  closeYugiohAssignmentPopup();
+  activeYugiohDuelPlayers = activeYugiohAssignments.map(assignment => ({
+    playerName: assignment.playerName,
+    deck: assignment.deck,
+    lifePoints: 8000,
+    lifeHistory: [{ type: "initial", label: "Startwert", from: null, to: 8000, expression: "8000", timestamp: Date.now() }]
+  }));
+  renderYugiohDuelArena();
+  yugiohDuelOverlay.style.display = "flex";
+}
+
+function renderYugiohDuelArena() {
+  yugiohDuelArena.replaceChildren();
+  activeYugiohDuelPlayers.forEach((player, index) => {
+    const defeated = player.lifePoints <= 0;
+    const low = player.lifePoints > 0 && player.lifePoints <= 2000;
+    const card = document.createElement("article");
+    card.className = "duel-player-card" + (defeated ? " is-defeated" : low ? " is-low" : "");
+    const name = document.createElement("div"); name.className = "duel-player-name"; name.textContent = player.playerName;
+    const deck = document.createElement("div"); deck.className = "duel-deck-name"; deck.textContent = "Deck: " + (player.deck?.theme || "Unbenanntes Deck");
+    const lifeDisplay = document.createElement("div"); lifeDisplay.className = "duel-life-display"; lifeDisplay.setAttribute("role", "button"); lifeDisplay.setAttribute("tabindex", "0"); lifeDisplay.setAttribute("aria-label", `Lebenspunkte von ${player.playerName} ändern`); lifeDisplay.title = "Klicken, um die Lebenspunkte zu ändern";
+    lifeDisplay.onclick = () => openYugiohCalculator(index);
+    lifeDisplay.onkeydown = event => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); openYugiohCalculator(index); } };
+    const lifeNumber = document.createElement("div"); lifeNumber.className = "duel-life-number"; lifeNumber.textContent = player.lifePoints.toLocaleString("de-DE");
+    const lifeCaption = document.createElement("div"); lifeCaption.className = "duel-life-caption"; lifeCaption.textContent = "Lebenspunkte · klicken zum Ändern";
+    const meter = document.createElement("div"); meter.className = "duel-life-meter";
+    const meterFill = document.createElement("span"); meterFill.style.width = Math.max(0, Math.min(100, player.lifePoints / 8000 * 100)) + "%"; meter.appendChild(meterFill);
+    lifeDisplay.append(lifeNumber, lifeCaption, meter);
+    const status = document.createElement("div"); status.className = "duel-status"; status.textContent = defeated ? "Verloren" : "Im Spiel";
+    const history = document.createElement("div"); history.className = "duel-history";
+    const historyTitle = document.createElement("div"); historyTitle.className = "duel-history-title"; historyTitle.textContent = "Änderungsverlauf";
+    const historyList = document.createElement("div"); historyList.className = "duel-history-list";
+    (player.lifeHistory || []).slice().reverse().forEach(entry => {
+      const row = document.createElement("div"); row.className = "duel-history-entry" + (entry.type === "initial" ? " is-initial" : "");
+      const time = new Date(entry.timestamp).toLocaleTimeString("de-DE", {hour:"2-digit", minute:"2-digit"});
+      const labelText = entry.type === "initial" ? entry.label : `${entry.expression} · ${entry.from} → ${entry.to}`;
+      row.innerHTML = `<span>${labelText}</span><strong>${time}</strong>`;
+      historyList.appendChild(row);
+    });
+    history.append(historyTitle, historyList);
+    card.append(name, deck, lifeDisplay, status, history); yugiohDuelArena.appendChild(card);
+  });
+}
+
+function closeYugiohDuel() { yugiohDuelOverlay.style.display = "none"; closeYugiohCalculator(); }
+function closeYugiohDuelOnOverlay(event) { if (event.target === yugiohDuelOverlay) closeYugiohDuel(); }
+function openYugiohCalculator(index) {
+  activeYugiohCalculatorIndex = index;
+  activeYugiohCalculatorExpression = String(activeYugiohDuelPlayers[index]?.lifePoints ?? 0);
+  yugiohCalculatorDisplay.textContent = activeYugiohCalculatorExpression;
+  yugiohCalculatorOverlay.style.display = "flex";
+}
+function closeYugiohCalculator() { yugiohCalculatorOverlay.style.display = "none"; activeYugiohCalculatorIndex = -1; activeYugiohCalculatorExpression = ""; }
+function closeYugiohCalculatorOnOverlay(event) { if (event.target === yugiohCalculatorOverlay) closeYugiohCalculator(); }
+function yugiohCalcInput(value) { if (activeYugiohCalculatorExpression === "0" && /\d/.test(value)) activeYugiohCalculatorExpression = ""; activeYugiohCalculatorExpression += value; yugiohCalculatorDisplay.textContent = activeYugiohCalculatorExpression; }
+function yugiohCalcBackspace() { activeYugiohCalculatorExpression = activeYugiohCalculatorExpression.slice(0,-1) || "0"; yugiohCalculatorDisplay.textContent = activeYugiohCalculatorExpression; }
+function yugiohCalcClear() { activeYugiohCalculatorExpression = "0"; yugiohCalculatorDisplay.textContent = "0"; }
+function resetYugiohCalculator() {
+  const player = activeYugiohDuelPlayers[activeYugiohCalculatorIndex];
+  activeYugiohCalculatorExpression = String(player?.lifePoints ?? 0);
+  yugiohCalculatorDisplay.textContent = activeYugiohCalculatorExpression;
+}
+function yugiohCalcEquals() {
+  if (!/^[0-9+*/.() -]+$/.test(activeYugiohCalculatorExpression)) return;
+  try { const result = Number(Function(`"use strict"; return (${activeYugiohCalculatorExpression})`)()); if (Number.isFinite(result)) { activeYugiohCalculatorExpression = String(Math.round(result)); yugiohCalculatorDisplay.textContent = activeYugiohCalculatorExpression; } } catch (_) { yugiohCalculatorDisplay.textContent = "Ungültig"; }
+}
+function applyYugiohCalculator() {
+  yugiohCalcEquals();
+  const player = activeYugiohDuelPlayers[activeYugiohCalculatorIndex];
+  const value = Number(activeYugiohCalculatorExpression);
+  if (!player || !Number.isFinite(value)) return;
+  const nextValue = Math.round(value);
+  const previousValue = player.lifePoints;
+  if (nextValue !== previousValue) {
+    player.lifeHistory = Array.isArray(player.lifeHistory) ? player.lifeHistory : [];
+    player.lifeHistory.push({ type: "change", label: "Änderung", from: previousValue, to: nextValue, expression: activeYugiohCalculatorExpression, timestamp: Date.now() });
+    player.lifePoints = nextValue;
+  }
+  closeYugiohCalculator();
+  renderYugiohDuelArena();
+}
+
 
 /* Auth */
 
@@ -9635,58 +9801,86 @@ function renderYugiohDecks() {
   });
 }
 
-function updateYugiohOwnerFilter() {
-  const selectedOwner = yugiohOwnerFilter.value;
-  const owners = [...new Set(
-    yugiohDecks
-      .map(deck => String(deck.owner || "").trim())
-      .filter(Boolean)
-  )].sort((a, b) => a.localeCompare(b, "de"));
-  const hasUnassignedDecks = yugiohDecks.some(
-    deck => !String(deck.owner || "").trim()
-  );
+function getSelectedYugiohOwners() {
+  return [...selectedYugiohOwnerValues];
+}
 
-  yugiohOwnerFilter.replaceChildren();
+function toggleYugiohOwnerFilter(event) {
+  if (event) event.stopPropagation();
+  const menu = document.getElementById("yugiohOwnerFilter");
+  const toggle = document.getElementById("yugiohOwnerFilterToggle");
+  const willOpen = menu.hidden;
+  menu.hidden = !willOpen;
+  toggle.setAttribute("aria-expanded", String(willOpen));
+}
 
-  const allOwnersOption = document.createElement("option");
-  allOwnersOption.value = "";
-  allOwnersOption.textContent = "Alle Besitzer";
-  yugiohOwnerFilter.appendChild(allOwnersOption);
+function updateYugiohOwnerFilterSummary() {
+  const summary = document.getElementById("yugiohOwnerFilterSummary");
+  if (!summary) return;
+  const selected = getSelectedYugiohOwners();
+  if (!selected.length) { summary.textContent = "Alle Besitzer"; return; }
+  const labels = [...document.querySelectorAll('#yugiohOwnerFilter input:checked + span')].map(node => node.textContent);
+  summary.textContent = labels.length > 2 ? `${labels.slice(0,2).join(", ")} +${labels.length-2}` : labels.join(", ");
+}
 
-  owners.forEach(owner => {
-    const option = document.createElement("option");
-    option.value = `owner:${encodeURIComponent(owner)}`;
-    option.textContent = owner;
-    yugiohOwnerFilter.appendChild(option);
-  });
-
-  if (hasUnassignedDecks) {
-    const unassignedOption = document.createElement("option");
-    unassignedOption.value = "unassigned";
-    unassignedOption.textContent = "Nicht angegeben";
-    yugiohOwnerFilter.appendChild(unassignedOption);
+document.addEventListener("click", event => {
+  const dropdown = document.querySelector(".yugioh-filter-dropdown");
+  if (dropdown && !dropdown.contains(event.target)) {
+    const menu = document.getElementById("yugiohOwnerFilter");
+    const toggle = document.getElementById("yugiohOwnerFilterToggle");
+    if (menu && !menu.hidden) { menu.hidden = true; toggle.setAttribute("aria-expanded", "false"); }
   }
+});
 
-  yugiohOwnerFilter.value = Array.from(yugiohOwnerFilter.options)
-    .some(option => option.value === selectedOwner)
-    ? selectedOwner
-    : "";
+function renderYugiohOwnerFilterOptions() {
+  const owners = [...new Set(yugiohDecks.map(deck => String(deck.owner || "").trim()).filter(Boolean))]
+    .sort((a, b) => a.localeCompare(b, "de"));
+  const hasUnassignedDecks = yugiohDecks.some(deck => !String(deck.owner || "").trim());
+  yugiohOwnerFilter.replaceChildren();
+  const values = [{value:"", label:"Alle Besitzer"}, ...owners.map(owner => ({value:`owner:${encodeURIComponent(owner)}`, label:owner}))];
+  if (hasUnassignedDecks) values.push({value:"unassigned", label:"Nicht angegeben"});
+  values.forEach(({value, label}) => {
+    const wrapper = document.createElement("label");
+    wrapper.className = "yugioh-owner-filter-option";
+    const input = document.createElement("input");
+    input.type = "checkbox";
+    input.value = value;
+    input.checked = value === "" ? selectedYugiohOwnerValues.size === 0 : selectedYugiohOwnerValues.has(value);
+    input.addEventListener("change", handleYugiohOwnerFilterChange);
+    const text = document.createElement("span"); text.textContent = label;
+    wrapper.append(input, text);
+    yugiohOwnerFilter.appendChild(wrapper);
+  });
+  updateYugiohOwnerFilterSummary();
+}
+
+function handleYugiohOwnerFilterChange() {
+  const selected = [...yugiohOwnerFilter.querySelectorAll('input[type="checkbox"]:checked')]
+    .map(input => input.value).filter(Boolean);
+  selectedYugiohOwnerValues = new Set(selected);
+  renderYugiohDecks();
+}
+
+function resetYugiohOwnerFilter() {
+  selectedYugiohOwnerValues.clear();
+  renderYugiohDecks();
+  const menu = document.getElementById("yugiohOwnerFilter");
+  const toggle = document.getElementById("yugiohOwnerFilterToggle");
+  if (menu) menu.hidden = true;
+  if (toggle) toggle.setAttribute("aria-expanded", "false");
+}
+
+function updateYugiohOwnerFilter() {
+  renderYugiohOwnerFilterOptions();
 }
 
 function getFilteredYugiohDecks() {
-  const selectedOwner = yugiohOwnerFilter.value;
-  if (!selectedOwner) {
-    return yugiohDecks;
-  }
-
-  if (selectedOwner === "unassigned") {
-    return yugiohDecks.filter(deck => !String(deck.owner || "").trim());
-  }
-
-  const owner = decodeURIComponent(selectedOwner.slice("owner:".length));
-  return yugiohDecks.filter(
-    deck => String(deck.owner || "").trim() === owner
-  );
+  const selectedOwners = getSelectedYugiohOwners();
+  if (selectedOwners.length === 0) return yugiohDecks;
+  return yugiohDecks.filter(deck => {
+    const owner = String(deck.owner || "").trim();
+    return selectedOwners.some(value => value === "unassigned" ? !owner : value === `owner:${encodeURIComponent(owner)}`);
+  });
 }
 
 function parseYugiohPlayerCount() {
@@ -9765,6 +9959,7 @@ function assignRandomYugiohDecks() {
   });
 
   yugiohAssignmentResults.innerHTML = "";
+  activeYugiohAssignments = assignments;
   showYugiohAssignmentPopup(assignments);
 }
 
