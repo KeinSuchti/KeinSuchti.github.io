@@ -3018,7 +3018,7 @@ body.app-scene .sidebar-logout-button .nav-icon svg {
 .poll-picker-time input { width:120px; }
 .poll-picker-actions { display:flex; justify-content:flex-end; gap:8px; margin-top:11px; }
 .poll-picker-actions button { margin:0; }
-@media (max-width:760px) { .poll-month-picker { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); width:min(360px,calc(100vw - 24px)); max-height:calc(100vh - 24px); overflow:auto; } }
+@media (max-width:760px) { .poll-month-picker { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); width:min(430px,calc(100vw - 20px)); max-height:calc(100dvh - 20px); overflow:auto; padding:12px; } .poll-picker-day { min-height:42px; } .poll-picker-actions { position:sticky; bottom:0; padding-top:10px; background:linear-gradient(180deg,rgba(8,24,45,0),rgba(8,24,45,.98) 28%); } }
 
 .next-appointment-banner { margin:0 auto 18px; max-width:920px; padding:16px 18px; border:1px solid rgba(101,226,215,.34); border-radius:16px; background:linear-gradient(110deg,rgba(16,64,75,.80),rgba(29,38,86,.80)); box-shadow:0 12px 30px rgba(0,0,0,.18); }
 .next-appointment-banner[hidden] { display:none; }
@@ -3086,6 +3086,22 @@ body.app-scene .sidebar-logout-button .nav-icon svg {
 @media (max-width:760px) { .admin-user-row { grid-template-columns:1fr; gap:9px; } .admin-user-actions { justify-content:flex-start; } }
 @media (max-width:600px) { .account-card { padding:14px; } }
 
+
+
+/* Gemeinsamer Aufbau für Termin-Festlegung und Verfügbarkeit */
+.appointment-form-card, .availability-form-card { align-content:start; gap:12px; }
+.appointment-form-card > .dashboard-kicker, .availability-form-card > .dashboard-kicker { margin-bottom:1px; }
+.appointment-form-card .edit-field, .availability-form-card .edit-field { min-width:0; }
+@media (max-width:576px) {
+  body.app-scene .appointment-layout, body.app-scene .availability-layout { gap:12px; }
+  body.app-scene .calendar-card, body.app-scene .appointment-form-card, body.app-scene .availability-calendar-card, body.app-scene .availability-form-card { border-radius:14px; }
+  body.app-scene .calendar-toolbar { grid-template-columns:42px minmax(0,1fr) 42px; gap:6px; }
+  body.app-scene .calendar-toolbar button { width:42px; height:40px; }
+  body.app-scene .appointment-calendar { gap:4px; }
+  body.app-scene .calendar-day { min-height:42px; border-radius:10px; }
+  body.app-scene .poll-form-row { gap:10px; }
+  body.app-scene .poll-month-picker { width:calc(100vw - 16px); }
+}
 
 /* --- Termin-Karte, Umfrage und sichtbarer mobiler Logout --- */
 .card-appointments .appointment-card-image { background-image:url("assets/appointments-cover.svg"); background-position:center 52%; }
@@ -7829,6 +7845,7 @@ function escapeHtml(value) { return String(value).replace(/[&<>'"]/g, ch => ({"&
 if (!appointmentCountdownTimer) appointmentCountdownTimer=setInterval(tickAppointmentCountdown, 1000);
 /* Termin-Umfrage mit mehreren Datumsvorschlägen */
 function pollStorageKey() { return `wfg-availability:${currentUser?.id || "guest"}`; }
+let selectedPollTimes = {};
 function pollDateKey(date) { return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,"0")}-${String(date.getDate()).padStart(2,"0")}`; }
 function formatPollDate(key) { return new Intl.DateTimeFormat("de-DE", { weekday:"short", day:"2-digit", month:"2-digit", year:"numeric" }).format(new Date(`${key}T12:00:00`)); }
 function pollMonthValue(date, time) {
@@ -7846,6 +7863,15 @@ function pollPickerSelectedDate() {
   const d=raw?new Date(raw):new Date(pollCalendarCursor.getFullYear(),pollCalendarCursor.getMonth(),1,19,0,0);
   return Number.isNaN(d.getTime())?new Date():d;
 }
+function pollPickerSelectionKeys() {
+  const raw=document.getElementById("pollMonthPicker")?.dataset.selected;
+  try { return raw ? JSON.parse(raw) : []; } catch (_) { return []; }
+}
+function setPollPickerSelection(keys) {
+  const picker=document.getElementById("pollMonthPicker");
+  if (picker) picker.dataset.selected=JSON.stringify([...new Set(keys)].sort());
+}
+function pollPickerTime() { return document.getElementById("pollPickerTime")?.value || "19:00"; }
 function setPollMonthValue(date,time) {
   const input=document.getElementById("pollMonth"); if(!input) return;
   const value=pollMonthValue(date,time); input.dataset.value=value; input.value=formatPollMonthInput(value);
@@ -7854,46 +7880,64 @@ function openPollMonthPicker() {
   const input=document.getElementById("pollMonth"), picker=document.getElementById("pollMonthPicker"); if(!input||!picker)return;
   const d=pollPickerSelectedDate();
   pollCalendarCursor=new Date(d.getFullYear(),d.getMonth(),1);
+  const existing=selectedPollDates.filter(key => { const x=new Date(`${key}T12:00:00`); return x.getFullYear()===pollCalendarCursor.getFullYear() && x.getMonth()===pollCalendarCursor.getMonth(); });
+  setPollPickerSelection(existing.length ? existing : [pollDateKey(d)]);
   input.setAttribute("aria-expanded","true"); picker.hidden=false; renderPollMonthPicker();
 }
-function closePollMonthPicker() {
+function closePollMonthPicker(apply=true) {
   const input=document.getElementById("pollMonth"), picker=document.getElementById("pollMonthPicker"); if(!input||!picker)return;
+  if (apply) applyPollMonthSuggestions();
   picker.hidden=true; input.setAttribute("aria-expanded","false");
+}
+function applyPollMonthSuggestions() {
+  const keys=pollPickerSelectionKeys().filter(key => key >= todayDateKey());
+  const time=pollPickerTime();
+  const [h,min]=(time||"19:00").split(":").map(Number);
+  const timeText=`${String(Number.isFinite(h)?h:19).padStart(2,"0")}:${String(Number.isFinite(min)?min:0).padStart(2,"0")}`;
+  keys.forEach(key => { selectedPollDates = selectedPollDates.includes(key) ? selectedPollDates : [...selectedPollDates,key]; selectedPollTimes[key]=timeText; });
+  selectedPollDates=[...new Set(selectedPollDates)].sort();
+  if (keys[0]) setPollMonthValue(new Date(`${keys[0]}T12:00:00`), timeText);
+  renderPollCalendar(); renderSelectedPollDates();
 }
 function changePollMonth(delta) {
   const targetMonth = new Date(pollCalendarCursor.getFullYear(), pollCalendarCursor.getMonth()+delta, 1);
   if (targetMonth < currentMonthStart()) return;
   pollCalendarCursor = targetMonth;
   const selected=pollPickerSelectedDate();
-  setPollMonthValue(new Date(targetMonth.getFullYear(),targetMonth.getMonth(),Math.min(selected.getDate(),new Date(targetMonth.getFullYear(),targetMonth.getMonth()+1,0).getDate())), `${String(selected.getHours()).padStart(2,"0")}:${String(selected.getMinutes()).padStart(2,"0")}`);
+  const maxDay=new Date(targetMonth.getFullYear(),targetMonth.getMonth()+1,0).getDate();
+  const day=Math.min(selected.getDate(),maxDay);
+  setPollMonthValue(new Date(targetMonth.getFullYear(),targetMonth.getMonth(),day), `${String(selected.getHours()).padStart(2,"0")}:${String(selected.getMinutes()).padStart(2,"0")}`);
+  const existing=selectedPollDates.filter(key => { const x=new Date(`${key}T12:00:00`); return x.getFullYear()===targetMonth.getFullYear() && x.getMonth()===targetMonth.getMonth(); });
+  setPollPickerSelection(existing.length ? existing : [pollDateKey(new Date(targetMonth.getFullYear(),targetMonth.getMonth(),day))]);
   renderPollCalendar();
   if(!document.getElementById("pollMonthPicker")?.hidden) renderPollMonthPicker();
 }
 function renderPollMonthPicker() {
   const picker=document.getElementById("pollMonthPicker"); if(!picker)return;
-  const y=pollCalendarCursor.getFullYear(),m=pollCalendarCursor.getMonth(),first=new Date(y,m,1),last=new Date(y,m+1,0),selected=pollPickerSelectedDate(),today=new Date();
+  const y=pollCalendarCursor.getFullYear(),m=pollCalendarCursor.getMonth(),first=new Date(y,m,1),last=new Date(y,m+1,0),today=new Date();
   const monthLabel=new Intl.DateTimeFormat("de-DE",{month:"long",year:"numeric"}).format(first);
-  const offset=(first.getDay()+6)%7;
+  const offset=(first.getDay()+6)%7, selectedKeys=pollPickerSelectionKeys();
   let html=`<div class="poll-picker-head"><button class="poll-picker-nav" type="button" onclick="changePollMonth(-1)" aria-label="Vorheriger Monat">‹</button><strong>${monthLabel}</strong><button class="poll-picker-nav" type="button" onclick="changePollMonth(1)" aria-label="Nächster Monat">›</button></div><div class="poll-picker-weekdays"><span>Mo</span><span>Di</span><span>Mi</span><span>Do</span><span>Fr</span><span>Sa</span><span>So</span></div><div class="poll-picker-grid">`;
   for(let i=0;i<offset;i++) html+='<span class="poll-picker-empty"></span>';
   for(let day=1;day<=last.getDate();day++){
-    const d=new Date(y,m,day), past=d<new Date(today.getFullYear(),today.getMonth(),today.getDate()), sel=selected.getFullYear()===y&&selected.getMonth()===m&&selected.getDate()===day;
-    html+=`<button type="button" class="poll-picker-day${sel?" selected":""}${day===today.getDate()&&m===today.getMonth()&&y===today.getFullYear()?" is-today":""}" ${past?"disabled":""} onclick="selectPollPickerDate(${day})">${day}</button>`;
+    const d=new Date(y,m,day), key=pollDateKey(d), past=d<new Date(today.getFullYear(),today.getMonth(),today.getDate()), sel=selectedKeys.includes(key);
+    html+=`<button type="button" class="poll-picker-day${sel?" selected":""}${day===today.getDate()&&m===today.getMonth()&&y===today.getFullYear()?" is-today":""}" ${past?"disabled":""} onclick="togglePollPickerDate(${day})">${day}</button>`;
   }
-  const time=`${String(selected.getHours()).padStart(2,"0")}:${String(selected.getMinutes()).padStart(2,"0")}`;
-  html+=`</div><div class="poll-picker-time"><span>Uhrzeit</span><input id="pollPickerTime" type="time" value="${time}" onchange="updatePollPickerTime(this.value)"></div><div class="poll-picker-actions"><button type="button" onclick="closePollMonthPicker()">Übernehmen</button></div>`;
-  picker.innerHTML=html;
+  const time=pollPickerTime();
+  html+=`</div><div class="poll-picker-time"><span>Uhrzeit für die markierten Tage</span><input id="pollPickerTime" type="time" value="${time}" onchange="updatePollPickerTime(this.value)"></div><div class="poll-picker-actions"><button type="button" onclick="closePollMonthPicker(true)">Übernehmen</button></div>`;
+  picker.innerHTML=html; picker.dataset.selected=JSON.stringify(selectedKeys);
 }
-function selectPollPickerDate(day) {
-  const selected=pollPickerSelectedDate();
-  const d=new Date(pollCalendarCursor.getFullYear(),pollCalendarCursor.getMonth(),day,selected.getHours(),selected.getMinutes(),0);
-  if(d<new Date(new Date().getFullYear(),new Date().getMonth(),new Date().getDate())) return;
-  setPollMonthValue(d,`${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`);
-  renderPollMonthPicker(); renderPollCalendar();
+function togglePollPickerDate(day) {
+  const key=pollDateKey(new Date(pollCalendarCursor.getFullYear(),pollCalendarCursor.getMonth(),day));
+  if (key < todayDateKey()) return;
+  const keys=pollPickerSelectionKeys();
+  setPollPickerSelection(keys.includes(key)?keys.filter(x=>x!==key):[...keys,key]);
+  renderPollMonthPicker();
 }
+function selectPollPickerDate(day) { togglePollPickerDate(day); }
 function updatePollPickerTime(value) {
   const selected=pollPickerSelectedDate(), [h,min]=(value||"19:00").split(":").map(Number);
-  selected.setHours(h||0,min||0,0,0);
+  selected.setHours(Number.isFinite(h)?h:19,Number.isFinite(min)?min:0,0,0);
   setPollMonthValue(selected,`${String(selected.getHours()).padStart(2,"0")}:${String(selected.getMinutes()).padStart(2,"0")}`);
 }
 function togglePollDate(day) {
@@ -7903,9 +7947,25 @@ function togglePollDate(day) {
   renderPollCalendar();
   renderSelectedPollDates();
 }
+function availabilityDateKey(value) { return String(value || "").slice(0,10); }
+function availabilityDateTime(value) {
+  const raw=String(value || "");
+  if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(raw)) return new Date(raw);
+  return null;
+}
+function formatAvailabilityDate(value) {
+  const key=availabilityDateKey(value);
+  const time=availabilityDateTime(value);
+  const base=formatPollDate(key);
+  if (!time || Number.isNaN(time.getTime())) return base;
+  return `${base} · ${new Intl.DateTimeFormat("de-DE",{hour:"2-digit",minute:"2-digit"}).format(time)} Uhr`;
+}
 function availabilityDateCounts() {
   const counts = {};
-  availabilityEntries.forEach(entry => (entry.dates || []).forEach(date => { counts[date] = (counts[date] || 0) + 1; }));
+  availabilityEntries.forEach(entry => (entry.dates || []).forEach(date => {
+    const key=availabilityDateKey(date);
+    counts[key] = (counts[key] || 0) + 1;
+  }));
   return counts;
 }
 function renderPollCalendar() {
@@ -7932,18 +7992,27 @@ function renderPollCalendar() {
   }
 }
 
-function renderSelectedPollDates() { const host=document.getElementById("pollSelectedDates"); if(!host)return; host.innerHTML=selectedPollDates.length?selectedPollDates.sort().map(key=>`<span class="poll-date-chip"><span>${formatPollDate(key)}</span><button type="button" onclick="toggleSavedPollDate('${key}')" aria-label="${formatPollDate(key)} entfernen" title="Datum entfernen">×</button></span>`).join(""):'<span class="panel-subtitle">Noch keine Termine ausgewählt.</span>'; const legend=document.getElementById("availabilityCommonLegend"); if(legend)legend.hidden=!Object.values(availabilityDateCounts()).some(count=>count>=2); }
-function toggleSavedPollDate(key) { selectedPollDates=selectedPollDates.filter(x=>x!==key); renderPollCalendar(); renderSelectedPollDates(); }
+function renderSelectedPollDates() {
+  const host=document.getElementById("pollSelectedDates"); if(!host)return;
+  host.innerHTML=selectedPollDates.length
+    ? selectedPollDates.sort().map(key=>{
+        const time=selectedPollTimes[key] ? ` · ${selectedPollTimes[key]} Uhr` : "";
+        return `<span class="poll-date-chip"><span>${formatPollDate(key)}${time}</span><button type="button" onclick="toggleSavedPollDate('${key}')" aria-label="${formatPollDate(key)} entfernen" title="Datum entfernen">×</button></span>`;
+      }).join("")
+    : '<span class="panel-subtitle">Noch keine Termine ausgewählt.</span>';
+  const legend=document.getElementById("availabilityCommonLegend"); if(legend)legend.hidden=!Object.values(availabilityDateCounts()).some(count=>count>=2);
+}
+function toggleSavedPollDate(key) { selectedPollDates=selectedPollDates.filter(x=>x!==key); delete selectedPollTimes[key]; renderPollCalendar(); renderSelectedPollDates(); }
 function renderAvailabilityEntries() {
   const host=document.getElementById("availabilityEntries"); if(!host)return;
   if(!availabilityEntries.length){host.innerHTML='<span class="panel-subtitle">Noch keine Einträge vorhanden.</span>';return;}
   const counts=availabilityDateCounts();
-  host.innerHTML=availabilityEntries.map((entry,i)=>`<div class="availability-entry"><div><div class="availability-entry-name">${escapeHtml(entry.participant_name)}</div><div class="panel-subtitle">${entry.dates.length} mögliche ${entry.dates.length===1?"Option":"Optionen"}</div></div><div class="availability-entry-dates">${entry.dates.sort().map(date=>`<span class="availability-entry-date ${counts[date]>=2?"is-common":""}">${formatPollDate(date)}${counts[date]>=2?` · ${counts[date]}×`:""}</span>`).join("")}<button class="availability-entry-remove" type="button" onclick="removeAvailabilityEntry(${i})" aria-label="Eintrag von ${escapeHtml(entry.participant_name)} entfernen">Eintrag entfernen</button></div></div>`).join("");
+  host.innerHTML=availabilityEntries.map((entry,i)=>`<div class="availability-entry"><div><div class="availability-entry-name">${escapeHtml(entry.participant_name)}</div><div class="panel-subtitle">${entry.dates.length} mögliche ${entry.dates.length===1?"Option":"Optionen"}</div></div><div class="availability-entry-dates">${entry.dates.sort().map(date=>{const key=availabilityDateKey(date); return `<span class="availability-entry-date ${counts[key]>=2?"is-common":""}">${formatAvailabilityDate(date)}${counts[key]>=2?` · ${counts[key]}×`:""}</span>`;}).join("")}<button class="availability-entry-remove" type="button" onclick="removeAvailabilityEntry(${i})" aria-label="Eintrag von ${escapeHtml(entry.participant_name)} entfernen">Eintrag entfernen</button></div></div>`).join("");
   const legend=document.getElementById("availabilityCommonLegend"); if(legend)legend.hidden=!Object.values(counts).some(count=>count>=2);
 }
 
 async function loadAppointmentPoll() { availabilityEntries=[]; try { availabilityEntries=JSON.parse(localStorage.getItem(pollStorageKey())||"[]"); } catch(_){ availabilityEntries=[]; } const result=await supabaseClient.from("appointment_availability").select("id,participant_name,dates,user_id").eq("user_id",currentUser.id).order("created_at",{ascending:true}); if(!result.error) availabilityEntries=result.data||[]; const month=document.getElementById("pollMonth"); if(month){ setPollMonthValue(new Date(pollCalendarCursor.getFullYear(),pollCalendarCursor.getMonth(),1,19,0,0)); month.onclick=openPollMonthPicker; month.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();openPollMonthPicker();}}; } renderPollCalendar();renderSelectedPollDates();renderAvailabilityEntries(); }
-document.addEventListener("click", event => { const picker=document.getElementById("pollMonthPicker"), field=document.querySelector(".poll-month-field"); if(picker && field && !field.contains(event.target)) closePollMonthPicker(); });
+document.addEventListener("click", event => { const picker=document.getElementById("pollMonthPicker"), field=document.querySelector(".poll-month-field"); if(picker && field && !field.contains(event.target)) closePollMonthPicker(false); });
 async function saveAppointmentPoll() {
   const name = document.getElementById("pollName").value.trim();
   const status = document.getElementById("pollStatus");
@@ -7952,7 +8021,11 @@ async function saveAppointmentPoll() {
   if (!name) { status.textContent = "Bitte deinen Namen eingeben."; return; }
   if (!selectedPollDates.length) { status.textContent = "Bitte mindestens einen möglichen Termin auswählen."; return; }
 
-  const entry = { participant_name: name, dates: [...selectedPollDates].sort(), user_id: currentUser.id };
+  const entryDates = [...selectedPollDates].sort().map(key => {
+    const time=selectedPollTimes[key] || "19:00";
+    return `${key}T${time}`;
+  });
+  const entry = { participant_name: name, dates: entryDates, user_id: currentUser.id };
   button.disabled = true;
   status.textContent = "Deine Verfügbarkeit wird gespeichert …";
   try {
