@@ -1034,7 +1034,9 @@ input[type="checkbox"] {
 }
 
 .yugioh-filter-bar .yugioh-filter-dropdown {
-  flex: 1 1 240px;
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
   width: min(340px, 100%);
 }
 
@@ -1042,10 +1044,37 @@ input[type="checkbox"] {
   .yugioh-filter-bar {
     align-items: stretch;
     flex-direction: column;
+    gap: 7px;
+    margin-top: 12px;
+    padding: 8px 10px 10px;
+  }
+
+  .yugioh-filter-bar label {
+    min-height: 22px;
+    font-size: 11px;
+  }
+
+  .yugioh-filter-bar label::before {
+    width: 20px;
+    height: 20px;
   }
 
   .yugioh-filter-bar .yugioh-filter-dropdown {
+    flex: 0 0 auto;
     width: 100%;
+    min-width: 0;
+  }
+
+  .yugioh-filter-dropdown-toggle {
+    min-height: 40px;
+    padding: 8px 10px;
+    font-size: 11px;
+  }
+
+  .yugioh-filter-dropdown-menu {
+    left: 0;
+    right: 0;
+    max-height: min(48vh, 260px);
   }
 }
 
@@ -4610,14 +4639,18 @@ body.color-vision-mode .beer-grade-slider::-moz-range-thumb {
 .duel-history-entry strong { color:#6f89aa; font-weight:700; white-space:nowrap; }
 .duel-actions { display:flex; justify-content:flex-end; margin-top:14px; }
 .duel-actions button { width:auto; margin:0; }
-.calculator-overlay { position:fixed; inset:0; z-index:12000; display:none; align-items:center; justify-content:center; padding:20px; background:rgba(3,7,20,.8); backdrop-filter:blur(8px); }
-.calculator-box { width:min(420px,100%); padding:22px; border:1px solid var(--border-strong); border-radius:var(--radius-lg); background:var(--surface); box-shadow:var(--shadow-pop); }
-.calculator-box h4 { margin:0 0 14px; color:var(--text); text-align:center; }
-.calculator-display { min-height:56px; margin-bottom:12px; padding:10px; border:1px solid var(--border-strong); border-radius:var(--radius-sm); background:var(--surface-input); color:var(--accent); font-size:28px; font-weight:900; text-align:right; overflow:auto; }
-.calculator-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:7px; }
-.calculator-grid button,.calculator-actions button { min-height:42px; }
-.calculator-actions { display:grid; grid-template-columns:repeat(5,1fr); gap:7px; margin-top:10px; }
-@media (max-width:650px){.duel-box{padding:14px}.duel-arena{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.duel-player-card{padding:10px;gap:7px;grid-template-rows:auto auto minmax(142px,1fr) auto auto}.duel-player-name{font-size:13px}.duel-life-number{font-size:clamp(38px,13vw,64px);-webkit-text-stroke:2px #050508;text-shadow:3px 3px 0 #050508}.calculator-actions{grid-template-columns:repeat(2,1fr)}}
+.calculator-overlay { position:fixed; inset:0; z-index:12000; display:none; align-items:center; justify-content:center; padding:12px; background:radial-gradient(circle at 50% 44%,rgba(86,102,194,.18),rgba(3,7,27,.94) 72%),rgba(4,8,15,.84); backdrop-filter:blur(8px); }
+.calculator-box { box-sizing:border-box; width:min(430px,100%); max-width:100%; max-height:calc(100vh - 24px); overflow:auto; padding:18px; border:1px solid rgba(125,158,224,.34); border-radius:18px; background:linear-gradient(145deg,rgba(12,26,59,.97),rgba(7,14,34,.98)); box-shadow:0 24px 70px rgba(0,0,0,.72),0 0 0 1px rgba(255,255,255,.035) inset,0 0 35px rgba(69,94,185,.22); }
+.calculator-box h4 { margin:0 0 12px; color:#f3f6ff; text-align:center; font-size:18px; letter-spacing:.04em; }
+.calculator-display { box-sizing:border-box; min-height:62px; width:100%; margin-bottom:12px; padding:12px 14px; border:1px solid rgba(172,193,255,.16); border-radius:14px; background:radial-gradient(circle at 50% 48%,rgba(119,157,215,.42) 0%,rgba(83,111,182,.5) 36%,rgba(63,52,139,.64) 65%,rgba(40,19,81,.82) 100%); color:#ffe95a; font-family:Impact,"Arial Black",Arial,sans-serif; font-size:32px; font-weight:900; text-align:right; letter-spacing:.03em; -webkit-text-stroke:1.5px #050508; paint-order:stroke fill; text-shadow:2px 2px 0 #050508; overflow:auto; }
+.calculator-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:7px; }
+.calculator-grid button, .calculator-actions button { box-sizing:border-box; min-width:0; width:100%; margin:0; min-height:42px; padding:9px 7px; font-size:14px; }
+.calculator-grid button { border:1px solid rgba(104,149,224,.3); background:linear-gradient(145deg,rgba(19,43,86,.86),rgba(7,17,39,.96)); color:#edf5ff; }
+.calculator-grid button:hover { border-color:rgba(105,226,215,.45); background:linear-gradient(145deg,rgba(30,62,114,.9),rgba(10,25,51,.98)); }
+.calculator-actions { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:7px; margin-top:10px; }
+.calculator-actions .calculator-equals { background:linear-gradient(135deg,rgba(33,118,120,.86),rgba(62,88,177,.84)); color:#efffff; }
+.calculator-actions .calculator-reset { background:rgba(95,61,110,.84); color:#f5eaff; }
+@media (max-width:650px){.duel-box{padding:14px}.duel-arena{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.duel-player-card{padding:10px;gap:7px;grid-template-rows:auto auto minmax(142px,1fr) auto auto}.duel-player-name{font-size:13px}.duel-life-number{font-size:clamp(38px,13vw,64px);-webkit-text-stroke:2px #050508;text-shadow:3px 3px 0 #050508}.calculator-overlay{padding:8px}.calculator-box{width:100%;max-height:calc(100vh - 16px);padding:14px;border-radius:16px}.calculator-grid{gap:6px}.calculator-actions{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}}
 </style>
 
 <!-- Cinematic background -->
