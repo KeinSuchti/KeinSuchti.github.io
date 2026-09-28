@@ -4986,7 +4986,7 @@ body.color-vision-mode .beer-grade-slider::-moz-range-thumb {
             <div id="availabilityCommonLegend" class="availability-common-legend" hidden><span class="availability-common-dot"></span><span>Markiert: mindestens zwei Personen können an diesem Tag.</span></div>
           </section>
           <section class="availability-form-card" aria-label="Verfügbarkeit eintragen">
-            <div class="poll-form-row"><label class="edit-field"><span>Dein Name</span><input id="pollName" placeholder="z. B. Anna"></label><label class="edit-field"><span>Monat für Vorschläge</span><input id="pollMonth" type="month"></label></div>
+            <div class="poll-form-row"><label class="edit-field"><span>Dein Name</span><input id="pollName" placeholder="z. B. Anna"></label><label class="edit-field"><span>Monat für Vorschläge</span><input id="pollMonth" type="date" inputmode="numeric"></label></div>
             <div id="pollSelectedDates" class="poll-selected-dates" aria-live="polite"></div>
             <button class="poll-save-button" type="button" onclick="saveAppointmentPoll()">✅ Meine Verfügbarkeit speichern</button>
             <p id="pollStatus" class="appointment-status" role="status"></p>
@@ -7786,7 +7786,8 @@ function changePollMonth(delta) {
   const targetMonth = new Date(pollCalendarCursor.getFullYear(), pollCalendarCursor.getMonth()+delta, 1);
   if (targetMonth < currentMonthStart()) return;
   pollCalendarCursor = targetMonth;
-  document.getElementById("pollMonth").value = `${pollCalendarCursor.getFullYear()}-${String(pollCalendarCursor.getMonth()+1).padStart(2,"0")}`;
+  const monthInput = document.getElementById("pollMonth");
+  if (monthInput) monthInput.value = `${pollCalendarCursor.getFullYear()}-${String(pollCalendarCursor.getMonth()+1).padStart(2,"0")}-01`;
   renderPollCalendar();
 }
 function togglePollDate(day) {
@@ -7808,9 +7809,9 @@ function renderPollCalendar() {
   selectedPollDates = selectedPollDates.filter(key => key >= todayDateKey());
   const monthInput = document.getElementById("pollMonth");
   if (monthInput) {
-    const currentMonthValue = `${minimumMonth.getFullYear()}-${String(minimumMonth.getMonth()+1).padStart(2,"0")}`;
+    const currentMonthValue = `${minimumMonth.getFullYear()}-${String(minimumMonth.getMonth()+1).padStart(2,"0")}-01`;
     monthInput.min = currentMonthValue;
-    const selectedMonth = `${pollCalendarCursor.getFullYear()}-${String(pollCalendarCursor.getMonth()+1).padStart(2,"0")}`;
+    const selectedMonth = `${pollCalendarCursor.getFullYear()}-${String(pollCalendarCursor.getMonth()+1).padStart(2,"0")}-01`;
     if (!monthInput.value || monthInput.value < currentMonthValue) monthInput.value = selectedMonth;
   }
   const previousMonthButton = document.getElementById("pollPreviousMonth");
@@ -7838,7 +7839,7 @@ function renderAvailabilityEntries() {
   const legend=document.getElementById("availabilityCommonLegend"); if(legend)legend.hidden=!Object.values(counts).some(count=>count>=2);
 }
 
-async function loadAppointmentPoll() { availabilityEntries=[]; try { availabilityEntries=JSON.parse(localStorage.getItem(pollStorageKey())||"[]"); } catch(_){ availabilityEntries=[]; } const result=await supabaseClient.from("appointment_availability").select("id,participant_name,dates,user_id").eq("user_id",currentUser.id).order("created_at",{ascending:true}); if(!result.error) availabilityEntries=result.data||[]; const month=document.getElementById("pollMonth"); if(month){month.value=`${pollCalendarCursor.getFullYear()}-${String(pollCalendarCursor.getMonth()+1).padStart(2,"0")}`;month.onchange=()=>{const [y,m]=month.value.split("-").map(Number);const targetMonth=new Date(y,m-1,1);pollCalendarCursor=targetMonth<currentMonthStart()?currentMonthStart():targetMonth;month.value=`${pollCalendarCursor.getFullYear()}-${String(pollCalendarCursor.getMonth()+1).padStart(2,"0")}`;renderPollCalendar();};} renderPollCalendar();renderSelectedPollDates();renderAvailabilityEntries(); }
+async function loadAppointmentPoll() { availabilityEntries=[]; try { availabilityEntries=JSON.parse(localStorage.getItem(pollStorageKey())||"[]"); } catch(_){ availabilityEntries=[]; } const result=await supabaseClient.from("appointment_availability").select("id,participant_name,dates,user_id").eq("user_id",currentUser.id).order("created_at",{ascending:true}); if(!result.error) availabilityEntries=result.data||[]; const month=document.getElementById("pollMonth"); if(month){month.value=`${pollCalendarCursor.getFullYear()}-${String(pollCalendarCursor.getMonth()+1).padStart(2,"0")}-01`;month.onchange=()=>{const [y,m]=month.value.split("-").map(Number);const targetMonth=new Date(y,m-1,1);pollCalendarCursor=targetMonth<currentMonthStart()?currentMonthStart():targetMonth;month.value=`${pollCalendarCursor.getFullYear()}-${String(pollCalendarCursor.getMonth()+1).padStart(2,"0")}-01`;renderPollCalendar();};} renderPollCalendar();renderSelectedPollDates();renderAvailabilityEntries(); }
 async function saveAppointmentPoll() {
   const name = document.getElementById("pollName").value.trim();
   const status = document.getElementById("pollStatus");
