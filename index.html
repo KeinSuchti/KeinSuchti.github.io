@@ -277,74 +277,6 @@ textarea:focus {
 
 
 
-/* ===== UX-Erweiterungen Termine ===== */
-function downloadAppointmentIcs(){
-  if(!nextAppointment?.start_at)return;
-  const start=new Date(nextAppointment.start_at), end=new Date(start.getTime()+3*3600*1000);
-  const fmt=d=>d.toISOString().replace(/[-:]/g,"").replace(/\.\d{3}/,"");
-  const esc=t=>String(t||"").replace(/[\\;,]/g,m=>"\\"+m).replace(/\r?\n/g,"\\n");
-  const ics=["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Watch Feast and Game//DE","BEGIN:VEVENT",
-    `UID:${nextAppointment.id}@wfg`,`DTSTAMP:${fmt(new Date())}`,`DTSTART:${fmt(start)}`,`DTEND:${fmt(end)}`,
-    `SUMMARY:${esc(nextAppointment.title||"Gemeinsamer Termin")}`,
-    ...(nextAppointment.location?[`LOCATION:${esc(nextAppointment.location)}`]:[]),
-    ...(nextAppointment.note?[`DESCRIPTION:${esc(nextAppointment.note)}`]:[]),
-    "END:VEVENT","END:VCALENDAR"].join("\r\n");
-  const url=URL.createObjectURL(new Blob([ics],{type:"text/calendar;charset=utf-8"}));
-  const a=document.createElement("a"); a.href=url; a.download="termin.ics"; document.body.appendChild(a); a.click(); a.remove();
-  setTimeout(()=>URL.revokeObjectURL(url),1000);
-}
-if(nextAppointmentBanner){
-  nextAppointmentBanner.setAttribute("role","button"); nextAppointmentBanner.tabIndex=0;
-  nextAppointmentBanner.setAttribute("aria-label","Nächster Termin – Details öffnen");
-  nextAppointmentBanner.addEventListener("click",()=>showAppointmentsApp());
-  nextAppointmentBanner.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();showAppointmentsApp();}});
-}
-// Erfolgsmeldungen blenden sich nach 6 Sekunden selbst aus.
-(function(){
-  const timers={};
-  const wrap=(name,id)=>{const orig=window[name]; if(typeof orig!=="function")return;
-    window[name]=function(text,type){orig.apply(this,arguments);clearTimeout(timers[id]);
-      if(type==="success")timers[id]=setTimeout(()=>{const el=document.getElementById(id);if(el){el.textContent="";el.classList.remove("status-success");}},6000);};};
-  wrap("setPollStatus","pollStatus"); wrap("setAppointmentStatus","appointmentStatus");
-})();
-
-/* ===== Termine: Optimierungen ===== */
-function quickSelectPoll(mode){
-  if(mode==="reset"){ loadAppointmentPoll(); setPollStatus("Auswahl auf den gespeicherten Stand zurückgesetzt."); return; }
-  const wanted=mode==="fridays"?[5]:[6,0];
-  const y=pollCalendarCursor.getFullYear(),m=pollCalendarCursor.getMonth(),last=new Date(y,m+1,0).getDate(),keys=[];
-  for(let d=1;d<=last;d++){const dt=new Date(y,m,d),k=pollDateKey(dt);if(k>=todayDateKey()&&wanted.includes(dt.getDay()))keys.push(k);}
-  if(!keys.length){setPollStatus("In diesem Monat gibt es keine passenden Tage mehr.","error");return;}
-  const allOn=keys.every(k=>selectedPollDates.includes(k));
-  selectedPollDates=allOn?selectedPollDates.filter(k=>!keys.includes(k)):[...new Set([...selectedPollDates,...keys])].sort();
-  keys.forEach(k=>{if(allOn)delete selectedPollTimes[k];else if(!selectedPollTimes[k])selectedPollTimes[k]=selectedPollTime;});
-  renderPollCalendar(); renderSelectedPollDates();
-}
-function pollIsDirty(){
-  const own=ownAvailabilityEntry(), today=todayDateKey();
-  const saved=(own?.dates||[]).filter(v=>availabilityDateKey(v)>=today).map(v=>`${availabilityDateKey(v)}T${availabilityTimeOf(v)}`).sort().join("|");
-  const cur=selectedPollDates.filter(k=>k>=today).map(k=>`${k}T${selectedPollTimes[k]||selectedPollTime}`).sort().join("|");
-  return saved!==cur;
-}
-function updatePollDirtyState(){
-  const dirty=pollIsDirty(), hint=document.getElementById("pollDirtyHint"), btn=document.querySelector(".poll-save-button");
-  if(hint)hint.hidden=!dirty;
-  if(btn)btn.classList.toggle("is-dirty",dirty);
-}
-function updateAppointmentDayHint(){
-  const host=document.getElementById("appointmentDayHint"); if(!host)return;
-  const key=document.getElementById("appointmentDate")?.value?.slice(0,10);
-  if(!key){return;}
-  const counts=availabilityDateCounts(), total=availabilityParticipantCount(), max=Math.max(0,...Object.values(counts));
-  const people=availabilityPeopleForDate(key), n=people.length;
-  let html=`<strong>${escapeHtml(formatPollDate(key))}</strong>`;
-  if(!n) html+=`<span class="day-warn">Für diesen Tag gibt es noch keine Zusagen.</span>`;
-  else html+=`<span class="${n>=total?"day-ok":""}">${n} von ${Math.max(total,n)} können: ${people.map(escapeHtml).join(", ")}</span>`;
-  if(n<max){const best=Object.entries(counts).filter(([k,c])=>c===max&&k>=todayDateKey()).map(([k])=>k).sort()[0];
-    if(best)html+=`<span class="day-warn">Besser passt ${escapeHtml(formatPollDate(best))} (${max} von ${Math.max(total,max)}).</span>`;}
-  host.innerHTML=html;
-}
-
 /* Serien & Filme */
 
 .random-movie-button {
@@ -5364,6 +5296,7 @@ body.app-scene .skip-link:focus{left:12px}
             <div id="appointmentDayHint" class="availability-day-details" aria-live="polite"><strong>Tag auswählen</strong><span>Tippe auf einen Tag – du siehst sofort, wer da kann.</span></div>
           </section>
           <section class="appointment-form-card">
+            <input type="hidden" id="appointmentDate" value="">
             <label class="edit-field"><span>Titel</span><input id="appointmentTitle" placeholder="z. B. Games"></label>
             <div class="time-picker">
               <div class="field-caption">Uhrzeit</div>
@@ -8670,6 +8603,75 @@ async function removeAvailabilityEntry(index){
     setPollStatus("Die Rückmeldung konnte nicht entfernt werden.","error");
   }
 }
+
+/* ===== UX-Erweiterungen Termine ===== */
+function downloadAppointmentIcs(){
+  if(!nextAppointment?.start_at)return;
+  const start=new Date(nextAppointment.start_at), end=new Date(start.getTime()+3*3600*1000);
+  const fmt=d=>d.toISOString().replace(/[-:]/g,"").replace(/\.\d{3}/,"");
+  const esc=t=>String(t||"").replace(/[\\;,]/g,m=>"\\"+m).replace(/\r?\n/g,"\\n");
+  const ics=["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Watch Feast and Game//DE","BEGIN:VEVENT",
+    `UID:${nextAppointment.id}@wfg`,`DTSTAMP:${fmt(new Date())}`,`DTSTART:${fmt(start)}`,`DTEND:${fmt(end)}`,
+    `SUMMARY:${esc(nextAppointment.title||"Gemeinsamer Termin")}`,
+    ...(nextAppointment.location?[`LOCATION:${esc(nextAppointment.location)}`]:[]),
+    ...(nextAppointment.note?[`DESCRIPTION:${esc(nextAppointment.note)}`]:[]),
+    "END:VEVENT","END:VCALENDAR"].join("\r\n");
+  const url=URL.createObjectURL(new Blob([ics],{type:"text/calendar;charset=utf-8"}));
+  const a=document.createElement("a"); a.href=url; a.download="termin.ics"; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+if(nextAppointmentBanner){
+  nextAppointmentBanner.setAttribute("role","button"); nextAppointmentBanner.tabIndex=0;
+  nextAppointmentBanner.setAttribute("aria-label","Nächster Termin – Details öffnen");
+  nextAppointmentBanner.addEventListener("click",()=>showAppointmentsApp());
+  nextAppointmentBanner.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();showAppointmentsApp();}});
+}
+// Erfolgsmeldungen blenden sich nach 6 Sekunden selbst aus.
+(function(){
+  const timers={};
+  const wrap=(name,id)=>{const orig=window[name]; if(typeof orig!=="function")return;
+    window[name]=function(text,type){orig.apply(this,arguments);clearTimeout(timers[id]);
+      if(type==="success")timers[id]=setTimeout(()=>{const el=document.getElementById(id);if(el){el.textContent="";el.classList.remove("status-success");}},6000);};};
+  wrap("setPollStatus","pollStatus"); wrap("setAppointmentStatus","appointmentStatus");
+})();
+
+/* ===== Termine: Optimierungen ===== */
+function quickSelectPoll(mode){
+  if(mode==="reset"){ loadAppointmentPoll(); setPollStatus("Auswahl auf den gespeicherten Stand zurückgesetzt."); return; }
+  const wanted=mode==="fridays"?[5]:[6,0];
+  const y=pollCalendarCursor.getFullYear(),m=pollCalendarCursor.getMonth(),last=new Date(y,m+1,0).getDate(),keys=[];
+  for(let d=1;d<=last;d++){const dt=new Date(y,m,d),k=pollDateKey(dt);if(k>=todayDateKey()&&wanted.includes(dt.getDay()))keys.push(k);}
+  if(!keys.length){setPollStatus("In diesem Monat gibt es keine passenden Tage mehr.","error");return;}
+  const allOn=keys.every(k=>selectedPollDates.includes(k));
+  selectedPollDates=allOn?selectedPollDates.filter(k=>!keys.includes(k)):[...new Set([...selectedPollDates,...keys])].sort();
+  keys.forEach(k=>{if(allOn)delete selectedPollTimes[k];else if(!selectedPollTimes[k])selectedPollTimes[k]=selectedPollTime;});
+  renderPollCalendar(); renderSelectedPollDates();
+}
+function pollIsDirty(){
+  const own=ownAvailabilityEntry(), today=todayDateKey();
+  const saved=(own?.dates||[]).filter(v=>availabilityDateKey(v)>=today).map(v=>`${availabilityDateKey(v)}T${availabilityTimeOf(v)}`).sort().join("|");
+  const cur=selectedPollDates.filter(k=>k>=today).map(k=>`${k}T${selectedPollTimes[k]||selectedPollTime}`).sort().join("|");
+  return saved!==cur;
+}
+function updatePollDirtyState(){
+  const dirty=pollIsDirty(), hint=document.getElementById("pollDirtyHint"), btn=document.querySelector(".poll-save-button");
+  if(hint)hint.hidden=!dirty;
+  if(btn)btn.classList.toggle("is-dirty",dirty);
+}
+function updateAppointmentDayHint(){
+  const host=document.getElementById("appointmentDayHint"); if(!host)return;
+  const key=document.getElementById("appointmentDate")?.value?.slice(0,10);
+  if(!key){return;}
+  const counts=availabilityDateCounts(), total=availabilityParticipantCount(), max=Math.max(0,...Object.values(counts));
+  const people=availabilityPeopleForDate(key), n=people.length;
+  let html=`<strong>${escapeHtml(formatPollDate(key))}</strong>`;
+  if(!n) html+=`<span class="day-warn">Für diesen Tag gibt es noch keine Zusagen.</span>`;
+  else html+=`<span class="${n>=total?"day-ok":""}">${n} von ${Math.max(total,n)} können: ${people.map(escapeHtml).join(", ")}</span>`;
+  if(n<max){const best=Object.entries(counts).filter(([k,c])=>c===max&&k>=todayDateKey()).map(([k])=>k).sort()[0];
+    if(best)html+=`<span class="day-warn">Besser passt ${escapeHtml(formatPollDate(best))} (${max} von ${Math.max(total,max)}).</span>`;}
+  host.innerHTML=html;
+}
+
 
 /* Serien & Filme */
 
