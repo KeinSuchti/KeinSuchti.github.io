@@ -4835,6 +4835,51 @@ html.duel-open, html.duel-open body { overflow:hidden; }
 .own-avail-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.own-avail-actions button{width:auto;margin:0;min-height:42px}
 @media(max-width:520px){.own-avail-row{grid-template-columns:1fr auto auto}}
 #pollName[readonly]{opacity:.85;cursor:default}
+/* ===== Heatmap: Zusagen farblich gestaffelt ===== */
+.calendar-day.heat-1{--heat:96,140,230;--heat-a:.24;--heat-b:.5}
+.calendar-day.heat-2{--heat:64,182,226;--heat-a:.34;--heat-b:.62}
+.calendar-day.heat-3{--heat:52,208,168;--heat-a:.46;--heat-b:.75}
+.calendar-day.heat-4{--heat:96,224,110;--heat-a:.58;--heat-b:.9}
+.calendar-day.heat-all{--heat:255,196,64;--heat-a:.70;--heat-b:1}
+.calendar-day[class*="heat-"]{
+  background:linear-gradient(160deg,rgba(var(--heat),calc(var(--heat-a) + .12)),rgba(var(--heat),var(--heat-a)))!important;
+  border:1.5px solid rgba(var(--heat),var(--heat-b))!important;
+  color:#fff!important;font-weight:800;font-size:15px;
+}
+.calendar-day.heat-all{box-shadow:0 0 14px rgba(255,196,64,.35)!important;color:#fff8e1!important}
+.calendar-day[class*="heat-"]:not(:disabled):hover{filter:brightness(1.18)}
+.calendar-day.is-best::before{content:"★"!important;display:block!important;position:absolute;left:4px;top:2px;width:auto;height:auto;background:none!important;border-radius:0;color:#ffd35c;font-size:12px;line-height:1;text-shadow:0 0 6px rgba(0,0,0,.55)}
+.calendar-day.common:not(.is-best)::before{display:none!important}
+.calendar-day[class*="heat-"] .calendar-day-count{
+  right:3px;bottom:3px;padding:1px 5px;border-radius:999px;background:rgba(6,18,34,.78);
+  border:1px solid rgba(var(--heat),.7);color:#fff;font-size:10px;font-weight:800;line-height:1.3;
+}
+.calendar-day.selected{box-shadow:0 0 0 2px #0b1a2e,0 0 0 4.5px #8cf1ff!important}
+.calendar-day.selected.heat-all{box-shadow:0 0 0 2px #0b1a2e,0 0 0 4.5px #8cf1ff,0 0 14px rgba(255,196,64,.35)!important}
+.calendar-day.is-appointment{outline:2px solid #b79cff;outline-offset:1px}
+.legend-scale{display:inline-flex;align-items:center;gap:0!important}
+.legend-scale i{width:18px!important;height:12px!important;border-radius:0}
+.legend-scale i:first-child{border-radius:6px 0 0 6px}
+.legend-scale i.lall{border-radius:0 6px 6px 0}
+.legend-scale i.l1{background:rgba(96,140,230,.75)}.legend-scale i.l2{background:rgba(64,182,226,.8)}.legend-scale i.l3{background:rgba(52,208,168,.85)}.legend-scale i.l4{background:rgba(96,224,110,.9)}.legend-scale i.lall{background:#ffc440}
+.legend-scale em{font-style:normal;margin-left:7px}
+.legend-star{color:#ffd35c;font-style:normal}
+/* Beste Tage */
+.best-day-row{position:relative;overflow:hidden;border-left:4px solid rgba(var(--heat,101,141,207),1)!important}
+.best-day-row.heat-1{--heat:96,140,230}.best-day-row.heat-2{--heat:64,182,226}.best-day-row.heat-3{--heat:52,208,168}.best-day-row.heat-4{--heat:96,224,110}.best-day-row.heat-all{--heat:255,196,64;background:linear-gradient(110deg,rgba(255,196,64,.16),rgba(22,40,62,.58))!important}
+.best-day-rank{display:inline-grid;place-items:center;min-width:26px;height:26px;margin-right:9px;border-radius:50%;background:rgba(var(--heat),.25);border:1px solid rgba(var(--heat),.8);color:#fff;font-size:12px;font-weight:900}
+.best-day-title{display:flex;align-items:center}
+.best-day-bar{height:6px;margin-top:7px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden}
+.best-day-bar span{display:block;height:100%;border-radius:inherit;background:rgb(var(--heat))}
+.best-day-badge{margin-left:8px;padding:2px 8px;border-radius:999px;background:rgba(255,196,64,.18);border:1px solid rgba(255,196,64,.6);color:#ffe29a;font-size:11px;font-weight:800;white-space:nowrap}
+/* Farbenblind-Modus: Stufen über Helligkeit + Rahmenstärke, Zahl bleibt immer sichtbar */
+body.color-vision-mode .calendar-day.heat-1{background:#1c4560!important;border:1.5px solid #89c3e0!important;color:#fff!important}
+body.color-vision-mode .calendar-day.heat-2{background:#1d5d80!important;border:2px solid #89c3e0!important;color:#fff!important}
+body.color-vision-mode .calendar-day.heat-3{background:#1f78a3!important;border:2.5px solid #bfe3f5!important;color:#fff!important}
+body.color-vision-mode .calendar-day.heat-4{background:#2a93c4!important;border:3px solid #fff!important;color:#fff!important}
+body.color-vision-mode .calendar-day.heat-all{background:#8a5d00!important;border:3px solid #f0b323!important;color:#fff!important;box-shadow:none!important}
+body.color-vision-mode .calendar-day[class*="heat-"] .calendar-day-count{background:#081521;border-color:#fff;color:#fff}
+@media(max-width:520px){.calendar-day[class*="heat-"]{font-size:14px}.calendar-day[class*="heat-"] .calendar-day-count{font-size:9px;padding:0 4px}}
 </style>
 
 <!-- Cinematic background -->
@@ -5175,7 +5220,7 @@ body.app-scene .skip-link:focus{left:12px}
             <div class="calendar-toolbar poll-calendar-toolbar"><button id="pollPreviousMonth" class="calendar-nav-button" type="button" onclick="changePollMonth(-1)" aria-label="Vorheriger Monat">‹</button><strong id="pollCalendarMonthLabel"></strong><button class="calendar-nav-button" type="button" onclick="changePollMonth(1)" aria-label="Nächster Monat">›</button></div>
             <div class="calendar-weekdays"><span>Mo</span><span>Di</span><span>Mi</span><span>Do</span><span>Fr</span><span>Sa</span><span>So</span></div>
             <div id="pollCalendar" class="appointment-calendar"></div>
-            <div class="calendar-legend"><span><i class="legend-ring"></i> Auswahl</span><span><i class="legend-dot"></i> Heute</span><span><i class="legend-check">✓</i> Termin</span><span><i class="legend-heat"></i> Zusagen</span></div>
+            <div class="calendar-legend"><span><i class="legend-ring"></i> Auswahl</span><span><i class="legend-dot"></i> Heute</span><span><i class="legend-check">✓</i> Termin</span><span class="legend-scale"><i class="l1"></i><i class="l2"></i><i class="l3"></i><i class="l4"></i><i class="lall"></i><em>wenige → alle</em></span><span><i class="legend-star">★</i> Bestwert</span></div>
             <div id="availabilityDayDetails" class="availability-day-details" aria-live="polite"><strong>Tag auswählen</strong><span>Tippe auf einen Tag, um zu sehen, wer verfügbar ist.</span></div>
           </section>
           <section class="availability-form-card" aria-label="Verfügbarkeit eintragen">
@@ -5212,7 +5257,7 @@ body.app-scene .skip-link:focus{left:12px}
             <div class="calendar-toolbar"><button id="calendarPreviousMonth" class="calendar-nav-button" type="button" onclick="changeCalendarMonth(-1)" aria-label="Vorheriger Monat">‹</button><strong id="calendarMonthLabel"></strong><button class="calendar-nav-button" type="button" onclick="changeCalendarMonth(1)" aria-label="Nächster Monat">›</button></div>
             <div class="calendar-weekdays"><span>Mo</span><span>Di</span><span>Mi</span><span>Do</span><span>Fr</span><span>Sa</span><span>So</span></div>
             <div id="appointmentCalendar" class="appointment-calendar"></div>
-            <div class="calendar-legend"><span><i class="legend-ring"></i> Auswahl</span><span><i class="legend-dot"></i> Heute</span><span><i class="legend-check">✓</i> Bestehender Termin</span><span><i class="legend-heat"></i> Zusagen</span></div>
+            <div class="calendar-legend"><span><i class="legend-ring"></i> Auswahl</span><span><i class="legend-dot"></i> Heute</span><span><i class="legend-check">✓</i> Bestehender Termin</span><span class="legend-scale"><i class="l1"></i><i class="l2"></i><i class="l3"></i><i class="l4"></i><i class="lall"></i><em>wenige → alle</em></span><span><i class="legend-star">★</i> Bestwert</span></div>
           </section>
           <section class="appointment-form-card">
             <label class="edit-field"><span>Titel</span><input id="appointmentTitle" placeholder="z. B. Games"></label>
@@ -7972,9 +8017,11 @@ function renderAppointmentCalendar(selectedDay) {
     if (nextAppointment?.start_at?.slice(0,10) === key) b.classList.add("is-appointment");
     const cnt = availabilityDateCounts()[key] || 0;
     if (cnt) {
-      b.classList.add(`heat-${Math.min(4,cnt)}`);
-      const badge=document.createElement("span"); badge.className="calendar-day-count"; badge.textContent=cnt; b.appendChild(badge);
-      b.title=`${cnt} ${cnt===1?"Person kann":"Personen können"}: ${availabilityPeopleForDate(key).join(", ")}`;
+      const heat=availabilityHeat(cnt);
+      b.classList.add(heat.cls);
+      if(heat.best)b.classList.add("common","is-best");
+      const badge=document.createElement("span"); badge.className="calendar-day-count"; badge.textContent=heat.total>1?`${cnt}/${heat.total}`:cnt; b.appendChild(badge);
+      b.title=`${cnt} von ${heat.total} ${heat.total===1?"Person kann":"Personen können"}: ${availabilityPeopleForDate(key).join(", ")}`;
     }
     b.onclick = () => selectCalendarDate(day);
     grid.appendChild(b);
@@ -8119,6 +8166,16 @@ function formatAvailabilityDate(value){
     : formatPollDate(availabilityDateKey(value));
 }
 
+function availabilityParticipantCount(){
+  return new Set(availabilityEntries.filter(e=>(e.dates||[]).some(v=>availabilityDateKey(v)>=todayDateKey())).map(e=>e.user_id||e.id)).size;
+}
+function availabilityHeat(count){
+  const counts=Object.values(availabilityDateCounts());
+  const max=Math.max(0,...counts), total=Math.max(availabilityParticipantCount(),max,1);
+  const ratio=count/total;
+  const level=(total>=2&&count>=total)?"all":ratio>=.75?"4":ratio>=.5?"3":ratio>=.25?"2":"1";
+  return {cls:`heat-${level}`,best:count>=2&&count===max,total,ratio,level};
+}
 function availabilityDateCounts(){
   const counts={};
   availabilityEntries.forEach(e=>(e.dates||[]).forEach(v=>{
@@ -8200,13 +8257,14 @@ function renderPollCalendar(){
     if(appointmentKey===key)b.classList.add("is-appointment");
 
     if(count){
-      b.classList.add(`heat-${Math.min(4,Math.max(1,Math.ceil(count/Math.max(maxCount,4)*4)))}`);
-      if(count>=2)b.classList.add("common");
+      const heat=availabilityHeat(count);
+      b.classList.add(heat.cls);
+      if(heat.best)b.classList.add("common","is-best");
       const badge=document.createElement("span");
       badge.className="calendar-day-count";
-      badge.textContent=count;
+      badge.textContent=heat.total>1?`${count}/${heat.total}`:count;
       b.appendChild(badge);
-      b.title=`${count} ${count===1?"Person kann":"Personen können"} an diesem Tag`;
+      b.title=`${count} von ${heat.total} ${heat.total===1?"Person kann":"Personen können"}: ${availabilityPeopleForDate(key).join(", ")}`;
     }
 
     b.onclick=()=>togglePollDate(day);
@@ -8311,13 +8369,17 @@ function renderBestDays(){
     .slice(0,6);
 
   host.innerHTML=rows.length
-    ? rows.map(([key,count])=>`<div class="best-day-row">
+    ? rows.map(([key,count],i)=>{
+        const heat=availabilityHeat(count);
+        const pct=Math.round(count/heat.total*100);
+        return `<div class="best-day-row ${heat.cls}">
         <div class="best-day-info">
-          <div class="best-day-date">${formatPollDate(key)}</div>
-          <div class="best-day-people">${count} ${count===1?"Zusage":"Zusagen"} · ${availabilityPeopleForDate(key).map(escapeHtml).join(", ")}</div>
+          <div class="best-day-date best-day-title"><span class="best-day-rank">${i+1}</span>${formatPollDate(key)}${heat.level==="all"?'<span class="best-day-badge">★ Alle können</span>':""}</div>
+          <div class="best-day-people">${count} von ${heat.total} · ${availabilityPeopleForDate(key).map(escapeHtml).join(", ")}</div>
+          <div class="best-day-bar" aria-hidden="true"><span style="width:${pct}%"></span></div>
         </div>
         <button type="button" onclick="adoptBestDay('${key}')">Diesen Termin übernehmen</button>
-      </div>`).join("")
+      </div>`;}).join("")
     : '<span class="helper-text">Sobald Rückmeldungen vorhanden sind, erscheinen hier die besten Tage.</span>';
 }
 
