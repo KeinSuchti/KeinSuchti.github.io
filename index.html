@@ -4935,7 +4935,20 @@ button.yugioh-image-placeholder:hover{border-color:rgba(101,226,215,.7);color:#d
 .yugioh-skeleton{height:118px;border-radius:16px;background:linear-gradient(100deg,rgba(28,46,69,.5) 30%,rgba(60,90,130,.35) 50%,rgba(28,46,69,.5) 70%);background-size:220% 100%;animation:yShimmer 1.3s linear infinite}
 @keyframes yShimmer{from{background-position:120% 0}to{background-position:-120% 0}}
 @media(max-width:760px){.yugioh-add-form{grid-template-columns:1fr 1fr}.yugioh-add-form #newYugiohTheme,.yugioh-add-form button{grid-column:1/-1}.yugioh-sort{flex:1 1 auto}.yugioh-deck-main{flex-direction:column}.yugioh-image-wrapper{width:100%}.yugioh-actions button{flex:1 1 auto;min-height:42px}.yugioh-actions .yugioh-delete-button{margin-left:0}}
+/* ===== Zahlen-Stepper (Spieleranzahl) ===== */
+.player-count-field{display:grid;gap:6px;margin-bottom:12px}
+.player-count-field>label{color:#9db1cd;font-size:13px;font-weight:700}
+.number-stepper{display:inline-grid;grid-template-columns:48px minmax(64px,88px) 48px;align-items:stretch;width:max-content;max-width:100%;border:1px solid rgba(101,141,207,.32);border-radius:14px;background:rgba(14,28,46,.8);overflow:hidden}
+.number-stepper:focus-within{border-color:rgba(101,226,215,.7);box-shadow:0 0 0 3px rgba(101,226,215,.16)}
+.number-stepper input{width:100%!important;min-width:0;margin:0!important;border:0!important;border-left:1px solid rgba(101,141,207,.2)!important;border-right:1px solid rgba(101,141,207,.2)!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;text-align:center;font-size:18px!important;font-weight:800;font-variant-numeric:tabular-nums;-moz-appearance:textfield;appearance:textfield}
+.number-stepper input::-webkit-outer-spin-button,.number-stepper input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.number-stepper .stepper-btn{width:auto!important;min-height:48px;margin:0!important;padding:0!important;border:0!important;border-radius:0!important;background:rgba(28,46,69,.72)!important;color:#d8fff9!important;font-size:24px;font-weight:700;line-height:1;user-select:none}
+.number-stepper .stepper-btn:hover:not(:disabled){background:rgba(34,121,123,.42)!important}
+.number-stepper .stepper-btn:active:not(:disabled){transform:none;background:rgba(34,121,123,.6)!important}
+.number-stepper .stepper-btn:disabled{opacity:.35}
+@media(max-width:520px){.number-stepper{grid-template-columns:56px minmax(72px,1fr) 56px;width:100%}.number-stepper .stepper-btn{min-height:52px;font-size:26px}}
 </style>
+
 
 
 
@@ -5233,15 +5246,14 @@ body.app-scene .skip-link:focus{left:12px}
 
       <details class="yugioh-player-panel">
         <summary>🎲 Decks zufällig zuteilen <span class="yugioh-summary-hint">Spieler eintragen &amp; Decks verlosen</span></summary>
-        <input
-          id="yugiohPlayerCount"
-          type="number"
-          min="1"
-          max="20"
-          value="2"
-          placeholder="Anzahl Spieler"
-          onchange="renderYugiohPlayerInputs()"
-        >
+        <div class="player-count-field">
+          <label for="yugiohPlayerCount">Anzahl Spieler</label>
+          <div class="number-stepper" role="group" aria-label="Anzahl Spieler">
+            <button type="button" id="yugiohPlayerMinus" class="stepper-btn" aria-label="Einen Spieler weniger" onclick="stepYugiohPlayers(-1)">−</button>
+            <input id="yugiohPlayerCount" type="number" inputmode="numeric" min="1" max="20" value="2" placeholder="2" onchange="renderYugiohPlayerInputs()" oninput="syncYugiohStepper()">
+            <button type="button" id="yugiohPlayerPlus" class="stepper-btn" aria-label="Einen Spieler mehr" onclick="stepYugiohPlayers(1)">+</button>
+          </div>
+        </div>
 
         <div id="yugiohPlayerInputs" class="yugioh-player-grid"></div>
 
@@ -10829,7 +10841,20 @@ function parseYugiohPlayerCount() {
   return Math.min(Math.floor(value), 20);
 }
 
+function syncYugiohStepper(){
+  const v=parseYugiohPlayerCount();
+  const minus=document.getElementById("yugiohPlayerMinus"),plus=document.getElementById("yugiohPlayerPlus");
+  if(minus)minus.disabled=v<=1;
+  if(plus)plus.disabled=v>=20;
+}
+function stepYugiohPlayers(delta){
+  yugiohPlayerCountInput.value=Math.min(20,Math.max(1,parseYugiohPlayerCount()+delta));
+  syncYugiohStepper();
+  renderYugiohPlayerInputs();
+}
+
 function renderYugiohPlayerInputs() {
+  syncYugiohStepper();
   const count = parseYugiohPlayerCount();
 
   yugiohPlayerCountInput.value = count;
