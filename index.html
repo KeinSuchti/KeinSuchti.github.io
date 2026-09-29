@@ -4797,6 +4797,36 @@ html.duel-open, html.duel-open body { overflow:hidden; }
   .duel-life-number { font-size:clamp(48px,22vw,96px); }
 }
 @media (prefers-reduced-motion:reduce) { .calculator-box { animation:none; } }
+/* ===== Lokaler Termin-Testmodus / UX-Überarbeitung ===== */
+.appointment-tabs{display:flex;gap:6px;padding:5px;margin:0 auto 18px;max-width:920px;border:1px solid rgba(101,141,207,.22);border-radius:14px;background:rgba(8,24,45,.72)}
+.appointment-tab{flex:1;min-height:46px;border:0!important;border-radius:10px!important;background:transparent!important;color:#9eb2cc!important;font-weight:800;cursor:pointer}
+.appointment-tab.is-active{background:linear-gradient(135deg,rgba(67,113,142,.9),rgba(81,69,140,.9))!important;color:#fff!important;box-shadow:0 6px 18px rgba(0,0,0,.18)}
+.appointment-step{max-width:920px;margin:0 auto}.appointment-step[hidden]{display:none!important}
+.step-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin:0 0 12px}.step-heading h3,.section-inline-heading h3{margin:2px 0 4px;color:#f0f5ff}
+.local-only-badge{padding:7px 10px;border:1px solid rgba(101,226,215,.22);border-radius:999px;color:#78dfd4;font-size:12px;font-weight:800;white-space:nowrap}
+.calendar-nav-button{width:44px!important;height:44px!important;min-width:44px!important;border-radius:12px!important}
+.calendar-day{min-height:46px!important;position:relative;display:grid;place-items:center;gap:0;border-radius:12px!important}
+.calendar-day:focus-visible,.appointment-tab:focus-visible,.time-chip:focus-visible{outline:3px solid rgba(101,226,215,.7);outline-offset:2px}
+.calendar-day.is-today{box-shadow:inset 0 0 0 2px rgba(151,169,194,.7)!important}
+.calendar-day.selected{border-color:#71e4d9!important;box-shadow:0 0 0 2px rgba(113,228,217,.7)!important;background:rgba(54,102,110,.55)!important}
+.calendar-day.is-appointment{border-color:#a68cff!important;background:rgba(102,73,154,.28)!important}
+.calendar-day.is-appointment::after{content:"✓";position:absolute;top:3px;right:5px;color:#c6b6ff;font-size:11px;font-weight:900}
+.calendar-day.heat-1{background:rgba(101,226,215,.12)!important}.calendar-day.heat-2{background:rgba(101,226,215,.20)!important}.calendar-day.heat-3{background:rgba(101,226,215,.30)!important}.calendar-day.heat-4{background:rgba(101,226,215,.42)!important}
+.calendar-day-count{position:absolute;right:5px;bottom:3px;font-size:9px;font-weight:900;color:#d8fff9}
+.calendar-day.common::before{content:"";position:absolute;left:5px;top:5px;width:6px;height:6px;border-radius:50%;background:#71e4d9}
+.calendar-legend{display:flex;flex-wrap:wrap;gap:8px 14px;margin-top:12px;color:#9eb2cc;font-size:12px}.calendar-legend span{display:inline-flex;align-items:center;gap:6px}.calendar-legend i{display:inline-grid;place-items:center;font-style:normal;width:15px;height:15px}.legend-ring{border:2px solid #71e4d9;border-radius:50%}.legend-dot{border-radius:50%;background:#9ba9bd}.legend-check{color:#c6b6ff;font-weight:900}.legend-heat{border-radius:4px;background:rgba(101,226,215,.28)}
+.availability-day-details{display:grid;gap:3px;margin-top:13px;padding:12px;border:1px solid rgba(101,141,207,.16);border-radius:12px;background:rgba(16,31,51,.56);font-size:12px}.availability-day-details strong{color:#edf4ff}.availability-day-details span{color:#9eb2cc}
+.field-caption{color:#c7d4e8;font-size:13px;font-weight:800;margin-bottom:7px}.time-picker{display:grid;gap:7px}.time-chips{display:flex;flex-wrap:wrap;gap:7px}.time-chip{width:auto!important;margin:0!important;min-height:42px;padding:8px 14px!important;border-radius:999px!important;border:1px solid rgba(101,141,207,.25)!important;background:rgba(28,46,69,.72)!important;color:#cbd8ea!important;font-weight:800}.time-chip.is-active{border-color:rgba(101,226,215,.7)!important;background:rgba(43,102,101,.55)!important;color:#efffff!important}
+.free-time{display:grid;grid-template-columns:1fr auto;align-items:center;gap:10px;color:#9eb2cc;font-size:12px}.free-time input{max-width:130px}.helper-text{margin:0;color:#9eb2cc;font-size:13px;line-height:1.45}
+.poll-selected-dates{display:flex;flex-wrap:wrap;gap:7px;min-height:42px;margin-top:0}.poll-date-chip{display:inline-flex;align-items:center;gap:6px;padding:7px 9px;border:1px solid rgba(101,226,215,.25);border-radius:999px;background:rgba(43,77,83,.4);color:#e9fffc;font-size:12px}.poll-date-chip button{width:28px!important;height:28px!important;padding:0!important;margin:0!important;border-radius:50%!important}
+.appointment-status{min-height:0!important;margin:0!important;padding:11px 12px;border-radius:10px;font-size:13px;line-height:1.45;background:rgba(101,141,207,.10);color:#bcd0e8}.appointment-status:empty{display:none}.appointment-status.status-success{background:rgba(55,170,118,.15);border:1px solid rgba(92,218,155,.28);color:#9ff1c7}.appointment-status.status-error{background:rgba(205,67,67,.15);border:1px solid rgba(255,118,118,.28);color:#ffb0aa}
+.best-days-card,.saved-appointment-card{margin-top:16px;padding:16px;border:1px solid rgba(101,141,207,.22);border-radius:16px;background:rgba(8,24,45,.64)}.section-inline-heading{display:flex;justify-content:space-between;gap:12px;align-items:center}.best-days-list{display:grid;gap:8px;margin-top:10px}.best-day-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:11px 12px;border:1px solid rgba(101,141,207,.15);border-radius:12px;background:rgba(22,40,62,.58)}.best-day-info{display:grid;gap:2px}.best-day-date{color:#eef5ff;font-weight:800}.best-day-people{color:#9eb2cc;font-size:12px}.best-day-row button{width:auto;margin:0;padding:9px 11px;font-size:12px}
+.saved-appointment-card{margin-top:12px;background:linear-gradient(135deg,rgba(45,67,104,.55),rgba(35,78,79,.35));border-color:rgba(101,226,215,.3)}.saved-appointment-main{display:grid;gap:5px}.saved-appointment-title{font-size:17px;font-weight:800;color:#f2f7ff}.saved-appointment-meta{color:#b9d0e8;font-size:13px}.saved-appointment-actions{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}.saved-appointment-actions button{width:auto;margin:0}
+.inline-confirm{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:10px;padding:10px;border-radius:10px;background:rgba(115,35,43,.22);border:1px solid rgba(255,115,115,.24);color:#ffd3d0;font-size:13px}.inline-confirm button{width:auto;margin:0;padding:7px 10px;font-size:12px}
+.availability-summary{margin-top:16px;padding:16px;border:1px solid rgba(101,141,207,.22);border-radius:16px;background:rgba(8,24,45,.64)}.availability-entry{padding:12px 0;border-bottom:1px solid rgba(101,141,207,.12)}.availability-entry:last-child{border-bottom:0}.availability-entry-name{color:#eef5ff;font-weight:800}.availability-entry-dates{display:flex;flex-wrap:wrap;gap:6px;margin-top:7px}.availability-entry-date{font-size:12px}
+@media(max-width:760px){.appointment-tabs{position:sticky;top:8px;z-index:50}.step-heading{display:grid}.availability-layout{gap:10px}.calendar-card,.availability-calendar-card,.appointment-form-card,.availability-form-card{padding:14px}.calendar-day{min-height:48px!important}.poll-selected-dates{margin-top:-2px}.best-day-row{grid-template-columns:1fr}.best-day-row button{width:100%}.appointment-save-button,.poll-save-button{position:sticky;bottom:10px;z-index:40;box-shadow:0 10px 28px rgba(0,0,0,.32);min-height:48px}.helper-text{font-size:13px}}
+
+
 </style>
 
 <!-- Cinematic background -->
@@ -5125,44 +5155,79 @@ body.app-scene .skip-link:focus{left:12px}
       <div class="list-panel-heading">
         <div><h2><span class="section-title-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M7 3v4m10-4v4M3 10h18m-12 4h6"></path></svg></span>Termine abstimmen</h2><p class="panel-subtitle">Gemeinsame Abende planen und den nächsten Termin festlegen.</p></div>
       </div>
-      <div class="appointment-layout">
-        <section class="calendar-card" aria-label="Kalender">
-          <div class="calendar-toolbar"><button id="calendarPreviousMonth" type="button" onclick="changeCalendarMonth(-1)" aria-label="Vorheriger Monat">‹</button><strong id="calendarMonthLabel"></strong><button type="button" onclick="changeCalendarMonth(1)" aria-label="Nächster Monat">›</button></div>
-          <div class="calendar-weekdays"><span>Mo</span><span>Di</span><span>Mi</span><span>Do</span><span>Fr</span><span>Sa</span><span>So</span></div>
-          <div id="appointmentCalendar" class="appointment-calendar"></div>
-          <p class="calendar-help">Wähle einen Tag aus. Er wird direkt in das Terminformular übernommen.</p>
-        </section>
-        <section class="appointment-form-card">
-          <div class="dashboard-kicker">Nächsten Termin festlegen</div>
-          <label class="edit-field"><span>Titel</span><input id="appointmentTitle" placeholder="z. B. Games"></label>
-          <label class="edit-field appointment-date-field"><span>Datum und Uhrzeit</span><input id="appointmentDate" type="datetime-local" autocomplete="off" aria-label="Datum und Uhrzeit" placeholder="Datum und Uhrzeit auswählen"></label>
-          <label class="edit-field"><span>Ort</span><input id="appointmentLocation" placeholder="z. B. Bei Anna, Café oder online"></label>
-          <label class="edit-field"><span>Freitext / Notiz</span><textarea id="appointmentNote" rows="3" placeholder="Was soll mitgebracht werden? Wer kommt mit?"></textarea></label>
-          <button class="appointment-save-button" type="button" onclick="saveNextAppointment()">📅 Nächsten Termin festlegen</button>
-          <p id="appointmentStatus" class="appointment-status" role="status"></p>
-          <div id="nextAppointmentSummary" class="availability-summary" hidden>
-            <div class="dashboard-kicker">Bisher eingetragen</div>
-            <div id="nextAppointmentEntry" class="availability-entries"></div>
-          </div>
-        </section>
+      <div class="appointment-tabs" role="tablist" aria-label="Terminplanung">
+        <button type="button" class="appointment-tab is-active" id="availabilityTab" role="tab" aria-selected="true" aria-controls="availabilityStep" onclick="switchAppointmentStep('availability')">Verfügbarkeit</button>
+        <button type="button" class="appointment-tab" id="appointmentTab" role="tab" aria-selected="false" aria-controls="appointmentStep" onclick="switchAppointmentStep('appointment')">Termin festlegen</button>
       </div>
-      <section class="appointment-poll-card" aria-label="Termin-Umfrage">
-        <div class="dashboard-kicker">Verfügbarkeit eintragen</div>
-        <h3>Wann kannst du?</h3>
-        <p class="panel-subtitle">Jede Person trägt ihren Namen ein und markiert beliebig viele Tage. Die Einträge aller Personen werden gesammelt angezeigt.</p>
+
+      <section id="availabilityStep" class="appointment-step is-active" role="tabpanel" aria-labelledby="availabilityTab">
+        <div class="step-heading"><div><div class="dashboard-kicker">Schritt 1</div><h3>Wann kannst du?</h3><p class="panel-subtitle">Markiere deine möglichen Tage und Zeiten. Die Auswahl wird nur auf diesem Gerät gespeichert.</p></div><div class="local-only-badge">● Nur dieses Gerät</div></div>
         <div class="availability-layout">
           <section class="availability-calendar-card" aria-label="Verfügbarkeitskalender">
-            <div class="calendar-toolbar poll-calendar-toolbar"><button id="pollPreviousMonth" type="button" onclick="changePollMonth(-1)" aria-label="Vorheriger Monat">‹</button><strong id="pollCalendarMonthLabel"></strong><button type="button" onclick="changePollMonth(1)" aria-label="Nächster Monat">›</button></div>
+            <div class="calendar-toolbar poll-calendar-toolbar"><button id="pollPreviousMonth" class="calendar-nav-button" type="button" onclick="changePollMonth(-1)" aria-label="Vorheriger Monat">‹</button><strong id="pollCalendarMonthLabel"></strong><button class="calendar-nav-button" type="button" onclick="changePollMonth(1)" aria-label="Nächster Monat">›</button></div>
             <div class="calendar-weekdays"><span>Mo</span><span>Di</span><span>Mi</span><span>Do</span><span>Fr</span><span>Sa</span><span>So</span></div>
             <div id="pollCalendar" class="appointment-calendar"></div>
-            <div id="availabilityCommonLegend" class="availability-common-legend" hidden><span class="availability-common-dot"></span><span>Markiert: mindestens zwei Personen können an diesem Tag.</span></div>
+            <div class="calendar-legend"><span><i class="legend-ring"></i> Auswahl</span><span><i class="legend-dot"></i> Heute</span><span><i class="legend-check">✓</i> Termin</span><span><i class="legend-heat"></i> Zusagen</span></div>
+            <div id="availabilityDayDetails" class="availability-day-details" aria-live="polite"><strong>Tag auswählen</strong><span>Tippe auf einen Tag, um zu sehen, wer verfügbar ist.</span></div>
           </section>
           <section class="availability-form-card" aria-label="Verfügbarkeit eintragen">
-            <div class="poll-form-row"><label class="edit-field"><span>Dein Name</span><input id="pollName" placeholder="z. B. Anna"></label></div>
+            <label class="edit-field"><span>Dein Name</span><input id="pollName" placeholder="z. B. Anna" autocomplete="name" value="Gast"></label>
+            <div class="time-picker">
+              <div class="field-caption">Uhrzeit</div>
+              <div id="pollTimeChips" class="time-chips" role="group" aria-label="Uhrzeit auswählen">
+                <button type="button" class="time-chip" data-time="18:00" onclick="setPollTime('18:00')">18:00</button>
+                <button type="button" class="time-chip is-active" data-time="19:00" onclick="setPollTime('19:00')">19:00</button>
+                <button type="button" class="time-chip" data-time="20:00" onclick="setPollTime('20:00')">20:00</button>
+              </div>
+              <label class="free-time"><span>Andere Uhrzeit</span><input id="pollCustomTime" type="time" value="19:00" onchange="setPollTime(this.value)"></label>
+              <p class="helper-text">Standard: 19:00 Uhr</p>
+            </div>
             <div id="pollSelectedDates" class="poll-selected-dates" aria-live="polite"></div>
             <button class="poll-save-button" type="button" onclick="saveAppointmentPoll()">✅ Meine Verfügbarkeit speichern</button>
-            <p id="pollStatus" class="appointment-status" role="status"></p>
-            <div class="availability-summary"><div class="dashboard-kicker">Bisher eingetragen</div><div id="availabilityEntries" class="availability-entries"><span class="panel-subtitle">Noch keine Einträge vorhanden.</span></div></div>
+            <div id="pollStatus" class="appointment-status" role="status" aria-live="polite"></div>
+          </section>
+        </div>
+        <section class="best-days-card" aria-labelledby="bestDaysTitle">
+          <div class="section-inline-heading"><div><div class="dashboard-kicker">Auswertung</div><h3 id="bestDaysTitle">Beste Tage</h3></div><span class="helper-text">Nach Anzahl der Zusagen sortiert</span></div>
+          <div id="bestDaysList" class="best-days-list"></div>
+        </section>
+        <section class="availability-summary" aria-labelledby="availabilityEntriesTitle">
+          <div class="section-inline-heading"><div><div class="dashboard-kicker">Rückmeldungen</div><h3 id="availabilityEntriesTitle">Wer kann?</h3></div></div>
+          <div id="availabilityEntries" class="availability-entries"><span class="panel-subtitle">Noch keine Einträge vorhanden.</span></div>
+        </section>
+      </section>
+
+      <section id="appointmentStep" class="appointment-step" role="tabpanel" aria-labelledby="appointmentTab" hidden>
+        <div class="step-heading"><div><div class="dashboard-kicker">Schritt 2</div><h3>Termin festlegen</h3><p class="panel-subtitle">Übernimm einen der besten Tage oder wähle einen anderen Termin.</p></div><div class="local-only-badge">● Nur dieses Gerät</div></div>
+        <div class="appointment-layout">
+          <section class="calendar-card" aria-label="Kalender zur Terminwahl">
+            <div class="calendar-toolbar"><button id="calendarPreviousMonth" class="calendar-nav-button" type="button" onclick="changeCalendarMonth(-1)" aria-label="Vorheriger Monat">‹</button><strong id="calendarMonthLabel"></strong><button class="calendar-nav-button" type="button" onclick="changeCalendarMonth(1)" aria-label="Nächster Monat">›</button></div>
+            <div class="calendar-weekdays"><span>Mo</span><span>Di</span><span>Mi</span><span>Do</span><span>Fr</span><span>Sa</span><span>So</span></div>
+            <div id="appointmentCalendar" class="appointment-calendar"></div>
+            <div class="calendar-legend"><span><i class="legend-ring"></i> Auswahl</span><span><i class="legend-dot"></i> Heute</span><span><i class="legend-check">✓</i> Bestehender Termin</span></div>
+          </section>
+          <section class="appointment-form-card">
+            <label class="edit-field"><span>Titel</span><input id="appointmentTitle" placeholder="z. B. Games"></label>
+            <div class="time-picker">
+              <div class="field-caption">Uhrzeit</div>
+              <div id="appointmentTimeChips" class="time-chips" role="group" aria-label="Uhrzeit auswählen">
+                <button type="button" class="time-chip" data-time="18:00" onclick="setAppointmentTime('18:00')">18:00</button>
+                <button type="button" class="time-chip is-active" data-time="19:00" onclick="setAppointmentTime('19:00')">19:00</button>
+                <button type="button" class="time-chip" data-time="20:00" onclick="setAppointmentTime('20:00')">20:00</button>
+              </div>
+              <label class="free-time"><span>Andere Uhrzeit</span><input id="appointmentCustomTime" type="time" value="19:00" onchange="setAppointmentTime(this.value)"></label>
+            </div>
+            <label class="edit-field"><span>Ort</span><input id="appointmentLocation" placeholder="z. B. Bei Anna, Café oder online"></label>
+            <label class="edit-field"><span>Freitext / Notiz</span><textarea id="appointmentNote" rows="3" placeholder="Was soll mitgebracht werden? Wer kommt mit?"></textarea></label>
+            <button class="appointment-save-button" type="button" onclick="saveNextAppointment()">📅 Nächsten Termin speichern</button>
+            <div id="appointmentStatus" class="appointment-status" role="status" aria-live="polite"></div>
+            <div id="nextAppointmentSummary" class="saved-appointment-card" hidden>
+              <div class="dashboard-kicker">Aktueller Termin</div>
+              <div id="nextAppointmentEntry"></div>
+            </div>
+            <div id="appointmentDeleteConfirm" class="inline-confirm" hidden>
+              <span>Termin wirklich entfernen?</span><button type="button" onclick="confirmClearAppointment()">Entfernen</button><button type="button" onclick="cancelClearAppointment()">Abbrechen</button>
+            </div>
           </section>
         </div>
       </section>
@@ -5494,7 +5559,6 @@ body.app-scene .skip-link:focus{left:12px}
     </div>
   </div>
 </div>
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const supabaseUrl = "https://tqxyofqzlflnpfomslky.supabase.co";
@@ -7839,373 +7903,149 @@ function renderSavedAppointment() {
   entryHost.appendChild(entry);
 }
 function tickAppointmentCountdown() { if (currentView === "menu") renderNextAppointment(); }
-async function loadNextAppointment() {
-  if (!currentUser) return;
-  const { data, error } = await supabaseClient.from("shared_events").select("id,title,start_at,location,note,user_id").eq("user_id", currentUser.id).gte("start_at", new Date().toISOString()).order("start_at", { ascending:true }).limit(1);
-  if (!error) {
-    nextAppointment = data?.[0] || null;
-  } else {
-    try { nextAppointment = JSON.parse(localStorage.getItem(appointmentStorageKey()) || "null"); } catch (_) { nextAppointment = null; }
-  }
-  renderNextAppointment();
-  renderSavedAppointment();
+async function appointmentStorageKey() { return "wfg-local-next-appointment"; }
+function formatAppointmentDate(value, withTime = true) {
+  if (!value) return "";
+  const date = new Date(value);
+  return new Intl.DateTimeFormat("de-DE", { weekday:"long", day:"2-digit", month:"long", year:"numeric", ...(withTime ? { hour:"2-digit", minute:"2-digit" } : {}) }).format(date);
+}
+function appointmentCountdown(value) {
+  const diff = new Date(value).getTime() - Date.now();
+  if (diff <= 0) return "Heute";
+  const totalSeconds = Math.floor(diff / 1000), days = Math.floor(totalSeconds/86400), hours=Math.floor((totalSeconds%86400)/3600), minutes=Math.floor((totalSeconds%3600)/60), seconds=totalSeconds%60;
+  return `In ${days} ${days===1?"Tag":"Tagen"}, ${String(hours).padStart(2,"0")} Std., ${String(minutes).padStart(2,"0")} Min., ${String(seconds).padStart(2,"0")} Sek.`;
+}
+function renderNextAppointment() {
+  if (!nextAppointment || !nextAppointment.start_at || new Date(nextAppointment.start_at) < new Date()) { nextAppointmentBanner.hidden=true; return; }
+  nextAppointmentBanner.hidden=false;
+  nextAppointmentBanner.innerHTML=`<div class="appointment-banner-grid"><div class="appointment-banner-icon">◷</div><div class="appointment-banner-copy"><div class="appointment-banner-kicker">Nächster gemeinsamer Termin</div><div class="appointment-banner-countdown">${escapeHtml(nextAppointment.title||"Gemeinsamer Termin")} · ${appointmentCountdown(nextAppointment.start_at)}</div><div class="appointment-banner-meta"><span>📅 ${formatAppointmentDate(nextAppointment.start_at)}</span>${nextAppointment.location?`<span>⌖ ${escapeHtml(nextAppointment.location)}</span>`:""}</div></div></div>`;
+}
+function renderSavedAppointment() {
+  const summary=document.getElementById("nextAppointmentSummary"), host=document.getElementById("nextAppointmentEntry"); if(!summary||!host)return;
+  host.replaceChildren();
+  if(!nextAppointment){summary.hidden=true;return;}
+  summary.hidden=false;
+  host.innerHTML=`<div class="saved-appointment-main"><div class="saved-appointment-title">${escapeHtml(nextAppointment.title||"Gemeinsamer Termin")}</div><div class="saved-appointment-meta">📅 ${escapeHtml(formatAppointmentDate(nextAppointment.start_at))}</div>${nextAppointment.location?`<div class="saved-appointment-meta">⌖ ${escapeHtml(nextAppointment.location)}</div>`:""}${nextAppointment.note?`<div class="saved-appointment-meta">${escapeHtml(nextAppointment.note)}</div>`:""}<div class="saved-appointment-actions"><button type="button" onclick="editSavedAppointment()">Ändern</button><button type="button" class="danger-button" onclick="requestClearAppointment()">Termin entfernen</button></div></div>`;
+}
+function tickAppointmentCountdown(){renderNextAppointment();}
+function loadNextAppointment(){
+  try{nextAppointment=JSON.parse(localStorage.getItem(appointmentStorageKey())||"null")}catch(_){nextAppointment=null}
+  renderNextAppointment(); renderSavedAppointment(); renderAppointmentCalendar(); loadAppointmentPoll();
+}
+function fillAppointmentFormFromCurrent(){if(!nextAppointment)return;document.getElementById("appointmentTitle").value=nextAppointment.title||"";setAppointmentDateValue(toDateTimeLocal(nextAppointment.start_at));document.getElementById("appointmentLocation").value=nextAppointment.location||"";document.getElementById("appointmentNote").value=nextAppointment.note||"";setAppointmentTime(toDateTimeLocal(nextAppointment.start_at).slice(11,16));}
+function setAppointmentDateValue(localValue){const input=document.getElementById("appointmentDate");if(input)input.value=localValue||""}
+function toDateTimeLocal(value){const d=new Date(value);if(Number.isNaN(d.getTime()))return"";const pad=n=>String(n).padStart(2,"0");return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`}
+function setAppointmentTime(time){
+  if(!time)return; const chipHost=document.getElementById("appointmentTimeChips"); if(chipHost)chipHost.querySelectorAll(".time-chip").forEach(b=>b.classList.toggle("is-active",b.dataset.time===time));
+  const custom=document.getElementById("appointmentCustomTime"); if(custom)custom.value=time;
+  const dateInput=document.getElementById("appointmentDate"); if(dateInput?.value)dateInput.value=dateInput.value.slice(0,11)+time;
   renderAppointmentCalendar();
-  if (nextAppointment) fillAppointmentFormFromCurrent(); else setAppointmentDateValue(document.getElementById("appointmentDate")?.value || "");
-  loadAppointmentPoll();
 }
-function fillAppointmentFormFromCurrent() {
-  if (!nextAppointment) return;
-  document.getElementById("appointmentTitle").value = nextAppointment.title || "";
-  setAppointmentDateValue(toDateTimeLocal(nextAppointment.start_at));
-  document.getElementById("appointmentLocation").value = nextAppointment.location || "";
-  document.getElementById("appointmentNote").value = nextAppointment.note || "";
+function changeCalendarMonth(delta){const target=new Date(calendarCursor.getFullYear(),calendarCursor.getMonth()+delta,1);if(target<currentMonthStart())return;calendarCursor=target;renderAppointmentCalendar()}
+function selectCalendarDate(day){
+  const date=new Date(calendarCursor.getFullYear(),calendarCursor.getMonth(),day), today=new Date(); if(date<new Date(today.getFullYear(),today.getMonth(),today.getDate()))return;
+  const time=document.getElementById("appointmentCustomTime")?.value||"19:00"; setAppointmentDateValue(`${pollDateKey(date)}T${time}`); renderAppointmentCalendar(day);
 }
-function setAppointmentDateValue(localValue) {
-  const input=document.getElementById("appointmentDate");
-  if (!input) return;
-  input.value=localValue || "";
-}
-function toDateTimeLocal(value) {
-  const d = new Date(value); if (Number.isNaN(d.getTime())) return "";
-  const pad = n => String(n).padStart(2,"0");
-  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
-}
-function currentMonthStart() { const today = new Date(); return new Date(today.getFullYear(), today.getMonth(), 1); }
-function todayDateKey() { return pollDateKey(new Date()); }
-function changeCalendarMonth(delta) {
-  const targetMonth = new Date(calendarCursor.getFullYear(), calendarCursor.getMonth()+delta, 1);
-  if (targetMonth < currentMonthStart()) return;
-  calendarCursor = targetMonth;
-  renderAppointmentCalendar();
-}
-function selectCalendarDate(day) {
-  const d = new Date(calendarCursor.getFullYear(), calendarCursor.getMonth(), day, 19, 0, 0);
-  const today = new Date();
-  if (d.getFullYear() === today.getFullYear() && d.getMonth() === today.getMonth() && d.getDate() === today.getDate() && d <= today) {
-    d.setTime(today.getTime() + 60_000);
-  }
-  if (d < new Date(today.getFullYear(), today.getMonth(), today.getDate())) return;
-  setAppointmentDateValue(toDateTimeLocal(d.toISOString()));
-  renderAppointmentCalendar(day);
-}
-function renderAppointmentCalendar(selectedDay) {
-  const grid = document.getElementById("appointmentCalendar"), label = document.getElementById("calendarMonthLabel");
-  if (!grid || !label) return;
-  const minimumMonth = currentMonthStart();
-  if (calendarCursor < minimumMonth) calendarCursor = minimumMonth;
-  const dateInput = document.getElementById("appointmentDate");
-  const previousMonthButton = document.getElementById("calendarPreviousMonth");
-  if (previousMonthButton) previousMonthButton.disabled = calendarCursor <= minimumMonth;
-  const year=calendarCursor.getFullYear(), month=calendarCursor.getMonth(), first=new Date(year,month,1), last=new Date(year,month+1,0);
-  label.textContent = new Intl.DateTimeFormat("de-DE", {month:"long", year:"numeric"}).format(first);
-  const offset=(first.getDay()+6)%7, selected=selectedDay || (nextAppointment ? new Date(nextAppointment.start_at).getMonth()===month && new Date(nextAppointment.start_at).getFullYear()===year && new Date(nextAppointment.start_at) >= new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate()) ? new Date(nextAppointment.start_at).getDate() : 0 : 0), today=new Date();
-  grid.innerHTML="";
-  for(let i=0;i<offset;i++){const empty=document.createElement("span");empty.className="calendar-day is-empty";grid.appendChild(empty);}
+function renderAppointmentCalendar(selectedDay){
+  const grid=document.getElementById("appointmentCalendar"),label=document.getElementById("calendarMonthLabel");if(!grid||!label)return;
+  const min=currentMonthStart();if(calendarCursor<min)calendarCursor=min;
+  const y=calendarCursor.getFullYear(),m=calendarCursor.getMonth(),first=new Date(y,m,1),last=new Date(y,m+1,0),today=new Date(), selectedKey=document.getElementById("appointmentDate")?.value?.slice(0,10)||"";
+  label.textContent=new Intl.DateTimeFormat("de-DE",{month:"long",year:"numeric"}).format(first);grid.innerHTML="";
+  document.getElementById("calendarPreviousMonth").disabled=calendarCursor<=min;
+  const offset=(first.getDay()+6)%7;for(let i=0;i<offset;i++){const e=document.createElement("span");e.className="calendar-day is-empty";grid.appendChild(e)}
   for(let day=1;day<=last.getDate();day++){
-    const button=document.createElement("button");button.type="button";button.className="calendar-day";button.textContent=day;
-    const date = new Date(year, month, day);
-    if (date < new Date(today.getFullYear(), today.getMonth(), today.getDate())) {
-      button.disabled = true;
-      button.title = "Vergangene Tage sind nicht auswählbar";
-    }
-    if(day===today.getDate()&&month===today.getMonth()&&year===today.getFullYear())button.classList.add("is-today");
-    if(day===selected)button.classList.add("selected");
-    button.onclick=()=>selectCalendarDate(day);grid.appendChild(button);
+    const d=new Date(y,m,day),key=pollDateKey(d),b=document.createElement("button");b.type="button";b.className="calendar-day";b.textContent=day;
+    const full=new Intl.DateTimeFormat("de-DE",{weekday:"long",day:"numeric",month:"long",year:"numeric"}).format(d);b.setAttribute("aria-label",full);b.setAttribute("aria-pressed",key===selectedKey?"true":"false");
+    if(d<new Date(today.getFullYear(),today.getMonth(),today.getDate()))b.disabled=true;
+    if(d.toDateString()===today.toDateString())b.classList.add("is-today");
+    if(key===selectedKey)b.classList.add("selected");
+    if(nextAppointment?.start_at?.slice(0,10)===key)b.classList.add("is-appointment");
+    b.onclick=()=>selectCalendarDate(day);grid.appendChild(b)
   }
 }
-async function saveNextAppointment() {
-  const title = document.getElementById("appointmentTitle").value.trim() || "Gemeinsamer Termin";
-  const dateInput = document.getElementById("appointmentDate");
-  const raw = dateInput.value;
-  const locationInput = document.getElementById("appointmentLocation");
-  const noteInput = document.getElementById("appointmentNote");
-  const status = document.getElementById("appointmentStatus");
-  const button = document.querySelector(".appointment-save-button");
-  if (!raw) { status.textContent = "Bitte zuerst ein Datum auswählen."; return; }
-  const startAt = new Date(raw);
-  if (Number.isNaN(startAt.getTime()) || startAt <= new Date()) {
-    status.textContent = "Bitte einen Termin in der Zukunft wählen.";
-    return;
-  }
-
-  const payload = {
-    title,
-    start_at: startAt.toISOString(),
-    location: locationInput.value.trim(),
-    note: noteInput.value.trim(),
-    user_id: currentUser.id
-  };
-  button.disabled = true;
-  status.textContent = "Termin wird gespeichert …";
-  try {
-    const { data, error } = await supabaseClient.from("shared_events")
-      .upsert(payload, { onConflict: "user_id" }).select().single();
-    if (error) {
-      nextAppointment = { ...payload, id: "local-preview" };
-      localStorage.setItem(appointmentStorageKey(), JSON.stringify(nextAppointment));
-      status.textContent = "Lokal gespeichert. Für gemeinsame Synchronisierung bitte das SQL-Schema ausführen.";
-    } else {
-      nextAppointment = data;
-      localStorage.removeItem(appointmentStorageKey());
-      status.textContent = "Termin gespeichert und auf der Übersicht aktiviert.";
-    }
-    document.getElementById("appointmentTitle").value = "";
-    dateInput.value = "";
-    locationInput.value = "";
-    noteInput.value = "";
-    renderNextAppointment();
-    renderSavedAppointment();
-    renderAppointmentCalendar(new Date(startAt).getDate());
-  } finally {
-    button.disabled = false;
-  }
+async function saveNextAppointment(){
+  const title=document.getElementById("appointmentTitle").value.trim()||"Gemeinsamer Termin", raw=document.getElementById("appointmentDate").value, location=document.getElementById("appointmentLocation").value.trim(), note=document.getElementById("appointmentNote").value.trim(), status=document.getElementById("appointmentStatus");
+  if(!raw){setAppointmentStatus("Bitte zuerst einen Tag auswählen.","error");return}
+  const startAt=new Date(raw);if(Number.isNaN(startAt.getTime())||startAt<=new Date()){setAppointmentStatus("Bitte einen Termin in der Zukunft wählen.","error");return}
+  nextAppointment={id:"local",title,start_at:startAt.toISOString(),location,note};localStorage.setItem(appointmentStorageKey(),JSON.stringify(nextAppointment));
+  setAppointmentStatus("Termin gespeichert – nur auf diesem Gerät.","success");renderNextAppointment();renderSavedAppointment();renderAppointmentCalendar();fillAppointmentFormFromCurrent();
 }
-async function clearNextAppointment() {
-  if(!currentUser) return;
-  if(!confirm("Den nächsten Termin wirklich entfernen?")) return;
-  const {error}=await supabaseClient.from("shared_events").delete().eq("user_id",currentUser.id);
-  localStorage.removeItem(appointmentStorageKey()); nextAppointment=null; renderNextAppointment(); renderSavedAppointment();
-  if(currentView==="appointments") document.getElementById("appointmentStatus").textContent=error ? "Lokaler Termin entfernt." : "Termin entfernt.";
+function setAppointmentStatus(text,type=""){const el=document.getElementById("appointmentStatus");if(!el)return;el.textContent=text;el.classList.toggle("status-success",type==="success");el.classList.toggle("status-error",type==="error")}
+function editSavedAppointment(){if(!nextAppointment)return;fillAppointmentFormFromCurrent();switchAppointmentStep("appointment");setAppointmentStatus("Du kannst den aktuellen Termin ändern.")}
+function requestClearAppointment(){const el=document.getElementById("appointmentDeleteConfirm");if(el)el.hidden=false}
+function cancelClearAppointment(){const el=document.getElementById("appointmentDeleteConfirm");if(el)el.hidden=true}
+function confirmClearAppointment(){localStorage.removeItem(appointmentStorageKey());nextAppointment=null;cancelClearAppointment();document.getElementById("appointmentStatus").textContent="Termin entfernt.";renderSavedAppointment();renderNextAppointment();renderAppointmentCalendar()}
+function clearNextAppointment(){requestClearAppointment()}
+function switchAppointmentStep(step){
+  const av=step==="availability", a=document.getElementById("availabilityStep"),b=document.getElementById("appointmentStep"),ta=document.getElementById("availabilityTab"),tb=document.getElementById("appointmentTab");
+  a.hidden=!av;b.hidden=av;ta.classList.toggle("is-active",av);tb.classList.toggle("is-active",!av);ta.setAttribute("aria-selected",String(av));tb.setAttribute("aria-selected",String(!av));
+  if(!av){renderAppointmentCalendar();if(nextAppointment)fillAppointmentFormFromCurrent()}
 }
 function escapeHtml(value) { return String(value).replace(/[&<>'"]/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;","\"":"&quot;"}[ch])); }
 if (!appointmentCountdownTimer) appointmentCountdownTimer=setInterval(tickAppointmentCountdown, 1000);
-/* Termin-Umfrage mit mehreren Datumsvorschlägen */
-function pollStorageKey() { return `wfg-availability:${currentUser?.id || "guest"}`; }
+/* Termin-Umfrage – vollständig lokal */
 let selectedPollTimes = {};
-function pollDateKey(date) { return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,"0")}-${String(date.getDate()).padStart(2,"0")}`; }
-function formatPollDate(key) { return new Intl.DateTimeFormat("de-DE", { weekday:"short", day:"2-digit", month:"2-digit", year:"numeric" }).format(new Date(`${key}T12:00:00`)); }
-function pollMonthValue(date, time) {
-  const d = date instanceof Date ? date : new Date(date);
-  const pad=n=>String(n).padStart(2,"0");
-  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${time || "19:00"}`;
+let selectedPollTime = "19:00";
+function pollStorageKey(){return "wfg-local-availability"}
+function pollDateKey(date){return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,"0")}-${String(date.getDate()).padStart(2,"0")}`}
+function formatPollDate(key){return new Intl.DateTimeFormat("de-DE",{weekday:"short",day:"2-digit",month:"2-digit",year:"numeric"}).format(new Date(`${key}T12:00:00`))}
+function todayDateKey(){return pollDateKey(new Date())}
+function currentMonthStart(){const d=new Date();return new Date(d.getFullYear(),d.getMonth(),1)}
+function setPollTime(time){selectedPollTime=time||"19:00";document.querySelectorAll("#pollTimeChips .time-chip").forEach(b=>b.classList.toggle("is-active",b.dataset.time===selectedPollTime));const c=document.getElementById("pollCustomTime");if(c)c.value=selectedPollTime;selectedPollDates.forEach(k=>selectedPollTimes[k]=selectedPollTime);renderSelectedPollDates()}
+function changePollMonth(delta){const t=new Date(pollCalendarCursor.getFullYear(),pollCalendarCursor.getMonth()+delta,1);if(t<currentMonthStart())return;pollCalendarCursor=t;renderPollCalendar()}
+function availabilityDateKey(value){return String(value||"").slice(0,10)}
+function availabilityDateTime(value){const d=new Date(value);return Number.isNaN(d.getTime())?null:d}
+function formatAvailabilityDate(value){const d=availabilityDateTime(value);return d?new Intl.DateTimeFormat("de-DE",{weekday:"short",day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"}).format(d)+" Uhr":formatPollDate(availabilityDateKey(value))}
+function availabilityDateCounts(){const counts={};availabilityEntries.forEach(e=>(e.dates||[]).forEach(v=>{const k=availabilityDateKey(v);counts[k]=(counts[k]||0)+1}));return counts}
+function availabilityPeopleForDate(key){return availabilityEntries.filter(e=>(e.dates||[]).some(v=>availabilityDateKey(v)===key)).map(e=>e.participant_name)}
+function togglePollDate(day){
+  const key=pollDateKey(new Date(pollCalendarCursor.getFullYear(),pollCalendarCursor.getMonth(),day));if(key<todayDateKey())return;
+  if(selectedPollDates.includes(key)){selectedPollDates=selectedPollDates.filter(x=>x!==key);delete selectedPollTimes[key]}else{selectedPollDates=[...selectedPollDates,key].sort();selectedPollTimes[key]=selectedPollTime}
+  renderPollCalendar();renderSelectedPollDates();showAvailabilityDay(key)
 }
-function formatPollMonthInput(value) {
-  if (!value) return "";
-  const d=new Date(value); if(Number.isNaN(d.getTime())) return "";
-  return new Intl.DateTimeFormat("de-DE",{day:"2-digit",month:"2-digit",year:"numeric"}).format(d)+" · "+new Intl.DateTimeFormat("de-DE",{hour:"2-digit",minute:"2-digit"}).format(d);
+function showAvailabilityDay(key){
+  const host=document.getElementById("availabilityDayDetails");if(!host)return;const people=availabilityPeopleForDate(key);host.innerHTML=`<strong>${formatPollDate(key)}</strong><span>${people.length?`${people.length} ${people.length===1?"Person kann":"Personen können"}: ${people.map(escapeHtml).join(", ")}`:"Noch keine Rückmeldungen für diesen Tag."}</span>`
 }
-function pollPickerSelectedDate() {
-  const raw=document.getElementById("pollMonth")?.dataset.value;
-  const d=raw?new Date(raw):new Date(pollCalendarCursor.getFullYear(),pollCalendarCursor.getMonth(),1,19,0,0);
-  return Number.isNaN(d.getTime())?new Date():d;
+function renderPollCalendar(){
+  const grid=document.getElementById("pollCalendar"),label=document.getElementById("pollCalendarMonthLabel");if(!grid||!label)return;const min=currentMonthStart();if(pollCalendarCursor<min)pollCalendarCursor=min;
+  const y=pollCalendarCursor.getFullYear(),m=pollCalendarCursor.getMonth(),first=new Date(y,m,1),last=new Date(y,m+1,0),today=new Date(),counts=availabilityDateCounts(),appointmentKey=nextAppointment?.start_at?.slice(0,10);
+  label.textContent=new Intl.DateTimeFormat("de-DE",{month:"long",year:"numeric"}).format(first);grid.innerHTML="";document.getElementById("pollPreviousMonth").disabled=pollCalendarCursor<=min;
+  const offset=(first.getDay()+6)%7;for(let i=0;i<offset;i++){const e=document.createElement("span");e.className="calendar-day is-empty";grid.appendChild(e)}
+  const maxCount=Math.max(1,...Object.values(counts));
+  for(let day=1;day<=last.getDate();day++){const d=new Date(y,m,day),key=pollDateKey(d),count=counts[key]||0,b=document.createElement("button");b.type="button";b.className="calendar-day";b.textContent=day;
+    b.setAttribute("aria-label",new Intl.DateTimeFormat("de-DE",{weekday:"long",day:"numeric",month:"long",year:"numeric"}).format(d));b.setAttribute("aria-pressed",selectedPollDates.includes(key)?"true":"false");
+    if(d<new Date(today.getFullYear(),today.getMonth(),today.getDate()))b.disabled=true;if(d.toDateString()===today.toDateString())b.classList.add("is-today");if(selectedPollDates.includes(key))b.classList.add("selected");if(appointmentKey===key)b.classList.add("is-appointment");
+    if(count){b.classList.add(`heat-${Math.min(4,Math.max(1,Math.ceil(count/maxCount*4)))}`);if(count>=2)b.classList.add("common");const badge=document.createElement("span");badge.className="calendar-day-count";badge.textContent=count;b.appendChild(badge)}
+    b.onclick=()=>togglePollDate(day);grid.appendChild(b)}
+  renderBestDays();renderAvailabilityDayDetailsDefault()
 }
-function pollPickerSelectionKeys() {
-  const raw=document.getElementById("pollMonthPicker")?.dataset.selected;
-  try { return raw ? JSON.parse(raw) : []; } catch (_) { return []; }
+function renderAvailabilityDayDetailsDefault(){const first=selectedPollDates[0]||Object.keys(availabilityDateCounts()).sort()[0];if(first)showAvailabilityDay(first)}
+function renderSelectedPollDates(){
+  const host=document.getElementById("pollSelectedDates");if(!host)return;host.innerHTML=selectedPollDates.length?selectedPollDates.map(k=>`<span class="poll-date-chip"><span>${formatPollDate(k)} · ${selectedPollTimes[k]||selectedPollTime} Uhr</span><button type="button" onclick="toggleSavedPollDate('${k}')" aria-label="${formatPollDate(k)} entfernen">×</button></span>`).join(""):'<span class="helper-text">Noch keine Tage ausgewählt.</span>';
+  const save=document.querySelector(".poll-save-button");if(save){save.textContent=selectedPollDates.length?`✅ ${selectedPollDates.length} Tage ausgewählt – speichern`:"✅ Meine Verfügbarkeit speichern"}
 }
-function setPollPickerSelection(keys) {
-  const picker=document.getElementById("pollMonthPicker");
-  if (picker) picker.dataset.selected=JSON.stringify([...new Set(keys)].sort());
+function toggleSavedPollDate(key){selectedPollDates=selectedPollDates.filter(x=>x!==key);delete selectedPollTimes[key];renderPollCalendar();renderSelectedPollDates()}
+function renderAvailabilityEntries(){
+  const host=document.getElementById("availabilityEntries");if(!host)return;if(!availabilityEntries.length){host.innerHTML='<span class="helper-text">Noch keine Einträge vorhanden.</span>';return}
+  host.innerHTML=availabilityEntries.map((e,i)=>`<div class="availability-entry"><div class="availability-entry-name">${escapeHtml(e.participant_name)}</div><div class="availability-entry-dates">${(e.dates||[]).sort().map(d=>`<span class="availability-entry-date">${formatAvailabilityDate(d)}</span>`).join("")}</div><button class="availability-entry-remove" type="button" onclick="removeAvailabilityEntry(${i})">Eintrag entfernen</button></div>`).join("")
 }
-function pollPickerTime() { return document.getElementById("pollPickerTime")?.value || "19:00"; }
-function setPollMonthValue(date,time) {
-  const input=document.getElementById("pollMonth"); if(!input) return;
-  const value=pollMonthValue(date,time); input.dataset.value=value; input.value=formatPollMonthInput(value);
+function renderBestDays(){
+  const host=document.getElementById("bestDaysList");if(!host)return;const counts=availabilityDateCounts(),rows=Object.entries(counts).filter(([k])=>k>=todayDateKey()).sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0])).slice(0,6);
+  host.innerHTML=rows.length?rows.map(([key,count])=>`<div class="best-day-row"><div class="best-day-info"><div class="best-day-date">${formatPollDate(key)}</div><div class="best-day-people">${count} ${count===1?"Zusage":"Zusagen"} · ${availabilityPeopleForDate(key).map(escapeHtml).join(", ")}</div></div><button type="button" onclick="adoptBestDay('${key}')">Diesen Termin übernehmen</button></div>`).join(""):'<span class="helper-text">Sobald Rückmeldungen vorhanden sind, erscheinen hier die besten Tage.</span>'
 }
-function openPollMonthPicker() {
-  const input=document.getElementById("pollMonth"), picker=document.getElementById("pollMonthPicker"); if(!input||!picker)return;
-  const d=pollPickerSelectedDate();
-  pollCalendarCursor=new Date(d.getFullYear(),d.getMonth(),1);
-  const existing=selectedPollDates.filter(key => { const x=new Date(`${key}T12:00:00`); return x.getFullYear()===pollCalendarCursor.getFullYear() && x.getMonth()===pollCalendarCursor.getMonth(); });
-  setPollPickerSelection(existing.length ? existing : [pollDateKey(d)]);
-  input.setAttribute("aria-expanded","true"); picker.hidden=false; renderPollMonthPicker();
+function adoptBestDay(key){const people=availabilityPeopleForDate(key);document.getElementById("appointmentTitle").value="Gemeinsamer Termin";setAppointmentDateValue(`${key}T${selectedPollTimes[key]||"19:00"}`);setAppointmentTime(selectedPollTimes[key]||"19:00");document.getElementById("appointmentLocation").value=people.length?`Bei ${people[0]}`:"";switchAppointmentStep("appointment");setAppointmentStatus("Vorschlag übernommen. Prüfe Uhrzeit und Ort vor dem Speichern.","success")}
+function loadAppointmentPoll(){
+  try{availabilityEntries=JSON.parse(localStorage.getItem(pollStorageKey())||"[]")}catch(_){availabilityEntries=[]}
+  const savedName=localStorage.getItem("wfg-local-name");if(savedName)document.getElementById("pollName").value=savedName;
+  setPollTime(selectedPollTime);renderPollCalendar();renderSelectedPollDates();renderAvailabilityEntries()
 }
-function closePollMonthPicker(apply=true) {
-  const input=document.getElementById("pollMonth"), picker=document.getElementById("pollMonthPicker"); if(!input||!picker)return;
-  if (apply) applyPollMonthSuggestions();
-  picker.hidden=true; input.setAttribute("aria-expanded","false");
+function saveAppointmentPoll(){
+  const name=document.getElementById("pollName").value.trim(),status=document.getElementById("pollStatus");if(!name){setPollStatus("Bitte deinen Namen eingeben.","error");return}if(!selectedPollDates.length){setPollStatus("Bitte mindestens einen möglichen Tag auswählen.","error");return}
+  const entry={participant_name:name,dates:[...selectedPollDates].sort().map(k=>`${k}T${selectedPollTimes[k]||selectedPollTime}`)};const old=availabilityEntries.findIndex(e=>e.participant_name.toLowerCase()===name.toLowerCase());if(old>=0)availabilityEntries[old]=entry;else availabilityEntries.push(entry);
+  localStorage.setItem(pollStorageKey(),JSON.stringify(availabilityEntries));localStorage.setItem("wfg-local-name",name);setPollStatus("Verfügbarkeit gespeichert – nur auf diesem Gerät.","success");selectedPollDates=[];selectedPollTimes={};renderPollCalendar();renderSelectedPollDates();renderAvailabilityEntries()
 }
-function applyPollMonthSuggestions() {
-  const keys=pollPickerSelectionKeys().filter(key => key >= todayDateKey());
-  const time=pollPickerTime();
-  const [h,min]=(time||"19:00").split(":").map(Number);
-  const timeText=`${String(Number.isFinite(h)?h:19).padStart(2,"0")}:${String(Number.isFinite(min)?min:0).padStart(2,"0")}`;
-  keys.forEach(key => { selectedPollDates = selectedPollDates.includes(key) ? selectedPollDates : [...selectedPollDates,key]; selectedPollTimes[key]=timeText; });
-  selectedPollDates=[...new Set(selectedPollDates)].sort();
-  if (keys[0]) setPollMonthValue(new Date(`${keys[0]}T12:00:00`), timeText);
-  renderPollCalendar(); renderSelectedPollDates();
-}
-function changePollMonth(delta) {
-  /* Gleiche Monatsnavigation wie im Appointment-Kalender: Der aktuelle Monat
-     ist das Minimum und der Cursor bleibt immer auf dem Monatsersten. */
-  const targetMonth = new Date(pollCalendarCursor.getFullYear(), pollCalendarCursor.getMonth()+delta, 1);
-  if (targetMonth < currentMonthStart()) return;
-  pollCalendarCursor = targetMonth;
-
-  const selected = pollPickerSelectedDate();
-  const maxDay = new Date(targetMonth.getFullYear(), targetMonth.getMonth()+1, 0).getDate();
-  const day = Math.min(selected.getDate(), maxDay);
-  const time = `${String(selected.getHours()).padStart(2,"0")}:${String(selected.getMinutes()).padStart(2,"0")}`;
-  setPollMonthValue(new Date(targetMonth.getFullYear(), targetMonth.getMonth(), day), time);
-
-  /* Bereits ausgewählte Tage des Zielmonats bleiben markiert. Gibt es dort
-     noch keine Auswahl, wird der korrespondierende Tag wie beim Appointment-
-     Kalender als aktuelle Auswahl vorgemerkt. */
-  const existing = selectedPollDates.filter(key => {
-    const x = new Date(`${key}T12:00:00`);
-    return x.getFullYear() === targetMonth.getFullYear() && x.getMonth() === targetMonth.getMonth();
-  });
-  setPollPickerSelection(existing.length ? existing : [pollDateKey(new Date(targetMonth.getFullYear(), targetMonth.getMonth(), day))]);
-
-  renderPollCalendar();
-  if (!document.getElementById("pollMonthPicker")?.hidden) renderPollMonthPicker();
-}
-function renderPollMonthPicker() {
-  const picker=document.getElementById("pollMonthPicker"); if(!picker)return;
-  const y=pollCalendarCursor.getFullYear(),m=pollCalendarCursor.getMonth(),first=new Date(y,m,1),last=new Date(y,m+1,0),today=new Date();
-  const monthLabel=new Intl.DateTimeFormat("de-DE",{month:"long",year:"numeric"}).format(first);
-  const offset=(first.getDay()+6)%7, selectedKeys=pollPickerSelectionKeys();
-  const previousDisabled = pollCalendarCursor <= currentMonthStart();
-  let html=`<div class="poll-picker-head"><button class="poll-picker-nav" type="button" onclick="changePollMonth(-1)" aria-label="Vorheriger Monat" ${previousDisabled?"disabled":""}>‹</button><strong>${monthLabel}</strong><button class="poll-picker-nav" type="button" onclick="changePollMonth(1)" aria-label="Nächster Monat">›</button></div><div class="poll-picker-weekdays"><span>Mo</span><span>Di</span><span>Mi</span><span>Do</span><span>Fr</span><span>Sa</span><span>So</span></div><div class="poll-picker-grid">`;
-  for(let i=0;i<offset;i++) html+='<span class="poll-picker-empty"></span>';
-  for(let day=1;day<=last.getDate();day++){
-    const d=new Date(y,m,day), key=pollDateKey(d), past=d<new Date(today.getFullYear(),today.getMonth(),today.getDate()), sel=selectedKeys.includes(key);
-    html+=`<button type="button" class="poll-picker-day${sel?" selected":""}${day===today.getDate()&&m===today.getMonth()&&y===today.getFullYear()?" is-today":""}" ${past?"disabled":""} onclick="togglePollPickerDate(${day})">${day}</button>`;
-  }
-  const time=pollPickerTime();
-  html+=`</div><div class="poll-picker-time"><span>Uhrzeit für die markierten Tage</span><input id="pollPickerTime" type="time" value="${time}" onchange="updatePollPickerTime(this.value)"></div><div class="poll-picker-actions"><button type="button" onclick="closePollMonthPicker(true)">Übernehmen</button></div>`;
-  picker.innerHTML=html; picker.dataset.selected=JSON.stringify(selectedKeys);
-}
-function togglePollPickerDate(day) {
-  /* 1:1 mit der Appointment-Auswahl: Vergangene Tage sind gesperrt, der
-     angeklickte Tag wird sofort als Auswahl übernommen. Zusätzlich bleibt
-     die Popup-Variante mehrzeilig, sodass mehrere Tage markiert werden können. */
-  const date = new Date(pollCalendarCursor.getFullYear(), pollCalendarCursor.getMonth(), day);
-  const key = pollDateKey(date);
-  if (key < todayDateKey()) return;
-
-  const keys = pollPickerSelectionKeys();
-  const nextKeys = keys.includes(key) ? keys.filter(x => x !== key) : [...keys, key];
-  setPollPickerSelection(nextKeys);
-
-  const time = pollPickerTime();
-  setPollMonthValue(new Date(date.getFullYear(), date.getMonth(), date.getDate()), time);
-  renderPollMonthPicker();
-}
-function selectPollPickerDate(day) { togglePollPickerDate(day); }
-function updatePollPickerTime(value) {
-  const selected=pollPickerSelectedDate(), [h,min]=(value||"19:00").split(":").map(Number);
-  selected.setHours(Number.isFinite(h)?h:19,Number.isFinite(min)?min:0,0,0);
-  setPollMonthValue(selected,`${String(selected.getHours()).padStart(2,"0")}:${String(selected.getMinutes()).padStart(2,"0")}`);
-}
-function togglePollDate(day) {
-  const key=pollDateKey(new Date(pollCalendarCursor.getFullYear(),pollCalendarCursor.getMonth(),day));
-  if (key < todayDateKey()) return;
-  selectedPollDates=selectedPollDates.includes(key)?selectedPollDates.filter(x=>x!==key):[...selectedPollDates,key];
-  renderPollCalendar();
-  renderSelectedPollDates();
-}
-function availabilityDateKey(value) { return String(value || "").slice(0,10); }
-function availabilityDateTime(value) {
-  const raw=String(value || "");
-  if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(raw)) return new Date(raw);
-  return null;
-}
-function formatAvailabilityDate(value) {
-  const key=availabilityDateKey(value);
-  const time=availabilityDateTime(value);
-  const base=formatPollDate(key);
-  if (!time || Number.isNaN(time.getTime())) return base;
-  return `${base} · ${new Intl.DateTimeFormat("de-DE",{hour:"2-digit",minute:"2-digit"}).format(time)} Uhr`;
-}
-function availabilityDateCounts() {
-  const counts = {};
-  availabilityEntries.forEach(entry => (entry.dates || []).forEach(date => {
-    const key=availabilityDateKey(date);
-    counts[key] = (counts[key] || 0) + 1;
-  }));
-  return counts;
-}
-function renderPollCalendar() {
-  const grid=document.getElementById("pollCalendar"), label=document.getElementById("pollCalendarMonthLabel"); if(!grid||!label)return;
-  const minimumMonth = currentMonthStart();
-  if (pollCalendarCursor < minimumMonth) pollCalendarCursor = minimumMonth;
-  selectedPollDates = selectedPollDates.filter(key => key >= todayDateKey());
-  const monthInput = document.getElementById("pollMonth");
-  if (monthInput && !monthInput.dataset.value) {
-    setPollMonthValue(new Date(pollCalendarCursor.getFullYear(),pollCalendarCursor.getMonth(),1,19,0,0));
-  }
-  const previousMonthButton = document.getElementById("pollPreviousMonth");
-  if (previousMonthButton) previousMonthButton.disabled = pollCalendarCursor <= minimumMonth;
-  const y=pollCalendarCursor.getFullYear(),m=pollCalendarCursor.getMonth(),first=new Date(y,m,1),last=new Date(y,m+1,0),counts=availabilityDateCounts();
-  label.textContent=new Intl.DateTimeFormat("de-DE",{month:"long",year:"numeric"}).format(first); grid.innerHTML="";
-  const offset=(first.getDay()+6)%7; for(let i=0;i<offset;i++){const e=document.createElement("span");e.className="calendar-day is-empty";grid.appendChild(e);}
-  for(let d=1;d<=last.getDate();d++){
-    const b=document.createElement("button"); b.type="button"; b.className="calendar-day"; b.textContent=d;
-    const key=pollDateKey(new Date(y,m,d)), count=counts[key] || 0;
-    if(key < todayDateKey()){ b.disabled=true; b.title="Vergangene Tage sind nicht auswählbar"; }
-    if(selectedPollDates.includes(key)) b.classList.add("selected");
-    if(count>=2){ b.classList.add("availability-common"); b.title=`${count} Personen können an diesem Tag${key < todayDateKey() ? " (vergangener Tag)" : ""}`; const badge=document.createElement("span"); badge.className="calendar-day-count"; badge.textContent=`${count}×`; b.appendChild(badge); }
-    b.onclick=()=>togglePollDate(d); grid.appendChild(b);
-  }
-}
-
-function renderSelectedPollDates() {
-  const host=document.getElementById("pollSelectedDates"); if(!host)return;
-  host.innerHTML=selectedPollDates.length
-    ? selectedPollDates.sort().map(key=>{
-        const time=selectedPollTimes[key] ? ` · ${selectedPollTimes[key]} Uhr` : "";
-        return `<span class="poll-date-chip"><span>${formatPollDate(key)}${time}</span><button type="button" onclick="toggleSavedPollDate('${key}')" aria-label="${formatPollDate(key)} entfernen" title="Datum entfernen">×</button></span>`;
-      }).join("")
-    : '<span class="panel-subtitle">Noch keine Termine ausgewählt.</span>';
-  const legend=document.getElementById("availabilityCommonLegend"); if(legend)legend.hidden=!Object.values(availabilityDateCounts()).some(count=>count>=2);
-}
-function toggleSavedPollDate(key) { selectedPollDates=selectedPollDates.filter(x=>x!==key); delete selectedPollTimes[key]; renderPollCalendar(); renderSelectedPollDates(); }
-function renderAvailabilityEntries() {
-  const host=document.getElementById("availabilityEntries"); if(!host)return;
-  if(!availabilityEntries.length){host.innerHTML='<span class="panel-subtitle">Noch keine Einträge vorhanden.</span>';return;}
-  const counts=availabilityDateCounts();
-  host.innerHTML=availabilityEntries.map((entry,i)=>`<div class="availability-entry"><div><div class="availability-entry-name">${escapeHtml(entry.participant_name)}</div><div class="panel-subtitle">${entry.dates.length} mögliche ${entry.dates.length===1?"Option":"Optionen"}</div></div><div class="availability-entry-dates">${entry.dates.sort().map(date=>{const key=availabilityDateKey(date); return `<span class="availability-entry-date ${counts[key]>=2?"is-common":""}">${formatAvailabilityDate(date)}${counts[key]>=2?` · ${counts[key]}×`:""}</span>`;}).join("")}<button class="availability-entry-remove" type="button" onclick="removeAvailabilityEntry(${i})" aria-label="Eintrag von ${escapeHtml(entry.participant_name)} entfernen">Eintrag entfernen</button></div></div>`).join("");
-  const legend=document.getElementById("availabilityCommonLegend"); if(legend)legend.hidden=!Object.values(counts).some(count=>count>=2);
-}
-
-async function loadAppointmentPoll() { availabilityEntries=[]; try { availabilityEntries=JSON.parse(localStorage.getItem(pollStorageKey())||"[]"); } catch(_){ availabilityEntries=[]; } const result=await supabaseClient.from("appointment_availability").select("id,participant_name,dates,user_id").eq("user_id",currentUser.id).order("created_at",{ascending:true}); if(!result.error) availabilityEntries=result.data||[]; const month=document.getElementById("pollMonth"); if(month){ setPollMonthValue(new Date(pollCalendarCursor.getFullYear(),pollCalendarCursor.getMonth(),1,19,0,0)); month.onclick=openPollMonthPicker; month.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();openPollMonthPicker();}}; } renderPollCalendar();renderSelectedPollDates();renderAvailabilityEntries(); }
-document.addEventListener("click", event => {
-  const pollPicker=document.getElementById("pollMonthPicker"), pollField=document.querySelector(".poll-month-field");
-  if(pollPicker && pollField && !pollField.contains(event.target)) closePollMonthPicker(false);
-});
-document.addEventListener("keydown", event => {
-  if(event.key !== "Escape") return;
-  closePollMonthPicker(false);
-});
-async function saveAppointmentPoll() {
-  const name = document.getElementById("pollName").value.trim();
-  const status = document.getElementById("pollStatus");
-  const button = document.querySelector(".poll-save-button");
-  selectedPollDates = selectedPollDates.filter(key => key >= todayDateKey());
-  if (!name) { status.textContent = "Bitte deinen Namen eingeben."; return; }
-  if (!selectedPollDates.length) { status.textContent = "Bitte mindestens einen möglichen Termin auswählen."; return; }
-
-  const entryDates = [...selectedPollDates].sort().map(key => {
-    const time=selectedPollTimes[key] || "19:00";
-    return `${key}T${time}`;
-  });
-  const entry = { participant_name: name, dates: entryDates, user_id: currentUser.id };
-  button.disabled = true;
-  status.textContent = "Deine Verfügbarkeit wird gespeichert …";
-  try {
-    const result = await supabaseClient.from("appointment_availability")
-      .upsert(entry, { onConflict: "user_id,participant_name" }).select().single();
-    const oldIndex = availabilityEntries.findIndex(item => item.participant_name.toLowerCase() === name.toLowerCase());
-    if (result.error) {
-      if (oldIndex >= 0) availabilityEntries[oldIndex] = entry;
-      else availabilityEntries.push(entry);
-      localStorage.setItem(pollStorageKey(), JSON.stringify(availabilityEntries));
-      status.textContent = "Lokal gespeichert. Für gemeinsame Synchronisierung bitte das SQL-Schema ausführen.";
-    } else {
-      if (oldIndex >= 0) availabilityEntries[oldIndex] = result.data;
-      else availabilityEntries.push(result.data);
-      status.textContent = "Deine Verfügbarkeit wurde gespeichert.";
-    }
-    renderPollCalendar();
-    renderSelectedPollDates();
-    renderAvailabilityEntries();
-  } finally {
-    button.disabled = false;
-  }
-}
-async function removeAvailabilityEntry(index) { const entry=availabilityEntries[index]; if(!entry)return; if(!confirm(`Eintrag von ${entry.participant_name} entfernen?`))return; if(entry.id) await supabaseClient.from("appointment_availability").delete().eq("id",entry.id); availabilityEntries.splice(index,1);localStorage.setItem(pollStorageKey(),JSON.stringify(availabilityEntries));renderAvailabilityEntries(); }
-
+function setPollStatus(text,type=""){const el=document.getElementById("pollStatus");if(!el)return;el.textContent=text;el.classList.toggle("status-success",type==="success");el.classList.toggle("status-error",type==="error")}
+function removeAvailabilityEntry(index){const entry=availabilityEntries[index];if(!entry)return;const removed=availabilityEntries.splice(index,1)[0];localStorage.setItem(pollStorageKey(),JSON.stringify(availabilityEntries));renderPollCalendar();renderSelectedPollDates();renderAvailabilityEntries();setPollStatus(`Rückmeldung von ${removed.participant_name} entfernt.`)}
 /* Serien & Filme */
 
 async function loadMovieItems() {
@@ -10613,14 +10453,14 @@ document.addEventListener("keydown", event => {
 });
 
 renderYugiohPlayerInputs();
-supabaseClient.auth.onAuthStateChange((event, session) => {
-  if (event === "PASSWORD_RECOVERY") {
-    passwordRecoveryPending = true;
-    passwordRecoveryAuthorized = true;
-    showPasswordRecovery(session);
-  }
-});
-initAuth();
+ supabaseClient.auth.onAuthStateChange((event, session) => {
+   if (event === "PASSWORD_RECOVERY") {
+     passwordRecoveryPending = true;
+     passwordRecoveryAuthorized = true;
+     showPasswordRecovery(session);
+   }
+ });
+ initAuth();
 
 function isMobileSidebar() { return window.matchMedia && window.matchMedia("(max-width: 900px)").matches; }
 function setMobileSidebarHostVisibility(visible) {
