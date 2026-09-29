@@ -7883,6 +7883,7 @@ async function loadNextAppointment() {
   } catch (error) {
     console.error("Termin konnte nicht geladen werden:", error);
     nextAppointment = null;
+    setAppointmentStatus(`Gemeinsamer Termin konnte nicht geladen werden (${error?.message || "unbekannter Fehler"}). Bitte supabase-appointments-setup.sql ausführen.`, "error");
   }
   renderNextAppointment();
   renderSavedAppointment();
@@ -8310,7 +8311,8 @@ async function loadAppointmentPoll(){
     showSupabaseError("Fehler beim Laden der Verfügbarkeit",error);
   }else{
     availabilityEntries=Array.isArray(data)?data:[];
-    setPollStatus("");
+    const others=availabilityEntries.filter(e=>e.user_id!==currentUser.id).length;
+    setPollStatus(others?"":"Es sind noch keine Rückmeldungen anderer Nutzender sichtbar. Falls andere bereits eingetragen haben, fehlt die Leseberechtigung in Supabase (supabase-appointments-setup.sql ausführen).");
   }
 
   const savedEntry=availabilityEntries.find(e=>e.user_id===currentUser.id);
