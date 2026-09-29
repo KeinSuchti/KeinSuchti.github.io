@@ -4906,7 +4906,37 @@ button:not(:disabled):active{transform:scale(.98)}
 .dirty-hint{padding:8px 11px;border-radius:10px;border:1px solid rgba(255,196,64,.4);background:rgba(255,196,64,.12);color:#ffe29a;font-size:12px;font-weight:700}.dirty-hint[hidden]{display:none}
 .poll-save-button.is-dirty{box-shadow:0 0 0 3px rgba(255,196,64,.45),0 10px 28px rgba(0,0,0,.32)}
 .availability-day-details .day-warn{color:#ffd58a}.availability-day-details .day-ok{color:#9ff1c7}
+/* ===== Yu-Gi-Oh!: UI/UX-Optimierung ===== */
+.yugioh-add-form{display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:10px;align-items:center}
+.yugioh-add-form button{width:auto;margin:0;white-space:nowrap}
+.yugioh-player-panel>summary{cursor:pointer;list-style:none;font-weight:800;font-size:16px;display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;min-height:36px}
+.yugioh-player-panel>summary::-webkit-details-marker{display:none}
+.yugioh-player-panel>summary::after{content:"▾";margin-left:auto;color:#9db1cd;transition:transform .2s}
+.yugioh-player-panel[open]>summary::after{transform:rotate(180deg)}
+.yugioh-player-panel[open]>summary{margin-bottom:12px}
+.yugioh-summary-hint{color:#9db1cd;font-size:12px;font-weight:600}
+.yugioh-filter-bar{flex-wrap:wrap;align-items:center;gap:10px}
+.yugioh-search{flex:1 1 220px;min-width:0;margin:0}
+.yugioh-sort{flex:0 0 auto;width:auto;margin:0}
+.yugioh-count{color:#9db1cd;font-size:13px;font-weight:700;white-space:nowrap}
+.yugioh-deck-card{display:block}
+.yugioh-deck-card .yugioh-theme{font-size:19px;margin-bottom:10px;line-height:1.25}
+.yugioh-chips{display:flex;flex-wrap:wrap;gap:7px}
+.yugioh-chip{display:inline-flex;align-items:center;gap:7px;padding:4px 10px;border-radius:999px;border:1px solid rgba(101,141,207,.26);background:rgba(28,46,69,.62);color:#d4e0f0;font-size:13px;font-weight:600;max-width:100%}
+.yugioh-chip.is-empty{opacity:.6;font-style:italic}
+.yugioh-swatch{width:12px;height:12px;border-radius:50%;border:1.5px solid rgba(255,255,255,.55);flex:0 0 12px}
+button.yugioh-image-placeholder{width:100%;height:100%;margin:0;border:2px dashed rgba(101,141,207,.35);border-radius:inherit;background:transparent;color:#8ea3c2;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:26px}
+button.yugioh-image-placeholder small{font-size:11px;font-weight:700}
+button.yugioh-image-placeholder:hover{border-color:rgba(101,226,215,.7);color:#d8fff9}
+.yugioh-image{transition:transform .25s}.yugioh-image-wrapper:hover .yugioh-image{transform:scale(1.04)}
+.yugioh-actions .yugioh-delete-button{margin-left:auto}
+.yugioh-empty{display:grid;justify-items:center;gap:10px;padding:34px 16px;text-align:center;border:1.5px dashed rgba(101,141,207,.3);border-radius:16px;color:#9db1cd}
+.yugioh-empty .empty-icon{font-size:38px}.yugioh-empty strong{color:#eef5ff;font-size:17px}.yugioh-empty button{width:auto;margin:4px 0 0}
+.yugioh-skeleton{height:118px;border-radius:16px;background:linear-gradient(100deg,rgba(28,46,69,.5) 30%,rgba(60,90,130,.35) 50%,rgba(28,46,69,.5) 70%);background-size:220% 100%;animation:yShimmer 1.3s linear infinite}
+@keyframes yShimmer{from{background-position:120% 0}to{background-position:-120% 0}}
+@media(max-width:760px){.yugioh-add-form{grid-template-columns:1fr 1fr}.yugioh-add-form #newYugiohTheme,.yugioh-add-form button{grid-column:1/-1}.yugioh-sort{flex:1 1 auto}.yugioh-deck-main{flex-direction:column}.yugioh-image-wrapper{width:100%}.yugioh-actions button{flex:1 1 auto;min-height:42px}.yugioh-actions .yugioh-delete-button{margin-left:0}}
 </style>
+
 
 
 
@@ -5193,15 +5223,16 @@ body.app-scene .skip-link:focus{left:12px}
     <div id="yugiohApp" class="app-panel" style="display:none;">
       <div class="list-panel-heading"><h2><span class="section-title-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="6" y="3" width="13" height="17" rx="2" transform="rotate(8 6 3)"></rect><rect x="4" y="5" width="13" height="17" rx="2"></rect><path d="m10.5 9 1.5-2 1.5 2-.5 2h-2l-.5-2Zm1.5 2v3m-2 2h4"></path></svg></span>Yu-Gi-Oh!-Decks</h2><button class="list-settings-button" type="button" onclick="openListSettings('yugioh')" aria-label="Einstellungen für Yu-Gi-Oh!-Decks" title="Listeneinstellungen">⚙</button></div>
 
-      <div class="yugioh-add-form">
-        <input id="newYugiohTheme" placeholder="Thema / Deckname">
-        <input id="newYugiohSleeveColor" placeholder="Hüllenfarbe">
-        <input id="newYugiohOwner" placeholder="Besitzer">
-        <button onclick="addYugiohDeck()">➕ Deck hinzufügen</button>
-      </div>
+      <form class="yugioh-add-form" onsubmit="event.preventDefault();addYugiohDeck()" autocomplete="off">
+        <input id="newYugiohTheme" placeholder="Thema / Deckname" aria-label="Thema / Deckname" enterkeyhint="next">
+        <input id="newYugiohSleeveColor" list="yugiohSleeveOptions" placeholder="Hüllenfarbe" aria-label="Hüllenfarbe" enterkeyhint="next">
+        <input id="newYugiohOwner" list="yugiohOwnerOptions" placeholder="Besitzer" aria-label="Besitzer" enterkeyhint="done">
+        <button type="submit" id="addYugiohButton">➕ Deck hinzufügen</button>
+        <datalist id="yugiohSleeveOptions"></datalist><datalist id="yugiohOwnerOptions"></datalist>
+      </form>
 
-      <div class="yugioh-player-panel">
-        <h3>🎲 Decks zufällig zuteilen</h3>
+      <details class="yugioh-player-panel">
+        <summary>🎲 Decks zufällig zuteilen <span class="yugioh-summary-hint">Spieler eintragen &amp; Decks verlosen</span></summary>
         <input
           id="yugiohPlayerCount"
           type="number"
@@ -5217,7 +5248,7 @@ body.app-scene .skip-link:focus{left:12px}
         <button onclick="assignRandomYugiohDecks()">🎲 Decks zufällig zuteilen</button>
 
         <div id="yugiohAssignmentResults" class="yugioh-assignment-results"></div>
-      </div>
+      </details>
 
       <div class="yugioh-filter-bar">
         <label for="yugiohOwnerFilterToggle">Besitzer filtern:</label>
@@ -5225,6 +5256,9 @@ body.app-scene .skip-link:focus{left:12px}
           <button type="button" id="yugiohOwnerFilterToggle" class="yugioh-filter-dropdown-toggle" aria-expanded="false" aria-controls="yugiohOwnerFilter" onclick="toggleYugiohOwnerFilter(event)">Besitzer auswählen <span id="yugiohOwnerFilterSummary">Alle Besitzer</span> ▾</button>
           <div id="yugiohOwnerFilter" class="yugioh-owner-filter-select yugioh-filter-dropdown-menu" role="group" aria-label="Mehrere Besitzer auswählen" hidden></div>
         </div>
+        <input type="search" id="yugiohSearch" class="yugioh-search" placeholder="🔍 Deck, Besitzer oder Farbe suchen …" aria-label="Decks durchsuchen" oninput="renderYugiohDecks()">
+        <select id="yugiohSort" class="yugioh-sort" aria-label="Sortierung" onchange="renderYugiohDecks()"><option value="theme">A–Z</option><option value="owner">Nach Besitzer</option><option value="new">Neueste zuerst</option></select>
+        <span id="yugiohCount" class="yugioh-count" aria-live="polite"></span>
       </div>
 
       <div id="yugiohDeckList" class="yugioh-list"></div>
@@ -5314,6 +5348,9 @@ body.app-scene .skip-link:focus{left:12px}
             <div id="nextAppointmentSummary" class="saved-appointment-card" hidden>
               <div class="dashboard-kicker">Aktueller Termin</div>
               <div id="nextAppointmentEntry"></div>
+            </div>
+            <div id="appointmentDeleteConfirm" class="inline-confirm" hidden>
+              <span>Termin wirklich entfernen?</span><button type="button" onclick="confirmClearAppointment()">Entfernen</button><button type="button" onclick="cancelClearAppointment()">Abbrechen</button>
             </div>
           </section>
         </div>
@@ -6325,7 +6362,8 @@ async function saveYugiohEdit() {
   const theme = getEditInputValue("theme");
 
   if (!theme) {
-    alert("Bitte ein Thema / einen Decknamen eingeben.");
+    setStatus("Bitte einen Decknamen eingeben.", true);
+    newYugiohThemeInput.focus();
     return;
   }
 
@@ -10571,6 +10609,7 @@ async function loadYugiohDecks() {
   }
 
   setStatus("Lade Yu-Gi-Oh!-Decks...");
+  if (!yugiohDecks.length) yugiohDeckList.innerHTML = '<div class="yugioh-skeleton"></div>'.repeat(3);
 
   const { data, error } = await supabaseClient
     .from("yugioh_decks")
@@ -10589,105 +10628,104 @@ async function loadYugiohDecks() {
   renderYugiohDecks();
 }
 
+const YUGIOH_COLOR_MAP={rot:"#e53935",blau:"#1e88e5",hellblau:"#64b5f6",dunkelblau:"#1a3a8a",gr\u00fcn:"#43a047",gelb:"#fdd835",schwarz:"#111",wei\u00df:"#f5f5f5",weiss:"#f5f5f5",lila:"#8e24aa",violett:"#8e24aa",orange:"#fb8c00",rosa:"#f48fb1",pink:"#ec407a",grau:"#9e9e9e",braun:"#795548",silber:"#c0c0c0",gold:"#d4af37",t\u00fcrkis:"#26c6da",transparent:"#cfd8dc",klar:"#cfd8dc"};
+function yugiohSwatchColor(name){
+  const n=String(name||"").toLowerCase();
+  const key=Object.keys(YUGIOH_COLOR_MAP).sort((a,b)=>b.length-a.length).find(k=>n.includes(k));
+  return key?YUGIOH_COLOR_MAP[key]:"";
+}
+function updateYugiohDatalists(){
+  const uniq=k=>[...new Set(yugiohDecks.map(d=>String(d[k]||"").trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"de"));
+  const fill=(id,list)=>{const el=document.getElementById(id);if(el)el.innerHTML=list.map(v=>`<option value="${escapeHtml(v)}"></option>`).join("");};
+  fill("yugiohOwnerOptions",uniq("owner"));
+  fill("yugiohSleeveOptions",[...new Set([...uniq("sleeve_color"),"Schwarz","Wei\u00df","Rot","Blau","Gr\u00fcn","Gelb","Lila","Orange","Transparent"])]);
+}
+function clearYugiohFilters(){
+  const q=document.getElementById("yugiohSearch"); if(q)q.value="";
+  resetYugiohOwnerFilter();
+  renderYugiohDecks();
+}
+function yugiohEmptyState(icon,title,text,btnLabel,onclick){
+  const box=document.createElement("div"); box.className="yugioh-empty";
+  box.innerHTML=`<div class="empty-icon" aria-hidden="true">${icon}</div><strong>${title}</strong><span>${text}</span>`;
+  if(btnLabel){const b=document.createElement("button");b.type="button";b.textContent=btnLabel;b.onclick=onclick;box.appendChild(b);}
+  return box;
+}
 function renderYugiohDecks() {
   yugiohDeckList.innerHTML = "";
   updateYugiohOwnerFilter();
+  updateYugiohDatalists();
+  const countEl=document.getElementById("yugiohCount");
 
   if (!Array.isArray(yugiohDecks) || yugiohDecks.length === 0) {
-    const empty = document.createElement("div");
-    empty.className = "yugioh-empty";
-    empty.textContent = "Noch keine Yu-Gi-Oh!-Decks vorhanden.";
-    yugiohDeckList.appendChild(empty);
+    if(countEl)countEl.textContent="";
+    yugiohDeckList.appendChild(yugiohEmptyState("🃏","Noch keine Decks","Lege oben dein erstes Deck an.","Erstes Deck anlegen",()=>newYugiohThemeInput.focus()));
     return;
   }
 
   const filteredDecks = getFilteredYugiohDecks();
+  if(countEl)countEl.textContent = filteredDecks.length===yugiohDecks.length ? `${yugiohDecks.length} Decks` : `${filteredDecks.length} von ${yugiohDecks.length} Decks`;
   if (filteredDecks.length === 0) {
-    const empty = document.createElement("div");
-    empty.className = "yugioh-empty";
-    empty.textContent = "Für diesen Besitzer sind keine Decks vorhanden.";
-    yugiohDeckList.appendChild(empty);
+    yugiohDeckList.appendChild(yugiohEmptyState("🔍","Keine Treffer","Für diese Suche oder diesen Filter gibt es keine Decks.","Filter zurücksetzen",clearYugiohFilters));
     return;
   }
 
   filteredDecks.forEach(deck => {
     const card = document.createElement("div");
     card.className = "yugioh-deck-card";
+    const name = deck.theme || "Unbenanntes Deck";
 
     const main = document.createElement("div");
     main.className = "yugioh-deck-main";
 
     const imageWrapper = document.createElement("div");
     imageWrapper.className = "yugioh-image-wrapper";
-
     if (deck.image) {
       const img = document.createElement("img");
-      img.src = deck.image;
+      img.src = deck.image; img.loading = "lazy"; img.decoding = "async";
       img.className = "yugioh-image";
-      img.alt = deck.theme ? "Bild von " + deck.theme : "Deckbild";
+      img.alt = "Bild von " + name;
       img.title = "Bild öffnen";
-      img.onclick = () => window.open(deck.image, "_blank");
+      img.onclick = () => window.open(deck.image, "_blank", "noopener");
       imageWrapper.appendChild(img);
     } else {
-      const placeholder = document.createElement("div");
-      placeholder.className = "yugioh-image-placeholder";
-      placeholder.textContent = "🃏";
-      placeholder.title = "Bild hochladen";
-      placeholder.onclick = () => uploadYugiohImage(deck.id);
-      imageWrapper.appendChild(placeholder);
+      const ph = document.createElement("button");
+      ph.type = "button"; ph.className = "yugioh-image-placeholder";
+      ph.setAttribute("aria-label", "Bild für " + name + " hochladen");
+      ph.innerHTML = '🃏<small>Bild hinzufügen</small>';
+      ph.onclick = () => uploadYugiohImage(deck.id);
+      imageWrapper.appendChild(ph);
     }
 
     const info = document.createElement("div");
     info.className = "yugioh-info";
-
     const theme = document.createElement("div");
     theme.className = "yugioh-theme";
-    theme.textContent = deck.theme || "Unbenanntes Deck";
+    theme.textContent = name;
 
-    const sleeve = document.createElement("div");
-    sleeve.className = "yugioh-meta";
-    sleeve.textContent = "Hüllenfarbe: " + (deck.sleeve_color || "nicht angegeben");
-
-    const owner = document.createElement("div");
-    owner.className = "yugioh-meta";
-    owner.textContent = "Besitzer: " + (deck.owner || "nicht angegeben");
+    const chips = document.createElement("div");
+    chips.className = "yugioh-chips";
+    const ownerChip = document.createElement("span");
+    ownerChip.className = "yugioh-chip" + (deck.owner ? "" : " is-empty");
+    ownerChip.textContent = "👤 " + (deck.owner || "kein Besitzer");
+    const sleeveChip = document.createElement("span");
+    sleeveChip.className = "yugioh-chip" + (deck.sleeve_color ? "" : " is-empty");
+    const col = yugiohSwatchColor(deck.sleeve_color);
+    if (col) { const sw=document.createElement("i"); sw.className="yugioh-swatch"; sw.style.background=col; sw.setAttribute("aria-hidden","true"); sleeveChip.appendChild(sw); }
+    sleeveChip.appendChild(document.createTextNode(deck.sleeve_color ? "Hüllen: " + deck.sleeve_color : "keine Hüllenfarbe"));
+    chips.appendChild(ownerChip); chips.appendChild(sleeveChip);
 
     const actions = document.createElement("div");
     actions.className = "yugioh-actions";
+    const mk=(cls,label,aria,fn)=>{const b=document.createElement("button");b.type="button";b.className=cls;b.textContent=label;b.setAttribute("aria-label",aria);b.onclick=fn;return b;};
+    actions.appendChild(mk("yugioh-edit-button","✏️ Bearbeiten","Deck "+name+" bearbeiten",()=>openYugiohEdit(deck.id)));
+    actions.appendChild(mk("yugioh-image-button",deck.image?"🖼️ Bild ändern":"🖼️ Bild hochladen","Bild für "+name+(deck.image?" ändern":" hochladen"),()=>uploadYugiohImage(deck.id)));
+    actions.appendChild(mk("yugioh-delete-button","🗑️ Löschen","Deck "+name+" löschen",()=>deleteYugiohDeck(deck.id,name)));
 
-    const editButton = document.createElement("button");
-    editButton.type = "button";
-    editButton.className = "yugioh-edit-button";
-    editButton.textContent = "✏️ Bearbeiten";
-    editButton.onclick = () => openYugiohEdit(deck.id);
-
-    const imageButton = document.createElement("button");
-    imageButton.type = "button";
-    imageButton.className = "yugioh-image-button";
-    imageButton.textContent = deck.image ? "🖼️ Bild ändern" : "🖼️ Bild hochladen";
-    imageButton.onclick = () => uploadYugiohImage(deck.id);
-
-    const deleteButton = document.createElement("button");
-    deleteButton.type = "button";
-    deleteButton.className = "yugioh-delete-button";
-    deleteButton.textContent = "❌ Löschen";
-    deleteButton.onclick = () => deleteYugiohDeck(deck.id, deck.theme || "Unbenanntes Deck");
-
-    actions.appendChild(editButton);
-    actions.appendChild(imageButton);
-    actions.appendChild(deleteButton);
-
-    info.appendChild(theme);
-    info.appendChild(sleeve);
-    info.appendChild(owner);
-    info.appendChild(actions);
-
+    info.appendChild(theme); info.appendChild(chips); info.appendChild(actions);
     addDblClickEdit(card, () => openYugiohEdit(deck.id));
-
-    main.appendChild(imageWrapper);
-    main.appendChild(info);
+    main.appendChild(imageWrapper); main.appendChild(info);
     card.appendChild(main);
-
     yugiohDeckList.appendChild(card);
   });
 }
@@ -10767,11 +10805,18 @@ function updateYugiohOwnerFilter() {
 
 function getFilteredYugiohDecks() {
   const selectedOwners = getSelectedYugiohOwners();
-  if (selectedOwners.length === 0) return yugiohDecks;
-  return yugiohDecks.filter(deck => {
+  let list = selectedOwners.length === 0 ? [...yugiohDecks] : yugiohDecks.filter(deck => {
     const owner = String(deck.owner || "").trim();
     return selectedOwners.some(value => value === "unassigned" ? !owner : value === `owner:${encodeURIComponent(owner)}`);
   });
+  const q = (document.getElementById("yugiohSearch")?.value || "").trim().toLowerCase();
+  if (q) list = list.filter(d => [d.theme, d.owner, d.sleeve_color].some(v => String(v || "").toLowerCase().includes(q)));
+  const cmp = (a, b) => String(a || "").localeCompare(String(b || ""), "de");
+  const mode = document.getElementById("yugiohSort")?.value || "theme";
+  list.sort(mode === "owner" ? (a, b) => cmp(a.owner, b.owner) || cmp(a.theme, b.theme)
+    : mode === "new" ? (a, b) => String(b.created_at || "").localeCompare(String(a.created_at || ""))
+    : (a, b) => cmp(a.theme, b.theme));
+  return list;
 }
 
 function parseYugiohPlayerCount() {
@@ -10877,12 +10922,15 @@ async function addYugiohDeck() {
     user_id: currentUser.id
   };
 
+  const addBtn = document.getElementById("addYugiohButton");
+  if (addBtn) { addBtn.disabled = true; addBtn.textContent = "Speichert …"; }
   const { data, error } = await supabaseClient
     .from("yugioh_decks")
     .insert(newDeck)
     .select("id, theme, sleeve_color, owner, image, user_id, created_at")
     .single();
 
+  if (addBtn) { addBtn.disabled = false; addBtn.textContent = "➕ Deck hinzufügen"; }
   if (error) {
     showSupabaseError("Fehler beim Hinzufügen des Yu-Gi-Oh!-Decks", error);
     return;
@@ -10890,7 +10938,10 @@ async function addYugiohDeck() {
 
   newYugiohThemeInput.value = "";
   newYugiohSleeveColorInput.value = "";
-  newYugiohOwnerInput.value = "";
+  // Besitzer bleibt stehen: mehrere Decks derselben Person lassen sich schneller anlegen.
+  setStatus(`Deck „${theme}“ hinzugefügt.`);
+  setTimeout(() => setStatus(""), 3500);
+  newYugiohThemeInput.focus();
 
   if (data) {
     yugiohDecks.push(data);
