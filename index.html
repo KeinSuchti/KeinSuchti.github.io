@@ -8028,70 +8028,362 @@ function switchAppointmentStep(step) {
 }
 function escapeHtml(value) { return String(value).replace(/[&<>'"]/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;","\"":"&quot;"}[ch])); }
 if (!appointmentCountdownTimer) appointmentCountdownTimer=setInterval(tickAppointmentCountdown,1000);
-/* Termin-Umfrage – vollständig lokal */
+/* Termin-Umfrage – gemeinsame Supabase-Daten */
 let selectedPollTimes = {};
 let selectedPollTime = "19:00";
-function pollStorageKey(){return "wfg-local-availability"}
-function pollDateKey(date){return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,"0")}-${String(date.getDate()).padStart(2,"0")}`}
-function formatPollDate(key){return new Intl.DateTimeFormat("de-DE",{weekday:"short",day:"2-digit",month:"2-digit",year:"numeric"}).format(new Date(`${key}T12:00:00`))}
-function todayDateKey(){return pollDateKey(new Date())}
-function currentMonthStart(){const d=new Date();return new Date(d.getFullYear(),d.getMonth(),1)}
-function setPollTime(time){selectedPollTime=time||"19:00";document.querySelectorAll("#pollTimeChips .time-chip").forEach(b=>b.classList.toggle("is-active",b.dataset.time===selectedPollTime));const c=document.getElementById("pollCustomTime");if(c)c.value=selectedPollTime;selectedPollDates.forEach(k=>selectedPollTimes[k]=selectedPollTime);renderSelectedPollDates()}
-function changePollMonth(delta){const t=new Date(pollCalendarCursor.getFullYear(),pollCalendarCursor.getMonth()+delta,1);if(t<currentMonthStart())return;pollCalendarCursor=t;renderPollCalendar()}
-function availabilityDateKey(value){return String(value||"").slice(0,10)}
-function availabilityDateTime(value){const d=new Date(value);return Number.isNaN(d.getTime())?null:d}
-function formatAvailabilityDate(value){const d=availabilityDateTime(value);return d?new Intl.DateTimeFormat("de-DE",{weekday:"short",day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"}).format(d)+" Uhr":formatPollDate(availabilityDateKey(value))}
-function availabilityDateCounts(){const counts={};availabilityEntries.forEach(e=>(e.dates||[]).forEach(v=>{const k=availabilityDateKey(v);counts[k]=(counts[k]||0)+1}));return counts}
-function availabilityPeopleForDate(key){return availabilityEntries.filter(e=>(e.dates||[]).some(v=>availabilityDateKey(v)===key)).map(e=>e.participant_name)}
+
+function pollStorageKey(){ return `wfg-availability:${currentUser?.id || "guest"}`; }
+function pollDateKey(date){ return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,"0")}-${String(date.getDate()).padStart(2,"0")}`; }
+function formatPollDate(key){ return new Intl.DateTimeFormat("de-DE",{weekday:"short",day:"2-digit",month:"2-digit",year:"numeric"}).format(new Date(`${key}T12:00:00`)); }
+function todayDateKey(){ return pollDateKey(new Date()); }
+function currentMonthStart(){ const d=new Date(); return new Date(d.getFullYear(),d.getMonth(),1); }
+
+function setPollTime(time){
+  selectedPollTime=time||"19:00";
+  document.querySelectorAll("#pollTimeChips .time-chip").forEach(b=>b.classList.toggle("is-active",b.dataset.time===selectedPollTime));
+  const c=document.getElementById("pollCustomTime");
+  if(c)c.value=selectedPollTime;
+  selectedPollDates.forEach(k=>selectedPollTimes[k]=selectedPollTime);
+  renderSelectedPollDates();
+}
+
+function changePollMonth(delta){
+  const t=new Date(pollCalendarCursor.getFullYear(),pollCalendarCursor.getMonth()+delta,1);
+  if(t<currentMonthStart())return;
+  pollCalendarCursor=t;
+  renderPollCalendar();
+}
+
+function availabilityDateKey(value){ return String(value||"").slice(0,10); }
+function availabilityDateTime(value){ const d=new Date(value); return Number.isNaN(d.getTime())?null:d; }
+function formatAvailabilityDate(value){
+  const d=availabilityDateTime(value);
+  return d
+    ? new Intl.DateTimeFormat("de-DE",{weekday:"short",day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"}).format(d)+" Uhr"
+    : formatPollDate(availabilityDateKey(value));
+}
+
+function availabilityDateCounts(){
+  const counts={};
+  availabilityEntries.forEach(e=>(e.dates||[]).forEach(v=>{
+    const k=availabilityDateKey(v);
+    counts[k]=(counts[k]||0)+1;
+  }));
+  return counts;
+}
+
+function availabilityPeopleForDate(key){
+  return availabilityEntries
+    .filter(e=>(e.dates||[]).some(v=>availabilityDateKey(v)===key))
+    .map(e=>e.participant_name)
+    .filter(Boolean);
+}
+
 function togglePollDate(day){
-  const key=pollDateKey(new Date(pollCalendarCursor.getFullYear(),pollCalendarCursor.getMonth(),day));if(key<todayDateKey())return;
-  if(selectedPollDates.includes(key)){selectedPollDates=selectedPollDates.filter(x=>x!==key);delete selectedPollTimes[key]}else{selectedPollDates=[...selectedPollDates,key].sort();selectedPollTimes[key]=selectedPollTime}
-  renderPollCalendar();renderSelectedPollDates();showAvailabilityDay(key)
+  const key=pollDateKey(new Date(pollCalendarCursor.getFullYear(),pollCalendarCursor.getMonth(),day));
+  if(key<todayDateKey())return;
+  if(selectedPollDates.includes(key)){
+    selectedPollDates=selectedPollDates.filter(x=>x!==key);
+    delete selectedPollTimes[key];
+  }else{
+    selectedPollDates=[...selectedPollDates,key].sort();
+    selectedPollTimes[key]=selectedPollTime;
+  }
+  renderPollCalendar();
+  renderSelectedPollDates();
+  showAvailabilityDay(key);
 }
+
 function showAvailabilityDay(key){
-  const host=document.getElementById("availabilityDayDetails");if(!host)return;const people=availabilityPeopleForDate(key);host.innerHTML=`<strong>${formatPollDate(key)}</strong><span>${people.length?`${people.length} ${people.length===1?"Person kann":"Personen können"}: ${people.map(escapeHtml).join(", ")}`:"Noch keine Rückmeldungen für diesen Tag."}</span>`
+  const host=document.getElementById("availabilityDayDetails");
+  if(!host)return;
+  const people=availabilityPeopleForDate(key);
+  host.innerHTML=`<strong>${formatPollDate(key)}</strong><span>${
+    people.length
+      ? `${people.length} ${people.length===1?"Person kann":"Personen können"}: ${people.map(escapeHtml).join(", ")}`
+      : "Noch keine Rückmeldungen für diesen Tag."
+  }</span>`;
 }
+
 function renderPollCalendar(){
-  const grid=document.getElementById("pollCalendar"),label=document.getElementById("pollCalendarMonthLabel");if(!grid||!label)return;const min=currentMonthStart();if(pollCalendarCursor<min)pollCalendarCursor=min;
-  const y=pollCalendarCursor.getFullYear(),m=pollCalendarCursor.getMonth(),first=new Date(y,m,1),last=new Date(y,m+1,0),today=new Date(),counts=availabilityDateCounts(),appointmentKey=nextAppointment?.start_at?.slice(0,10);
-  label.textContent=new Intl.DateTimeFormat("de-DE",{month:"long",year:"numeric"}).format(first);grid.innerHTML="";document.getElementById("pollPreviousMonth").disabled=pollCalendarCursor<=min;
-  const offset=(first.getDay()+6)%7;for(let i=0;i<offset;i++){const e=document.createElement("span");e.className="calendar-day is-empty";grid.appendChild(e)}
+  const grid=document.getElementById("pollCalendar"),label=document.getElementById("pollCalendarMonthLabel");
+  if(!grid||!label)return;
+  const min=currentMonthStart();
+  if(pollCalendarCursor<min)pollCalendarCursor=min;
+
+  const y=pollCalendarCursor.getFullYear(),m=pollCalendarCursor.getMonth();
+  const first=new Date(y,m,1),last=new Date(y,m+1,0),today=new Date();
+  const counts=availabilityDateCounts(),appointmentKey=nextAppointment?.start_at?.slice(0,10);
+
+  label.textContent=new Intl.DateTimeFormat("de-DE",{month:"long",year:"numeric"}).format(first);
+  grid.innerHTML="";
+  const prev=document.getElementById("pollPreviousMonth");
+  if(prev)prev.disabled=pollCalendarCursor<=min;
+
+  const offset=(first.getDay()+6)%7;
+  for(let i=0;i<offset;i++){
+    const e=document.createElement("span");
+    e.className="calendar-day is-empty";
+    grid.appendChild(e);
+  }
+
   const maxCount=Math.max(1,...Object.values(counts));
-  for(let day=1;day<=last.getDate();day++){const d=new Date(y,m,day),key=pollDateKey(d),count=counts[key]||0,b=document.createElement("button");b.type="button";b.className="calendar-day";b.textContent=day;
-    b.setAttribute("aria-label",new Intl.DateTimeFormat("de-DE",{weekday:"long",day:"numeric",month:"long",year:"numeric"}).format(d));b.setAttribute("aria-pressed",selectedPollDates.includes(key)?"true":"false");
-    if(d<new Date(today.getFullYear(),today.getMonth(),today.getDate()))b.disabled=true;if(d.toDateString()===today.toDateString())b.classList.add("is-today");if(selectedPollDates.includes(key))b.classList.add("selected");if(appointmentKey===key)b.classList.add("is-appointment");
-    if(count){b.classList.add(`heat-${Math.min(4,Math.max(1,Math.ceil(count/maxCount*4)))}`);if(count>=2)b.classList.add("common");const badge=document.createElement("span");badge.className="calendar-day-count";badge.textContent=count;b.appendChild(badge)}
-    b.onclick=()=>togglePollDate(day);grid.appendChild(b)}
-  renderBestDays();renderAvailabilityDayDetailsDefault()
+  for(let day=1;day<=last.getDate();day++){
+    const d=new Date(y,m,day),key=pollDateKey(d),count=counts[key]||0;
+    const b=document.createElement("button");
+    b.type="button";
+    b.className="calendar-day";
+    b.textContent=day;
+    b.setAttribute("aria-label",new Intl.DateTimeFormat("de-DE",{weekday:"long",day:"numeric",month:"long",year:"numeric"}).format(d));
+    b.setAttribute("aria-pressed",selectedPollDates.includes(key)?"true":"false");
+
+    if(d<new Date(today.getFullYear(),today.getMonth(),today.getDate()))b.disabled=true;
+    if(d.toDateString()===today.toDateString())b.classList.add("is-today");
+    if(selectedPollDates.includes(key))b.classList.add("selected");
+    if(appointmentKey===key)b.classList.add("is-appointment");
+
+    if(count){
+      b.classList.add(`heat-${Math.min(4,Math.max(1,Math.ceil(count/maxCount*4)))}`);
+      if(count>=2)b.classList.add("common");
+      const badge=document.createElement("span");
+      badge.className="calendar-day-count";
+      badge.textContent=count;
+      b.appendChild(badge);
+      b.title=`${count} ${count===1?"Person kann":"Personen können"} an diesem Tag`;
+    }
+
+    b.onclick=()=>togglePollDate(day);
+    grid.appendChild(b);
+  }
+
+  renderBestDays();
+  renderAvailabilityDayDetailsDefault();
 }
-function renderAvailabilityDayDetailsDefault(){const first=selectedPollDates[0]||Object.keys(availabilityDateCounts()).sort()[0];if(first)showAvailabilityDay(first)}
+
+function renderAvailabilityDayDetailsDefault(){
+  const first=selectedPollDates[0]||Object.keys(availabilityDateCounts()).sort()[0];
+  if(first)showAvailabilityDay(first);
+}
+
 function renderSelectedPollDates(){
-  const host=document.getElementById("pollSelectedDates");if(!host)return;host.innerHTML=selectedPollDates.length?selectedPollDates.map(k=>`<span class="poll-date-chip"><span>${formatPollDate(k)} · ${selectedPollTimes[k]||selectedPollTime} Uhr</span><button type="button" onclick="toggleSavedPollDate('${k}')" aria-label="${formatPollDate(k)} entfernen">×</button></span>`).join(""):'<span class="helper-text">Noch keine Tage ausgewählt.</span>';
-  const save=document.querySelector(".poll-save-button");if(save){save.textContent=selectedPollDates.length?`✅ ${selectedPollDates.length} Tage ausgewählt – speichern`:"✅ Meine Verfügbarkeit speichern"}
+  const host=document.getElementById("pollSelectedDates");
+  if(!host)return;
+  host.innerHTML=selectedPollDates.length
+    ? selectedPollDates.map(k=>`<span class="poll-date-chip"><span>${formatPollDate(k)} · ${selectedPollTimes[k]||selectedPollTime} Uhr</span><button type="button" onclick="toggleSavedPollDate('${k}')" aria-label="${formatPollDate(k)} entfernen">×</button></span>`).join("")
+    : '<span class="helper-text">Noch keine Tage ausgewählt.</span>';
+
+  const save=document.querySelector(".poll-save-button");
+  if(save)save.textContent=selectedPollDates.length
+    ? `✅ ${selectedPollDates.length} Tage ausgewählt – speichern`
+    : "✅ Meine Verfügbarkeit speichern";
 }
-function toggleSavedPollDate(key){selectedPollDates=selectedPollDates.filter(x=>x!==key);delete selectedPollTimes[key];renderPollCalendar();renderSelectedPollDates()}
+
+function toggleSavedPollDate(key){
+  selectedPollDates=selectedPollDates.filter(x=>x!==key);
+  delete selectedPollTimes[key];
+  renderPollCalendar();
+  renderSelectedPollDates();
+}
+
 function renderAvailabilityEntries(){
-  const host=document.getElementById("availabilityEntries");if(!host)return;if(!availabilityEntries.length){host.innerHTML='<span class="helper-text">Noch keine Einträge vorhanden.</span>';return}
-  host.innerHTML=availabilityEntries.map((e,i)=>`<div class="availability-entry"><div class="availability-entry-name">${escapeHtml(e.participant_name)}</div><div class="availability-entry-dates">${(e.dates||[]).sort().map(d=>`<span class="availability-entry-date">${formatAvailabilityDate(d)}</span>`).join("")}</div><button class="availability-entry-remove" type="button" onclick="removeAvailabilityEntry(${i})">Eintrag entfernen</button></div>`).join("")
+  const host=document.getElementById("availabilityEntries");
+  if(!host)return;
+  if(!availabilityEntries.length){
+    host.innerHTML='<span class="helper-text">Noch keine Rückmeldungen vorhanden.</span>';
+    return;
+  }
+
+  host.innerHTML=availabilityEntries.map((e,i)=>{
+    const own = currentUser && e.user_id === currentUser.id;
+    const removeButton = own
+      ? `<button class="availability-entry-remove" type="button" onclick="removeAvailabilityEntry(${i})">Meine Rückmeldung ändern</button>`
+      : "";
+    return `<div class="availability-entry">
+      <div class="availability-entry-name">${escapeHtml(e.participant_name || "Unbekannt")}</div>
+      <div class="availability-entry-dates">${(e.dates||[]).slice().sort().map(d=>`<span class="availability-entry-date">${formatAvailabilityDate(d)}</span>`).join("")}</div>
+      ${removeButton}
+    </div>`;
+  }).join("");
 }
+
 function renderBestDays(){
-  const host=document.getElementById("bestDaysList");if(!host)return;const counts=availabilityDateCounts(),rows=Object.entries(counts).filter(([k])=>k>=todayDateKey()).sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0])).slice(0,6);
-  host.innerHTML=rows.length?rows.map(([key,count])=>`<div class="best-day-row"><div class="best-day-info"><div class="best-day-date">${formatPollDate(key)}</div><div class="best-day-people">${count} ${count===1?"Zusage":"Zusagen"} · ${availabilityPeopleForDate(key).map(escapeHtml).join(", ")}</div></div><button type="button" onclick="adoptBestDay('${key}')">Diesen Termin übernehmen</button></div>`).join(""):'<span class="helper-text">Sobald Rückmeldungen vorhanden sind, erscheinen hier die besten Tage.</span>'
+  const host=document.getElementById("bestDaysList");
+  if(!host)return;
+  const counts=availabilityDateCounts();
+  const rows=Object.entries(counts)
+    .filter(([k])=>k>=todayDateKey())
+    .sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0]))
+    .slice(0,6);
+
+  host.innerHTML=rows.length
+    ? rows.map(([key,count])=>`<div class="best-day-row">
+        <div class="best-day-info">
+          <div class="best-day-date">${formatPollDate(key)}</div>
+          <div class="best-day-people">${count} ${count===1?"Zusage":"Zusagen"} · ${availabilityPeopleForDate(key).map(escapeHtml).join(", ")}</div>
+        </div>
+        <button type="button" onclick="adoptBestDay('${key}')">Diesen Termin übernehmen</button>
+      </div>`).join("")
+    : '<span class="helper-text">Sobald Rückmeldungen vorhanden sind, erscheinen hier die besten Tage.</span>';
 }
-function adoptBestDay(key){const people=availabilityPeopleForDate(key);document.getElementById("appointmentTitle").value="Gemeinsamer Termin";setAppointmentDateValue(`${key}T${selectedPollTimes[key]||"19:00"}`);setAppointmentTime(selectedPollTimes[key]||"19:00");document.getElementById("appointmentLocation").value=people.length?`Bei ${people[0]}`:"";switchAppointmentStep("appointment");setAppointmentStatus("Vorschlag übernommen. Prüfe Uhrzeit und Ort vor dem Speichern.","success")}
-function loadAppointmentPoll(){
-  try{availabilityEntries=JSON.parse(localStorage.getItem(pollStorageKey())||"[]")}catch(_){availabilityEntries=[]}
-  const savedName=localStorage.getItem("wfg-local-name");if(savedName)document.getElementById("pollName").value=savedName;
-  setPollTime(selectedPollTime);renderPollCalendar();renderSelectedPollDates();renderAvailabilityEntries()
+
+function adoptBestDay(key){
+  const people=availabilityPeopleForDate(key);
+  const entry=availabilityEntries.find(e=>(e.dates||[]).some(v=>availabilityDateKey(v)===key));
+  const dateValue=(entry?.dates||[]).find(v=>availabilityDateKey(v)===key);
+  const time=dateValue && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(dateValue)
+    ? dateValue.slice(11,16)
+    : (selectedPollTimes[key]||"19:00");
+
+  document.getElementById("appointmentTitle").value="Gemeinsamer Termin";
+  setAppointmentDateValue(`${key}T${time}`);
+  setAppointmentTime(time);
+  document.getElementById("appointmentLocation").value="";
+  switchAppointmentStep("appointment");
+  setAppointmentStatus(`Vorschlag übernommen (${people.length} Rückmeldungen). Prüfe Uhrzeit und Ort vor dem Speichern.`,"success");
 }
-function saveAppointmentPoll(){
-  const name=document.getElementById("pollName").value.trim(),status=document.getElementById("pollStatus");if(!name){setPollStatus("Bitte deinen Namen eingeben.","error");return}if(!selectedPollDates.length){setPollStatus("Bitte mindestens einen möglichen Tag auswählen.","error");return}
-  const entry={participant_name:name,dates:[...selectedPollDates].sort().map(k=>`${k}T${selectedPollTimes[k]||selectedPollTime}`)};const old=availabilityEntries.findIndex(e=>e.participant_name.toLowerCase()===name.toLowerCase());if(old>=0)availabilityEntries[old]=entry;else availabilityEntries.push(entry);
-  localStorage.setItem(pollStorageKey(),JSON.stringify(availabilityEntries));localStorage.setItem("wfg-local-name",name);setPollStatus("Verfügbarkeit gespeichert – nur auf diesem Gerät.","success");selectedPollDates=[];selectedPollTimes={};renderPollCalendar();renderSelectedPollDates();renderAvailabilityEntries()
+
+async function loadAppointmentPoll(){
+  if(!currentUser){
+    availabilityEntries=[];
+    renderPollCalendar();
+    renderSelectedPollDates();
+    renderAvailabilityEntries();
+    return;
+  }
+
+  const {data,error}=await supabaseClient
+    .from("appointment_availability")
+    .select("id,participant_name,dates,user_id,created_at")
+    .order("created_at",{ascending:true});
+
+  if(error){
+    availabilityEntries=[];
+    setPollStatus("Rückmeldungen konnten nicht geladen werden.","error");
+    showSupabaseError("Fehler beim Laden der Verfügbarkeit",error);
+  }else{
+    availabilityEntries=Array.isArray(data)?data:[];
+    setPollStatus("");
+  }
+
+  const savedEntry=availabilityEntries.find(e=>e.user_id===currentUser.id);
+  const savedName=savedEntry?.participant_name || currentUser.user_metadata?.username || currentUser.email?.split("@")[0] || "";
+  const nameField=document.getElementById("pollName");
+  if(nameField && savedName)nameField.value=savedName;
+
+  // Die aktuelle eigene Auswahl aus der gemeinsamen Datenbank wiederherstellen.
+  selectedPollDates=[];
+  selectedPollTimes={};
+  if(savedEntry){
+    (savedEntry.dates||[]).forEach(value=>{
+      const key=availabilityDateKey(value);
+      if(key>=todayDateKey()){
+        selectedPollDates.push(key);
+        const dt=availabilityDateTime(value);
+        selectedPollTimes[key]=dt && !Number.isNaN(dt.getTime())
+          ? `${String(dt.getHours()).padStart(2,"0")}:${String(dt.getMinutes()).padStart(2,"0")}`
+          : "19:00";
+      }
+    });
+    selectedPollDates=[...new Set(selectedPollDates)].sort();
+    if(selectedPollDates[0])selectedPollTime=selectedPollTimes[selectedPollDates[0]]||"19:00";
+  }
+
+  setPollTime(selectedPollTime);
+  renderPollCalendar();
+  renderSelectedPollDates();
+  renderAvailabilityEntries();
 }
-function setPollStatus(text,type=""){const el=document.getElementById("pollStatus");if(!el)return;el.textContent=text;el.classList.toggle("status-success",type==="success");el.classList.toggle("status-error",type==="error")}
-function removeAvailabilityEntry(index){const entry=availabilityEntries[index];if(!entry)return;const removed=availabilityEntries.splice(index,1)[0];localStorage.setItem(pollStorageKey(),JSON.stringify(availabilityEntries));renderPollCalendar();renderSelectedPollDates();renderAvailabilityEntries();setPollStatus(`Rückmeldung von ${removed.participant_name} entfernt.`)}
+
+async function saveAppointmentPoll(){
+  const name=document.getElementById("pollName").value.trim();
+  const status=document.getElementById("pollStatus");
+  const button=document.querySelector(".poll-save-button");
+
+  selectedPollDates=selectedPollDates.filter(key=>key>=todayDateKey());
+
+  if(!currentUser){
+    setPollStatus("Bitte zuerst anmelden.","error");
+    return;
+  }
+  if(!name){
+    setPollStatus("Bitte deinen Namen eingeben.","error");
+    return;
+  }
+  if(!selectedPollDates.length){
+    setPollStatus("Bitte mindestens einen möglichen Tag auswählen.","error");
+    return;
+  }
+
+  const entryDates=[...selectedPollDates].sort().map(k=>`${k}T${selectedPollTimes[k]||selectedPollTime}`);
+  button.disabled=true;
+  setPollStatus("Deine Verfügbarkeit wird gemeinsam gespeichert …");
+
+  try{
+    // Nur den eigenen Datensatz ändern. Die Anzeige und Auswertung lädt
+    // anschließend alle Datensätze aller Nutzenden aus Supabase.
+    const ownExisting=availabilityEntries.find(e=>e.user_id===currentUser.id);
+
+    let result;
+    if(ownExisting?.id){
+      result=await supabaseClient
+        .from("appointment_availability")
+        .update({
+          participant_name:name,
+          dates:entryDates
+        })
+        .eq("id",ownExisting.id)
+        .eq("user_id",currentUser.id)
+        .select("id,participant_name,dates,user_id,created_at")
+        .single();
+    }else{
+      result=await supabaseClient
+        .from("appointment_availability")
+        .insert({
+          participant_name:name,
+          dates:entryDates,
+          user_id:currentUser.id
+        })
+        .select("id,participant_name,dates,user_id,created_at")
+        .single();
+    }
+
+    if(result.error)throw result.error;
+
+    // Danach bewusst neu aus der gemeinsamen Quelle laden, damit sofort
+    // die Daten aller Nutzenden und die aktualisierten Best-Tage sichtbar sind.
+    await loadAppointmentPoll();
+    setPollStatus("Deine Verfügbarkeit wurde gespeichert und ist jetzt für alle sichtbar.","success");
+  }catch(error){
+    showSupabaseError("Fehler beim gemeinsamen Speichern der Verfügbarkeit",error);
+    setPollStatus("Die Verfügbarkeit konnte nicht gespeichert werden.","error");
+  }finally{
+    button.disabled=false;
+  }
+}
+
+async function removeAvailabilityEntry(index){
+  const entry=availabilityEntries[index];
+  if(!entry || !currentUser || entry.user_id!==currentUser.id)return;
+
+  try{
+    const {error}=await supabaseClient
+      .from("appointment_availability")
+      .delete()
+      .eq("id",entry.id)
+      .eq("user_id",currentUser.id);
+
+    if(error)throw error;
+
+    await loadAppointmentPoll();
+    setPollStatus("Deine Rückmeldung wurde entfernt.","success");
+  }catch(error){
+    showSupabaseError("Fehler beim Entfernen deiner Rückmeldung",error);
+    setPollStatus("Die Rückmeldung konnte nicht entfernt werden.","error");
+  }
+}
+
 /* Serien & Filme */
+
 
 async function loadMovieItems() {
   if (!currentUser) {
