@@ -277,6 +277,37 @@ textarea:focus {
 
 
 
+/* ===== UX-Erweiterungen Termine ===== */
+function downloadAppointmentIcs(){
+  if(!nextAppointment?.start_at)return;
+  const start=new Date(nextAppointment.start_at), end=new Date(start.getTime()+3*3600*1000);
+  const fmt=d=>d.toISOString().replace(/[-:]/g,"").replace(/\.\d{3}/,"");
+  const esc=t=>String(t||"").replace(/[\\;,]/g,m=>"\\"+m).replace(/\r?\n/g,"\\n");
+  const ics=["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Watch Feast and Game//DE","BEGIN:VEVENT",
+    `UID:${nextAppointment.id}@wfg`,`DTSTAMP:${fmt(new Date())}`,`DTSTART:${fmt(start)}`,`DTEND:${fmt(end)}`,
+    `SUMMARY:${esc(nextAppointment.title||"Gemeinsamer Termin")}`,
+    ...(nextAppointment.location?[`LOCATION:${esc(nextAppointment.location)}`]:[]),
+    ...(nextAppointment.note?[`DESCRIPTION:${esc(nextAppointment.note)}`]:[]),
+    "END:VEVENT","END:VCALENDAR"].join("\r\n");
+  const url=URL.createObjectURL(new Blob([ics],{type:"text/calendar;charset=utf-8"}));
+  const a=document.createElement("a"); a.href=url; a.download="termin.ics"; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+if(nextAppointmentBanner){
+  nextAppointmentBanner.setAttribute("role","button"); nextAppointmentBanner.tabIndex=0;
+  nextAppointmentBanner.setAttribute("aria-label","Nächster Termin – Details öffnen");
+  nextAppointmentBanner.addEventListener("click",()=>showAppointmentsApp());
+  nextAppointmentBanner.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();showAppointmentsApp();}});
+}
+// Erfolgsmeldungen blenden sich nach 6 Sekunden selbst aus.
+(function(){
+  const timers={};
+  const wrap=(name,id)=>{const orig=window[name]; if(typeof orig!=="function")return;
+    window[name]=function(text,type){orig.apply(this,arguments);clearTimeout(timers[id]);
+      if(type==="success")timers[id]=setTimeout(()=>{const el=document.getElementById(id);if(el){el.textContent="";el.classList.remove("status-success");}},6000);};};
+  wrap("setPollStatus","pollStatus"); wrap("setAppointmentStatus","appointmentStatus");
+})();
+
 /* Serien & Filme */
 
 .random-movie-button {
@@ -4880,7 +4911,28 @@ body.color-vision-mode .calendar-day.heat-4{background:#2a93c4!important;border:
 body.color-vision-mode .calendar-day.heat-all{background:#8a5d00!important;border:3px solid #f0b323!important;color:#fff!important;box-shadow:none!important}
 body.color-vision-mode .calendar-day[class*="heat-"] .calendar-day-count{background:#081521;border-color:#fff;color:#fff}
 @media(max-width:520px){.calendar-day[class*="heat-"]{font-size:14px}.calendar-day[class*="heat-"] .calendar-day-count{font-size:9px;padding:0 4px}}
+/* ===== Allgemeine UX-Politur ===== */
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+button,[role=button],.calendar-day,.time-chip,.dashboard-card,.dashboard-nav-item{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+h1,h2,h3{text-wrap:balance}
+p,.panel-subtitle,.helper-text{text-wrap:pretty}
+.appointment-banner-countdown,.calendar-day-count,.own-avail-date,.best-day-date{font-variant-numeric:tabular-nums}
+button:not(:disabled),[role=button]{cursor:pointer}
+button:disabled{opacity:.55;cursor:not-allowed}
+button,input,select,textarea{transition:background-color .15s,border-color .15s,box-shadow .15s,transform .1s,filter .15s}
+button:not(:disabled):active{transform:scale(.98)}
+:where(button,a,input,select,textarea,[tabindex]):focus-visible{outline:3px solid rgba(101,226,215,.75);outline-offset:2px}
+.next-appointment-banner:not([hidden]){cursor:pointer;transition:transform .15s,box-shadow .15s}
+.next-appointment-banner:not([hidden]):hover{transform:translateY(-1px);box-shadow:0 16px 36px rgba(0,0,0,.26)}
+.next-appointment-banner .banner-cta{margin-top:6px;color:#77e6db;font-size:12px;font-weight:800}
+.appointment-status.status-success{animation:statusIn .25s ease}
+@keyframes statusIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+.saved-appointment-actions .ics-button{border:1px solid rgba(101,226,215,.35)!important;background:rgba(43,77,83,.45)!important;color:#d5fffb!important}
+@media(max-width:760px){input:not([type=checkbox]):not([type=radio]),select,textarea{font-size:16px!important}.calendar-day,.time-chip,.calendar-nav-button{min-height:44px}}
+@supports(padding:max(0px)){body{padding-left:max(0px,env(safe-area-inset-left));padding-right:max(0px,env(safe-area-inset-right))}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
 </style>
+
 
 <!-- Cinematic background -->
 <meta name="color-scheme" content="dark">
@@ -5214,7 +5266,7 @@ body.app-scene .skip-link:focus{left:12px}
       </div>
 
       <section id="availabilityStep" class="appointment-step is-active" role="tabpanel" aria-labelledby="availabilityTab">
-        <div class="step-heading"><div><div class="dashboard-kicker">Schritt 1</div><h3>Wann kannst du?</h3><p class="panel-subtitle">Markiere deine möglichen Tage und Zeiten. Deine Rückmeldung wird für alle Nutzenden gemeinsam gespeichert.</p></div><div class="local-only-badge">● Gemeinsam gespeichert</div></div>
+        <div class="step-heading"><div><div class="dashboard-kicker">Schritt 1</div><h3>Wann kannst du?</h3><p class="panel-subtitle">Tippe auf die Tage, an denen du Zeit hast, und speichere. Alle sehen deine Auswahl.</p></div><div class="local-only-badge">● Gemeinsam gespeichert</div></div>
         <div class="availability-layout">
           <section class="availability-calendar-card" aria-label="Verfügbarkeitskalender">
             <div class="calendar-toolbar poll-calendar-toolbar"><button id="pollPreviousMonth" class="calendar-nav-button" type="button" onclick="changePollMonth(-1)" aria-label="Vorheriger Monat">‹</button><strong id="pollCalendarMonthLabel"></strong><button class="calendar-nav-button" type="button" onclick="changePollMonth(1)" aria-label="Nächster Monat">›</button></div>
@@ -5251,7 +5303,7 @@ body.app-scene .skip-link:focus{left:12px}
       </section>
 
       <section id="appointmentStep" class="appointment-step" role="tabpanel" aria-labelledby="appointmentTab" hidden>
-        <div class="step-heading"><div><div class="dashboard-kicker">Schritt 2</div><h3>Termin festlegen</h3><p class="panel-subtitle">Übernimm einen der besten Tage oder wähle einen anderen Termin.</p></div><div class="local-only-badge">● Gemeinsam gespeichert</div></div>
+        <div class="step-heading"><div><div class="dashboard-kicker">Schritt 2</div><h3>Termin festlegen</h3><p class="panel-subtitle">Übernimm einen der besten Tage oder wähle selbst einen Tag. Der Termin erscheint als Countdown auf der Startseite.</p></div><div class="local-only-badge">● Gemeinsam gespeichert</div></div>
         <div class="appointment-layout">
           <section class="calendar-card" aria-label="Kalender zur Terminwahl">
             <div class="calendar-toolbar"><button id="calendarPreviousMonth" class="calendar-nav-button" type="button" onclick="changeCalendarMonth(-1)" aria-label="Vorheriger Monat">‹</button><strong id="calendarMonthLabel"></strong><button class="calendar-nav-button" type="button" onclick="changeCalendarMonth(1)" aria-label="Nächster Monat">›</button></div>
@@ -7897,7 +7949,7 @@ function appointmentCountdown(value) {
   const hours = Math.floor((totalSeconds % 86400) / 3600);
   const minutes = Math.floor((totalSeconds % 3600) / 60);
   const seconds = totalSeconds % 60;
-  return `In ${days} ${days === 1 ? "Tag" : "Tagen"}, ${String(hours).padStart(2,"0")} Std., ${String(minutes).padStart(2,"0")} Min., ${String(seconds).padStart(2,"0")} Sek.`;
+  return `${days > 0 ? `In ${days} ${days === 1 ? "Tag" : "Tagen"}, ` : "Heute in "}${String(hours).padStart(2,"0")} Std., ${String(minutes).padStart(2,"0")} Min., ${String(seconds).padStart(2,"0")} Sek.`;
 }
 function renderNextAppointment() {
   if (!nextAppointmentBanner) return;
@@ -7907,7 +7959,7 @@ function renderNextAppointment() {
     return;
   }
   nextAppointmentBanner.hidden = false;
-  nextAppointmentBanner.innerHTML = `<div class="appointment-banner-grid"><div class="appointment-banner-icon">◷</div><div class="appointment-banner-copy"><div class="appointment-banner-kicker">Nächster gemeinsamer Termin</div><div class="appointment-banner-countdown">${escapeHtml(nextAppointment.title || "Gemeinsamer Termin")} · ${appointmentCountdown(nextAppointment.start_at)}</div><div class="appointment-banner-meta"><span>📅 ${escapeHtml(formatAppointmentDate(nextAppointment.start_at))}</span>${nextAppointment.location ? `<span>⌖ ${escapeHtml(nextAppointment.location)}</span>` : ""}</div>${nextAppointment.note ? `<div class="appointment-banner-note">${escapeHtml(nextAppointment.note)}</div>` : ""}</div></div>`;
+  nextAppointmentBanner.innerHTML = `<div class="appointment-banner-grid"><div class="appointment-banner-icon">◷</div><div class="appointment-banner-copy"><div class="appointment-banner-kicker">Nächster gemeinsamer Termin</div><div class="appointment-banner-countdown">${escapeHtml(nextAppointment.title || "Gemeinsamer Termin")} · ${appointmentCountdown(nextAppointment.start_at)}</div><div class="appointment-banner-meta"><span>📅 ${escapeHtml(formatAppointmentDate(nextAppointment.start_at))}</span>${nextAppointment.location ? `<span>⌖ ${escapeHtml(nextAppointment.location)}</span>` : ""}</div>${nextAppointment.note ? `<div class="appointment-banner-note">${escapeHtml(nextAppointment.note)}</div>` : ""}<div class="banner-cta">Details &amp; Verfügbarkeiten ansehen →</div></div></div>`;
 }
 function renderSavedAppointment() {
   const summary = document.getElementById("nextAppointmentSummary");
@@ -7919,7 +7971,7 @@ function renderSavedAppointment() {
     return;
   }
   summary.hidden = false;
-  host.innerHTML = `<div class="saved-appointment-main"><div class="saved-appointment-title">${escapeHtml(nextAppointment.title || "Gemeinsamer Termin")}</div><div class="saved-appointment-meta">📅 ${escapeHtml(formatAppointmentDate(nextAppointment.start_at))}</div>${nextAppointment.location ? `<div class="saved-appointment-meta">⌖ ${escapeHtml(nextAppointment.location)}</div>` : ""}${nextAppointment.note ? `<div class="saved-appointment-meta">${escapeHtml(nextAppointment.note)}</div>` : ""}<div class="saved-appointment-actions"><button type="button" onclick="editSavedAppointment()">Ändern</button><button type="button" class="danger-button" onclick="requestClearAppointment()">Termin entfernen</button></div></div>`;
+  host.innerHTML = `<div class="saved-appointment-main"><div class="saved-appointment-title">${escapeHtml(nextAppointment.title || "Gemeinsamer Termin")}</div><div class="saved-appointment-meta">📅 ${escapeHtml(formatAppointmentDate(nextAppointment.start_at))}</div>${nextAppointment.location ? `<div class="saved-appointment-meta">⌖ ${escapeHtml(nextAppointment.location)}</div>` : ""}${nextAppointment.note ? `<div class="saved-appointment-meta">${escapeHtml(nextAppointment.note)}</div>` : ""}<div class="saved-appointment-actions"><button type="button" onclick="editSavedAppointment()">Ändern</button><button type="button" class="ics-button" onclick="downloadAppointmentIcs()">📆 Zum Kalender hinzufügen</button><button type="button" class="danger-button" onclick="requestClearAppointment()">Termin entfernen</button></div></div>`;
 }
 function tickAppointmentCountdown() { if (currentView === "menu") renderNextAppointment(); }
 async function loadNextAppointment() {
