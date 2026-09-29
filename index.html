@@ -4827,6 +4827,14 @@ html.duel-open, html.duel-open body { overflow:hidden; }
 @media(max-width:760px){.appointment-tabs{position:sticky;top:8px;z-index:50}.step-heading{display:grid}.availability-layout{gap:10px}.calendar-card,.availability-calendar-card,.appointment-form-card,.availability-form-card{padding:14px}.calendar-day{min-height:48px!important}.poll-selected-dates{margin-top:-2px}.best-day-row{grid-template-columns:1fr}.best-day-row button{width:100%}.appointment-save-button,.poll-save-button{position:sticky;bottom:10px;z-index:40;box-shadow:0 10px 28px rgba(0,0,0,.32);min-height:48px}.helper-text{font-size:13px}}
 
 
+.own-avail-list{display:grid;gap:8px;margin-top:10px}
+.own-avail-row{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:10px;align-items:center;padding:10px 12px;border:1px solid rgba(101,141,207,.15);border-radius:12px;background:rgba(22,40,62,.58)}
+.own-avail-date{color:#eef5ff;font-weight:800;font-size:14px}
+.own-avail-row input[type=time]{width:auto;max-width:120px;margin:0;min-height:40px}
+.own-avail-remove{width:40px!important;height:40px;margin:0!important;padding:0!important;border-radius:10px!important;border:1px solid rgba(255,118,118,.28)!important;background:rgba(205,67,67,.14)!important;color:#ffb0aa!important;font-size:18px;cursor:pointer}
+.own-avail-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.own-avail-actions button{width:auto;margin:0;min-height:42px}
+@media(max-width:520px){.own-avail-row{grid-template-columns:1fr auto auto}}
+#pollName[readonly]{opacity:.85;cursor:default}
 </style>
 
 <!-- Cinematic background -->
@@ -5171,7 +5179,7 @@ body.app-scene .skip-link:focus{left:12px}
             <div id="availabilityDayDetails" class="availability-day-details" aria-live="polite"><strong>Tag auswählen</strong><span>Tippe auf einen Tag, um zu sehen, wer verfügbar ist.</span></div>
           </section>
           <section class="availability-form-card" aria-label="Verfügbarkeit eintragen">
-            <label class="edit-field"><span>Dein Name</span><input id="pollName" placeholder="z. B. Anna" autocomplete="name" value="Gast"></label>
+            <label class="edit-field"><span>Dein Name</span><input id="pollName" autocomplete="username" readonly aria-readonly="true" placeholder="Wird automatisch ausgefüllt"></label>
             <div class="time-picker">
               <div class="field-caption">Uhrzeit</div>
               <div id="pollTimeChips" class="time-chips" role="group" aria-label="Uhrzeit auswählen">
@@ -5192,7 +5200,7 @@ body.app-scene .skip-link:focus{left:12px}
           <div id="bestDaysList" class="best-days-list"></div>
         </section>
         <section class="availability-summary" aria-labelledby="availabilityEntriesTitle">
-          <div class="section-inline-heading"><div><div class="dashboard-kicker">Rückmeldungen</div><h3 id="availabilityEntriesTitle">Wer kann?</h3></div></div>
+          <div class="section-inline-heading"><div><div class="dashboard-kicker">Dein Eintrag</div><h3 id="availabilityEntriesTitle">Meine Verfügbarkeiten</h3></div></div>
           <div id="availabilityEntries" class="availability-entries"><span class="panel-subtitle">Noch keine Einträge vorhanden.</span></div>
         </section>
       </section>
@@ -8115,6 +8123,7 @@ function availabilityDateCounts(){
   const counts={};
   availabilityEntries.forEach(e=>(e.dates||[]).forEach(v=>{
     const k=availabilityDateKey(v);
+    if(k<todayDateKey())return;
     counts[k]=(counts[k]||0)+1;
   }));
   return counts;
@@ -8233,25 +8242,63 @@ function toggleSavedPollDate(key){
   renderSelectedPollDates();
 }
 
+function pollUsername(){
+  return currentProfile?.username || currentUser?.user_metadata?.username || currentUser?.email?.split("@")[0] || "";
+}
+function ownAvailabilityEntry(){
+  return currentUser ? (availabilityEntries.find(e=>e.user_id===currentUser.id)||null) : null;
+}
+function availabilityTimeOf(value){
+  return /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(String(value||"")) ? String(value).slice(11,16) : "19:00";
+}
 function renderAvailabilityEntries(){
   const host=document.getElementById("availabilityEntries");
   if(!host)return;
-  if(!availabilityEntries.length){
-    host.innerHTML='<span class="helper-text">Noch keine Rückmeldungen vorhanden.</span>';
+  const own=ownAvailabilityEntry();
+  const dates=[...new Set((own?.dates||[]).map(availabilityDateKey))].filter(k=>k>=todayDateKey()).sort();
+  if(!dates.length){
+    host.innerHTML='<span class="helper-text">Du hast noch keine Verfügbarkeit eingetragen. Wähle oben Tage im Kalender aus und speichere sie.</span>';
     return;
   }
+  const timeOf=k=>availabilityTimeOf((own.dates||[]).find(v=>availabilityDateKey(v)===k));
+  host.innerHTML=`<div class="own-avail-list">${dates.map(k=>`<div class="own-avail-row">
+      <div class="own-avail-date">${escapeHtml(formatPollDate(k))}</div>
+      <input type="time" value="${timeOf(k)}" aria-label="Uhrzeit für ${escapeHtml(formatPollDate(k))}" onchange="changeOwnAvailabilityTime('${k}',this.value)">
+      <button class="own-avail-remove" type="button" aria-label="${escapeHtml(formatPollDate(k))} entfernen" onclick="removeOwnAvailabilityDate('${k}')">×</button>
+    </div>`).join("")}</div>
+    <div class="own-avail-actions"><button type="button" class="danger-button" onclick="removeAllOwnAvailability()">Alle meine Verfügbarkeiten löschen</button></div>`;
+}
 
-  host.innerHTML=availabilityEntries.map((e,i)=>{
-    const own = currentUser && e.user_id === currentUser.id;
-    const removeButton = own
-      ? `<button class="availability-entry-remove" type="button" onclick="removeAvailabilityEntry(${i})">Meine Rückmeldung ändern</button>`
-      : "";
-    return `<div class="availability-entry">
-      <div class="availability-entry-name">${escapeHtml(e.participant_name || "Unbekannt")}</div>
-      <div class="availability-entry-dates">${(e.dates||[]).slice().sort().map(d=>`<span class="availability-entry-date">${formatAvailabilityDate(d)}</span>`).join("")}</div>
-      ${removeButton}
-    </div>`;
-  }).join("");
+async function saveOwnAvailabilityDates(dates,okMessage){
+  const own=ownAvailabilityEntry();
+  if(!own||!currentUser)return;
+  try{
+    const res=dates.length
+      ? await supabaseClient.from("appointment_availability").update({participant_name:pollUsername()||own.participant_name,dates}).eq("id",own.id).eq("user_id",currentUser.id)
+      : await supabaseClient.from("appointment_availability").delete().eq("id",own.id).eq("user_id",currentUser.id);
+    if(res.error)throw res.error;
+    await loadAppointmentPoll();
+    setPollStatus(okMessage,"success");
+  }catch(error){
+    showSupabaseError("Fehler beim Aktualisieren deiner Verfügbarkeit",error);
+    setPollStatus("Änderung konnte nicht gespeichert werden.","error");
+  }
+}
+function changeOwnAvailabilityTime(key,time){
+  const own=ownAvailabilityEntry();
+  if(!own||!/^\d{2}:\d{2}$/.test(time||""))return;
+  const dates=(own.dates||[]).filter(v=>availabilityDateKey(v)>=todayDateKey()).map(v=>availabilityDateKey(v)===key?`${key}T${time}`:v);
+  saveOwnAvailabilityDates(dates,"Uhrzeit aktualisiert.");
+}
+function removeOwnAvailabilityDate(key){
+  const own=ownAvailabilityEntry();
+  if(!own)return;
+  const dates=(own.dates||[]).filter(v=>availabilityDateKey(v)>=todayDateKey()&&availabilityDateKey(v)!==key);
+  saveOwnAvailabilityDates(dates,"Tag entfernt.");
+}
+function removeAllOwnAvailability(){
+  if(!confirm("Alle deine eingetragenen Verfügbarkeiten wirklich löschen?"))return;
+  saveOwnAvailabilityDates([],"Alle deine Verfügbarkeiten wurden gelöscht.");
 }
 
 function renderBestDays(){
@@ -8290,6 +8337,22 @@ function adoptBestDay(key){
   setAppointmentStatus(`Vorschlag übernommen (${people.length} Rückmeldungen). Prüfe Uhrzeit und Ort vor dem Speichern.`,"success");
 }
 
+async function purgeOwnPastAvailability(){
+  // Fallback, falls die Datenbankfunktion fehlt: eigene vergangene Tage selbst entfernen.
+  const own=ownAvailabilityEntry();
+  if(!own)return;
+  const today=todayDateKey();
+  const future=(own.dates||[]).filter(v=>availabilityDateKey(v)>=today);
+  if(future.length===(own.dates||[]).length)return;
+  try{
+    const res=future.length
+      ? await supabaseClient.from("appointment_availability").update({dates:future}).eq("id",own.id).eq("user_id",currentUser.id)
+      : await supabaseClient.from("appointment_availability").delete().eq("id",own.id).eq("user_id",currentUser.id);
+    if(res.error)throw res.error;
+  }catch(e){console.warn("Vergangene Termine konnten nicht entfernt werden:",e);}
+  if(future.length){ own.dates=future; }
+  else availabilityEntries=availabilityEntries.filter(e=>e!==own);
+}
 async function loadAppointmentPoll(){
   startAppointmentsRealtime();
   if(!currentUser){
@@ -8299,6 +8362,9 @@ async function loadAppointmentPoll(){
     renderAvailabilityEntries();
     return;
   }
+
+  // Vergangene Termine serverseitig für alle entfernen (Fehler hier sind unkritisch).
+  try{ await supabaseClient.rpc("cleanup_past_availability"); }catch(e){}
 
   const {data,error}=await supabaseClient
     .from("appointment_availability")
@@ -8311,14 +8377,14 @@ async function loadAppointmentPoll(){
     showSupabaseError("Fehler beim Laden der Verfügbarkeit",error);
   }else{
     availabilityEntries=Array.isArray(data)?data:[];
+    await purgeOwnPastAvailability();
     const others=availabilityEntries.filter(e=>e.user_id!==currentUser.id).length;
     setPollStatus(others?"":"Es sind noch keine Rückmeldungen anderer Nutzender sichtbar. Falls andere bereits eingetragen haben, fehlt die Leseberechtigung in Supabase (supabase-appointments-setup.sql ausführen).");
   }
 
   const savedEntry=availabilityEntries.find(e=>e.user_id===currentUser.id);
-  const savedName=savedEntry?.participant_name || currentUser.user_metadata?.username || currentUser.email?.split("@")[0] || "";
   const nameField=document.getElementById("pollName");
-  if(nameField && savedName)nameField.value=savedName;
+  if(nameField)nameField.value=pollUsername();
 
   // Die aktuelle eigene Auswahl aus der gemeinsamen Datenbank wiederherstellen.
   selectedPollDates=[];
@@ -8345,7 +8411,7 @@ async function loadAppointmentPoll(){
 }
 
 async function saveAppointmentPoll(){
-  const name=document.getElementById("pollName").value.trim();
+  const name=pollUsername()||document.getElementById("pollName").value.trim();
   const status=document.getElementById("pollStatus");
   const button=document.querySelector(".poll-save-button");
 
@@ -8356,7 +8422,7 @@ async function saveAppointmentPoll(){
     return;
   }
   if(!name){
-    setPollStatus("Bitte deinen Namen eingeben.","error");
+    setPollStatus("Dein Benutzername konnte nicht ermittelt werden. Bitte neu anmelden.","error");
     return;
   }
   if(!selectedPollDates.length){
