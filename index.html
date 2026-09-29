@@ -5204,7 +5204,7 @@ body.app-scene .skip-link:focus{left:12px}
             <div class="calendar-toolbar"><button id="calendarPreviousMonth" class="calendar-nav-button" type="button" onclick="changeCalendarMonth(-1)" aria-label="Vorheriger Monat">‹</button><strong id="calendarMonthLabel"></strong><button class="calendar-nav-button" type="button" onclick="changeCalendarMonth(1)" aria-label="Nächster Monat">›</button></div>
             <div class="calendar-weekdays"><span>Mo</span><span>Di</span><span>Mi</span><span>Do</span><span>Fr</span><span>Sa</span><span>So</span></div>
             <div id="appointmentCalendar" class="appointment-calendar"></div>
-            <div class="calendar-legend"><span><i class="legend-ring"></i> Auswahl</span><span><i class="legend-dot"></i> Heute</span><span><i class="legend-check">✓</i> Bestehender Termin</span></div>
+            <div class="calendar-legend"><span><i class="legend-ring"></i> Auswahl</span><span><i class="legend-dot"></i> Heute</span><span><i class="legend-check">✓</i> Bestehender Termin</span><span><i class="legend-heat"></i> Zusagen</span></div>
           </section>
           <section class="appointment-form-card">
             <label class="edit-field"><span>Titel</span><input id="appointmentTitle" placeholder="z. B. Games"></label>
@@ -7872,9 +7872,9 @@ function tickAppointmentCountdown() { if (currentView === "menu") renderNextAppo
 async function loadNextAppointment() {
   if (!currentUser || !supabaseClient) return;
   try {
+    // Gemeinsamer Termin: nächster anstehender Termin über ALLE Nutzenden.
     const { data, error } = await supabaseClient.from("shared_events")
       .select("id,title,start_at,location,note,user_id")
-      .eq("user_id", currentUser.id)
       .gte("start_at", new Date().toISOString())
       .order("start_at", { ascending: true })
       .limit(1);
@@ -7888,7 +7888,7 @@ async function loadNextAppointment() {
   renderSavedAppointment();
   renderAppointmentCalendar();
   if (nextAppointment) fillAppointmentFormFromCurrent();
-  if (typeof loadAppointmentPoll === "function") loadAppointmentPoll();
+  loadAppointmentPoll();
 }
 function fillAppointmentFormFromCurrent() {
   if (!nextAppointment) return;
@@ -7961,6 +7961,12 @@ function renderAppointmentCalendar(selectedDay) {
     if (d.toDateString() === today.toDateString()) b.classList.add("is-today");
     if (key === selectedKey || day === selectedDay) b.classList.add("selected");
     if (nextAppointment?.start_at?.slice(0,10) === key) b.classList.add("is-appointment");
+    const cnt = availabilityDateCounts()[key] || 0;
+    if (cnt) {
+      b.classList.add(`heat-${Math.min(4,cnt)}`);
+      const badge=document.createElement("span"); badge.className="calendar-day-count"; badge.textContent=cnt; b.appendChild(badge);
+      b.title=`${cnt} ${cnt===1?"Person kann":"Personen können"}: ${availabilityPeopleForDate(key).join(", ")}`;
+    }
     b.onclick = () => selectCalendarDate(day);
     grid.appendChild(b);
   }
@@ -7980,14 +7986,13 @@ async function saveNextAppointment() {
   try {
     const payload = { title, start_at:startAt.toISOString(), location, note, user_id:currentUser.id };
 
-    // Nicht von einem UNIQUE-Constraint auf user_id abhängig sein:
-    // vorhandenen eigenen Termin suchen und gezielt aktualisieren,
-    // ansonsten einen neuen gemeinsamen Termin anlegen.
+    // Es gibt genau einen gemeinsamen nächsten Termin: den vorhandenen
+    // (egal von wem) aktualisieren, sonst neu anlegen.
     const existingResult = await supabaseClient
       .from("shared_events")
-      .select("id,title,start_at,location,note,user_id")
-      .eq("user_id", currentUser.id)
-      .order("start_at", { ascending: false })
+      .select("id")
+      .gte("start_at", new Date().toISOString())
+      .order("start_at", { ascending: true })
       .limit(1);
     if (existingResult.error) throw existingResult.error;
 
@@ -7997,8 +8002,7 @@ async function saveNextAppointment() {
       result = await supabaseClient
         .from("shared_events")
         .update({ title, start_at:startAt.toISOString(), location, note })
-        .eq("id", existing.id)
-        .eq("user_id", currentUser.id);
+        .eq("id", existing.id);
     } else {
       result = await supabaseClient
         .from("shared_events")
@@ -8028,9 +8032,9 @@ function editSavedAppointment() { if (!nextAppointment) return; fillAppointmentF
 function requestClearAppointment() { const el=document.getElementById("appointmentDeleteConfirm"); if(el) el.hidden=false; }
 function cancelClearAppointment() { const el=document.getElementById("appointmentDeleteConfirm"); if(el) el.hidden=true; }
 async function confirmClearAppointment() {
-  if (!currentUser || !supabaseClient) return;
+  if (!currentUser || !supabaseClient || !nextAppointment?.id) return;
   try {
-    const { error } = await supabaseClient.from("shared_events").delete().eq("user_id", currentUser.id);
+    const { error } = await supabaseClient.from("shared_events").delete().eq("id", nextAppointment.id);
     if (error) throw error;
     nextAppointment = null;
     cancelClearAppointment();
@@ -8050,25 +8054,43 @@ function switchAppointmentStep(step) {
   ta.classList.toggle("is-active",availability); tb.classList.toggle("is-active",!availability);
   ta.setAttribute("aria-selected",String(availability)); tb.setAttribute("aria-selected",String(!availability));
   if (!availability) { renderAppointmentCalendar(); if(nextAppointment) fillAppointmentFormFromCurrent(); }
+  else if (typeof loadAppointmentPoll==="function") loadAppointmentPoll();
 }
 function escapeHtml(value) { return String(value).replace(/[&<>'"]/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;","\"":"&quot;"}[ch])); }
 if (!appointmentCountdownTimer) appointmentCountdownTimer=setInterval(tickAppointmentCountdown,1000);
+/* Realtime: Änderungen anderer Nutzender live übernehmen */
+let appointmentsRealtimeChannel=null;
+function startAppointmentsRealtime(){
+  if(appointmentsRealtimeChannel||!supabaseClient||!currentUser)return;
+  try{
+    appointmentsRealtimeChannel=supabaseClient.channel("appointments-shared")
+      .on("postgres_changes",{event:"*",schema:"public",table:"appointment_availability"},()=>loadAppointmentPoll())
+      .on("postgres_changes",{event:"*",schema:"public",table:"shared_events"},()=>loadNextAppointment())
+      .subscribe();
+  }catch(e){console.warn("Realtime nicht verfügbar:",e);}
+}
 /* Termin-Umfrage – gemeinsame Supabase-Daten */
 let selectedPollTimes = {};
 let selectedPollTime = "19:00";
 
+function setPollStatus(text,type=""){
+  const el=document.getElementById("pollStatus"); if(!el)return;
+  el.textContent=text||"";
+  el.classList.toggle("status-success",type==="success");
+  el.classList.toggle("status-error",type==="error");
+}
 function pollStorageKey(){ return `wfg-availability:${currentUser?.id || "guest"}`; }
 function pollDateKey(date){ return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,"0")}-${String(date.getDate()).padStart(2,"0")}`; }
 function formatPollDate(key){ return new Intl.DateTimeFormat("de-DE",{weekday:"short",day:"2-digit",month:"2-digit",year:"numeric"}).format(new Date(`${key}T12:00:00`)); }
 function todayDateKey(){ return pollDateKey(new Date()); }
 function currentMonthStart(){ const d=new Date(); return new Date(d.getFullYear(),d.getMonth(),1); }
 
-function setPollTime(time){
+function setPollTime(time,applyToAll=true){
   selectedPollTime=time||"19:00";
   document.querySelectorAll("#pollTimeChips .time-chip").forEach(b=>b.classList.toggle("is-active",b.dataset.time===selectedPollTime));
   const c=document.getElementById("pollCustomTime");
   if(c)c.value=selectedPollTime;
-  selectedPollDates.forEach(k=>selectedPollTimes[k]=selectedPollTime);
+  if(applyToAll)selectedPollDates.forEach(k=>selectedPollTimes[k]=selectedPollTime);
   renderSelectedPollDates();
 }
 
@@ -8168,7 +8190,7 @@ function renderPollCalendar(){
     if(appointmentKey===key)b.classList.add("is-appointment");
 
     if(count){
-      b.classList.add(`heat-${Math.min(4,Math.max(1,Math.ceil(count/maxCount*4)))}`);
+      b.classList.add(`heat-${Math.min(4,Math.max(1,Math.ceil(count/Math.max(maxCount,4)*4)))}`);
       if(count>=2)b.classList.add("common");
       const badge=document.createElement("span");
       badge.className="calendar-day-count";
@@ -8268,6 +8290,7 @@ function adoptBestDay(key){
 }
 
 async function loadAppointmentPoll(){
+  startAppointmentsRealtime();
   if(!currentUser){
     availabilityEntries=[];
     renderPollCalendar();
@@ -8313,7 +8336,7 @@ async function loadAppointmentPoll(){
     if(selectedPollDates[0])selectedPollTime=selectedPollTimes[selectedPollDates[0]]||"19:00";
   }
 
-  setPollTime(selectedPollTime);
+  setPollTime(selectedPollTime,false);
   renderPollCalendar();
   renderSelectedPollDates();
   renderAvailabilityEntries();
@@ -8340,7 +8363,7 @@ async function saveAppointmentPoll(){
   }
 
   const entryDates=[...selectedPollDates].sort().map(k=>`${k}T${selectedPollTimes[k]||selectedPollTime}`);
-  button.disabled=true;
+  if(button)button.disabled=true;
   setPollStatus("Deine Verfügbarkeit wird gemeinsam gespeichert …");
 
   try{
@@ -8383,9 +8406,9 @@ async function saveAppointmentPoll(){
     setPollStatus("Deine Verfügbarkeit wurde gespeichert und ist jetzt für alle sichtbar.","success");
   }catch(error){
     showSupabaseError("Fehler beim gemeinsamen Speichern der Verfügbarkeit",error);
-    setPollStatus("Die Verfügbarkeit konnte nicht gespeichert werden.","error");
+    setPollStatus(`Die Verfügbarkeit konnte nicht gespeichert werden${error?.message?` (${error.message})`:""}. Wurde supabase-appointments-setup.sql ausgeführt?`,"error");
   }finally{
-    button.disabled=false;
+    if(button)button.disabled=false;
   }
 }
 
