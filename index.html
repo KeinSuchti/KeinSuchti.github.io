@@ -7833,6 +7833,7 @@ function appointmentStorageKey() { return `wfg-next-appointment:${currentUser?.i
 function formatAppointmentDate(value, withTime = true) {
   if (!value) return "";
   const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
   return new Intl.DateTimeFormat("de-DE", { weekday:"long", day:"2-digit", month:"long", year:"numeric", ...(withTime ? { hour:"2-digit", minute:"2-digit" } : {}) }).format(date);
 }
 function appointmentCountdown(value) {
@@ -7846,143 +7847,187 @@ function appointmentCountdown(value) {
   return `In ${days} ${days === 1 ? "Tag" : "Tagen"}, ${String(hours).padStart(2,"0")} Std., ${String(minutes).padStart(2,"0")} Min., ${String(seconds).padStart(2,"0")} Sek.`;
 }
 function renderNextAppointment() {
+  if (!nextAppointmentBanner) return;
   if (!nextAppointment || !nextAppointment.start_at || new Date(nextAppointment.start_at) < new Date()) {
     nextAppointmentBanner.hidden = true;
+    nextAppointmentBanner.innerHTML = "";
     return;
   }
-  const title = nextAppointment.title || "Wo und wann?";
   nextAppointmentBanner.hidden = false;
-  nextAppointmentBanner.innerHTML = `<div class="appointment-banner-grid"><div class="appointment-banner-icon">◷</div><div class="appointment-banner-copy"><div class="appointment-banner-kicker">Nächster gemeinsamer Termin</div><div class="appointment-banner-countdown">${escapeHtml(title)} · ${appointmentCountdown(nextAppointment.start_at)}</div><div class="appointment-banner-meta"><span>📅 ${formatAppointmentDate(nextAppointment.start_at)}</span>${nextAppointment.location ? `<span>⌖ ${escapeHtml(nextAppointment.location)}</span>` : ""}</div>${nextAppointment.note ? `<div class="appointment-banner-note">${escapeHtml(nextAppointment.note)}</div>` : ""}</div></div>`;
+  nextAppointmentBanner.innerHTML = `<div class="appointment-banner-grid"><div class="appointment-banner-icon">◷</div><div class="appointment-banner-copy"><div class="appointment-banner-kicker">Nächster gemeinsamer Termin</div><div class="appointment-banner-countdown">${escapeHtml(nextAppointment.title || "Gemeinsamer Termin")} · ${appointmentCountdown(nextAppointment.start_at)}</div><div class="appointment-banner-meta"><span>📅 ${escapeHtml(formatAppointmentDate(nextAppointment.start_at))}</span>${nextAppointment.location ? `<span>⌖ ${escapeHtml(nextAppointment.location)}</span>` : ""}</div>${nextAppointment.note ? `<div class="appointment-banner-note">${escapeHtml(nextAppointment.note)}</div>` : ""}</div></div>`;
 }
 function renderSavedAppointment() {
   const summary = document.getElementById("nextAppointmentSummary");
-  const entryHost = document.getElementById("nextAppointmentEntry");
-  if (!summary || !entryHost) return;
-  entryHost.replaceChildren();
+  const host = document.getElementById("nextAppointmentEntry");
+  if (!summary || !host) return;
+  host.replaceChildren();
   if (!nextAppointment || !nextAppointment.start_at || new Date(nextAppointment.start_at) < new Date()) {
     summary.hidden = true;
     return;
   }
-
   summary.hidden = false;
-  const entry = document.createElement("div");
-  entry.className = "availability-entry";
-
-  const details = document.createElement("div");
-  const title = document.createElement("div");
-  title.className = "availability-entry-name";
-  title.textContent = nextAppointment.title || "Gemeinsamer Termin";
-  const date = document.createElement("div");
-  date.className = "panel-subtitle";
-  date.textContent = formatAppointmentDate(nextAppointment.start_at);
-  details.append(title, date);
-
-  const metadata = document.createElement("div");
-  metadata.className = "availability-entry-dates";
-  if (nextAppointment.location) {
-    const location = document.createElement("span");
-    location.className = "availability-entry-date";
-    location.textContent = `⌖ ${nextAppointment.location}`;
-    metadata.appendChild(location);
-  }
-  if (nextAppointment.note) {
-    const note = document.createElement("span");
-    note.className = "availability-entry-date";
-    note.textContent = nextAppointment.note;
-    metadata.appendChild(note);
-  }
-  const removeButton = document.createElement("button");
-  removeButton.className = "availability-entry-remove";
-  removeButton.type = "button";
-  removeButton.textContent = "Termin entfernen";
-  removeButton.setAttribute("aria-label", `Termin ${nextAppointment.title || "Gemeinsamer Termin"} entfernen`);
-  removeButton.addEventListener("click", clearNextAppointment);
-  metadata.appendChild(removeButton);
-
-  entry.append(details, metadata);
-  entryHost.appendChild(entry);
+  host.innerHTML = `<div class="saved-appointment-main"><div class="saved-appointment-title">${escapeHtml(nextAppointment.title || "Gemeinsamer Termin")}</div><div class="saved-appointment-meta">📅 ${escapeHtml(formatAppointmentDate(nextAppointment.start_at))}</div>${nextAppointment.location ? `<div class="saved-appointment-meta">⌖ ${escapeHtml(nextAppointment.location)}</div>` : ""}${nextAppointment.note ? `<div class="saved-appointment-meta">${escapeHtml(nextAppointment.note)}</div>` : ""}<div class="saved-appointment-actions"><button type="button" onclick="editSavedAppointment()">Ändern</button><button type="button" class="danger-button" onclick="requestClearAppointment()">Termin entfernen</button></div></div>`;
 }
 function tickAppointmentCountdown() { if (currentView === "menu") renderNextAppointment(); }
-async function appointmentStorageKey() { return "wfg-local-next-appointment"; }
-function formatAppointmentDate(value, withTime = true) {
-  if (!value) return "";
-  const date = new Date(value);
-  return new Intl.DateTimeFormat("de-DE", { weekday:"long", day:"2-digit", month:"long", year:"numeric", ...(withTime ? { hour:"2-digit", minute:"2-digit" } : {}) }).format(date);
+async function loadNextAppointment() {
+  if (!currentUser || !supabaseClient) return;
+  try {
+    const { data, error } = await supabaseClient.from("shared_events")
+      .select("id,title,start_at,location,note,user_id")
+      .eq("user_id", currentUser.id)
+      .gte("start_at", new Date().toISOString())
+      .order("start_at", { ascending: true })
+      .limit(1);
+    if (error) throw error;
+    nextAppointment = data?.[0] || null;
+  } catch (error) {
+    console.error("Termin konnte nicht geladen werden:", error);
+    nextAppointment = null;
+  }
+  renderNextAppointment();
+  renderSavedAppointment();
+  renderAppointmentCalendar();
+  if (nextAppointment) fillAppointmentFormFromCurrent();
+  if (typeof loadAppointmentPoll === "function") loadAppointmentPoll();
 }
-function appointmentCountdown(value) {
-  const diff = new Date(value).getTime() - Date.now();
-  if (diff <= 0) return "Heute";
-  const totalSeconds = Math.floor(diff / 1000), days = Math.floor(totalSeconds/86400), hours=Math.floor((totalSeconds%86400)/3600), minutes=Math.floor((totalSeconds%3600)/60), seconds=totalSeconds%60;
-  return `In ${days} ${days===1?"Tag":"Tagen"}, ${String(hours).padStart(2,"0")} Std., ${String(minutes).padStart(2,"0")} Min., ${String(seconds).padStart(2,"0")} Sek.`;
+function fillAppointmentFormFromCurrent() {
+  if (!nextAppointment) return;
+  const title = document.getElementById("appointmentTitle");
+  const location = document.getElementById("appointmentLocation");
+  const note = document.getElementById("appointmentNote");
+  if (title) title.value = nextAppointment.title || "";
+  setAppointmentDateValue(toDateTimeLocal(nextAppointment.start_at));
+  if (location) location.value = nextAppointment.location || "";
+  if (note) note.value = nextAppointment.note || "";
+  const local = toDateTimeLocal(nextAppointment.start_at);
+  if (local) setAppointmentTime(local.slice(11,16));
 }
-function renderNextAppointment() {
-  if (!nextAppointment || !nextAppointment.start_at || new Date(nextAppointment.start_at) < new Date()) { nextAppointmentBanner.hidden=true; return; }
-  nextAppointmentBanner.hidden=false;
-  nextAppointmentBanner.innerHTML=`<div class="appointment-banner-grid"><div class="appointment-banner-icon">◷</div><div class="appointment-banner-copy"><div class="appointment-banner-kicker">Nächster gemeinsamer Termin</div><div class="appointment-banner-countdown">${escapeHtml(nextAppointment.title||"Gemeinsamer Termin")} · ${appointmentCountdown(nextAppointment.start_at)}</div><div class="appointment-banner-meta"><span>📅 ${formatAppointmentDate(nextAppointment.start_at)}</span>${nextAppointment.location?`<span>⌖ ${escapeHtml(nextAppointment.location)}</span>`:""}</div></div></div>`;
+function setAppointmentDateValue(localValue) {
+  const input = document.getElementById("appointmentDate");
+  if (input) input.value = localValue || "";
 }
-function renderSavedAppointment() {
-  const summary=document.getElementById("nextAppointmentSummary"), host=document.getElementById("nextAppointmentEntry"); if(!summary||!host)return;
-  host.replaceChildren();
-  if(!nextAppointment){summary.hidden=true;return;}
-  summary.hidden=false;
-  host.innerHTML=`<div class="saved-appointment-main"><div class="saved-appointment-title">${escapeHtml(nextAppointment.title||"Gemeinsamer Termin")}</div><div class="saved-appointment-meta">📅 ${escapeHtml(formatAppointmentDate(nextAppointment.start_at))}</div>${nextAppointment.location?`<div class="saved-appointment-meta">⌖ ${escapeHtml(nextAppointment.location)}</div>`:""}${nextAppointment.note?`<div class="saved-appointment-meta">${escapeHtml(nextAppointment.note)}</div>`:""}<div class="saved-appointment-actions"><button type="button" onclick="editSavedAppointment()">Ändern</button><button type="button" class="danger-button" onclick="requestClearAppointment()">Termin entfernen</button></div></div>`;
+function toDateTimeLocal(value) {
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return "";
+  const pad = n => String(n).padStart(2,"0");
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
-function tickAppointmentCountdown(){renderNextAppointment();}
-function loadNextAppointment(){
-  try{nextAppointment=JSON.parse(localStorage.getItem(appointmentStorageKey())||"null")}catch(_){nextAppointment=null}
-  renderNextAppointment(); renderSavedAppointment(); renderAppointmentCalendar(); loadAppointmentPoll();
-}
-function fillAppointmentFormFromCurrent(){if(!nextAppointment)return;document.getElementById("appointmentTitle").value=nextAppointment.title||"";setAppointmentDateValue(toDateTimeLocal(nextAppointment.start_at));document.getElementById("appointmentLocation").value=nextAppointment.location||"";document.getElementById("appointmentNote").value=nextAppointment.note||"";setAppointmentTime(toDateTimeLocal(nextAppointment.start_at).slice(11,16));}
-function setAppointmentDateValue(localValue){const input=document.getElementById("appointmentDate");if(input)input.value=localValue||""}
-function toDateTimeLocal(value){const d=new Date(value);if(Number.isNaN(d.getTime()))return"";const pad=n=>String(n).padStart(2,"0");return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`}
-function setAppointmentTime(time){
-  if(!time)return; const chipHost=document.getElementById("appointmentTimeChips"); if(chipHost)chipHost.querySelectorAll(".time-chip").forEach(b=>b.classList.toggle("is-active",b.dataset.time===time));
-  const custom=document.getElementById("appointmentCustomTime"); if(custom)custom.value=time;
-  const dateInput=document.getElementById("appointmentDate"); if(dateInput?.value)dateInput.value=dateInput.value.slice(0,11)+time;
+function setAppointmentTime(time) {
+  if (!time) return;
+  document.querySelectorAll("#appointmentTimeChips .time-chip").forEach(b => b.classList.toggle("is-active", b.dataset.time === time));
+  const custom = document.getElementById("appointmentCustomTime");
+  if (custom) custom.value = time;
+  const dateInput = document.getElementById("appointmentDate");
+  if (dateInput?.value) dateInput.value = dateInput.value.slice(0,11) + time;
   renderAppointmentCalendar();
 }
-function changeCalendarMonth(delta){const target=new Date(calendarCursor.getFullYear(),calendarCursor.getMonth()+delta,1);if(target<currentMonthStart())return;calendarCursor=target;renderAppointmentCalendar()}
-function selectCalendarDate(day){
-  const date=new Date(calendarCursor.getFullYear(),calendarCursor.getMonth(),day), today=new Date(); if(date<new Date(today.getFullYear(),today.getMonth(),today.getDate()))return;
-  const time=document.getElementById("appointmentCustomTime")?.value||"19:00"; setAppointmentDateValue(`${pollDateKey(date)}T${time}`); renderAppointmentCalendar(day);
+function currentMonthStart() { const d = new Date(); return new Date(d.getFullYear(), d.getMonth(), 1); }
+function changeCalendarMonth(delta) {
+  const target = new Date(calendarCursor.getFullYear(), calendarCursor.getMonth() + delta, 1);
+  if (target < currentMonthStart()) return;
+  calendarCursor = target;
+  renderAppointmentCalendar();
 }
-function renderAppointmentCalendar(selectedDay){
-  const grid=document.getElementById("appointmentCalendar"),label=document.getElementById("calendarMonthLabel");if(!grid||!label)return;
-  const min=currentMonthStart();if(calendarCursor<min)calendarCursor=min;
-  const y=calendarCursor.getFullYear(),m=calendarCursor.getMonth(),first=new Date(y,m,1),last=new Date(y,m+1,0),today=new Date(), selectedKey=document.getElementById("appointmentDate")?.value?.slice(0,10)||"";
-  label.textContent=new Intl.DateTimeFormat("de-DE",{month:"long",year:"numeric"}).format(first);grid.innerHTML="";
-  document.getElementById("calendarPreviousMonth").disabled=calendarCursor<=min;
-  const offset=(first.getDay()+6)%7;for(let i=0;i<offset;i++){const e=document.createElement("span");e.className="calendar-day is-empty";grid.appendChild(e)}
-  for(let day=1;day<=last.getDate();day++){
-    const d=new Date(y,m,day),key=pollDateKey(d),b=document.createElement("button");b.type="button";b.className="calendar-day";b.textContent=day;
-    const full=new Intl.DateTimeFormat("de-DE",{weekday:"long",day:"numeric",month:"long",year:"numeric"}).format(d);b.setAttribute("aria-label",full);b.setAttribute("aria-pressed",key===selectedKey?"true":"false");
-    if(d<new Date(today.getFullYear(),today.getMonth(),today.getDate()))b.disabled=true;
-    if(d.toDateString()===today.toDateString())b.classList.add("is-today");
-    if(key===selectedKey)b.classList.add("selected");
-    if(nextAppointment?.start_at?.slice(0,10)===key)b.classList.add("is-appointment");
-    b.onclick=()=>selectCalendarDate(day);grid.appendChild(b)
+function selectCalendarDate(day) {
+  const date = new Date(calendarCursor.getFullYear(), calendarCursor.getMonth(), day);
+  const today = new Date();
+  if (date < new Date(today.getFullYear(), today.getMonth(), today.getDate())) return;
+  const time = document.getElementById("appointmentCustomTime")?.value || "19:00";
+  setAppointmentDateValue(`${pollDateKey(date)}T${time}`);
+  renderAppointmentCalendar(day);
+}
+function renderAppointmentCalendar(selectedDay) {
+  const grid = document.getElementById("appointmentCalendar");
+  const label = document.getElementById("calendarMonthLabel");
+  if (!grid || !label) return;
+  const min = currentMonthStart();
+  if (calendarCursor < min) calendarCursor = min;
+  const y = calendarCursor.getFullYear(), m = calendarCursor.getMonth();
+  const first = new Date(y,m,1), last = new Date(y,m+1,0), today = new Date();
+  const selectedKey = document.getElementById("appointmentDate")?.value?.slice(0,10) || "";
+  label.textContent = new Intl.DateTimeFormat("de-DE", {month:"long", year:"numeric"}).format(first);
+  const previous = document.getElementById("calendarPreviousMonth");
+  if (previous) previous.disabled = calendarCursor <= min;
+  grid.innerHTML = "";
+  const offset = (first.getDay() + 6) % 7;
+  for (let i=0; i<offset; i++) { const e=document.createElement("span"); e.className="calendar-day is-empty"; grid.appendChild(e); }
+  for (let day=1; day<=last.getDate(); day++) {
+    const d = new Date(y,m,day), key = pollDateKey(d);
+    const b = document.createElement("button");
+    b.type="button"; b.className="calendar-day"; b.textContent=day;
+    b.setAttribute("aria-label", new Intl.DateTimeFormat("de-DE", {weekday:"long", day:"numeric", month:"long", year:"numeric"}).format(d));
+    b.setAttribute("aria-pressed", key === selectedKey ? "true" : "false");
+    if (d < new Date(today.getFullYear(),today.getMonth(),today.getDate())) b.disabled=true;
+    if (d.toDateString() === today.toDateString()) b.classList.add("is-today");
+    if (key === selectedKey || day === selectedDay) b.classList.add("selected");
+    if (nextAppointment?.start_at?.slice(0,10) === key) b.classList.add("is-appointment");
+    b.onclick = () => selectCalendarDate(day);
+    grid.appendChild(b);
   }
 }
-async function saveNextAppointment(){
-  const title=document.getElementById("appointmentTitle").value.trim()||"Gemeinsamer Termin", raw=document.getElementById("appointmentDate").value, location=document.getElementById("appointmentLocation").value.trim(), note=document.getElementById("appointmentNote").value.trim(), status=document.getElementById("appointmentStatus");
-  if(!raw){setAppointmentStatus("Bitte zuerst einen Tag auswählen.","error");return}
-  const startAt=new Date(raw);if(Number.isNaN(startAt.getTime())||startAt<=new Date()){setAppointmentStatus("Bitte einen Termin in der Zukunft wählen.","error");return}
-  nextAppointment={id:"local",title,start_at:startAt.toISOString(),location,note};localStorage.setItem(appointmentStorageKey(),JSON.stringify(nextAppointment));
-  setAppointmentStatus("Termin gespeichert – nur auf diesem Gerät.","success");renderNextAppointment();renderSavedAppointment();renderAppointmentCalendar();fillAppointmentFormFromCurrent();
+async function saveNextAppointment() {
+  const title = document.getElementById("appointmentTitle")?.value.trim() || "Gemeinsamer Termin";
+  const raw = document.getElementById("appointmentDate")?.value;
+  const location = document.getElementById("appointmentLocation")?.value.trim() || "";
+  const note = document.getElementById("appointmentNote")?.value.trim() || "";
+  if (!raw) { setAppointmentStatus("Bitte zuerst einen Tag auswählen.", "error"); return; }
+  const startAt = new Date(raw);
+  if (Number.isNaN(startAt.getTime()) || startAt <= new Date()) { setAppointmentStatus("Bitte einen Termin in der Zukunft wählen.", "error"); return; }
+  if (!currentUser || !supabaseClient) { setAppointmentStatus("Bitte zuerst anmelden.", "error"); return; }
+  const button = document.querySelector(".appointment-save-button");
+  if (button) button.disabled = true;
+  setAppointmentStatus("Termin wird gespeichert …");
+  try {
+    const payload = { title, start_at:startAt.toISOString(), location, note, user_id:currentUser.id };
+    const { data, error } = await supabaseClient.from("shared_events").upsert(payload, { onConflict:"user_id" }).select().single();
+    if (error) throw error;
+    nextAppointment = data;
+    setAppointmentStatus("Termin gespeichert und auf der Übersicht aktiviert.", "success");
+    renderNextAppointment();
+    renderSavedAppointment();
+    renderAppointmentCalendar();
+  } catch (error) {
+    console.error("Termin konnte nicht gespeichert werden:", error);
+    setAppointmentStatus("Termin konnte nicht gespeichert werden. Bitte später erneut versuchen.", "error");
+  } finally {
+    if (button) button.disabled = false;
+  }
 }
-function setAppointmentStatus(text,type=""){const el=document.getElementById("appointmentStatus");if(!el)return;el.textContent=text;el.classList.toggle("status-success",type==="success");el.classList.toggle("status-error",type==="error")}
-function editSavedAppointment(){if(!nextAppointment)return;fillAppointmentFormFromCurrent();switchAppointmentStep("appointment");setAppointmentStatus("Du kannst den aktuellen Termin ändern.")}
-function requestClearAppointment(){const el=document.getElementById("appointmentDeleteConfirm");if(el)el.hidden=false}
-function cancelClearAppointment(){const el=document.getElementById("appointmentDeleteConfirm");if(el)el.hidden=true}
-function confirmClearAppointment(){localStorage.removeItem(appointmentStorageKey());nextAppointment=null;cancelClearAppointment();document.getElementById("appointmentStatus").textContent="Termin entfernt.";renderSavedAppointment();renderNextAppointment();renderAppointmentCalendar()}
-function clearNextAppointment(){requestClearAppointment()}
-function switchAppointmentStep(step){
-  const av=step==="availability", a=document.getElementById("availabilityStep"),b=document.getElementById("appointmentStep"),ta=document.getElementById("availabilityTab"),tb=document.getElementById("appointmentTab");
-  a.hidden=!av;b.hidden=av;ta.classList.toggle("is-active",av);tb.classList.toggle("is-active",!av);ta.setAttribute("aria-selected",String(av));tb.setAttribute("aria-selected",String(!av));
-  if(!av){renderAppointmentCalendar();if(nextAppointment)fillAppointmentFormFromCurrent()}
+function setAppointmentStatus(text,type="") {
+  const el=document.getElementById("appointmentStatus"); if(!el)return;
+  el.textContent=text;
+  el.classList.toggle("status-success",type==="success");
+  el.classList.toggle("status-error",type==="error");
+}
+function editSavedAppointment() { if (!nextAppointment) return; fillAppointmentFormFromCurrent(); switchAppointmentStep("appointment"); setAppointmentStatus("Du kannst den aktuellen Termin ändern."); }
+function requestClearAppointment() { const el=document.getElementById("appointmentDeleteConfirm"); if(el) el.hidden=false; }
+function cancelClearAppointment() { const el=document.getElementById("appointmentDeleteConfirm"); if(el) el.hidden=true; }
+async function confirmClearAppointment() {
+  if (!currentUser || !supabaseClient) return;
+  try {
+    const { error } = await supabaseClient.from("shared_events").delete().eq("user_id", currentUser.id);
+    if (error) throw error;
+    nextAppointment = null;
+    cancelClearAppointment();
+    setAppointmentStatus("Termin entfernt.", "success");
+    renderSavedAppointment(); renderNextAppointment(); renderAppointmentCalendar();
+  } catch (error) {
+    console.error("Termin konnte nicht entfernt werden:", error);
+    setAppointmentStatus("Termin konnte nicht entfernt werden.", "error");
+  }
+}
+function clearNextAppointment() { requestClearAppointment(); }
+function switchAppointmentStep(step) {
+  const availability = step === "availability";
+  const a=document.getElementById("availabilityStep"), b=document.getElementById("appointmentStep"), ta=document.getElementById("availabilityTab"), tb=document.getElementById("appointmentTab");
+  if (!a || !b || !ta || !tb) return;
+  a.hidden=!availability; b.hidden=availability;
+  ta.classList.toggle("is-active",availability); tb.classList.toggle("is-active",!availability);
+  ta.setAttribute("aria-selected",String(availability)); tb.setAttribute("aria-selected",String(!availability));
+  if (!availability) { renderAppointmentCalendar(); if(nextAppointment) fillAppointmentFormFromCurrent(); }
 }
 function escapeHtml(value) { return String(value).replace(/[&<>'"]/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;","\"":"&quot;"}[ch])); }
-if (!appointmentCountdownTimer) appointmentCountdownTimer=setInterval(tickAppointmentCountdown, 1000);
+if (!appointmentCountdownTimer) appointmentCountdownTimer=setInterval(tickAppointmentCountdown,1000);
 /* Termin-Umfrage – vollständig lokal */
 let selectedPollTimes = {};
 let selectedPollTime = "19:00";
