@@ -7998,22 +7998,18 @@ async function saveNextAppointment() {
         .from("shared_events")
         .update({ title, start_at:startAt.toISOString(), location, note })
         .eq("id", existing.id)
-        .eq("user_id", currentUser.id)
-        .select("id,title,start_at,location,note,user_id")
-        .single();
+        .eq("user_id", currentUser.id);
     } else {
       result = await supabaseClient
         .from("shared_events")
-        .insert(payload)
-        .select("id,title,start_at,location,note,user_id")
-        .single();
+        .insert(payload);
     }
     if (result.error) throw result.error;
-    nextAppointment = result.data;
+
+    // Anschließend aus der Datenbank neu laden, statt auf RETURNING/SELECT
+    // angewiesen zu sein (wichtig bei aktivierten RLS-Policies).
+    await loadNextAppointment();
     setAppointmentStatus("Termin gespeichert und auf der Übersicht aktiviert.", "success");
-    renderNextAppointment();
-    renderSavedAppointment();
-    renderAppointmentCalendar();
   } catch (error) {
     console.error("Termin konnte nicht gespeichert werden:", error);
     const detail = error?.message ? ` (${error.message})` : "";
@@ -8368,9 +8364,7 @@ async function saveAppointmentPoll(){
           dates:entryDates
         })
         .eq("id",ownExisting.id)
-        .eq("user_id",currentUser.id)
-        .select("id,participant_name,dates,user_id,created_at")
-        .single();
+        .eq("user_id",currentUser.id);
     }else{
       result=await supabaseClient
         .from("appointment_availability")
@@ -8378,15 +8372,13 @@ async function saveAppointmentPoll(){
           participant_name:name,
           dates:entryDates,
           user_id:currentUser.id
-        })
-        .select("id,participant_name,dates,user_id,created_at")
-        .single();
+        });
     }
 
     if(result.error)throw result.error;
 
-    // Danach bewusst neu aus der gemeinsamen Quelle laden, damit sofort
-    // die Daten aller Nutzenden und die aktualisierten Best-Tage sichtbar sind.
+    // Nicht auf eine zurückgelieferte Zeile angewiesen sein: RLS kann
+    // Schreiben erlauben, aber RETURNING/SELECT auf derselben Zeile verbieten.
     await loadAppointmentPoll();
     setPollStatus("Deine Verfügbarkeit wurde gespeichert und ist jetzt für alle sichtbar.","success");
   }catch(error){
