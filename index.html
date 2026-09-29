@@ -277,37 +277,6 @@ textarea:focus {
 
 
 
-/* ===== UX-Erweiterungen Termine ===== */
-function downloadAppointmentIcs(){
-  if(!nextAppointment?.start_at)return;
-  const start=new Date(nextAppointment.start_at), end=new Date(start.getTime()+3*3600*1000);
-  const fmt=d=>d.toISOString().replace(/[-:]/g,"").replace(/\.\d{3}/,"");
-  const esc=t=>String(t||"").replace(/[\\;,]/g,m=>"\\"+m).replace(/\r?\n/g,"\\n");
-  const ics=["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Watch Feast and Game//DE","BEGIN:VEVENT",
-    `UID:${nextAppointment.id}@wfg`,`DTSTAMP:${fmt(new Date())}`,`DTSTART:${fmt(start)}`,`DTEND:${fmt(end)}`,
-    `SUMMARY:${esc(nextAppointment.title||"Gemeinsamer Termin")}`,
-    ...(nextAppointment.location?[`LOCATION:${esc(nextAppointment.location)}`]:[]),
-    ...(nextAppointment.note?[`DESCRIPTION:${esc(nextAppointment.note)}`]:[]),
-    "END:VEVENT","END:VCALENDAR"].join("\r\n");
-  const url=URL.createObjectURL(new Blob([ics],{type:"text/calendar;charset=utf-8"}));
-  const a=document.createElement("a"); a.href=url; a.download="termin.ics"; document.body.appendChild(a); a.click(); a.remove();
-  setTimeout(()=>URL.revokeObjectURL(url),1000);
-}
-if(nextAppointmentBanner){
-  nextAppointmentBanner.setAttribute("role","button"); nextAppointmentBanner.tabIndex=0;
-  nextAppointmentBanner.setAttribute("aria-label","Nächster Termin – Details öffnen");
-  nextAppointmentBanner.addEventListener("click",()=>showAppointmentsApp());
-  nextAppointmentBanner.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();showAppointmentsApp();}});
-}
-// Erfolgsmeldungen blenden sich nach 6 Sekunden selbst aus.
-(function(){
-  const timers={};
-  const wrap=(name,id)=>{const orig=window[name]; if(typeof orig!=="function")return;
-    window[name]=function(text,type){orig.apply(this,arguments);clearTimeout(timers[id]);
-      if(type==="success")timers[id]=setTimeout(()=>{const el=document.getElementById(id);if(el){el.textContent="";el.classList.remove("status-success");}},6000);};};
-  wrap("setPollStatus","pollStatus"); wrap("setAppointmentStatus","appointmentStatus");
-})();
-
 /* Serien & Filme */
 
 .random-movie-button {
@@ -4931,7 +4900,14 @@ button:not(:disabled):active{transform:scale(.98)}
 @media(max-width:760px){input:not([type=checkbox]):not([type=radio]),select,textarea{font-size:16px!important}.calendar-day,.time-chip,.calendar-nav-button{min-height:44px}}
 @supports(padding:max(0px)){body{padding-left:max(0px,env(safe-area-inset-left));padding-right:max(0px,env(safe-area-inset-right))}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+/* ===== Termine: Schnellauswahl, Hinweise ===== */
+.quick-select{display:flex;flex-wrap:wrap;gap:7px}.quick-select button{width:auto;margin:0;min-height:40px;padding:8px 12px;border-radius:999px!important;border:1px solid rgba(101,141,207,.28)!important;background:rgba(28,46,69,.72)!important;color:#cbd8ea!important;font-size:13px;font-weight:700}
+.quick-select button:hover{border-color:rgba(101,226,215,.6)!important;color:#fff!important}
+.dirty-hint{padding:8px 11px;border-radius:10px;border:1px solid rgba(255,196,64,.4);background:rgba(255,196,64,.12);color:#ffe29a;font-size:12px;font-weight:700}.dirty-hint[hidden]{display:none}
+.poll-save-button.is-dirty{box-shadow:0 0 0 3px rgba(255,196,64,.45),0 10px 28px rgba(0,0,0,.32)}
+.availability-day-details .day-warn{color:#ffd58a}.availability-day-details .day-ok{color:#9ff1c7}
 </style>
+
 
 
 <!-- Cinematic background -->
@@ -5287,7 +5263,14 @@ body.app-scene .skip-link:focus{left:12px}
               <label class="free-time"><span>Andere Uhrzeit</span><input id="pollCustomTime" type="time" value="19:00" onchange="setPollTime(this.value)"></label>
               <p class="helper-text">Standard: 19:00 Uhr</p>
             </div>
+            <div class="quick-select" role="group" aria-label="Schnellauswahl">
+              <button type="button" onclick="quickSelectPoll('weekends')">Wochenenden</button>
+              <button type="button" onclick="quickSelectPoll('fridays')">Freitage</button>
+              <button type="button" onclick="quickSelectPoll('reset')">Auswahl zurücksetzen</button>
+            </div>
+            <p class="helper-text">Schnellauswahl gilt für den angezeigten Monat.</p>
             <div id="pollSelectedDates" class="poll-selected-dates" aria-live="polite"></div>
+            <div id="pollDirtyHint" class="dirty-hint" hidden>● Ungespeicherte Änderungen</div>
             <button class="poll-save-button" type="button" onclick="saveAppointmentPoll()">✅ Meine Verfügbarkeit speichern</button>
             <div id="pollStatus" class="appointment-status" role="status" aria-live="polite"></div>
           </section>
@@ -5310,8 +5293,10 @@ body.app-scene .skip-link:focus{left:12px}
             <div class="calendar-weekdays"><span>Mo</span><span>Di</span><span>Mi</span><span>Do</span><span>Fr</span><span>Sa</span><span>So</span></div>
             <div id="appointmentCalendar" class="appointment-calendar"></div>
             <div class="calendar-legend"><span><i class="legend-ring"></i> Auswahl</span><span><i class="legend-dot"></i> Heute</span><span><i class="legend-check">✓</i> Bestehender Termin</span><span class="legend-scale"><i class="l1"></i><i class="l2"></i><i class="l3"></i><i class="l4"></i><i class="lall"></i><em>wenige → alle</em></span><span><i class="legend-star">★</i> Bestwert</span></div>
+            <div id="appointmentDayHint" class="availability-day-details" aria-live="polite"><strong>Tag auswählen</strong><span>Tippe auf einen Tag – du siehst sofort, wer da kann.</span></div>
           </section>
           <section class="appointment-form-card">
+            <input type="hidden" id="appointmentDate" value="">
             <label class="edit-field"><span>Titel</span><input id="appointmentTitle" placeholder="z. B. Games"></label>
             <div class="time-picker">
               <div class="field-caption">Uhrzeit</div>
@@ -7965,6 +7950,8 @@ function renderSavedAppointment() {
   const summary = document.getElementById("nextAppointmentSummary");
   const host = document.getElementById("nextAppointmentEntry");
   if (!summary || !host) return;
+  const saveBtn=document.querySelector(".appointment-save-button");
+  if (saveBtn) saveBtn.textContent = (nextAppointment && new Date(nextAppointment.start_at) > new Date()) ? "📅 Termin ändern & speichern" : "📅 Nächsten Termin speichern";
   host.replaceChildren();
   if (!nextAppointment || !nextAppointment.start_at || new Date(nextAppointment.start_at) < new Date()) {
     summary.hidden = true;
@@ -8078,6 +8065,7 @@ function renderAppointmentCalendar(selectedDay) {
     b.onclick = () => selectCalendarDate(day);
     grid.appendChild(b);
   }
+  updateAppointmentDayHint();
 }
 async function saveNextAppointment() {
   const title = document.getElementById("appointmentTitle")?.value.trim() || "Gemeinsamer Termin";
@@ -8343,6 +8331,7 @@ function renderSelectedPollDates(){
   if(save)save.textContent=selectedPollDates.length
     ? `✅ ${selectedPollDates.length} Tage ausgewählt – speichern`
     : "✅ Meine Verfügbarkeit speichern";
+  updatePollDirtyState();
 }
 
 function toggleSavedPollDate(key){
@@ -8614,6 +8603,75 @@ async function removeAvailabilityEntry(index){
     setPollStatus("Die Rückmeldung konnte nicht entfernt werden.","error");
   }
 }
+
+/* ===== UX-Erweiterungen Termine ===== */
+function downloadAppointmentIcs(){
+  if(!nextAppointment?.start_at)return;
+  const start=new Date(nextAppointment.start_at), end=new Date(start.getTime()+3*3600*1000);
+  const fmt=d=>d.toISOString().replace(/[-:]/g,"").replace(/\.\d{3}/,"");
+  const esc=t=>String(t||"").replace(/[\\;,]/g,m=>"\\"+m).replace(/\r?\n/g,"\\n");
+  const ics=["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Watch Feast and Game//DE","BEGIN:VEVENT",
+    `UID:${nextAppointment.id}@wfg`,`DTSTAMP:${fmt(new Date())}`,`DTSTART:${fmt(start)}`,`DTEND:${fmt(end)}`,
+    `SUMMARY:${esc(nextAppointment.title||"Gemeinsamer Termin")}`,
+    ...(nextAppointment.location?[`LOCATION:${esc(nextAppointment.location)}`]:[]),
+    ...(nextAppointment.note?[`DESCRIPTION:${esc(nextAppointment.note)}`]:[]),
+    "END:VEVENT","END:VCALENDAR"].join("\r\n");
+  const url=URL.createObjectURL(new Blob([ics],{type:"text/calendar;charset=utf-8"}));
+  const a=document.createElement("a"); a.href=url; a.download="termin.ics"; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+if(nextAppointmentBanner){
+  nextAppointmentBanner.setAttribute("role","button"); nextAppointmentBanner.tabIndex=0;
+  nextAppointmentBanner.setAttribute("aria-label","Nächster Termin – Details öffnen");
+  nextAppointmentBanner.addEventListener("click",()=>showAppointmentsApp());
+  nextAppointmentBanner.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();showAppointmentsApp();}});
+}
+// Erfolgsmeldungen blenden sich nach 6 Sekunden selbst aus.
+(function(){
+  const timers={};
+  const wrap=(name,id)=>{const orig=window[name]; if(typeof orig!=="function")return;
+    window[name]=function(text,type){orig.apply(this,arguments);clearTimeout(timers[id]);
+      if(type==="success")timers[id]=setTimeout(()=>{const el=document.getElementById(id);if(el){el.textContent="";el.classList.remove("status-success");}},6000);};};
+  wrap("setPollStatus","pollStatus"); wrap("setAppointmentStatus","appointmentStatus");
+})();
+
+/* ===== Termine: Optimierungen ===== */
+function quickSelectPoll(mode){
+  if(mode==="reset"){ loadAppointmentPoll(); setPollStatus("Auswahl auf den gespeicherten Stand zurückgesetzt."); return; }
+  const wanted=mode==="fridays"?[5]:[6,0];
+  const y=pollCalendarCursor.getFullYear(),m=pollCalendarCursor.getMonth(),last=new Date(y,m+1,0).getDate(),keys=[];
+  for(let d=1;d<=last;d++){const dt=new Date(y,m,d),k=pollDateKey(dt);if(k>=todayDateKey()&&wanted.includes(dt.getDay()))keys.push(k);}
+  if(!keys.length){setPollStatus("In diesem Monat gibt es keine passenden Tage mehr.","error");return;}
+  const allOn=keys.every(k=>selectedPollDates.includes(k));
+  selectedPollDates=allOn?selectedPollDates.filter(k=>!keys.includes(k)):[...new Set([...selectedPollDates,...keys])].sort();
+  keys.forEach(k=>{if(allOn)delete selectedPollTimes[k];else if(!selectedPollTimes[k])selectedPollTimes[k]=selectedPollTime;});
+  renderPollCalendar(); renderSelectedPollDates();
+}
+function pollIsDirty(){
+  const own=ownAvailabilityEntry(), today=todayDateKey();
+  const saved=(own?.dates||[]).filter(v=>availabilityDateKey(v)>=today).map(v=>`${availabilityDateKey(v)}T${availabilityTimeOf(v)}`).sort().join("|");
+  const cur=selectedPollDates.filter(k=>k>=today).map(k=>`${k}T${selectedPollTimes[k]||selectedPollTime}`).sort().join("|");
+  return saved!==cur;
+}
+function updatePollDirtyState(){
+  const dirty=pollIsDirty(), hint=document.getElementById("pollDirtyHint"), btn=document.querySelector(".poll-save-button");
+  if(hint)hint.hidden=!dirty;
+  if(btn)btn.classList.toggle("is-dirty",dirty);
+}
+function updateAppointmentDayHint(){
+  const host=document.getElementById("appointmentDayHint"); if(!host)return;
+  const key=document.getElementById("appointmentDate")?.value?.slice(0,10);
+  if(!key){return;}
+  const counts=availabilityDateCounts(), total=availabilityParticipantCount(), max=Math.max(0,...Object.values(counts));
+  const people=availabilityPeopleForDate(key), n=people.length;
+  let html=`<strong>${escapeHtml(formatPollDate(key))}</strong>`;
+  if(!n) html+=`<span class="day-warn">Für diesen Tag gibt es noch keine Zusagen.</span>`;
+  else html+=`<span class="${n>=total?"day-ok":""}">${n} von ${Math.max(total,n)} können: ${people.map(escapeHtml).join(", ")}</span>`;
+  if(n<max){const best=Object.entries(counts).filter(([k,c])=>c===max&&k>=todayDateKey()).map(([k])=>k).sort()[0];
+    if(best)html+=`<span class="day-warn">Besser passt ${escapeHtml(formatPollDate(best))} (${max} von ${Math.max(total,max)}).</span>`;}
+  host.innerHTML=html;
+}
+
 
 /* Serien & Filme */
 
