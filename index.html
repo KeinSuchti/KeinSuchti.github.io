@@ -5161,7 +5161,7 @@ body.app-scene .skip-link:focus{left:12px}
       </div>
 
       <section id="availabilityStep" class="appointment-step is-active" role="tabpanel" aria-labelledby="availabilityTab">
-        <div class="step-heading"><div><div class="dashboard-kicker">Schritt 1</div><h3>Wann kannst du?</h3><p class="panel-subtitle">Markiere deine möglichen Tage und Zeiten. Die Auswahl wird nur auf diesem Gerät gespeichert.</p></div><div class="local-only-badge">● Nur dieses Gerät</div></div>
+        <div class="step-heading"><div><div class="dashboard-kicker">Schritt 1</div><h3>Wann kannst du?</h3><p class="panel-subtitle">Markiere deine möglichen Tage und Zeiten. Deine Rückmeldung wird für alle Nutzenden gemeinsam gespeichert.</p></div><div class="local-only-badge">● Gemeinsam gespeichert</div></div>
         <div class="availability-layout">
           <section class="availability-calendar-card" aria-label="Verfügbarkeitskalender">
             <div class="calendar-toolbar poll-calendar-toolbar"><button id="pollPreviousMonth" class="calendar-nav-button" type="button" onclick="changePollMonth(-1)" aria-label="Vorheriger Monat">‹</button><strong id="pollCalendarMonthLabel"></strong><button class="calendar-nav-button" type="button" onclick="changePollMonth(1)" aria-label="Nächster Monat">›</button></div>
@@ -5198,7 +5198,7 @@ body.app-scene .skip-link:focus{left:12px}
       </section>
 
       <section id="appointmentStep" class="appointment-step" role="tabpanel" aria-labelledby="appointmentTab" hidden>
-        <div class="step-heading"><div><div class="dashboard-kicker">Schritt 2</div><h3>Termin festlegen</h3><p class="panel-subtitle">Übernimm einen der besten Tage oder wähle einen anderen Termin.</p></div><div class="local-only-badge">● Nur dieses Gerät</div></div>
+        <div class="step-heading"><div><div class="dashboard-kicker">Schritt 2</div><h3>Termin festlegen</h3><p class="panel-subtitle">Übernimm einen der besten Tage oder wähle einen anderen Termin.</p></div><div class="local-only-badge">● Gemeinsam gespeichert</div></div>
         <div class="appointment-layout">
           <section class="calendar-card" aria-label="Kalender zur Terminwahl">
             <div class="calendar-toolbar"><button id="calendarPreviousMonth" class="calendar-nav-button" type="button" onclick="changeCalendarMonth(-1)" aria-label="Vorheriger Monat">‹</button><strong id="calendarMonthLabel"></strong><button class="calendar-nav-button" type="button" onclick="changeCalendarMonth(1)" aria-label="Nächster Monat">›</button></div>
@@ -7979,16 +7979,45 @@ async function saveNextAppointment() {
   setAppointmentStatus("Termin wird gespeichert …");
   try {
     const payload = { title, start_at:startAt.toISOString(), location, note, user_id:currentUser.id };
-    const { data, error } = await supabaseClient.from("shared_events").upsert(payload, { onConflict:"user_id" }).select().single();
-    if (error) throw error;
-    nextAppointment = data;
+
+    // Nicht von einem UNIQUE-Constraint auf user_id abhängig sein:
+    // vorhandenen eigenen Termin suchen und gezielt aktualisieren,
+    // ansonsten einen neuen gemeinsamen Termin anlegen.
+    const existingResult = await supabaseClient
+      .from("shared_events")
+      .select("id,title,start_at,location,note,user_id")
+      .eq("user_id", currentUser.id)
+      .order("start_at", { ascending: false })
+      .limit(1);
+    if (existingResult.error) throw existingResult.error;
+
+    let result;
+    const existing = existingResult.data?.[0];
+    if (existing?.id) {
+      result = await supabaseClient
+        .from("shared_events")
+        .update({ title, start_at:startAt.toISOString(), location, note })
+        .eq("id", existing.id)
+        .eq("user_id", currentUser.id)
+        .select("id,title,start_at,location,note,user_id")
+        .single();
+    } else {
+      result = await supabaseClient
+        .from("shared_events")
+        .insert(payload)
+        .select("id,title,start_at,location,note,user_id")
+        .single();
+    }
+    if (result.error) throw result.error;
+    nextAppointment = result.data;
     setAppointmentStatus("Termin gespeichert und auf der Übersicht aktiviert.", "success");
     renderNextAppointment();
     renderSavedAppointment();
     renderAppointmentCalendar();
   } catch (error) {
     console.error("Termin konnte nicht gespeichert werden:", error);
-    setAppointmentStatus("Termin konnte nicht gespeichert werden. Bitte später erneut versuchen.", "error");
+    const detail = error?.message ? ` (${error.message})` : "";
+    setAppointmentStatus(`Termin konnte nicht gespeichert werden${detail}`, "error");
   } finally {
     if (button) button.disabled = false;
   }
@@ -8321,7 +8350,14 @@ async function saveAppointmentPoll(){
   try{
     // Nur den eigenen Datensatz ändern. Die Anzeige und Auswertung lädt
     // anschließend alle Datensätze aller Nutzenden aus Supabase.
-    const ownExisting=availabilityEntries.find(e=>e.user_id===currentUser.id);
+    const ownLookup = await supabaseClient
+      .from("appointment_availability")
+      .select("id,participant_name,dates,user_id,created_at")
+      .eq("user_id", currentUser.id)
+      .order("created_at", { ascending: false })
+      .limit(1);
+    if (ownLookup.error) throw ownLookup.error;
+    const ownExisting=ownLookup.data?.[0] || null;
 
     let result;
     if(ownExisting?.id){
