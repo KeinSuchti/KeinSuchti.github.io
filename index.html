@@ -4985,7 +4985,31 @@ button.yugioh-image-placeholder:hover{border-color:rgba(101,226,215,.7);color:#d
 .duel-player-card.is-defeated .duel-quick{display:none}
 @media(max-width:900px){.duel-topbar{flex-wrap:nowrap}.duel-box h3{white-space:nowrap}.duel-tools button span{display:none}.duel-tools button{min-width:40px;padding:0 6px}.duel-tools{gap:4px}}
 @media(max-width:420px){.duel-turn-label{display:none}.duel-arena[data-count="5"] .duel-quick,.duel-arena[data-count="6"] .duel-quick{grid-template-columns:repeat(3,minmax(0,1fr))}.duel-arena[data-count="5"] .duel-quick button:nth-child(n+4),.duel-arena[data-count="6"] .duel-quick button:nth-child(n+4){display:none}}
+/* ===== Battle Arena: Team-Setup ===== */
+.duel-setup-overlay{display:none;position:fixed;inset:0;z-index:10060;align-items:center;justify-content:center;padding:14px;background:rgba(3,8,20,.82);backdrop-filter:blur(4px)}
+.duel-setup-box{width:min(520px,100%);max-height:calc(100dvh - 28px);overflow-y:auto;overscroll-behavior:contain;padding:18px;border-radius:18px;border:1px solid rgba(125,158,224,.34);background:#0e1c34;color:#e6efff;box-shadow:0 24px 60px rgba(0,0,0,.5)}
+.duel-setup-box h3{margin:0 0 4px;font-size:20px}
+.ds-hint{margin:2px 0 10px;color:#9db6e6;font-size:13px}
+.ds-group{margin-top:14px}.ds-label{margin-bottom:6px;color:#9db6e6;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase}
+.ds-seg{display:flex;gap:6px;flex-wrap:wrap}
+.ds-seg button{flex:1 1 0;min-width:110px;min-height:46px;margin:0;padding:8px 10px;border:1px solid rgba(125,158,224,.3);border-radius:12px;background:rgba(19,43,86,.6)!important;color:#cfe0ff;font-weight:800;font-size:14px}
+.ds-seg button.is-active{background:linear-gradient(135deg,#2f6fdd,#22a7a0)!important;border-color:#8cf1ff;color:#fff}
+.ds-rows{display:grid;gap:6px}
+.ds-row{display:grid;grid-template-columns:minmax(0,1fr) 130px;gap:10px;align-items:center;padding:6px 8px 6px 12px;border:1px solid rgba(125,158,224,.2);border-radius:12px;background:rgba(19,43,86,.42)}
+.ds-name{font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ds-team-select{height:44px;margin:0;font-size:16px!important;font-weight:800;border-left:6px solid var(--tc,#4c8dff)!important}
+.ds-team-select[data-team="0"]{--tc:#4c8dff}.ds-team-select[data-team="1"]{--tc:#ff6b6b}.ds-team-select[data-team="2"]{--tc:#4ad08a}.ds-team-select[data-team="3"]{--tc:#ffc44d}
+.ds-error{margin:8px 0 0;color:#ffb0aa;font-size:13px;font-weight:700}
+.ds-actions{display:flex;gap:8px;margin-top:18px;position:sticky;bottom:-18px;padding:10px 0 0;background:linear-gradient(180deg,transparent,#0e1c34 30%)}
+.ds-actions button{flex:1;min-height:50px;margin:0;font-weight:800}
+.ds-actions .ds-cancel{flex:0 0 auto;padding:0 18px;background:rgba(19,43,86,.7)!important;border:1px solid rgba(125,158,224,.3)!important;color:#dbe7ff!important}
+.duel-player-card[data-team]{position:relative;--team:#4c8dff}
+.duel-player-card[data-team="1"]{--team:#ff6b6b}.duel-player-card[data-team="2"]{--team:#4ad08a}.duel-player-card[data-team="3"]{--team:#ffc44d}
+.duel-player-card[data-team]::before{content:"";position:absolute;left:0;right:0;top:0;height:6px;border-radius:inherit;border-bottom-left-radius:0;border-bottom-right-radius:0;background:var(--team)}
+.duel-player-card[data-team] .duel-deck-name{color:var(--team);font-weight:800}
+@media(max-width:420px){.ds-row{grid-template-columns:minmax(0,1fr) 116px}.ds-seg button{min-width:0}}
 </style>
+
 
 
 
@@ -5690,6 +5714,10 @@ body.app-scene .skip-link:focus{left:12px}
   </div>
 </div>
 
+<!-- Yu-Gi-Oh!-Duell-Setup (Teams) -->
+<div id="duelSetupOverlay" class="duel-setup-overlay" role="dialog" aria-modal="true" aria-labelledby="duelSetupTitle" onclick="if(event.target===this)duelSetupCancel()">
+  <div id="duelSetupBox" class="duel-setup-box"></div>
+</div>
 <!-- Yu-Gi-Oh!-Duell-Arena -->
 <div id="yugiohDuelOverlay" class="duel-overlay" role="dialog" aria-modal="true" aria-labelledby="yugiohDuelTitle" onclick="closeYugiohDuelOnOverlay(event)">
   <div class="duel-box">
@@ -6742,6 +6770,15 @@ function openYugiohDuel() {
     alert("Bitte zuerst Decks zufällig zuteilen.");
     return;
   }
+  if ([4, 6, 8].includes(activeYugiohAssignments.length)) { openDuelSetup(); return; }
+  startYugiohDuel({ mode: "solo" });
+}
+
+function startYugiohDuel(cfg = { mode: "solo" }) {
+  if (!Array.isArray(activeYugiohAssignments) || activeYugiohAssignments.length === 0) {
+    alert("Bitte zuerst Decks zufällig zuteilen.");
+    return;
+  }
   closeYugiohAssignmentPopup();
   activeYugiohDuelPlayers = activeYugiohAssignments.map(assignment => ({
     playerName: assignment.playerName,
@@ -6749,6 +6786,7 @@ function openYugiohDuel() {
     lifePoints: 8000,
     lifeHistory: [{ type: "initial", label: "Startwert", from: null, to: 8000, expression: "8000", timestamp: Date.now() }]
   }));
+  applyDuelTeams(cfg);
   duelUndoStack = []; duelTurnIndex = 0; duelTurnNumber = 1;
   renderYugiohDuelArena();
   yugiohDuelOverlay.style.display = "flex";
@@ -6768,8 +6806,10 @@ function renderYugiohDuelArena() {
     const low = player.lifePoints > 0 && player.lifePoints <= 2000;
     const card = document.createElement("article");
     card.className = "duel-player-card" + (defeated ? " is-defeated" : low ? " is-low" : "") + (index === duelTurnIndex && !defeated ? " is-active" : "");
+    if (player.teamId !== undefined) card.dataset.team = String(player.teamId % 4);
     const name = document.createElement("div"); name.className = "duel-player-name"; name.textContent = player.playerName;
-    const deck = document.createElement("div"); deck.className = "duel-deck-name"; deck.textContent = "Deck: " + (player.deck?.theme || "Unbenanntes Deck");
+    const deck = document.createElement("div"); deck.className = "duel-deck-name"; if (player.isTeam) { deck.textContent = "👥 " + player.deckLabel; deck.title = player.members.map(m => `${m.playerName}: ${m.deck?.theme || "Unbenanntes Deck"}`).join("\n"); }
+    else deck.textContent = (player.teamId !== undefined ? `Team ${player.teamId + 1} · ` : "") + "Deck: " + (player.deck?.theme || "Unbenanntes Deck");
     const lifeDisplay = document.createElement("div"); lifeDisplay.className = "duel-life-display"; lifeDisplay.setAttribute("role", "button"); lifeDisplay.setAttribute("tabindex", "0"); lifeDisplay.setAttribute("aria-label", `Lebenspunkte von ${player.playerName} ändern`); lifeDisplay.title = "Klicken, um die Lebenspunkte zu ändern";
     lifeDisplay.onclick = () => openYugiohCalculator(index);
     lifeDisplay.onkeydown = event => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); openYugiohCalculator(index); } };
@@ -6865,12 +6905,20 @@ function duelShowBanner(text, ms = 3500, kind = "info") {
 }
 function updateDuelBanner(force) {
   const el = document.getElementById("duelBanner"); if (!el) return;
-  const alive = activeYugiohDuelPlayers.filter(p => p.lifePoints > 0);
+  const players = activeYugiohDuelPlayers, alive = players.filter(p => p.lifePoints > 0);
   const label = document.getElementById("duelTurnLabel");
   if (label) label.textContent = "· Zug " + duelTurnNumber;
-  if (activeYugiohDuelPlayers.length >= 2 && alive.length <= 1) {
-    el.textContent = alive.length ? `🏆 ${alive[0].playerName} gewinnt!` : "🤝 Unentschieden";
-    el.dataset.kind = "winner"; el.hidden = false; return;
+  const key = p => p.teamId !== undefined ? "t" + p.teamId : "p" + players.indexOf(p);
+  if (players.length >= 2 && new Set(alive.map(key)).size <= 1) {
+    let text = "🤝 Unentschieden";
+    if (alive.length) {
+      if (duelTeamMode) {
+        const tid = alive[0].teamId;
+        const members = alive[0].isTeam ? alive[0].deckLabel : players.filter(p => p.teamId === tid).map(p => p.playerName).join(" & ");
+        text = `🏆 Team ${tid + 1} (${members}) gewinnt!`;
+      } else text = `🏆 ${alive[0].playerName} gewinnt!`;
+    }
+    el.textContent = text; el.dataset.kind = "winner"; el.hidden = false; return;
   }
   if (el.dataset.kind === "winner" || force) { el.hidden = true; el.dataset.kind = ""; }
 }
@@ -6908,6 +6956,61 @@ function duelRematch() {
   activeYugiohDuelPlayers.forEach(p => { p.lifePoints = 8000; p.lifeHistory = [{ type: "initial", label: "Startwert", from: null, to: 8000, expression: "8000", timestamp: Date.now() }]; });
   duelUndoStack = []; duelTurnIndex = 0; duelTurnNumber = 1;
   renderYugiohDuelArena(); duelShowBanner("↻ Neues Duell gestartet", 2500);
+}
+
+/* ===== Battle Arena: Teams (4 / 6 / 8 Spieler) ===== */
+let duelTeamMode = false, duelTeamShared = false, duelSetup = null;
+const DUEL_TEAM_OPTIONS = { 4: [2], 6: [2, 3], 8: [2, 4] };
+function applyDuelTeams(cfg) {
+  duelTeamMode = cfg.mode === "teams"; duelTeamShared = duelTeamMode && !!cfg.shared;
+  if (!duelTeamMode) return;
+  const base = activeYugiohDuelPlayers;
+  base.forEach((p, i) => { p.teamId = cfg.teams[i]; });
+  if (!duelTeamShared) return;
+  const ids = [...new Set(base.map(p => p.teamId))].sort((a, b) => a - b);
+  activeYugiohDuelPlayers = ids.map(id => {
+    const members = base.filter(p => p.teamId === id);
+    return { playerName: `Team ${id + 1}`, deck: null, isTeam: true, teamId: id, members, deckLabel: members.map(m => m.playerName).join(" & "),
+      lifePoints: 8000, lifeHistory: [{ type: "initial", label: "Startwert", from: null, to: 8000, expression: "8000", timestamp: Date.now() }] };
+  });
+}
+function openDuelSetup() {
+  const n = activeYugiohAssignments.length, count = DUEL_TEAM_OPTIONS[n][0];
+  duelSetup = { n, mode: "solo", teamCount: count, shared: true, teams: activeYugiohAssignments.map((_, i) => i % count) };
+  renderDuelSetup();
+  document.getElementById("duelSetupOverlay").style.display = "flex";
+}
+function duelSetupCancel() {
+  document.getElementById("duelSetupOverlay").style.display = "none";
+  yugiohAssignmentPopup.style.display = "flex";
+}
+function duelSetupSet(key, value) {
+  duelSetup[key] = value;
+  if (key === "teamCount") duelSetup.teams = duelSetup.teams.map((_, i) => i % value);
+  renderDuelSetup();
+}
+function duelSetupTeam(i, value) { duelSetup.teams[i] = Number(value); renderDuelSetup(); }
+function duelSetupStart() {
+  const st = duelSetup;
+  document.getElementById("duelSetupOverlay").style.display = "none";
+  startYugiohDuel(st.mode === "teams" ? { mode: "teams", shared: st.shared, teams: st.teams } : { mode: "solo" });
+}
+function renderDuelSetup() {
+  const st = duelSetup, box = document.getElementById("duelSetupBox"), teams = st.mode === "teams";
+  const seg = (key, opts) => `<div class="ds-seg" role="group">${opts.map(([v, l]) => `<button type="button" class="${st[key] === v ? "is-active" : ""}" aria-pressed="${st[key] === v}" onclick="duelSetupSet('${key}',${typeof v === "string" ? `'${v}'` : v})">${l}</button>`).join("")}</div>`;
+  const used = new Set(st.teams), valid = Array.from({ length: st.teamCount }, (_, i) => used.has(i)).every(Boolean);
+  let html = `<h3 id="duelSetupTitle">⚔️ Duell einrichten</h3><p class="ds-hint">${st.n} Spieler – wie soll gespielt werden?</p>
+    <div class="ds-group"><div class="ds-label">Spielmodus</div>${seg("mode", [["solo", "Jeder für sich"], ["teams", "Teams"]])}</div>`;
+  if (teams) {
+    html += `<div class="ds-group"><div class="ds-label">Anzahl Teams</div>${seg("teamCount", DUEL_TEAM_OPTIONS[st.n].map(c => [c, `${c} Teams`]))}</div>
+    <div class="ds-group"><div class="ds-label">Lebenspunkte</div>${seg("shared", [[true, "Gemeinsam pro Team"], [false, "Pro Spieler einzeln"]])}
+      <p class="ds-hint">${st.shared ? "Jedes Team hat zusammen 8000 LP." : "Jeder Spieler hat 8000 LP. Ein Team gewinnt, wenn alle Gegner besiegt sind."}</p></div>
+    <div class="ds-group"><div class="ds-label">Team-Zuordnung</div><div class="ds-rows">${activeYugiohAssignments.map((a, i) => `<label class="ds-row"><span class="ds-name">${escapeHtml(a.playerName)}</span>
+      <select class="ds-team-select" data-team="${st.teams[i] % 4}" onchange="duelSetupTeam(${i},this.value)" aria-label="Team für ${escapeHtml(a.playerName)}">${Array.from({ length: st.teamCount }, (_, t) => `<option value="${t}" ${st.teams[i] === t ? "selected" : ""}>Team ${t + 1}</option>`).join("")}</select></label>`).join("")}</div>
+      ${valid ? "" : '<p class="ds-error">Jedes Team braucht mindestens einen Spieler.</p>'}</div>`;
+  }
+  html += `<div class="ds-actions"><button type="button" class="ds-cancel" onclick="duelSetupCancel()">Zurück</button><button type="button" class="ds-start" onclick="duelSetupStart()" ${teams && !valid ? "disabled" : ""}>⚔️ Duell starten</button></div>`;
+  box.innerHTML = html;
 }
 
 /* Auth */
