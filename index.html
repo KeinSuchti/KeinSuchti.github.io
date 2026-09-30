@@ -4969,7 +4969,7 @@ button.yugioh-image-placeholder:hover{border-color:rgba(101,226,215,.7);color:#d
 }
 /* ===== Battle Arena: Werkzeuge ===== */
 .duel-topbar{display:flex!important;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
-.duel-turn-label{font-size:.55em;font-weight:700;color:#9db6e6;letter-spacing:.04em;white-space:nowrap}
+
 .duel-tools{display:flex;gap:6px;margin-left:auto}
 .duel-tools button{display:inline-flex;align-items:center;justify-content:center;gap:4px;min-width:44px;height:44px;margin:0;padding:0 10px;border:1px solid rgba(125,158,224,.34);border-radius:12px;background:rgba(19,43,86,.7)!important;color:#e6efff;font-size:18px;font-weight:800}
 .duel-tools button span{font-size:12px}
@@ -4981,10 +4981,9 @@ button.yugioh-image-placeholder:hover{border-color:rgba(101,226,215,.7);color:#d
 .duel-quick button{min-height:36px;margin:0;padding:0;border:1px solid rgba(125,158,224,.28);border-radius:9px;background:rgba(19,43,86,.62)!important;color:#dbe7ff;font-size:12px;font-weight:800;font-variant-numeric:tabular-nums}
 .duel-quick button:nth-child(-n+3){color:#ffb9b3}.duel-quick button:last-child{color:#a6f0c6}
 .duel-quick button:active{background:rgba(40,70,130,.95)!important;transform:scale(.95)}
-.duel-player-card.is-active{box-shadow:0 0 0 2px rgba(255,208,90,.85),0 0 22px rgba(255,196,64,.28)}
 .duel-player-card.is-defeated .duel-quick{display:none}
 @media(max-width:900px){.duel-topbar{flex-wrap:nowrap}.duel-box h3{white-space:nowrap}.duel-tools button span{display:none}.duel-tools button{min-width:40px;padding:0 6px}.duel-tools{gap:4px}}
-@media(max-width:420px){.duel-turn-label{display:none}.duel-arena[data-count="5"] .duel-quick,.duel-arena[data-count="6"] .duel-quick{grid-template-columns:repeat(3,minmax(0,1fr))}.duel-arena[data-count="5"] .duel-quick button:nth-child(n+4),.duel-arena[data-count="6"] .duel-quick button:nth-child(n+4){display:none}}
+@media(max-width:420px){.duel-arena[data-count="5"] .duel-quick,.duel-arena[data-count="6"] .duel-quick{grid-template-columns:repeat(3,minmax(0,1fr))}.duel-arena[data-count="5"] .duel-quick button:nth-child(n+4),.duel-arena[data-count="6"] .duel-quick button:nth-child(n+4){display:none}}
 /* ===== Battle Arena: Team-Setup ===== */
 .duel-setup-overlay{display:none;position:fixed;inset:0;z-index:10060;align-items:center;justify-content:center;padding:14px;background:rgba(3,8,20,.82);backdrop-filter:blur(4px)}
 .duel-setup-box{width:min(520px,100%);max-height:calc(100dvh - 28px);overflow-y:auto;overscroll-behavior:contain;padding:18px;border-radius:18px;border:1px solid rgba(125,158,224,.34);background:#0e1c34;color:#e6efff;box-shadow:0 24px 60px rgba(0,0,0,.5)}
@@ -5051,12 +5050,8 @@ button.yugioh-image-placeholder:hover{border-color:rgba(101,226,215,.7);color:#d
 .ds-seg button{width:auto!important;flex:1 1 130px}
 .ds-team-select{width:100%!important;box-sizing:border-box}
 @media(max-width:600px){.duel-setup-overlay{align-items:flex-end!important;padding:0!important}.duel-setup-box{width:100%!important;max-height:92dvh;border-radius:20px 20px 0 0!important;border-bottom:0!important}.ds-head,.ds-body{padding-left:16px;padding-right:16px}.ds-actions{padding-left:16px!important;padding-right:16px!important}}
-/* ===== Farbenfreundlicher Modus: 5 Paletten (kein Rot/Grün als Bedeutungsträger) ===== */
-body.color-vision-mode{--accent:#56B4E9;--accent-2:#E69F00;--accent-ink:#071722;--danger:#CC79A7;--info:#56B4E9;--note:#E69F00;--star:#F0E442;--cv-p:#56B4E9;--cv-s:#E69F00;--cv-w:#CC79A7;--cv-h:#F0E442;--cv-r1:#16425b;--cv-r2:#1b5f86;--cv-r3:#2378a8;--cv-r4:#56B4E9;--cv-all:#F0E442;--cv-t0:#56B4E9;--cv-t1:#E69F00;--cv-t2:#CC79A7;--cv-t3:#F0E442;}
-body.color-vision-mode.cv-ibm{--accent:#648FFF;--accent-2:#FE6100;--accent-ink:#071022;--danger:#DC267F;--info:#648FFF;--note:#FE6100;--star:#FFB000;--cv-p:#648FFF;--cv-s:#FE6100;--cv-w:#DC267F;--cv-h:#FFB000;--cv-r1:#2a3a7a;--cv-r2:#3d58b5;--cv-r3:#5479e6;--cv-r4:#8fb0ff;--cv-all:#FFB000;--cv-t0:#648FFF;--cv-t1:#FE6100;--cv-t2:#DC267F;--cv-t3:#B8A2FF;}
-body.color-vision-mode.cv-tol{--accent:#4C8FD9;--accent-2:#DDAA33;--accent-ink:#071722;--danger:#BB5566;--info:#4C8FD9;--note:#DDAA33;--star:#DDAA33;--cv-p:#4C8FD9;--cv-s:#DDAA33;--cv-w:#BB5566;--cv-h:#DDAA33;--cv-r1:#1c3f66;--cv-r2:#27598f;--cv-r3:#3a78b8;--cv-r4:#8fb9ea;--cv-all:#DDAA33;--cv-t0:#4C8FD9;--cv-t1:#DDAA33;--cv-t2:#BB5566;--cv-t3:#E8E8E8;}
-body.color-vision-mode.cv-cividis{--accent:#6E9BE0;--accent-2:#D9C25A;--accent-ink:#0a1420;--danger:#C9B6F2;--info:#6E9BE0;--note:#D9C25A;--star:#FFEA46;--cv-p:#6E9BE0;--cv-s:#D9C25A;--cv-w:#C9B6F2;--cv-h:#FFEA46;--cv-r1:#2b3f6b;--cv-r2:#4a5a80;--cv-r3:#6b6b6f;--cv-r4:#d9c25a;--cv-all:#FFEA46;--cv-t0:#6E9BE0;--cv-t1:#D9C25A;--cv-t2:#C9B6F2;--cv-t3:#E8E8E8;}
-body.color-vision-mode.cv-hc{--accent:#FFD400;--accent-2:#66B3FF;--accent-ink:#000000;--danger:#FFFFFF;--info:#FFD400;--note:#66B3FF;--star:#FFD400;--cv-p:#FFD400;--cv-s:#66B3FF;--cv-w:#FFFFFF;--cv-h:#FFD400;--cv-r1:#2b2b2b;--cv-r2:#4d4d4d;--cv-r3:#7a7a7a;--cv-r4:#d0d0d0;--cv-all:#FFD400;--cv-t0:#FFD400;--cv-t1:#66B3FF;--cv-t2:#FFFFFF;--cv-t3:#C9A0FF;--bg:#000;--surface:#0a0a0a;--surface-2:#141414;--surface-3:#1f1f1f;--surface-input:#000;--border:rgba(255,255,255,.7);--border-strong:#fff;--text:#fff;--text-muted:#e6e6e6;--text-faint:#cfcfcf;}
+/* ===== Farbenfreundlicher Modus (Rot-Grün-Schwäche): Blau / Orange / Gelb, kein Rot, kein Grün ===== */
+body.color-vision-mode{--accent:#56B4E9;--accent-2:#E69F00;--accent-ink:#071722;--danger:#E69F00;--danger-hover:#FFC94D;--success:#56B4E9;--info:#56B4E9;--note:#E69F00;--star:#F0E442;--cv-p:#56B4E9;--cv-s:#E69F00;--cv-w:#E69F00;--cv-h:#F0E442;--cv-r1:#16425b;--cv-r2:#1b5f86;--cv-r3:#2378a8;--cv-r4:#56B4E9;--cv-all:#F0E442;--cv-t0:#56B4E9;--cv-t1:#E69F00;--cv-t2:#CC79A7;--cv-t3:#F0E442;}
 /* Status: Bedeutung immer auch über Symbol + Rahmen, nie nur über Farbe (WCAG 1.4.1) */
 body.color-vision-mode :is(.status,.appointment-status,#pollStatus).status-success:not(:empty){border-left:5px solid var(--cv-p)!important;color:#fff!important}
 body.color-vision-mode :is(.status,.appointment-status,#pollStatus).status-error:not(:empty){border-left:5px dashed var(--cv-w)!important;color:#fff!important}
@@ -5085,26 +5080,30 @@ body.color-vision-mode .duel-player-card.is-defeated .duel-life-display{backgrou
 body.color-vision-mode .duel-player-card.is-defeated .duel-life-number{color:#c4cdd8;text-shadow:none;text-decoration:line-through}
 body.color-vision-mode .duel-player-card.is-defeated .duel-status{color:#c4cdd8}
 body.color-vision-mode .duel-player-card.is-defeated .duel-player-name{text-decoration:line-through}
-body.color-vision-mode .duel-player-card.is-active{box-shadow:0 0 0 3px #fff,0 0 0 6px var(--cv-h)}
 body.color-vision-mode .calculator-quick button{color:#fff}
 body.color-vision-mode .calculator-quick button:nth-child(-n+3){border-color:var(--cv-w);border-style:dashed}body.color-vision-mode .calculator-quick button:last-child{border-color:var(--cv-p)}
 body.color-vision-mode .fx-die-face.f1 .pip{background:radial-gradient(circle at 35% 30%,var(--cv-p),#123)}
 body.color-vision-mode .duel-banner[data-kind="winner"]{background:var(--cv-all);color:#0b1420;border-color:#fff}
-/* Paletten-Auswahl */
-body:not(.color-vision-mode) #colorVisionPaletteButton{display:none}
-.cv-overlay{display:none;position:fixed;inset:0;z-index:12600;align-items:center;justify-content:center;padding:14px;background:rgba(3,8,20,.8)}
-.cv-box{box-sizing:border-box;display:flex;flex-direction:column;width:min(560px,100%);max-height:min(720px,calc(100dvh - 28px));border-radius:18px;border:1px solid rgba(137,195,224,.5);background:#0e1c2c;color:#f4f7fa;overflow:hidden}
-.cv-head{padding:18px 20px 6px}.cv-head h3{margin:0 0 4px;font-size:20px}.cv-head p{margin:0;color:#c2d0dc;font-size:13px}
-.cv-list{flex:1 1 auto;overflow-y:auto;padding:8px 20px;display:grid;gap:10px}
-.cv-card{display:grid;gap:6px;width:100%!important;margin:0!important;padding:12px 14px!important;text-align:left;border:2px solid rgba(137,195,224,.3)!important;border-radius:14px!important;background:rgba(23,54,77,.55)!important;color:#f4f7fa!important;font:inherit}
-.cv-card[aria-checked="true"]{border-color:#fff!important;background:rgba(255,255,255,.1)!important}
-.cv-card strong{display:flex;align-items:center;gap:8px;font-size:15px}.cv-card[aria-checked="true"] strong::after{content:"✓ Aktiv";margin-left:auto;font-size:12px;padding:2px 8px;border-radius:999px;background:#fff;color:#0b1420}
-.cv-card span.cv-desc{font-size:12.5px;color:#c2d0dc;font-weight:500;line-height:1.4}
-.cv-swatch{display:flex;height:22px;border-radius:7px;overflow:hidden;border:1px solid rgba(255,255,255,.5)}.cv-swatch i{flex:1}
-.cv-foot{padding:12px 20px calc(12px + env(safe-area-inset-bottom));border-top:1px solid rgba(137,195,224,.25)}
-.cv-foot button{width:100%!important;margin:0!important;min-height:48px}
-@media(max-width:600px){.cv-overlay{align-items:flex-end;padding:0}.cv-box{width:100%;max-height:92dvh;border-radius:20px 20px 0 0}}
+/* ===== CV-Modus: keine roten oder grünen Buttons ===== */
+body.color-vision-mode :is(.delete-button,.delete-item-button,.availability-entry-remove,.clear-button,.custom-delete-item,.game-row-delete,.yugioh-delete-button,.btn-del,.danger-button,.own-avail-remove,.edit-delete-button,.calculator-reset,.inline-confirm button.danger){background:#1b2a38!important;border:2px dashed #E69F00!important;color:#FFC94D!important;box-shadow:none!important}
+body.color-vision-mode :is(.delete-button,.delete-item-button,.availability-entry-remove,.clear-button,.custom-delete-item,.game-row-delete,.yugioh-delete-button,.btn-del,.danger-button,.own-avail-remove,.edit-delete-button,.calculator-reset):hover{background:#2a3b4c!important;border-color:#FFC94D!important;color:#fff!important}
+body.color-vision-mode :is(.edit-cancel-button,.duel-close){background:#20445e!important;border:2px solid #89c3e0!important;color:#fff!important;box-shadow:none!important}
+body.color-vision-mode :is(.ds-actions .ds-start,.calculator-actions .calculator-ok){background:#E69F00!important;border:2px solid #FFD166!important;color:#10202b!important;font-weight:900}
+body.color-vision-mode .ds-seg button.is-active{background:#56B4E9!important;border:2px solid #fff!important;color:#071722!important}
+body.color-vision-mode .calculator-quick button:last-child,body.color-vision-mode .duel-quick button:last-child{color:#fff}
+body.color-vision-mode .sidebar-logout-button .nav-icon,body.color-vision-mode .sidebar-collapsed .sidebar-logout-button .nav-icon{color:#fff!important}
+body.color-vision-mode .poll-date-chip button:hover,body.color-vision-mode .poll-date-chip button:focus-visible{background:#2a3b4c!important;border-color:#FFC94D!important;color:#FFC94D!important}
+body.color-vision-mode .account-danger-zone,body.color-vision-mode .inline-confirm{border:2px dashed #E69F00!important;background:rgba(230,159,0,.08)!important}
+body.color-vision-mode .account-danger-zone h3{color:#FFC94D!important}
+body.color-vision-mode .auth-error{color:#FFC94D!important}
+body.color-vision-mode .availability-day-details .day-ok{color:#8fd0f5}
+body.color-vision-mode .beer-grade-slider::-webkit-slider-runnable-track,body.color-vision-mode .beer-grade-slider::-moz-range-track{background:#56B4E9}
+body.color-vision-mode .ds-team-select[data-team="2"]{--tc:var(--cv-t2)}
+/* ===== Yu-Gi-Oh!: Löschen nur in der Bearbeitungsansicht ===== */
+.edit-delete-button{display:block;width:100%;margin:16px 0 0;min-height:46px;border:1px solid rgba(255,118,118,.42);border-radius:12px;background:rgba(205,67,67,.12);color:#ffb0aa;font-weight:800}
+.edit-delete-button[hidden]{display:none}
 </style>
+
 
 
 
@@ -5284,7 +5283,6 @@ body.app-scene .skip-link:focus{left:12px}
             <button id="sidebarAdminNavItem" class="dashboard-nav-item dashboard-nav-subitem" type="button" onclick="showAdminApp()" hidden title="Administration"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3 20 6v5c0 5-3.4 8.2-8 10-4.6-1.8-8-5-8-10V6l8-3Z"></path><path d="m9 12 2 2 4-4"></path></svg></span><span class="nav-label">Administration</span></button>
           </div>
           <button id="colorVisionToggle" class="dashboard-nav-item color-vision-toggle" type="button" onclick="toggleColorVisionMode()" aria-label="Farbenfreundlichen Modus" aria-pressed="false" title="Farbenfreundlichen Modus"><span class="nav-icon" aria-hidden="true">◐</span><span class="nav-label">Farbenfreundlicher Modus</span></button>
-          <button id="colorVisionPaletteButton" class="dashboard-nav-item" type="button" onclick="openColorVisionPalettes()" aria-label="Farbschema wählen" title="Farbschema wählen"><span class="nav-icon" aria-hidden="true">🎨</span><span class="nav-label">Farbschema wählen</span></button>
         </nav>
         <button id="sidebarLogout" class="sidebar-logout-button" type="button" onclick="logout()" aria-label="Logout" title="Logout"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M10 17l5-5-5-5"></path><path d="M15 12H3"></path><path d="M12 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6"></path></svg></span></button>
 
@@ -5813,7 +5811,6 @@ body.app-scene .skip-link:focus{left:12px}
   </div>
 </div>
 
-<div id="cvPaletteOverlay" class="cv-overlay" role="dialog" aria-modal="true" aria-labelledby="cvTitle" onclick="if(event.target===this)closeColorVisionPalettes()"><div class="cv-box"><div class="cv-head"><h3 id="cvTitle">🎨 Farbschema wählen</h3><p>Alle Schemata verzichten auf Rot und Grün. Wichtige Infos haben zusätzlich Symbole oder Muster.</p></div><div id="cvPaletteList" class="cv-list" role="radiogroup" aria-label="Farbschema"></div><div class="cv-foot"><button type="button" onclick="closeColorVisionPalettes()">Fertig</button></div></div></div>
 <div id="duelFxOverlay" class="duel-fx" role="dialog" aria-modal="true" aria-label="Wurf-Ergebnis" onclick="duelFxClose()"></div>
 <!-- Yu-Gi-Oh!-Duell-Setup (Teams) -->
 <div id="duelSetupOverlay" class="duel-setup-overlay" role="dialog" aria-modal="true" aria-labelledby="duelSetupTitle" onclick="if(event.target===this)duelSetupCancel()">
@@ -5823,9 +5820,8 @@ body.app-scene .skip-link:focus{left:12px}
 <div id="yugiohDuelOverlay" class="duel-overlay" role="dialog" aria-modal="true" aria-labelledby="yugiohDuelTitle" onclick="closeYugiohDuelOnOverlay(event)">
   <div class="duel-box">
     <div class="duel-topbar">
-      <h3 id="yugiohDuelTitle">⚔️ Battle Arena <small id="duelTurnLabel" class="duel-turn-label"></small></h3>
+      <h3 id="yugiohDuelTitle">⚔️ Battle Arena</h3>
       <div class="duel-tools" role="toolbar" aria-label="Arena-Werkzeuge">
-        <button type="button" onclick="duelNextTurn()" aria-label="Zug beenden" title="Zug beenden">▶<span>Zug</span></button>
         <button type="button" onclick="duelUndo()" aria-label="Letzte Änderung rückgängig" title="Rückgängig">↶</button>
         <button type="button" onclick="duelCoin()" aria-label="Münzwurf" title="Münzwurf">🪙</button>
         <button type="button" onclick="duelDice()" aria-label="Würfeln" title="Würfel">🎲</button>
@@ -5868,6 +5864,7 @@ body.app-scene .skip-link:focus{left:12px}
 
     <div id="editEntryFields" class="edit-fields"></div>
 
+    <button type="button" id="editDeleteButton" class="edit-delete-button" hidden>🗑️ Deck löschen</button>
     <div class="edit-actions">
       <button onclick="saveEditedEntry()">💾 Speichern</button>
       <button class="edit-cancel-button" onclick="closeEditEntryModal()">Abbrechen</button>
@@ -6062,35 +6059,12 @@ function toggleColorVisionMode() {
   setColorVisionMode(enabled);
   try {
     localStorage.setItem(colorVisionModeStorageKey, enabled ? "enabled" : "disabled");
-    if (enabled && !localStorage.getItem(CV_PALETTE_KEY)) openColorVisionPalettes();
   } catch (error) {
     console.error("Einstellung für den farbenblöden Modus konnte nicht gespeichert werden.", error);
     setStatus("Der Modus ist aktiv, konnte aber nicht dauerhaft gespeichert werden.", true);
   }
 }
 
-const CV_PALETTE_KEY = "wfg-color-vision-palette";
-const CV_PALETTES = [{"key": "okabe", "name": "Okabe-Ito (Standard)", "desc": "Der verbreitetste Standard für Farbenblindheit: Himmelblau, Orange, Violett und Gelb. Kein Rot, kein Grün.", "sw": ["#56B4E9", "#E69F00", "#CC79A7", "#F0E442", "#2378a8", "#56B4E9"]}, {"key": "ibm", "name": "Blau–Orange (IBM)", "desc": "Kräftige Kontraste aus der IBM-Design-Palette: Blau, Orange, Magenta und Amber.", "sw": ["#648FFF", "#FE6100", "#DC267F", "#FFB000", "#5479e6", "#8fb0ff"]}, {"key": "tol", "name": "Paul Tol (Hoher Kontrast)", "desc": "Aus Paul Tols „High-contrast“-Schema: Blau, Gelb und Rosé, auch bei starker Sehschwäche gut trennbar.", "sw": ["#4C8FD9", "#DDAA33", "#BB5566", "#DDAA33", "#3a78b8", "#8fb9ea"]}, {"key": "cividis", "name": "Cividis (Blau–Gelb)", "desc": "Wissenschaftliche Palette, entwickelt für Rot-Grün-Schwäche: nur Blau- und Gelbtöne, gleichmäßig in der Helligkeit.", "sw": ["#6E9BE0", "#D9C25A", "#C9B6F2", "#FFEA46", "#6b6b6f", "#d9c25a"]}, {"key": "hc", "name": "Maximaler Kontrast", "desc": "Schwarz, Weiß, Gelb und Blau mit kräftigen Rahmen (WCAG AAA). Für stark eingeschränktes Sehen.", "sw": ["#FFD400", "#66B3FF", "#FFFFFF", "#FFD400", "#7a7a7a", "#d0d0d0"]}];
-function applyColorVisionPalette(key) {
-  let stored = null; try { stored = localStorage.getItem(CV_PALETTE_KEY); } catch (e) {}
-  const k = CV_PALETTES.some(p => p.key === (key || stored)) ? (key || stored) : "okabe";
-  CV_PALETTES.forEach(p => document.body.classList.remove("cv-" + p.key));
-  document.body.classList.add("cv-" + k);
-  return k;
-}
-function renderColorVisionPalettes() {
-  const current = applyColorVisionPalette();
-  document.getElementById("cvPaletteList").innerHTML = CV_PALETTES.map(p => `<button type="button" role="radio" class="cv-card" aria-checked="${p.key === current}" onclick="selectColorVisionPalette('${p.key}')"><strong>${p.name}</strong><span class="cv-desc">${p.desc}</span><span class="cv-swatch" aria-hidden="true">${p.sw.map(c => `<i style="background:${c}"></i>`).join("")}</span></button>`).join("");
-}
-function selectColorVisionPalette(key) {
-  applyColorVisionPalette(key);
-  try { localStorage.setItem(CV_PALETTE_KEY, key); } catch (e) { setStatus("Schema aktiv, aber nicht dauerhaft gespeichert.", true); }
-  renderColorVisionPalettes();
-}
-function openColorVisionPalettes() { renderColorVisionPalettes(); document.getElementById("cvPaletteOverlay").style.display = "flex"; }
-function closeColorVisionPalettes() { document.getElementById("cvPaletteOverlay").style.display = "none"; }
-document.addEventListener("keydown", e => { if (e.key === "Escape" && document.getElementById("cvPaletteOverlay")?.style.display === "flex") { closeColorVisionPalettes(); e.stopImmediatePropagation(); } }, true);
-applyColorVisionPalette();
 initializeColorVisionMode();
 
 function showSupabaseError(title, error) {
@@ -6250,6 +6224,7 @@ function getEditInputValue(key) {
 }
 
 function renderEditFields(title, fields) {
+  const editDeleteButton = document.getElementById("editDeleteButton"); if (editDeleteButton) { editDeleteButton.hidden = true; editDeleteButton.onclick = null; }
   editEntryTitle.textContent = title;
   editEntryFields.innerHTML = "";
 
@@ -6391,6 +6366,14 @@ function openYugiohEdit(deckId) {
     { key: "sleeve_color", label: "Hüllenfarbe", value: deck.sleeve_color || "" },
     { key: "owner", label: "Besitzer", value: deck.owner || "" }
   ]);
+  const delBtn = document.getElementById("editDeleteButton");
+  if (delBtn) {
+    delBtn.hidden = false;
+    delBtn.onclick = async () => {
+      await deleteYugiohDeck(deck.id, deck.theme || "Unbenanntes Deck");
+      if (!yugiohDecks.some(entry => entry.id === deck.id)) closeEditEntryModal();
+    };
+  }
 }
 
 async function saveEditedEntry() {
@@ -6914,7 +6897,7 @@ function startYugiohDuel(cfg = { mode: "solo" }) {
     lifeHistory: [{ type: "initial", label: "Startwert", from: null, to: 8000, expression: "8000", timestamp: Date.now() }]
   }));
   applyDuelTeams(cfg);
-  duelUndoStack = []; duelTurnIndex = 0; duelTurnNumber = 1;
+  duelUndoStack = [];
   renderYugiohDuelArena();
   yugiohDuelOverlay.style.display = "flex";
   duelRequestWakeLock();
@@ -6932,7 +6915,7 @@ function renderYugiohDuelArena() {
     const defeated = player.lifePoints <= 0;
     const low = player.lifePoints > 0 && player.lifePoints <= 2000;
     const card = document.createElement("article");
-    card.className = "duel-player-card" + (defeated ? " is-defeated" : low ? " is-low" : "") + (index === duelTurnIndex && !defeated ? " is-active" : "");
+    card.className = "duel-player-card" + (defeated ? " is-defeated" : low ? " is-low" : "");
     if (player.teamId !== undefined) card.dataset.team = String(player.teamId % 4);
     const name = document.createElement("div"); name.className = "duel-player-name"; name.textContent = player.playerName;
     const deck = document.createElement("div"); deck.className = "duel-deck-name"; if (player.isTeam) { deck.textContent = "👥 " + player.deckLabel; deck.title = player.members.map(m => `${m.playerName}: ${m.deck?.theme || "Unbenanntes Deck"}`).join("\n"); }
@@ -6945,7 +6928,7 @@ function renderYugiohDuelArena() {
     const meter = document.createElement("div"); meter.className = "duel-life-meter";
     const meterFill = document.createElement("span"); meterFill.style.width = Math.max(0, Math.min(100, player.lifePoints / 8000 * 100)) + "%"; meter.appendChild(meterFill);
     lifeDisplay.append(lifeNumber, lifeCaption, meter);
-    const status = document.createElement("div"); status.className = "duel-status"; status.textContent = defeated ? "Verloren" : index === duelTurnIndex ? "▶ Am Zug" : "Im Spiel";
+    const status = document.createElement("div"); status.className = "duel-status"; status.textContent = defeated ? "Verloren" : "Im Spiel";
     const history = document.createElement("div"); history.className = "duel-history" + (player.historyOpen ? " is-open" : "");
     const changeCount = (player.lifeHistory || []).filter(entry => entry.type !== "initial").length;
     const historyTitle = document.createElement("button"); historyTitle.type = "button"; historyTitle.className = "duel-history-toggle"; historyTitle.textContent = "Änderungsverlauf" + (changeCount ? " (" + changeCount + ")" : "");
@@ -7009,7 +6992,7 @@ function applyYugiohCalculator() {
 
 
 /* ===== Battle Arena: Zusatzfunktionen ===== */
-let duelUndoStack = [], duelTurnIndex = 0, duelTurnNumber = 1, duelWakeLock = null, duelBannerTimer = null;
+let duelUndoStack = [], duelWakeLock = null, duelBannerTimer = null;
 const duelRnd = n => { const a = new Uint32Array(1); crypto.getRandomValues(a); return a[0] % n; };
 async function duelRequestWakeLock() { try { if ("wakeLock" in navigator) duelWakeLock = await navigator.wakeLock.request("screen"); } catch (e) {} }
 function duelReleaseWakeLock() { try { duelWakeLock?.release(); } catch (e) {} duelWakeLock = null; }
@@ -7027,8 +7010,6 @@ function duelShowBanner(text, ms = 3500, kind = "info") {
 function updateDuelBanner(force) {
   const el = document.getElementById("duelBanner"); if (!el) return;
   const players = activeYugiohDuelPlayers, alive = players.filter(p => p.lifePoints > 0);
-  const label = document.getElementById("duelTurnLabel");
-  if (label) label.textContent = "· Zug " + duelTurnNumber;
   const key = p => p.teamId !== undefined ? "t" + p.teamId : "p" + players.indexOf(p);
   if (players.length >= 2 && new Set(alive.map(key)).size <= 1) {
     let text = "🤝 Unentschieden";
@@ -7060,15 +7041,6 @@ function duelUndo() {
   p.lifeHistory.push({ type: "change", label: "Rückgängig", from: p.lifePoints, to: last.from, expression: "↶", timestamp: Date.now() });
   p.lifePoints = last.from; renderYugiohDuelArena();
   duelShowBanner(`↶ ${p.playerName}: zurück auf ${last.from.toLocaleString("de-DE")} LP`);
-}
-function duelNextTurn() {
-  const n = activeYugiohDuelPlayers.length; if (n < 2) return;
-  for (let i = 1; i <= n; i++) {
-    const next = (duelTurnIndex + i) % n;
-    if (activeYugiohDuelPlayers[next].lifePoints > 0) { if (next <= duelTurnIndex) duelTurnNumber++; duelTurnIndex = next; break; }
-  }
-  renderYugiohDuelArena();
-  duelShowBanner(`▶ ${activeYugiohDuelPlayers[duelTurnIndex].playerName} ist am Zug`, 2500);
 }
 let duelFxTimer = null;
 const duelReduceMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -7106,7 +7078,7 @@ function yugiohCalcQuick(v) {
 function duelRematch() {
   if (!confirm("Alle Lebenspunkte auf 8000 zurücksetzen und neu starten?")) return;
   activeYugiohDuelPlayers.forEach(p => { p.lifePoints = 8000; p.lifeHistory = [{ type: "initial", label: "Startwert", from: null, to: 8000, expression: "8000", timestamp: Date.now() }]; });
-  duelUndoStack = []; duelTurnIndex = 0; duelTurnNumber = 1;
+  duelUndoStack = [];
   renderYugiohDuelArena(); duelShowBanner("↻ Neues Duell gestartet", 2500);
 }
 
@@ -11108,7 +11080,6 @@ function renderYugiohDecks() {
     const mk=(cls,label,aria,fn)=>{const b=document.createElement("button");b.type="button";b.className=cls;b.textContent=label;b.setAttribute("aria-label",aria);b.onclick=fn;return b;};
     actions.appendChild(mk("yugioh-edit-button","✏️ Bearbeiten","Deck "+name+" bearbeiten",()=>openYugiohEdit(deck.id)));
     actions.appendChild(mk("yugioh-image-button",deck.image?"🖼️ Bild ändern":"🖼️ Bild hochladen","Bild für "+name+(deck.image?" ändern":" hochladen"),()=>uploadYugiohImage(deck.id)));
-    actions.appendChild(mk("yugioh-delete-button","🗑️ Löschen","Deck "+name+" löschen",()=>deleteYugiohDeck(deck.id,name)));
 
     info.appendChild(theme); info.appendChild(chips); info.appendChild(actions);
     addDblClickEdit(card, () => openYugiohEdit(deck.id));
