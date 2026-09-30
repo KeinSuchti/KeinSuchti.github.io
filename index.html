@@ -5262,6 +5262,128 @@ body.color-vision-mode #moviesApp .movie-btn-del:hover{background:#2a3b4c!import
   .movie-progress-bar span,.movie-check-box{transition:none}
   #moviesApp .movie-item.is-flash{animation:none}
 }
+
+/* ===== Games: überarbeitete Liste (Desktop + Mobil) ===== */
+.games-sr-only{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+#gamesApp .random-card-button{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:52px;margin:0 0 16px;font-size:16px;font-weight:800;border-radius:14px}
+#gamesApp .games-progress{margin-bottom:14px}
+
+/* Spalten verwalten */
+#gamesApp .games-columns-panel{margin:0 0 14px;padding:6px 14px;border:1px solid var(--border);border-radius:var(--radius-lg);background:rgba(23,35,58,.42)}
+#gamesApp .games-columns-panel>summary{cursor:pointer;list-style:none;font-weight:800;font-size:15px;display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;min-height:44px}
+#gamesApp .games-columns-panel>summary::-webkit-details-marker{display:none}
+#gamesApp .games-columns-panel>summary::after{content:"▾";margin-left:auto;color:#9db1cd;transition:transform .2s}
+#gamesApp .games-columns-panel[open]>summary::after{transform:rotate(180deg)}
+#gamesApp .games-columns-panel[open]>summary{margin-bottom:8px}
+#gamesApp .games-columns-panel[open]{padding-bottom:14px}
+#gamesApp .games-column-form{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:10px;margin:0 0 12px;padding:0;background:none;border:0}
+#gamesApp .games-column-form > *{margin:0;min-width:0;min-height:44px}
+#gamesApp .games-column-form button{width:auto;white-space:nowrap;padding:0 18px}
+#gamesApp .games-column-list{list-style:none;margin:0 0 10px;padding:0;display:flex;flex-wrap:wrap;gap:8px}
+#gamesApp .games-column-empty{color:var(--text-muted);font-size:13px}
+#gamesApp .games-column-chip{display:inline-flex;align-items:center;gap:2px;max-width:100%;padding:3px 4px 3px 12px;border:1px solid var(--border-strong);border-radius:999px;background:var(--surface-2)}
+#gamesApp .games-column-chip-name{max-width:160px;margin-right:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px;font-weight:700}
+#gamesApp .games-chip-btn{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;min-width:36px;margin:0;padding:0;border:0;border-radius:50%;background:transparent;color:var(--text-muted);font-size:14px;line-height:1;box-shadow:none;transform:none}
+#gamesApp .games-chip-btn:hover:not(:disabled){background:rgba(255,255,255,.12);color:var(--text)}
+#gamesApp .games-chip-btn:disabled{opacity:.3}
+#gamesApp .games-drag-hint{text-align:left;font-size:12px}
+
+/* Suche, Sortierung, Filter */
+#gamesApp .games-toolbar{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr) auto;align-items:center;gap:10px;margin:0 0 14px}
+#gamesApp .games-toolbar > input,#gamesApp .games-toolbar > select{margin:0;min-width:0;width:100%;min-height:44px}
+#gamesApp .games-seg{grid-column:1/-1;display:flex;gap:4px;padding:4px;border:1px solid var(--border);border-radius:12px;background:rgba(10,27,49,.6);overflow-x:auto;scrollbar-width:none}
+#gamesApp .games-seg::-webkit-scrollbar{display:none}
+#gamesApp .games-seg button{flex:1 0 auto;width:auto;min-width:0;min-height:40px;margin:0;padding:8px 12px;border:0;border-radius:9px;background:transparent;color:var(--text-muted);font-size:13px;font-weight:800;white-space:nowrap;box-shadow:none;transform:none}
+#gamesApp .games-seg button:hover{background:rgba(255,255,255,.06);color:var(--text)}
+#gamesApp .games-seg button.is-active{background:rgba(34,121,123,.5);color:#d8fff9}
+#gamesApp .games-seg button:focus-visible{outline:2px solid var(--accent-2);outline-offset:2px}
+#gamesApp .games-count{grid-column:1/-1;color:var(--text-muted);font-size:13px;font-weight:700;padding:0 4px}
+
+/* Spiel hinzufügen */
+#gamesApp .games-add-form{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr) auto;align-items:center;gap:10px;margin:0 0 18px;padding:12px;border:1px solid var(--border);border-radius:var(--radius-lg);background:rgba(23,35,58,.42)}
+#gamesApp .games-add-form > *{margin:0;min-width:0;min-height:44px}
+#gamesApp .games-add-form button{width:auto;white-space:nowrap;padding:0 18px}
+
+/* Leerzustand */
+#gamesApp .games-empty-state{display:grid;justify-items:center;gap:12px}
+#gamesApp .games-empty-reset{width:auto;margin:0;min-height:40px;padding:8px 16px;border-radius:10px;font-size:13px}
+
+/* Tabelle (Desktop): Kopfzeile und erste Spalte bleiben beim Scrollen sichtbar */
+#gamesApp .games-table-wrapper{margin-top:0;padding:0;max-height:78vh;overflow:auto;border-radius:var(--radius-lg)}
+#gamesApp .games-table{width:100%;min-width:0;border-collapse:separate;border-spacing:0 8px}
+#gamesApp .games-table thead th{position:sticky;top:0;z-index:3;padding:8px 10px;background:var(--surface);border-bottom:1px solid var(--border-strong);text-transform:none;letter-spacing:0}
+#gamesApp .games-table th:first-child,#gamesApp .games-table td:first-child{position:sticky;left:0;z-index:2;min-width:300px}
+#gamesApp .games-table thead th:first-child{z-index:4}
+#gamesApp .games-table tbody td:first-child{background:var(--surface-2)}
+#gamesApp .games-table tbody tr:hover td:first-child{background:var(--surface-3)}
+#gamesApp .games-table tr.is-complete td:first-child{box-shadow:inset 3px 0 0 var(--cv-p,#2fbfae)}
+#gamesApp .games-table td.game-check-cell{width:1%;white-space:nowrap}
+#gamesApp .games-table tr.is-flash td{animation:gamesFlash .9s ease}
+#gamesApp .game-mobile-card.is-flash{animation:movieFlash .9s ease}
+@keyframes gamesFlash{0%{box-shadow:inset 0 0 0 2px rgba(105,230,215,.75)}100%{box-shadow:inset 0 0 0 2px rgba(105,230,215,0)}}
+
+/* Kopf pro Spalte */
+#gamesApp .game-column-header{padding:4px 8px}
+#gamesApp .game-column-header:focus-visible{outline:2px solid var(--accent-2);outline-offset:2px}
+#gamesApp .game-column-count{color:var(--text-faint);font-size:12px;font-weight:700;line-height:1}
+
+/* Spielzeile */
+#gamesApp .game-row-main{display:flex;align-items:flex-start;gap:12px}
+#gamesApp .game-image-wrapper{width:120px;aspect-ratio:16/9;flex:0 0 auto}
+#gamesApp .game-image-link{display:block;width:100%;height:100%}
+#gamesApp .game-image-placeholder{display:flex;align-items:center;justify-content:center;width:100%;height:100%;cursor:pointer;transition:color .15s,background .15s}
+#gamesApp .game-image-placeholder:hover{background:rgba(255,255,255,.06);color:var(--text)}
+#gamesApp .game-info{flex:1 1 auto;min-width:0}
+#gamesApp .game-name{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;color:var(--text);font-size:17px;font-weight:700;line-height:1.3;text-decoration:none;overflow-wrap:anywhere;cursor:default}
+#gamesApp a.game-name{cursor:pointer}
+#gamesApp a.game-name:hover{text-decoration:underline;text-underline-offset:3px}
+#gamesApp .game-meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+#gamesApp .game-meta:empty{display:none}
+#gamesApp .game-chip{display:inline-flex;align-items:center;max-width:100%;padding:3px 10px;border:1px solid rgba(255,255,255,.16);border-radius:999px;background:rgba(255,255,255,.06);color:var(--text-muted);font-size:12px;font-weight:700;text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#gamesApp .game-chip-progress.is-complete{border-color:rgba(105,230,215,.45);background:rgba(34,121,123,.25);color:#d8fff9}
+#gamesApp .game-chip-link{border-color:rgba(140,124,240,.4);background:rgba(140,124,240,.14);color:#dcd6ff}
+#gamesApp .game-chip-link:hover{background:rgba(140,124,240,.3)}
+#gamesApp .game-row-actions{display:flex;flex-wrap:nowrap;gap:6px;margin-top:8px}
+#gamesApp .game-icon-btn{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;width:38px;height:38px;min-width:38px;margin:0;padding:0;border:1px solid rgba(255,255,255,.1);border-radius:10px;background:rgba(255,255,255,.06);color:var(--text);font-size:16px;line-height:1;box-shadow:none;transform:none}
+#gamesApp .game-icon-btn:hover{background:rgba(255,255,255,.13)}
+#gamesApp .game-icon-btn-del{margin-left:6px}
+#gamesApp .game-icon-btn-del:hover{background:#d62f2f;border-color:#ff9a9a}
+
+/* Große, gut treffbare Haken */
+#gamesApp .game-check-wrap{position:relative;display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;cursor:pointer}
+#gamesApp .game-check-wrap input.game-check{position:absolute;inset:0;width:100%;height:100%;margin:0;padding:0;border:0;background:transparent;opacity:0;cursor:pointer;transform:none}
+#gamesApp .game-check-box{display:flex;align-items:center;justify-content:center;flex:0 0 auto;width:26px;height:26px;border:2px solid rgba(160,185,220,.55);border-radius:8px;color:transparent;font-size:16px;font-weight:900;line-height:1;transition:background .15s,border-color .15s,color .15s}
+#gamesApp .game-check-wrap:hover .game-check-box{border-color:#69e6d7}
+#gamesApp .game-check-wrap input:checked + .game-check-box{background:var(--cv-p,#2fbfae);border-color:var(--cv-p,#2fbfae);color:#04211d}
+#gamesApp .game-check-wrap input:focus-visible + .game-check-box{outline:2px solid var(--accent-2);outline-offset:2px}
+#gamesApp .game-check-wrap--row{display:flex;justify-content:space-between;gap:12px;width:100%;height:auto;min-height:48px;padding:6px 12px}
+
+/* Mobile Karten */
+#gamesApp .game-mobile-card{margin:0;padding:12px;border-radius:16px}
+#gamesApp .game-mobile-checks{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-top:12px}
+
+@media (max-width:650px){
+  #gamesApp .games-toolbar{grid-template-columns:minmax(0,1fr)}
+  #gamesApp .games-count{padding:0 2px}
+  #gamesApp .games-seg{flex-wrap:wrap;overflow:visible}
+  #gamesApp .games-seg button{flex:1 1 30%}
+  #gamesApp .games-column-form,#gamesApp .games-add-form{grid-template-columns:minmax(0,1fr)}
+  #gamesApp .games-column-form button,#gamesApp .games-add-form button{width:100%;min-height:48px}
+  #gamesApp .games-chip-btn{width:44px;height:44px;min-width:44px}
+  #gamesApp .games-table-wrapper{max-height:none;overflow:visible;background:transparent;border:0}
+  #gamesApp .games-mobile-list{gap:12px}
+  #gamesApp .game-mobile-card .game-row-main{flex-direction:row;align-items:flex-start;gap:12px}
+  #gamesApp .game-mobile-card .game-image-wrapper{width:92px;max-width:none;aspect-ratio:1/1}
+  #gamesApp .game-mobile-card .game-info{flex:1 1 auto;width:auto;min-width:0}
+  #gamesApp .game-mobile-card .game-row-actions{display:flex;flex-wrap:wrap}
+  #gamesApp .game-icon-btn{width:44px;height:44px}
+  #gamesApp .game-icon-btn-del{margin-left:auto}
+}
+@media (prefers-reduced-motion:reduce){
+  #gamesApp .games-table tr.is-flash td,#gamesApp .game-mobile-card.is-flash{animation:none}
+  #gamesApp .game-check-box{transition:none}
+}
+body.color-vision-mode #gamesApp .game-icon-btn-del:hover{background:#2a3b4c!important;border-color:#FFC94D!important;color:#fff!important}
 </style>
 
 
@@ -5512,40 +5634,67 @@ body.app-scene .skip-link:focus{left:12px}
     <div id="gamesApp" class="app-panel" style="display:none;">
       <div class="list-panel-heading"><h2><span class="section-title-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 8h10a4 4 0 0 1 3.8 2.8l1.1 4a2.5 2.5 0 0 1-4.1 2.5l-2.3-2H8.5l-2.3 2a2.5 2.5 0 0 1-4.1-2.5l1.1-4A4 4 0 0 1 7 8Z"></path><path d="M7 11v4m-2-2h4m7-.5h.01M18 14.5h.01"></path></svg></span>Spiele</h2><button class="list-settings-button" type="button" onclick="openListSettings('games')" aria-label="Einstellungen für Games" title="Listeneinstellungen">⚙</button></div>
 
-      <div class="games-column-form">
-        <input
-          id="newGameColumnName"
-          placeholder="Neue Spalte hinzufügen, z. B. Peter, Anna oder Koop"
-        >
-        <button onclick="addGameColumn()">➕ Spalte hinzufügen</button>
+      <button class="random-card-button" type="button" onclick="openRandomGame()" title="Wählt zufällig aus der aktuell angezeigten Auswahl">
+        🎲 Was spielen wir?
+      </button>
+
+      <div class="movie-progress games-progress">
+        <div class="movie-progress-head">
+          <strong id="gamesProgressText" role="status" aria-live="polite">Lade …</strong>
+          <span id="gamesPercent" class="movie-percent"></span>
+        </div>
+        <div class="movie-progress-bar" role="progressbar" aria-label="Anteil der Spiele mit allen Haken" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="gamesProgressFill"></span></div>
+      </div>
+
+      <details id="gamesColumnsPanel" class="games-columns-panel">
+        <summary>🧩 Spalten verwalten <span id="gamesColumnsHint" class="yugioh-summary-hint"></span></summary>
+
+        <div class="games-column-form">
+          <input
+            id="newGameColumnName"
+            placeholder="Neue Spalte, z. B. Peter, Anna oder Koop"
+            aria-label="Name der neuen Spalte"
+            autocomplete="off"
+            enterkeyhint="done"
+          >
+          <button type="button" onclick="addGameColumn()">➕ Spalte hinzufügen</button>
+        </div>
+
+        <ul id="gamesColumnList" class="games-column-list" aria-label="Vorhandene Spalten"></ul>
 
         <div class="games-drag-hint">
-          Spalten im Tabellenkopf greifen und nach links oder rechts ziehen.
+          Reihenfolge mit ◀ ▶ ändern, im Tabellenkopf ziehen oder per Tastatur mit Alt + Pfeiltasten.
         </div>
-      </div>
+      </details>
 
-      <div class="games-add-form">
-        <input id="newGameName" placeholder="Name">
-        <input id="newGameUrl" placeholder="Link">
-        <button onclick="addGameItem()">➕ Spiel hinzufügen</button>
-      </div>
+      <div class="games-toolbar">
+        <input id="gamesSearch" type="search" class="games-search" placeholder="🔍 Spiele suchen …" aria-label="Spiele durchsuchen" autocomplete="off" oninput="setGamesQuery(this.value)">
 
-      <div class="games-check-controls">
-        <select id="gamesCheckSort" onchange="renderGamesTable()">
-          <option value="none">Haken-Sortierung</option>
+        <select id="gamesCheckSort" aria-label="Sortierung" onchange="renderGamesTable()">
+          <option value="none">Neueste zuerst</option>
+          <option value="az">A–Z</option>
+          <option value="za">Z–A</option>
           <option value="checkedAsc">Wenige Haken zuerst</option>
           <option value="checkedDesc">Viele Haken zuerst</option>
           <option value="completeFirst">Vollständige zuerst</option>
           <option value="incompleteFirst">Unvollständige zuerst</option>
         </select>
 
-        <select id="gamesCheckFilter" onchange="renderGamesTable()">
-          <option value="all">Alle Spiele</option>
-          <option value="complete">Alle Spalten abgehakt</option>
-          <option value="incomplete">Nicht alle Spalten abgehakt</option>
-          <option value="noneChecked">Keine Haken gesetzt</option>
-          <option value="someChecked">Mindestens ein Haken gesetzt</option>
-        </select>
+        <div class="games-seg" role="group" aria-label="Nach Haken filtern">
+          <button type="button" data-filter="all" class="is-active" aria-pressed="true" onclick="setGamesFilter('all')">Alle <span class="movie-seg-count" id="gamesCountAll">0</span></button>
+          <button type="button" data-filter="complete" aria-pressed="false" onclick="setGamesFilter('complete')" title="Alle Spalten abgehakt">Komplett <span class="movie-seg-count" id="gamesCountComplete">0</span></button>
+          <button type="button" data-filter="incomplete" aria-pressed="false" onclick="setGamesFilter('incomplete')" title="Nicht alle Spalten abgehakt">Unvollständig <span class="movie-seg-count" id="gamesCountIncomplete">0</span></button>
+          <button type="button" data-filter="noneChecked" aria-pressed="false" onclick="setGamesFilter('noneChecked')" title="Keine Haken gesetzt">Ohne Haken <span class="movie-seg-count" id="gamesCountNone">0</span></button>
+          <button type="button" data-filter="someChecked" aria-pressed="false" onclick="setGamesFilter('someChecked')" title="Mindestens ein Haken gesetzt">Mit Haken <span class="movie-seg-count" id="gamesCountSome">0</span></button>
+        </div>
+
+        <span id="gamesCount" class="games-count" aria-live="polite"></span>
+      </div>
+
+      <div class="games-add-form">
+        <input id="newGameName" placeholder="Name des Spiels" aria-label="Name des Spiels" autocomplete="off" enterkeyhint="next">
+        <input id="newGameUrl" placeholder="Link (optional)" aria-label="Link" inputmode="url" autocomplete="off" enterkeyhint="done">
+        <button type="button" id="addGameButton" onclick="addGameItem()">➕ Spiel hinzufügen</button>
       </div>
 
       <div id="gamesTableWrapper" class="games-table-wrapper"></div>
@@ -6136,7 +6285,6 @@ const newGameColumnNameInput = document.getElementById("newGameColumnName");
 const newGameNameInput = document.getElementById("newGameName");
 const newGameUrlInput = document.getElementById("newGameUrl");
 const gamesCheckSortSelect = document.getElementById("gamesCheckSort");
-const gamesCheckFilterSelect = document.getElementById("gamesCheckFilter");
 
 const yugiohDeckList = document.getElementById("yugiohDeckList");
 const yugiohOwnerFilter = document.getElementById("yugiohOwnerFilter");
@@ -6169,6 +6317,12 @@ let gameChecks = {};
 let draggedGameColumnId = null;
 let touchDraggedGameColumnId = null;
 let touchCurrentGameColumnId = null;
+let gamesView = { query: "", filter: "all" };
+let gamesFlashId = null;
+let gamesScrollToFlash = false;
+let gameAddBusy = false;
+const GAMES_CHECK_SORTS = ["checkedAsc", "checkedDesc", "completeFirst", "incompleteFirst"];
+const gamesMobileQuery = window.matchMedia("(max-width: 650px)");
 
 let yugiohDecks = [];
 let yugiohPlayerNames = [];
@@ -6322,7 +6476,7 @@ function createSmallEditButton(onClick) {
 function shouldIgnoreEditDblClick(event) {
   return Boolean(
     event.target.closest(
-      "button, input, textarea, select, a, .btn, .btn-small, .movie-check-wrap, .movie-chip, .movie-note, .star, .game-check, .game-column-header, .image, .game-image, .yugioh-image, .yugioh-image-placeholder, .game-image-placeholder"
+      "button, input, textarea, select, a, .btn, .btn-small, .movie-check-wrap, .movie-chip, .movie-note, .star, .game-check, .game-check-wrap, .game-icon-btn, .game-chip, .game-column-header, .image, .game-image, .yugioh-image, .yugioh-image-placeholder, .game-image-placeholder"
     )
   );
 }
@@ -10879,6 +11033,7 @@ async function loadGamesData() {
   }
 
   setStatus("Lade Spiele...");
+  if (!gameItems.length) gamesTableWrapper.innerHTML = '<div class="yugioh-skeleton"></div>'.repeat(3);
 
   const [itemsResult, columnsResult, checksResult] = await Promise.all([
     supabaseClient
@@ -10919,6 +11074,9 @@ async function loadGamesData() {
   gameColumns = columnsResult.data || [];
   gameChecks = {};
 
+  const columnsPanel = document.getElementById("gamesColumnsPanel");
+  if (columnsPanel && gameColumns.length === 0) columnsPanel.open = true;
+
   (checksResult.data || []).forEach(check => {
     gameChecks[getGameCheckKey(check.game_id, check.column_id)] = {
       id: check.id,
@@ -10941,309 +11099,636 @@ function isGameComplete(item) {
   return gameColumns.length > 0 && getGameCheckedCount(item) === gameColumns.length;
 }
 
-function getFilteredSortedGameItems() {
-  let data = [...gameItems];
+/* ===== Games: Ansicht (Suche, Filter, Sortierung) ===== */
 
-  const filter = gamesCheckFilterSelect ? gamesCheckFilterSelect.value : "all";
+function getGamesStats() {
+  const columnCount = gameColumns.length;
+  const stats = { total: gameItems.length, complete: 0, none: 0, some: 0, counts: new Map() };
+
+  gameItems.forEach(item => {
+    const checked = getGameCheckedCount(item);
+    stats.counts.set(item.id, checked);
+    if (columnCount > 0 && checked === columnCount) stats.complete++;
+    if (checked === 0) stats.none++;
+    else stats.some++;
+  });
+
+  return stats;
+}
+
+function gamesViewDependsOnChecks() {
   const sort = gamesCheckSortSelect ? gamesCheckSortSelect.value : "none";
+  return gamesView.filter !== "all" || GAMES_CHECK_SORTS.includes(sort);
+}
 
-  data = data.filter(item => {
-    const checkedCount = getGameCheckedCount(item);
-    const complete = gameColumns.length > 0 && checkedCount === gameColumns.length;
+function getFilteredSortedGameItems(stats = getGamesStats()) {
+  const query = gamesView.query.trim().toLowerCase();
+  const filter = gamesView.filter;
+  const sort = gamesCheckSortSelect ? gamesCheckSortSelect.value : "none";
+  const columnCount = gameColumns.length;
 
-    if (filter === "complete") return complete;
-    if (filter === "incomplete") return !complete;
-    if (filter === "noneChecked") return checkedCount === 0;
-    if (filter === "someChecked") return checkedCount > 0;
+  const checkedOf = item => stats.counts.get(item.id) || 0;
+  const isComplete = item => columnCount > 0 && checkedOf(item) === columnCount;
+
+  const data = gameItems.filter(item => {
+    const checked = checkedOf(item);
+
+    if (filter === "complete" && !isComplete(item)) return false;
+    if (filter === "incomplete" && isComplete(item)) return false;
+    if (filter === "noneChecked" && checked !== 0) return false;
+    if (filter === "someChecked" && checked === 0) return false;
+
+    if (query) {
+      const haystack = (String(item.name || "") + " " + String(item.url || "")).toLowerCase();
+      if (!haystack.includes(query)) return false;
+    }
 
     return true;
   });
 
-  if (sort === "checkedAsc") {
-    data.sort((a, b) => getGameCheckedCount(a) - getGameCheckedCount(b));
-  } else if (sort === "checkedDesc") {
-    data.sort((a, b) => getGameCheckedCount(b) - getGameCheckedCount(a));
-  } else if (sort === "completeFirst") {
-    data.sort((a, b) => Number(isGameComplete(b)) - Number(isGameComplete(a)));
-  } else if (sort === "incompleteFirst") {
-    data.sort((a, b) => Number(isGameComplete(a)) - Number(isGameComplete(b)));
-  }
+  const byName = (x, y) => String(x.name || "").localeCompare(String(y.name || ""), "de", { sensitivity: "base" });
+
+  if (sort === "az") data.sort(byName);
+  else if (sort === "za") data.sort((x, y) => byName(y, x));
+  else if (sort === "checkedAsc") data.sort((x, y) => checkedOf(x) - checkedOf(y));
+  else if (sort === "checkedDesc") data.sort((x, y) => checkedOf(y) - checkedOf(x));
+  else if (sort === "completeFirst") data.sort((x, y) => Number(isComplete(y)) - Number(isComplete(x)));
+  else if (sort === "incompleteFirst") data.sort((x, y) => Number(isComplete(x)) - Number(isComplete(y)));
 
   return data;
 }
 
-function renderGamesTable() {
-  gamesTableWrapper.innerHTML = "";
+function setGamesQuery(query) {
+  gamesView.query = query || "";
+  renderGamesTable();
+}
 
-  if (gameItems.length === 0 && gameColumns.length === 0) {
-    const empty = document.createElement("div");
-    empty.className = "games-empty";
-    empty.textContent = "Noch keine Spiele und noch keine Spalten vorhanden.";
-    gamesTableWrapper.appendChild(empty);
+function setGamesFilter(filter) {
+  gamesView.filter = filter;
+  renderGamesTable();
+}
+
+function resetGamesView(shouldRender = true) {
+  gamesView = { query: "", filter: "all" };
+  const search = document.getElementById("gamesSearch");
+  if (search) search.value = "";
+  if (shouldRender) renderGamesTable();
+}
+
+function openRandomGame() {
+  if (!gameItems.length) {
+    showRandomPopup("Es gibt noch keine Spiele in der Liste.");
     return;
   }
 
+  const pool = getFilteredSortedGameItems();
+
+  if (!pool.length) {
+    showRandomPopup("Für die aktuelle Suche bzw. Filterauswahl gibt es kein Spiel.");
+    return;
+  }
+
+  const item = pool[Math.floor(Math.random() * pool.length)];
+  const url = item.url && item.url.trim() ? normalize(item.url.trim()) : "";
+
+  showRandomPopup("Wir spielen " + (item.name || "etwas Unbekanntes") + "!", url);
+}
+
+function updateGamesSummary(visibleCount, stats) {
+  const columnCount = gameColumns.length;
+  const setText = (id, text) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = text;
+  };
+
+  const percent = stats.total && columnCount ? Math.round((stats.complete / stats.total) * 100) : 0;
+
+  let text;
+  if (!stats.total) text = "Noch keine Spiele";
+  else if (!columnCount) text = "Lege Spalten an, um Haken zu setzen";
+  else text = stats.complete + " von " + stats.total + " Spielen komplett";
+
+  setText("gamesProgressText", text);
+  setText("gamesPercent", stats.total && columnCount ? percent + " %" : "");
+
+  const fill = document.getElementById("gamesProgressFill");
+  if (fill) {
+    fill.style.width = percent + "%";
+    if (fill.parentElement) fill.parentElement.setAttribute("aria-valuenow", String(percent));
+  }
+
+  setText("gamesCountAll", stats.total);
+  setText("gamesCountComplete", stats.complete);
+  setText("gamesCountIncomplete", stats.total - stats.complete);
+  setText("gamesCountNone", stats.none);
+  setText("gamesCountSome", stats.some);
+
+  document.querySelectorAll("#gamesApp .games-seg button").forEach(btn => {
+    const active = btn.dataset.filter === gamesView.filter;
+    btn.classList.toggle("is-active", active);
+    btn.setAttribute("aria-pressed", active ? "true" : "false");
+  });
+
+  if (!stats.total) {
+    setText("gamesCount", "");
+  } else if (visibleCount === stats.total) {
+    setText("gamesCount", stats.total + (stats.total === 1 ? " Spiel" : " Spiele"));
+  } else {
+    setText("gamesCount", visibleCount + " von " + stats.total + " Spielen");
+  }
+}
+
+/* ===== Games: Bausteine ===== */
+
+function getGameColumnCheckedCount(column) {
+  return gameItems.reduce((count, item) => {
+    return count + (gameChecks[getGameCheckKey(item.id, column.id)]?.checked === true ? 1 : 0);
+  }, 0);
+}
+
+function createGamesEmpty(text, withReset) {
+  const empty = document.createElement("div");
+  empty.className = "card-empty games-empty-state";
+  empty.appendChild(document.createTextNode(text));
+
+  if (withReset) {
+    const reset = document.createElement("button");
+    reset.type = "button";
+    reset.className = "games-empty-reset";
+    reset.textContent = "Suche & Filter zurücksetzen";
+    reset.onclick = () => resetGamesView();
+    empty.appendChild(reset);
+  }
+
+  return empty;
+}
+
+function createGameIconButton(icon, label, itemName, className, onClick) {
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.className = "game-icon-btn " + className;
+  btn.textContent = icon;
+  btn.title = label;
+  btn.setAttribute("aria-label", label + ": " + itemName);
+  btn.onclick = event => {
+    event.stopPropagation();
+    onClick();
+  };
+  return btn;
+}
+
+function createGameImage(item) {
+  const wrapper = document.createElement("div");
+  wrapper.className = "game-image-wrapper";
+  const name = item.name || "Unbenannt";
+
+  if (item.image) {
+    const img = document.createElement("img");
+    img.src = item.image;
+    img.className = "game-image";
+    img.loading = "lazy";
+    img.decoding = "async";
+    img.alt = item.name ? "Vorschaubild von " + item.name : "Vorschaubild";
+
+    if (item.url) {
+      const link = document.createElement("a");
+      link.className = "game-image-link";
+      link.href = normalize(item.url.trim());
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      link.title = "Link öffnen";
+      link.appendChild(img);
+      wrapper.appendChild(link);
+    } else {
+      img.title = "Bild öffnen";
+      img.onclick = () => window.open(item.image, "_blank");
+      wrapper.appendChild(img);
+    }
+  } else {
+    const placeholder = document.createElement("div");
+    placeholder.className = "game-image-placeholder";
+    placeholder.textContent = "🎮";
+    placeholder.title = "Bild hochladen";
+    placeholder.setAttribute("role", "button");
+    placeholder.setAttribute("tabindex", "0");
+    placeholder.setAttribute("aria-label", "Bild hochladen: " + name);
+    placeholder.onclick = () => uploadGameImage(item.id);
+    placeholder.addEventListener("keydown", event => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        uploadGameImage(item.id);
+      }
+    });
+    wrapper.appendChild(placeholder);
+  }
+
+  return wrapper;
+}
+
+function createGameMain(item, stats) {
+  const name = item.name || "Unbenannt";
+  const columnCount = gameColumns.length;
+  const checked = stats.counts.get(item.id) || 0;
+  const complete = columnCount > 0 && checked === columnCount;
+
+  const main = document.createElement("div");
+  main.className = "game-row-main";
+  main.appendChild(createGameImage(item));
+
+  const info = document.createElement("div");
+  info.className = "game-info";
+
+  let title;
+  if (item.url) {
+    title = document.createElement("a");
+    title.href = normalize(item.url.trim());
+    title.target = "_blank";
+    title.rel = "noopener noreferrer";
+    title.title = "Link öffnen";
+  } else {
+    title = document.createElement("div");
+  }
+  title.className = "game-name";
+  title.textContent = name;
+  info.appendChild(title);
+
+  const meta = document.createElement("div");
+  meta.className = "game-meta";
+
+  if (columnCount > 0) {
+    const progress = document.createElement("span");
+    progress.className = "game-chip game-chip-progress" + (complete ? " is-complete" : "");
+    progress.textContent = complete ? "✓ Komplett" : checked + " von " + columnCount;
+    meta.appendChild(progress);
+  }
+
+  if (item.url) {
+    const linkChip = document.createElement("a");
+    linkChip.className = "game-chip game-chip-link";
+    linkChip.href = normalize(item.url.trim());
+    linkChip.target = "_blank";
+    linkChip.rel = "noopener noreferrer";
+    linkChip.title = normalize(item.url.trim());
+    linkChip.textContent = "🔗 " + feastLinkHost(item.url) + " ↗";
+    meta.appendChild(linkChip);
+  }
+
+  info.appendChild(meta);
+
+  const actions = document.createElement("div");
+  actions.className = "game-row-actions";
+  actions.append(
+    createGameIconButton("✏️", "Bearbeiten", name, "game-icon-btn-edit", () => openGameEdit(item.id)),
+    createGameIconButton("🖼️", item.image ? "Bild ändern" : "Bild hochladen", name, "game-icon-btn-image", () => uploadGameImage(item.id)),
+    createGameIconButton("❌", "Löschen", name, "game-icon-btn-del game-row-delete", () => deleteGameItem(item.id, name))
+  );
+  info.appendChild(actions);
+
+  main.appendChild(info);
+  return main;
+}
+
+function createGameCheck(item, column, withText) {
+  const label = document.createElement("label");
+  label.className = "game-check-wrap" + (withText ? " game-check-wrap--row game-mobile-check-row" : "");
+
+  if (withText) {
+    const text = document.createElement("span");
+    text.className = "game-mobile-check-title";
+    text.textContent = column.name || "Spalte";
+    text.title = column.name || "Spalte";
+    label.appendChild(text);
+  }
+
+  const input = document.createElement("input");
+  input.type = "checkbox";
+  input.className = "game-check";
+  input.checked = gameChecks[getGameCheckKey(item.id, column.id)]?.checked === true;
+  input.dataset.gfocus = "check:" + item.id + ":" + column.id;
+  input.setAttribute("aria-label", (item.name || "Unbenannt") + " – " + (column.name || "Spalte"));
+  input.addEventListener("change", () => toggleGameCheck(item, column, input));
+
+  const box = document.createElement("span");
+  box.className = "game-check-box";
+  box.setAttribute("aria-hidden", "true");
+  box.textContent = "✓";
+
+  label.append(input, box);
+  return label;
+}
+
+async function toggleGameCheck(item, column, input) {
+  const key = getGameCheckKey(item.id, column.id);
+  const newValue = input.checked;
+  const previous = gameChecks[key] ? { ...gameChecks[key] } : null;
+
+  /* Sofort anzeigen, bei Fehler zurücksetzen */
+  gameChecks[key] = { id: previous ? previous.id : "", checked: newValue };
+  afterGameCheckChange(item.id);
+
+  const success = await updateGameCheck(item.id, column.id, newValue);
+
+  if (!success) {
+    if (previous) gameChecks[key] = previous;
+    else delete gameChecks[key];
+    renderGamesTable();
+  }
+}
+
+function afterGameCheckChange(itemId) {
+  if (gamesViewDependsOnChecks()) {
+    gamesFlashId = itemId;
+    renderGamesTable();
+    return;
+  }
+
+  refreshGameRowState(itemId);
+  const stats = getGamesStats();
+  updateGamesSummary(getFilteredSortedGameItems(stats).length, stats);
+  updateGameColumnCounts();
+}
+
+function refreshGameRowState(itemId) {
+  const item = gameItems.find(entry => entry.id === itemId);
+  if (!item) return;
+
+  const total = gameColumns.length;
+  const checked = getGameCheckedCount(item);
+  const complete = total > 0 && checked === total;
+
+  gamesTableWrapper.querySelectorAll('[data-game-id="' + itemId + '"]').forEach(el => {
+    el.classList.toggle("is-complete", complete);
+    const chip = el.querySelector(".game-chip-progress");
+    if (chip) {
+      chip.textContent = complete ? "✓ Komplett" : checked + " von " + total;
+      chip.classList.toggle("is-complete", complete);
+    }
+  });
+}
+
+function updateGameColumnCounts() {
+  gameColumns.forEach(column => {
+    const el = gamesTableWrapper.querySelector('.game-column-count[data-col-id="' + column.id + '"]');
+    if (el) el.textContent = getGameColumnCheckedCount(column) + "/" + gameItems.length;
+  });
+}
+
+function createGameColumnHeader(column) {
+  const th = document.createElement("th");
+  th.scope = "col";
+  th.dataset.columnId = column.id;
+
+  const headerWrap = document.createElement("div");
+  headerWrap.className = "game-column-header";
+  headerWrap.draggable = true;
+  headerWrap.tabIndex = 0;
+  headerWrap.dataset.columnId = column.id;
+  headerWrap.dataset.gfocus = "col:" + column.id;
+  headerWrap.title = "Ziehen oder Alt + Pfeiltasten: verschieben · Doppelklick oder Enter: umbenennen";
+  headerWrap.setAttribute("aria-label", (column.name || "Spalte") + ". Enter zum Umbenennen, Alt plus Pfeiltasten zum Verschieben.");
+
+  const handle = document.createElement("div");
+  handle.className = "game-column-drag-handle";
+  handle.textContent = "☰";
+  handle.setAttribute("aria-hidden", "true");
+
+  const title = document.createElement("div");
+  title.className = "game-column-title";
+  title.textContent = column.name || "Spalte";
+  title.title = "Doppelklick zum Bearbeiten";
+
+  const count = document.createElement("div");
+  count.className = "game-column-count";
+  count.dataset.colId = column.id;
+  count.textContent = getGameColumnCheckedCount(column) + "/" + gameItems.length;
+
+  title.addEventListener("dblclick", event => {
+    event.preventDefault();
+    event.stopPropagation();
+    openGameColumnEdit(column.id);
+  });
+
+  headerWrap.addEventListener("keydown", event => {
+    if (event.key === "Enter" || event.key === "F2") {
+      event.preventDefault();
+      openGameColumnEdit(column.id);
+    } else if (event.altKey && (event.key === "ArrowLeft" || event.key === "ArrowRight")) {
+      event.preventDefault();
+      moveGameColumn(column.id, event.key === "ArrowLeft" ? -1 : 1);
+    }
+  });
+
+  headerWrap.addEventListener("dragstart", event => {
+    draggedGameColumnId = column.id;
+    headerWrap.classList.add("dragging");
+    event.dataTransfer.effectAllowed = "move";
+    event.dataTransfer.setData("text/plain", column.id);
+  });
+
+  headerWrap.addEventListener("dragend", () => {
+    draggedGameColumnId = null;
+    clearGameColumnDragStyles();
+  });
+
+  headerWrap.addEventListener("dragover", event => {
+    event.preventDefault();
+
+    if (draggedGameColumnId && draggedGameColumnId !== column.id) {
+      event.dataTransfer.dropEffect = "move";
+      clearGameColumnDragOverStyles();
+      headerWrap.classList.add("drag-over");
+    }
+  });
+
+  headerWrap.addEventListener("dragleave", () => {
+    headerWrap.classList.remove("drag-over");
+  });
+
+  headerWrap.addEventListener("drop", async event => {
+    event.preventDefault();
+
+    const sourceColumnId =
+      draggedGameColumnId ||
+      event.dataTransfer.getData("text/plain");
+
+    await reorderGameColumnByDrop(sourceColumnId, column.id);
+
+    draggedGameColumnId = null;
+    clearGameColumnDragStyles();
+  });
+
+  headerWrap.addEventListener("touchstart", () => {
+    touchDraggedGameColumnId = column.id;
+    touchCurrentGameColumnId = column.id;
+    headerWrap.classList.add("dragging");
+  }, { passive: true });
+
+  headerWrap.addEventListener("touchmove", event => {
+    if (!touchDraggedGameColumnId) return;
+
+    const touch = event.touches[0];
+    const targetHeader = getGameColumnHeaderFromPoint(touch.clientX, touch.clientY);
+
+    clearGameColumnDragOverStyles();
+
+    if (targetHeader && targetHeader.dataset.columnId !== touchDraggedGameColumnId) {
+      touchCurrentGameColumnId = targetHeader.dataset.columnId;
+      targetHeader.classList.add("drag-over");
+    }
+  }, { passive: true });
+
+  headerWrap.addEventListener("touchend", async () => {
+    const sourceColumnId = touchDraggedGameColumnId;
+    const targetColumnId = touchCurrentGameColumnId;
+
+    touchDraggedGameColumnId = null;
+    touchCurrentGameColumnId = null;
+
+    await reorderGameColumnByDrop(sourceColumnId, targetColumnId);
+    clearGameColumnDragStyles();
+  });
+
+  headerWrap.append(handle, title, count);
+  th.appendChild(headerWrap);
+  return th;
+}
+
+async function moveGameColumn(columnId, direction) {
+  const index = gameColumns.findIndex(column => column.id === columnId);
+  const target = index < 0 ? null : gameColumns[index + direction];
+  if (!target) return;
+  await reorderGameColumnByDrop(columnId, target.id);
+}
+
+function renderGamesColumnList() {
+  const hint = document.getElementById("gamesColumnsHint");
+  const list = document.getElementById("gamesColumnList");
+
+  if (hint) {
+    hint.textContent = gameColumns.length
+      ? gameColumns.length + (gameColumns.length === 1 ? " Spalte" : " Spalten")
+      : "Noch keine Spalten";
+  }
+
+  if (!list) return;
+  list.innerHTML = "";
+
+  if (!gameColumns.length) {
+    const li = document.createElement("li");
+    li.className = "games-column-empty";
+    li.textContent = "Jede Spalte ist ein Kriterium, z. B. eine Person oder \"Koop\". Lege oben die erste Spalte an.";
+    list.appendChild(li);
+    return;
+  }
+
+  gameColumns.forEach((column, index) => {
+    const name = column.name || "Spalte";
+
+    const li = document.createElement("li");
+    li.className = "games-column-chip";
+
+    const label = document.createElement("span");
+    label.className = "games-column-chip-name";
+    label.textContent = name;
+    label.title = name;
+
+    const makeButton = (icon, text, disabled, focusKey, handler) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "games-chip-btn";
+      btn.textContent = icon;
+      btn.title = text;
+      btn.setAttribute("aria-label", text);
+      btn.disabled = disabled;
+      btn.dataset.gfocus = focusKey;
+      btn.onclick = handler;
+      return btn;
+    };
+
+    li.append(
+      label,
+      makeButton("◀", "Nach links: " + name, index === 0, "colmove:" + column.id + ":-1", () => moveGameColumn(column.id, -1)),
+      makeButton("▶", "Nach rechts: " + name, index === gameColumns.length - 1, "colmove:" + column.id + ":1", () => moveGameColumn(column.id, 1)),
+      makeButton("✏️", "Umbenennen: " + name, false, "coledit:" + column.id, () => openGameColumnEdit(column.id))
+    );
+
+    list.appendChild(li);
+  });
+}
+
+function restoreGamesFocus(key) {
+  if (!key) return;
+
+  let el = gamesApp.querySelector('[data-gfocus="' + key + '"]');
+
+  /* Der gedrückte Pfeil kann nach dem Verschieben deaktiviert sein */
+  if (el && el.disabled) {
+    el = (el.closest("li") || gamesApp).querySelector("button:not(:disabled)");
+  }
+
+  if (el) el.focus({ preventScroll: true });
+}
+
+function applyGamesFlash() {
+  if (gamesFlashId === null) return;
+
+  const el = gamesTableWrapper.querySelector('[data-game-id="' + gamesFlashId + '"]');
+
+  if (el) {
+    el.classList.add("is-flash");
+    if (gamesScrollToFlash) el.scrollIntoView({ block: "nearest" });
+  }
+
+  gamesFlashId = null;
+  gamesScrollToFlash = false;
+}
+
+/* ===== Games: Rendering ===== */
+
+function renderGamesDesktopTable(visibleGameItems, stats) {
+  const columnCount = gameColumns.length;
+
   const table = document.createElement("table");
   table.className = "games-table games-desktop-table";
+
+  const caption = document.createElement("caption");
+  caption.className = "games-sr-only";
+  caption.textContent = "Spiele mit Haken je Spalte";
+  table.appendChild(caption);
 
   const thead = document.createElement("thead");
   const headRow = document.createElement("tr");
 
   const gameHead = document.createElement("th");
+  gameHead.scope = "col";
   gameHead.textContent = "Spiel";
   headRow.appendChild(gameHead);
 
-  gameColumns.forEach((column) => {
-    const th = document.createElement("th");
-    th.dataset.columnId = column.id;
-
-    const headerWrap = document.createElement("div");
-    headerWrap.className = "game-column-header";
-    headerWrap.draggable = true;
-    headerWrap.dataset.columnId = column.id;
-    headerWrap.title = "Spalte ziehen, um sie zu verschieben";
-
-    const handle = document.createElement("div");
-    handle.className = "game-column-drag-handle";
-    handle.textContent = "☰";
-
-    const title = document.createElement("div");
-    title.className = "game-column-title";
-    title.textContent = column.name || "Spalte";
-    title.title = "Doppelklick zum Bearbeiten";
-
-    title.addEventListener("dblclick", event => {
-      event.preventDefault();
-      event.stopPropagation();
-      openGameColumnEdit(column.id);
-    });
-
-    headerWrap.addEventListener("dragstart", event => {
-      draggedGameColumnId = column.id;
-      headerWrap.classList.add("dragging");
-      event.dataTransfer.effectAllowed = "move";
-      event.dataTransfer.setData("text/plain", column.id);
-    });
-
-    headerWrap.addEventListener("dragend", () => {
-      draggedGameColumnId = null;
-      clearGameColumnDragStyles();
-    });
-
-    headerWrap.addEventListener("dragover", event => {
-      event.preventDefault();
-
-      if (draggedGameColumnId && draggedGameColumnId !== column.id) {
-        event.dataTransfer.dropEffect = "move";
-        clearGameColumnDragOverStyles();
-        headerWrap.classList.add("drag-over");
-      }
-    });
-
-    headerWrap.addEventListener("dragleave", () => {
-      headerWrap.classList.remove("drag-over");
-    });
-
-    headerWrap.addEventListener("drop", async event => {
-      event.preventDefault();
-
-      const sourceColumnId =
-        draggedGameColumnId ||
-        event.dataTransfer.getData("text/plain");
-
-      await reorderGameColumnByDrop(sourceColumnId, column.id);
-
-      draggedGameColumnId = null;
-      clearGameColumnDragStyles();
-    });
-
-    headerWrap.addEventListener("touchstart", event => {
-      touchDraggedGameColumnId = column.id;
-      touchCurrentGameColumnId = column.id;
-      headerWrap.classList.add("dragging");
-    }, { passive: true });
-
-    headerWrap.addEventListener("touchmove", event => {
-      if (!touchDraggedGameColumnId) return;
-
-      const touch = event.touches[0];
-      const targetHeader = getGameColumnHeaderFromPoint(touch.clientX, touch.clientY);
-
-      clearGameColumnDragOverStyles();
-
-      if (targetHeader && targetHeader.dataset.columnId !== touchDraggedGameColumnId) {
-        touchCurrentGameColumnId = targetHeader.dataset.columnId;
-        targetHeader.classList.add("drag-over");
-      }
-    }, { passive: true });
-
-    headerWrap.addEventListener("touchend", async () => {
-      const sourceColumnId = touchDraggedGameColumnId;
-      const targetColumnId = touchCurrentGameColumnId;
-
-      touchDraggedGameColumnId = null;
-      touchCurrentGameColumnId = null;
-
-      await reorderGameColumnByDrop(sourceColumnId, targetColumnId);
-      clearGameColumnDragStyles();
-    });
-
-    headerWrap.appendChild(handle);
-    headerWrap.appendChild(title);
-
-    th.appendChild(headerWrap);
-    headRow.appendChild(th);
-  });
+  gameColumns.forEach(column => headRow.appendChild(createGameColumnHeader(column)));
 
   thead.appendChild(headRow);
   table.appendChild(thead);
 
   const tbody = document.createElement("tbody");
 
-  if (gameItems.length === 0) {
-    const row = document.createElement("tr");
-    const cell = document.createElement("td");
-    cell.colSpan = Math.max(1, gameColumns.length + 1);
-    cell.className = "games-empty";
-    cell.textContent = "Noch keine Spiele vorhanden.";
-    row.appendChild(cell);
-    tbody.appendChild(row);
-  }
-
-  const visibleGameItems = getFilteredSortedGameItems();
-
-  if (gameItems.length > 0 && visibleGameItems.length === 0) {
-    const row = document.createElement("tr");
-    const cell = document.createElement("td");
-    cell.colSpan = Math.max(1, gameColumns.length + 1);
-    cell.className = "games-empty";
-    cell.textContent = "Keine Spiele passen zum aktuellen Filter.";
-    row.appendChild(cell);
-    tbody.appendChild(row);
-  }
-
   visibleGameItems.forEach(item => {
     const row = document.createElement("tr");
+    row.className = "game-row";
+    row.dataset.gameId = item.id;
+
+    if (columnCount > 0 && stats.counts.get(item.id) === columnCount) {
+      row.classList.add("is-complete");
+    }
 
     const gameCell = document.createElement("td");
-
-    const main = document.createElement("div");
-    main.className = "game-row-main";
-
-    const imageWrapper = document.createElement("div");
-    imageWrapper.className = "game-image-wrapper";
-
-    if (item.image) {
-      const img = document.createElement("img");
-      img.src = item.image;
-      img.className = "game-image";
-      img.alt = item.name ? "Vorschaubild von " + item.name : "Vorschaubild";
-      img.title = item.url ? "Link öffnen" : "Bild öffnen";
-      img.onclick = () => {
-        if (item.url) {
-          window.open(item.url, "_blank");
-        } else {
-          window.open(item.image, "_blank");
-        }
-      };
-      imageWrapper.appendChild(img);
-    } else {
-      const placeholder = document.createElement("div");
-      placeholder.className = "game-image-placeholder";
-      placeholder.textContent = "🎮";
-      placeholder.title = "Bild hochladen";
-      placeholder.style.cursor = "pointer";
-      placeholder.onclick = () => uploadGameImage(item.id);
-      imageWrapper.appendChild(placeholder);
-    }
-
-    const info = document.createElement("div");
-    info.className = "game-info";
-
-    const name = document.createElement("div");
-    name.className = "game-name";
-    name.textContent = item.name || "Unbenannt";
-    name.onclick = () => {
-      if (item.url) {
-        window.open(item.url, "_blank");
-      }
-    };
-
-    info.appendChild(name);
-
-
-    if (item.url) {
-      const urlText = document.createElement("div");
-      urlText.className = "game-url";
-      urlText.textContent = item.url;
-      info.appendChild(urlText);
-    }
-
-    const rowActions = document.createElement("div");
-    rowActions.className = "game-row-actions";
-
-    const editButton = document.createElement("button");
-    editButton.className = "game-row-edit";
-    editButton.type = "button";
-    editButton.textContent = "✏️ Bearbeiten";
-    editButton.onclick = () => openGameEdit(item.id);
-    rowActions.appendChild(editButton);
-
-    if (item.url) {
-      const linkButton = document.createElement("button");
-      linkButton.className = "game-row-link";
-      linkButton.type = "button";
-      linkButton.textContent = "🔗 Öffnen";
-      linkButton.onclick = () => window.open(item.url, "_blank");
-      rowActions.appendChild(linkButton);
-
-    }
-
-    const imageButton = document.createElement("button");
-    imageButton.className = "game-row-image-upload";
-    imageButton.type = "button";
-    imageButton.textContent = item.image ? "🖼️ Bild ändern" : "🖼️ Bild hochladen";
-    imageButton.onclick = () => uploadGameImage(item.id);
-    rowActions.appendChild(imageButton);
-
-    const deleteButton = document.createElement("button");
-    deleteButton.className = "game-row-delete";
-    deleteButton.type = "button";
-    deleteButton.textContent = "❌ Löschen";
-    deleteButton.onclick = () => deleteGameItem(item.id, item.name || "Unbenannt");
-    rowActions.appendChild(deleteButton);
-
-    info.appendChild(rowActions);
-
-    main.appendChild(imageWrapper);
-    main.appendChild(info);
-    addDblClickEdit(row, () => openGameEdit(item.id));
-
-    gameCell.appendChild(main);
+    gameCell.appendChild(createGameMain(item, stats));
     row.appendChild(gameCell);
+    addDblClickEdit(row, () => openGameEdit(item.id));
 
     gameColumns.forEach(column => {
       const cell = document.createElement("td");
-      const checkbox = document.createElement("input");
-      checkbox.type = "checkbox";
-      checkbox.className = "game-check";
-
-      const key = getGameCheckKey(item.id, column.id);
-      checkbox.checked = gameChecks[key]?.checked === true;
-
-      checkbox.addEventListener("change", async () => {
-        const newValue = checkbox.checked;
-        const success = await updateGameCheck(item.id, column.id, newValue);
-
-        if (!success) {
-          checkbox.checked = !newValue;
-          return;
-        }
-
-        renderGamesTable();
-      });
-
-      cell.appendChild(checkbox);
+      cell.className = "game-check-cell";
+      cell.appendChild(createGameCheck(item, column, false));
       row.appendChild(cell);
     });
 
@@ -11252,165 +11737,82 @@ function renderGamesTable() {
 
   table.appendChild(tbody);
   gamesTableWrapper.appendChild(table);
+}
+
+function renderGamesMobileList(visibleGameItems, stats) {
+  const columnCount = gameColumns.length;
 
   const mobileList = document.createElement("div");
   mobileList.className = "games-mobile-list";
 
-  if (gameItems.length === 0) {
-    const empty = document.createElement("div");
-    empty.className = "games-empty";
-    empty.textContent = "Noch keine Spiele vorhanden.";
-    mobileList.appendChild(empty);
-  } else if (visibleGameItems.length === 0) {
-    const empty = document.createElement("div");
-    empty.className = "games-empty";
-    empty.textContent = "Keine Spiele passen zum aktuellen Filter.";
-    mobileList.appendChild(empty);
-  } else {
-    visibleGameItems.forEach(item => {
-      const card = document.createElement("div");
-      card.className = "game-mobile-card";
-      addDblClickEdit(card, () => openGameEdit(item.id));
+  visibleGameItems.forEach(item => {
+    const card = document.createElement("div");
+    card.className = "game-mobile-card";
+    card.dataset.gameId = item.id;
 
-      const main = document.createElement("div");
-      main.className = "game-row-main";
+    if (columnCount > 0 && stats.counts.get(item.id) === columnCount) {
+      card.classList.add("is-complete");
+    }
 
-      const imageWrapper = document.createElement("div");
-      imageWrapper.className = "game-image-wrapper";
+    addDblClickEdit(card, () => openGameEdit(item.id));
+    card.appendChild(createGameMain(item, stats));
 
-      if (item.image) {
-        const img = document.createElement("img");
-        img.src = item.image;
-        img.className = "game-image";
-        img.alt = item.name ? "Vorschaubild von " + item.name : "Vorschaubild";
-        img.title = item.url ? "Link öffnen" : "Bild öffnen";
-        img.onclick = () => {
-          if (item.url) {
-            window.open(item.url, "_blank");
-          } else {
-            window.open(item.image, "_blank");
-          }
-        };
-        imageWrapper.appendChild(img);
-      } else {
-        const placeholder = document.createElement("div");
-        placeholder.className = "game-image-placeholder";
-        placeholder.textContent = "🎮";
-        placeholder.title = "Bild hochladen";
-        placeholder.style.cursor = "pointer";
-        placeholder.onclick = () => uploadGameImage(item.id);
-        imageWrapper.appendChild(placeholder);
-      }
+    if (columnCount === 0) {
+      const noColumns = document.createElement("div");
+      noColumns.className = "game-mobile-no-columns";
+      noColumns.textContent = "Noch keine Spalten vorhanden.";
+      card.appendChild(noColumns);
+    } else {
+      const checks = document.createElement("div");
+      checks.className = "game-mobile-checks";
+      gameColumns.forEach(column => checks.appendChild(createGameCheck(item, column, true)));
+      card.appendChild(checks);
+    }
 
-      const info = document.createElement("div");
-      info.className = "game-info";
-
-      const name = document.createElement("div");
-      name.className = "game-name";
-      name.textContent = item.name || "Unbenannt";
-      name.onclick = () => {
-        if (item.url) {
-          window.open(item.url, "_blank");
-        }
-      };
-
-      info.appendChild(name);
-
-      if (item.url) {
-        const urlText = document.createElement("div");
-        urlText.className = "game-url";
-        urlText.textContent = item.url;
-        info.appendChild(urlText);
-      }
-
-      const rowActions = document.createElement("div");
-      rowActions.className = "game-row-actions";
-
-      const editButton = document.createElement("button");
-      editButton.className = "game-row-edit";
-      editButton.type = "button";
-      editButton.textContent = "✏️ Bearbeiten";
-      editButton.onclick = () => openGameEdit(item.id);
-      rowActions.appendChild(editButton);
-
-      if (item.url) {
-        const linkButton = document.createElement("button");
-        linkButton.className = "game-row-link";
-        linkButton.type = "button";
-        linkButton.textContent = "🔗 Öffnen";
-        linkButton.onclick = () => window.open(item.url, "_blank");
-        rowActions.appendChild(linkButton);
-      }
-
-      const imageButton = document.createElement("button");
-      imageButton.className = "game-row-image-upload";
-      imageButton.type = "button";
-      imageButton.textContent = item.image ? "🖼️ Bild ändern" : "🖼️ Bild hochladen";
-      imageButton.onclick = () => uploadGameImage(item.id);
-      rowActions.appendChild(imageButton);
-
-      const deleteButton = document.createElement("button");
-      deleteButton.className = "game-row-delete";
-      deleteButton.type = "button";
-      deleteButton.textContent = "❌ Löschen";
-      deleteButton.onclick = () => deleteGameItem(item.id, item.name || "Unbenannt");
-      rowActions.appendChild(deleteButton);
-
-      info.appendChild(rowActions);
-      main.appendChild(imageWrapper);
-      main.appendChild(info);
-      card.appendChild(main);
-
-      if (gameColumns.length === 0) {
-        const noColumns = document.createElement("div");
-        noColumns.className = "game-mobile-no-columns";
-        noColumns.textContent = "Noch keine Spalten vorhanden.";
-        card.appendChild(noColumns);
-      } else {
-        const checks = document.createElement("div");
-        checks.className = "game-mobile-checks";
-
-        gameColumns.forEach(column => {
-          const label = document.createElement("label");
-          label.className = "game-mobile-check-row";
-
-          const title = document.createElement("span");
-          title.className = "game-mobile-check-title";
-          title.textContent = column.name || "Spalte";
-          title.title = column.name || "Spalte";
-
-          const checkbox = document.createElement("input");
-          checkbox.type = "checkbox";
-          checkbox.className = "game-check";
-
-          const key = getGameCheckKey(item.id, column.id);
-          checkbox.checked = gameChecks[key]?.checked === true;
-
-          checkbox.addEventListener("change", async () => {
-            const newValue = checkbox.checked;
-            const success = await updateGameCheck(item.id, column.id, newValue);
-
-            if (!success) {
-              checkbox.checked = !newValue;
-              return;
-            }
-
-            renderGamesTable();
-          });
-
-          label.appendChild(title);
-          label.appendChild(checkbox);
-          checks.appendChild(label);
-        });
-
-        card.appendChild(checks);
-      }
-
-      mobileList.appendChild(card);
-    });
-  }
+    mobileList.appendChild(card);
+  });
 
   gamesTableWrapper.appendChild(mobileList);
+}
+
+function renderGamesTable() {
+  /* Fokus und Scrollposition merken, damit ein Neuzeichnen nichts "verliert" */
+  const active = document.activeElement;
+  const focusKey = active && active.dataset && gamesApp.contains(active) ? (active.dataset.gfocus || "") : "";
+  const scrollLeft = gamesTableWrapper.scrollLeft;
+
+  const stats = getGamesStats();
+  const visibleGameItems = getFilteredSortedGameItems(stats);
+
+  updateGamesSummary(visibleGameItems.length, stats);
+  renderGamesColumnList();
+
+  gamesTableWrapper.innerHTML = "";
+
+  if (gameItems.length === 0) {
+    gamesTableWrapper.appendChild(createGamesEmpty(
+      gameColumns.length === 0
+        ? "Noch keine Spiele und keine Spalten vorhanden – lege oben zuerst Spalten (z. B. Personen) an und füge dann das erste Spiel hinzu."
+        : "Noch keine Spiele vorhanden – füge oben das erste Spiel hinzu.",
+      false
+    ));
+  } else if (visibleGameItems.length === 0) {
+    gamesTableWrapper.appendChild(createGamesEmpty("Keine Spiele passen zur aktuellen Suche oder zum Filter.", true));
+  } else if (gamesMobileQuery.matches) {
+    renderGamesMobileList(visibleGameItems, stats);
+  } else {
+    renderGamesDesktopTable(visibleGameItems, stats);
+  }
+
+  gamesTableWrapper.scrollLeft = scrollLeft;
+  restoreGamesFocus(focusKey);
+  applyGamesFlash();
+}
+
+if (gamesMobileQuery.addEventListener) {
+  gamesMobileQuery.addEventListener("change", () => { if (currentView === "games") renderGamesTable(); });
+} else if (gamesMobileQuery.addListener) {
+  gamesMobileQuery.addListener(() => { if (currentView === "games") renderGamesTable(); });
 }
 
 async function addGameColumn() {
@@ -11448,6 +11850,7 @@ async function addGameColumn() {
   }
 
   newGameColumnNameInput.value = "";
+  newGameColumnNameInput.focus();
 
   if (data) {
     gameColumns.push(data);
@@ -11530,6 +11933,21 @@ async function reorderGameColumnByDrop(sourceColumnId, targetColumnId) {
 
 
 async function addGameItem() {
+  if (gameAddBusy) return;
+
+  gameAddBusy = true;
+  const addButton = document.getElementById("addGameButton");
+  if (addButton) addButton.disabled = true;
+
+  try {
+    await addGameItemInner();
+  } finally {
+    gameAddBusy = false;
+    if (addButton) addButton.disabled = false;
+  }
+}
+
+async function addGameItemInner() {
   if (!currentUser) {
     showLogin();
     return;
@@ -11566,7 +11984,16 @@ async function addGameItem() {
 
   if (data) {
     gameItems.unshift(data);
+    gamesFlashId = data.id;
+    gamesScrollToFlash = true;
+
+    /* Neues Spiel soll sichtbar sein, auch wenn Suche/Filter aktiv sind */
+    if (!getFilteredSortedGameItems().some(entry => entry.id === data.id)) {
+      resetGamesView(false);
+    }
+
     renderGamesTable();
+    newGameNameInput.focus();
 
     if (url) {
       autoGameMeta(url, data.id);
