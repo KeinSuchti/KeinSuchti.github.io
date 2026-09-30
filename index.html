@@ -5146,6 +5146,52 @@ a.feast-tile-media:hover img{transform:scale(1.06)}
   .feast-tile,.feast-tile-media img{transition:none}
   .feast-tile.is-new,.feast-tile-reroll:active .feast-dice{animation:none}
 }
+/* ===== Feast Table: überarbeitete Liste (Desktop + Mobil) ===== */
+.card-empty{padding:26px 16px;border:1px dashed var(--border-strong);border-radius:14px;color:var(--text-muted);text-align:center;font-size:14px;font-weight:600}
+#feastApp .random-card-button{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:52px;margin:0 0 16px;font-size:16px;font-weight:800;border-radius:14px}
+#feastApp #feastPinned{margin:0 0 20px}
+#feastApp .card-controls{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr) minmax(0,1fr) auto;gap:10px;align-items:center;margin:0 0 14px}
+#feastApp .card-controls > *{margin:0;min-width:0;width:100%;min-height:44px}
+#feastApp .card-controls .card-count{width:auto;display:inline-flex;align-items:center;white-space:nowrap;color:var(--text-muted);font-size:13px;font-weight:700;padding:0 4px}
+#feastApp .card-add-form{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr) auto;align-items:center;gap:10px;margin:0 0 18px;padding:12px}
+#feastApp .card-add-form > *{margin:0;min-width:0;min-height:44px}
+#feastApp .card-add-form button{width:auto;white-space:nowrap;padding:0 18px}
+#feastApp #feastList{display:grid;gap:12px}
+#feastApp .card-item{margin:0;padding:14px;border-radius:16px}
+#feastApp .card-item-header{display:grid;grid-template-columns:132px minmax(0,1fr) auto;grid-template-areas:"img title actions" "img stars stars" "img link link" "img comment comment";column-gap:16px;row-gap:8px;align-items:start;align-content:start}
+#feastApp .card-content{display:contents}
+#feastApp .image-wrapper{grid-area:img;width:132px;aspect-ratio:4/3;border-radius:12px}
+#feastApp .image-wrapper.is-placeholder{display:flex;align-items:center;justify-content:center;font-size:30px;border-style:dashed;opacity:.8;cursor:pointer;user-select:none;transition:opacity .2s,border-color .2s}
+#feastApp .image-wrapper.is-placeholder:hover{opacity:1;border-color:rgba(101,226,215,.6)}
+#feastApp .card-title{grid-area:title;align-self:center;margin:0;font-size:18px;line-height:1.3;cursor:default;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+#feastApp .card-title.has-link{cursor:pointer}
+#feastApp .card-title.has-link:hover{text-decoration:underline;text-underline-offset:3px}
+#feastApp .card-actions{grid-area:actions;margin:0;gap:6px;flex-wrap:nowrap;justify-content:flex-end}
+#feastApp .card-stars{grid-area:stars;display:flex;align-items:center;flex-wrap:wrap}
+#feastApp .card-stars[data-unrated]::after{content:"Unbewertet";margin-left:8px;padding:2px 9px;border-radius:999px;border:1px dashed rgba(255,255,255,.28);color:var(--text-muted);font-size:12px;font-weight:700}
+#feastApp .star{padding:5px 3px;font-size:22px;line-height:1;user-select:none}
+#feastApp .card-url-input{grid-area:link;margin:0}
+#feastApp .card-comment{grid-area:comment;margin:0}
+#feastApp .btn{position:relative;flex:0 0 auto;width:38px;min-width:38px;height:38px;min-height:38px;padding:0;font-size:16px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1)}
+#feastApp .btn:hover{background:rgba(255,255,255,.13)}
+#feastApp .btn-del{margin-left:8px}
+#feastApp .btn-del:hover{background:#d62f2f;border-color:#ff9a9a}
+#feastApp .btn.has-dot::after{content:"";position:absolute;top:4px;right:4px;width:8px;height:8px;border-radius:50%;background:var(--accent-2);box-shadow:0 0 0 2px rgba(10,27,49,.9)}
+#feastApp .btn:focus-visible,#feastApp .star:focus-visible,#feastApp .image-wrapper.is-placeholder:focus-visible{outline:2px solid var(--accent-2);outline-offset:2px}
+@media (max-width:640px){
+  #feastApp .card-controls{grid-template-columns:repeat(2,minmax(0,1fr))}
+  #feastApp .card-controls .card-search{grid-column:1/-1}
+  #feastApp .card-controls .card-count{grid-column:1/-1;padding:0 2px}
+  #feastApp .card-add-form{grid-template-columns:minmax(0,1fr)}
+  #feastApp .card-add-form button{width:100%;min-height:48px}
+  #feastApp .card-item{padding:12px}
+  #feastApp .card-item-header{grid-template-columns:84px minmax(0,1fr);grid-template-areas:"img title" "img stars" "actions actions" "link link" "comment comment";column-gap:12px}
+  #feastApp .image-wrapper{width:84px;aspect-ratio:1/1}
+  #feastApp .card-title{font-size:16px;align-self:start}
+  #feastApp .card-actions{justify-content:flex-start}
+  #feastApp .btn{width:44px;min-width:44px;height:44px;min-height:44px}
+  #feastApp .btn-del{margin-left:auto}
+}
 </style>
 
 
@@ -5646,34 +5692,40 @@ body.app-scene .skip-link:focus{left:12px}
         🎲 Was fressen wir?
       </button>
 
+      <section id="feastPinned" aria-label="Heutige Auswahl" hidden>
+        <div id="feastPinnedGrid" class="feast-pinned-grid"></div>
+        <p id="feastPinnedNote" class="feast-pin-note" role="status" aria-live="polite" hidden></p>
+      </section>
+
       <div class="card-controls">
-        <select id="feastSort" onchange="renderCardItems('feast')">
-          <option value="none">Sortierung</option>
+        <input id="feastSearch" type="search" class="card-search" placeholder="🔍 Suchen …" aria-label="Einträge durchsuchen" autocomplete="off" oninput="renderCardItems('feast')">
+
+        <select id="feastSort" aria-label="Sortierung" onchange="renderCardItems('feast')">
+          <option value="none">Neueste zuerst</option>
           <option value="high">Bewertung ↓</option>
           <option value="low">Bewertung ↑</option>
         </select>
 
-        <select id="feastFilter" onchange="renderCardItems('feast')">
+        <select id="feastFilter" aria-label="Filter nach Bewertung" onchange="renderCardItems('feast')">
           <option value="0">Alle Bewertungen</option>
+          <option value="unrated">Nur unbewertet</option>
           <option value="1">⭐ 1+</option>
           <option value="2">⭐ 2+</option>
           <option value="3">⭐ 3+</option>
           <option value="4">⭐ 4+</option>
           <option value="5">⭐ 5</option>
         </select>
+
+        <span id="feastCount" class="card-count" aria-live="polite"></span>
       </div>
 
       <div class="card-add-form">
-        <input id="newFeastName" placeholder="Name">
-        <input id="newFeastUrl" placeholder="Link">
+        <input id="newFeastName" placeholder="Name" aria-label="Name" autocomplete="off" enterkeyhint="next">
+        <input id="newFeastUrl" placeholder="Link (für die Zufallsauswahl nötig)" aria-label="Link" inputmode="url" autocomplete="off" enterkeyhint="done">
 
         <button onclick="addCardItem('feast')">➕ Hinzufügen</button>
       </div>
 
-      <section id="feastPinned" aria-label="Heutige Auswahl" hidden>
-        <div id="feastPinnedGrid" class="feast-pinned-grid"></div>
-        <p id="feastPinnedNote" class="feast-pin-note" role="status" aria-live="polite" hidden></p>
-      </section>
       <div id="feastList"></div>
 
     </div>
@@ -6151,10 +6203,19 @@ function createEditIconButton(onClick, className = "btn btn-edit") {
   button.className = className;
   button.textContent = "✏️";
   button.title = "Eintrag bearbeiten";
+  button.setAttribute("role", "button");
+  button.setAttribute("tabindex", "0");
+  button.setAttribute("aria-label", "Eintrag bearbeiten");
   button.onclick = event => {
     event.stopPropagation();
     onClick();
   };
+  button.addEventListener("keydown", event => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      button.click();
+    }
+  });
   return button;
 }
 
@@ -9653,15 +9714,46 @@ function renderCardItems(type) {
       });
     }
   } else {
-    const filter = Number(config.filterElement.value);
+    const filterValue = config.filterElement.value;
 
-    data = data.filter(item => (item.rating || 0) >= filter);
+    if (filterValue === "unrated") {
+      data = data.filter(item => Number(item.rating || 0) === 0);
+    } else {
+      const filter = Number(filterValue);
+      data = data.filter(item => (item.rating || 0) >= filter);
+    }
 
     if (sort === "high") {
       data.sort((a, b) => (b.rating || 0) - (a.rating || 0));
     } else if (sort === "low") {
       data.sort((a, b) => (a.rating || 0) - (b.rating || 0));
     }
+  }
+
+  /* Suche (nur wenn das Feld existiert), Zähler und Leerzustand */
+  const searchEl = document.getElementById(type + "Search");
+  const query = searchEl ? searchEl.value.trim().toLowerCase() : "";
+
+  if (query) {
+    data = data.filter(item => String(item.name || "").toLowerCase().includes(query));
+  }
+
+  const countEl = document.getElementById(type + "Count");
+
+  if (countEl) {
+    countEl.textContent = data.length === config.items.length
+      ? (data.length === 1 ? "1 Eintrag" : data.length + " Einträge")
+      : data.length + " von " + config.items.length;
+  }
+
+  if (data.length === 0) {
+    const empty = document.createElement("div");
+    empty.className = "card-empty";
+    empty.textContent = config.items.length === 0
+      ? "Noch keine Einträge – füge oben den ersten hinzu."
+      : "Keine Treffer für diese Auswahl.";
+    config.listElement.appendChild(empty);
+    return;
   }
 
   data.forEach(item => {
@@ -9690,13 +9782,30 @@ function renderCardItems(type) {
 
       imgWrap.appendChild(img);
       header.appendChild(imgWrap);
+    } else if (type === "feast") {
+      /* Platzhalter: einheitliches Layout, Klick öffnet die Bildauswahl */
+      const ph = document.createElement("div");
+      ph.className = "image-wrapper is-placeholder";
+      ph.textContent = "🍽️";
+      ph.title = "Bild hinzufügen";
+      ph.setAttribute("role", "button");
+      ph.setAttribute("tabindex", "0");
+      ph.setAttribute("aria-label", "Bild hinzufügen");
+      ph.onclick = () => imgBtn.click();
+      ph.onkeydown = event => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          imgBtn.click();
+        }
+      };
+      header.appendChild(ph);
     }
 
     const content = document.createElement("div");
     content.className = "card-content";
 
     const title = document.createElement("div");
-    title.className = "card-title";
+    title.className = "card-title" + (item.url ? " has-link" : "");
     title.textContent = item.name || "Unbenannt";
 
     title.onclick = () => {
@@ -9737,6 +9846,7 @@ function renderCardItems(type) {
     const editBtn = createEditIconButton(() => openCardEdit(type, item.id));
     const imgBtn = createCardButton("🖼️", "btn btn-img");
     const noteBtn = createCardButton("📝", "btn btn-note");
+    if (item.comment && item.comment.trim() !== "") noteBtn.classList.add("has-dot");
     const delBtn = createCardButton("❌", "btn btn-del");
 
     if (type !== "beer") {
@@ -9779,6 +9889,7 @@ function renderCardItems(type) {
     });
 
     comment.addEventListener("input", () => {
+      noteBtn.classList.toggle("has-dot", comment.value.trim() !== "");
       saveCommentDebounced(comment.value);
     });
 
@@ -9842,23 +9953,38 @@ function renderCardItems(type) {
       content.appendChild(createBeerGradeSlider(item, type));
     } else {
       const stars = document.createElement("div");
+      stars.className = "card-stars";
+      stars.setAttribute("role", "group");
+      stars.setAttribute("aria-label", "Bewertung");
+      if (!(item.rating || 0)) stars.dataset.unrated = "1";
 
       for (let s = 1; s <= 5; s++) {
         const star = document.createElement("span");
         star.textContent = "⭐";
         star.className = "star";
+        star.setAttribute("role", "button");
+        star.setAttribute("tabindex", "0");
+        star.setAttribute("aria-label", s + (s === 1 ? " Stern" : " Sterne"));
+        star.onkeydown = event => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            star.click();
+          }
+        };
 
         if ((item.rating || 0) >= s) {
           star.classList.add("active");
         }
 
         star.onclick = async () => {
-          item.rating = s;
+          /* Erneuter Klick auf die aktuelle Sternzahl setzt die Bewertung zurück */
+          const newRating = (item.rating || 0) === s ? 0 : s;
+          item.rating = newRating;
 
           const success = await updateCardItem(
             type,
             item.id,
-            { rating: s },
+            { rating: newRating },
             "Fehler beim Speichern der Bewertung"
           );
 
@@ -10035,6 +10161,30 @@ function createCardButton(text, className) {
   const btn = document.createElement("div");
   btn.className = className;
   btn.textContent = text;
+
+  const labels = {
+    "btn-link": "Link bearbeiten",
+    "btn-img": "Bild ändern",
+    "btn-note": "Notiz",
+    "btn-del": "Löschen"
+  };
+
+  Object.keys(labels).forEach(key => {
+    if (className.split(" ").includes(key)) {
+      btn.title = labels[key];
+      btn.setAttribute("aria-label", labels[key]);
+    }
+  });
+
+  btn.setAttribute("role", "button");
+  btn.setAttribute("tabindex", "0");
+  btn.addEventListener("keydown", event => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      btn.click();
+    }
+  });
+
   return btn;
 }
 
@@ -10057,6 +10207,17 @@ function getUnratedCardCandidates(type) {
 }
 
 /* ===== Feast: angeheftete Zufallsauswahl (Snack + Abendessen) ===== */
+["newFeastName", "newFeastUrl"].forEach(function(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.addEventListener("keydown", function(event) {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      addCardItem("feast");
+    }
+  });
+});
+
 const FEAST_PIN_SLOTS = [
   { key: "snack", label: "Snack", icon: "🥨" },
   { key: "dinner", label: "Abendessen", icon: "🍽️" }
