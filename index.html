@@ -5105,15 +5105,50 @@ body.color-vision-mode .ds-team-select[data-team="2"]{--tc:var(--cv-t2)}
 .edit-box .edit-delete-button:focus-visible{outline:2px solid #fff;outline-offset:2px}
 .edit-box .edit-delete-button[hidden]{display:none}
 /* ===== Feast: angeheftete Zufallsauswahl (Snack + Abendessen) ===== */
-#feastPinned{display:grid;gap:10px;margin:0 0 16px}
+#feastPinned{margin:0 0 18px}
 #feastPinned[hidden]{display:none}
-.feast-pin{display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid rgba(99,218,207,.38);border-radius:14px;background:rgba(34,121,123,.16)}
-.feast-pin-label{flex:0 0 auto;padding:3px 10px;border-radius:999px;background:rgba(105,230,215,.18);color:#d8fff9;font-size:12px;font-weight:800;letter-spacing:.02em}
-.feast-pin-name{flex:1 1 auto;min-width:0;font-weight:700;overflow-wrap:anywhere}
-.feast-pin-name.has-link{cursor:pointer;text-decoration:underline;text-underline-offset:3px}
-.feast-pin-btn{flex:0 0 auto;width:38px;min-width:38px;height:38px;margin:0;padding:0;display:inline-flex;align-items:center;justify-content:center;border:1px solid rgba(101,141,207,.35);border-radius:10px;background:rgba(18,39,62,.72);color:var(--text);font-size:16px;line-height:1;cursor:pointer}
-.feast-pin-btn:hover{border-color:rgba(101,226,215,.6)}
-.feast-pin-btn:focus-visible{outline:2px solid var(--accent-2);outline-offset:2px}
+.feast-pinned-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.feast-tile{position:relative;display:flex;flex-direction:column;min-width:0;overflow:hidden;border:1px solid rgba(99,218,207,.34);border-radius:16px;background:linear-gradient(180deg,rgba(24,60,74,.55),rgba(10,27,49,.85));box-shadow:0 10px 26px rgba(0,0,0,.28);transition:border-color .2s,transform .2s,box-shadow .2s}
+.feast-tile:hover{border-color:rgba(101,226,215,.6);box-shadow:0 14px 30px rgba(0,0,0,.34)}
+.feast-tile.is-new{animation:feastTileIn .35s cubic-bezier(.2,.8,.2,1)}
+@keyframes feastTileIn{from{opacity:0;transform:translateY(8px) scale(.96)}to{opacity:1;transform:none}}
+.feast-tile-media{position:relative;display:block;aspect-ratio:16/10;background:rgba(18,39,62,.85);overflow:hidden;color:inherit;text-decoration:none}
+.feast-tile-media img{display:block;width:100%;height:100%;object-fit:cover;transition:transform .3s}
+a.feast-tile-media:hover img{transform:scale(1.05)}
+.feast-tile-placeholder{display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:44px;background:radial-gradient(circle at 30% 20%,rgba(105,230,215,.22),transparent 60%),rgba(18,39,62,.9)}
+.feast-tile-badge{position:absolute;left:10px;top:10px;padding:4px 11px;border-radius:999px;background:rgba(6,18,33,.82);border:1px solid rgba(105,230,215,.45);color:#d8fff9;font-size:12px;font-weight:800;letter-spacing:.03em;backdrop-filter:blur(4px)}
+.feast-tile-close{position:absolute;right:8px;top:8px;width:34px;height:34px;margin:0;padding:0;display:inline-flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.22);border-radius:50%;background:rgba(6,18,33,.78);color:#fff;font-size:15px;line-height:1;cursor:pointer;backdrop-filter:blur(4px)}
+.feast-tile-close:hover{background:rgba(214,47,47,.9);border-color:#ff9a9a}
+.feast-tile-body{display:flex;flex-direction:column;gap:10px;flex:1 1 auto;padding:12px 14px 14px}
+.feast-tile-name{margin:0;font-size:17px;font-weight:800;line-height:1.25;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.feast-tile-actions{display:flex;gap:8px;margin-top:auto}
+.feast-tile-link,.feast-tile-reroll{flex:1 1 0;min-width:0;min-height:42px;margin:0;padding:8px 10px;display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:10px;font-size:13px;font-weight:800;text-decoration:none;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.feast-tile-link{border:1px solid rgba(105,230,215,.5);background:rgba(34,121,123,.35);color:#d8fff9}
+.feast-tile-link:hover{background:rgba(34,121,123,.6)}
+.feast-tile-reroll{border:1px solid rgba(101,141,207,.38);background:rgba(18,39,62,.75);color:var(--text)}
+.feast-tile-reroll:hover:not(:disabled){border-color:rgba(101,226,215,.6);background:rgba(29,56,84,.9)}
+.feast-tile-reroll:disabled{opacity:.45;cursor:not-allowed}
+.feast-tile-reroll:not(:disabled):active .feast-dice{animation:feastDice .45s ease}
+@keyframes feastDice{to{transform:rotate(360deg)}}
+.feast-tile-body .feast-tile-close{display:none}
+.feast-tile-close:focus-visible,.feast-tile-link:focus-visible,.feast-tile-reroll:focus-visible,a.feast-tile-media:focus-visible{outline:2px solid var(--accent-2);outline-offset:2px}
+.feast-pin-note{margin:10px 2px 0;padding:8px 12px;border-radius:10px;border:1px dashed rgba(230,190,90,.55);background:rgba(230,190,90,.08);color:#f2dca0;font-size:13px;font-weight:600}
+.feast-pin-note[hidden]{display:none}
+@media (max-width:560px){
+  .feast-pinned-grid{grid-template-columns:1fr;gap:10px}
+  .feast-tile{flex-direction:row}
+  .feast-tile-media{flex:0 0 116px;aspect-ratio:auto;min-height:132px}
+  .feast-tile-badge{left:6px;top:6px;padding:3px 9px;font-size:11px}
+  .feast-close-media{display:none}
+  .feast-tile-body{padding:10px 12px 12px;position:relative}
+  .feast-tile-body .feast-tile-close{display:inline-flex;top:8px;right:8px}
+  .feast-tile-name{padding-right:38px;font-size:16px}
+  .feast-tile-actions{flex-direction:column}
+}
+@media (prefers-reduced-motion:reduce){
+  .feast-tile,.feast-tile-media img{transition:none}
+  .feast-tile.is-new,.feast-tile-reroll:active .feast-dice{animation:none}
+}
 </style>
 
 
@@ -5638,7 +5673,10 @@ body.app-scene .skip-link:focus{left:12px}
         <button onclick="addCardItem('feast')">➕ Hinzufügen</button>
       </div>
 
-      <div id="feastPinned" hidden></div>
+      <section id="feastPinned" aria-label="Heutige Auswahl" hidden>
+        <div id="feastPinnedGrid" class="feast-pinned-grid"></div>
+        <p id="feastPinnedNote" class="feast-pin-note" role="status" aria-live="polite" hidden></p>
+      </section>
       <div id="feastList"></div>
 
     </div>
@@ -10023,11 +10061,14 @@ function getUnratedCardCandidates(type) {
 
 /* ===== Feast: angeheftete Zufallsauswahl (Snack + Abendessen) ===== */
 const FEAST_PIN_SLOTS = [
-  { key: "snack", label: "Snack" },
-  { key: "dinner", label: "Abendessen" }
+  { key: "snack", label: "Snack", icon: "🥨" },
+  { key: "dinner", label: "Abendessen", icon: "🍽️" }
 ];
 
 let feastPinned = { snack: null, dinner: null };
+let feastPinnedLoadedFor = null;
+let feastPinAnimate = {};
+let feastPinNoteTimer = null;
 
 function feastPinStorageKey() {
   let userId = "anon";
@@ -10035,9 +10076,15 @@ function feastPinStorageKey() {
   return "feastPinned:" + userId;
 }
 
-function loadFeastPinned() {
+/* Laden nur einmal pro Nutzer, nicht bei jedem Rendern */
+function ensureFeastPinnedLoaded() {
+  const key = feastPinStorageKey();
+  if (feastPinnedLoadedFor === key) return;
+
+  feastPinnedLoadedFor = key;
+
   try {
-    const raw = localStorage.getItem(feastPinStorageKey());
+    const raw = localStorage.getItem(key);
     const saved = raw ? JSON.parse(raw) : {};
     feastPinned = {
       snack: saved && saved.snack != null ? saved.snack : null,
@@ -10071,6 +10118,17 @@ function pickFeastItem(excludeIds) {
   return pool[Math.floor(Math.random() * pool.length)];
 }
 
+function showFeastPinNote(message) {
+  const note = document.getElementById("feastPinnedNote");
+  if (!note) return;
+
+  clearTimeout(feastPinNoteTimer);
+  note.textContent = message;
+  note.hidden = false;
+
+  feastPinNoteTimer = setTimeout(function() { note.hidden = true; }, 5000);
+}
+
 function pinFeastPicks() {
   const config = cardLists.feast;
 
@@ -10078,6 +10136,8 @@ function pinFeastPicks() {
     showRandomPopup("Die Liste wurde noch nicht geladen.");
     return;
   }
+
+  ensureFeastPinnedLoaded();
 
   const first = pickFeastItem([]);
 
@@ -10089,46 +10149,57 @@ function pinFeastPicks() {
   const second = pickFeastItem([first.id]);
 
   feastPinned = { snack: first.id, dinner: second ? second.id : null };
+  feastPinAnimate = { snack: true, dinner: true };
   saveFeastPinned();
   renderFeastPinned();
 
   if (!second) {
-    showRandomPopup("Es gibt nur einen unbewerteten Eintrag mit Link – deshalb wurde nur der Snack ausgewählt.");
+    showFeastPinNote("Es gibt nur einen unbewerteten Eintrag mit Link – deshalb wurde nur der Snack ausgewählt.");
   }
+
+  const box = document.getElementById("feastPinned");
+  if (box && box.scrollIntoView) box.scrollIntoView({ block: "nearest", behavior: "smooth" });
 }
 
 function rerollFeastPin(slotKey) {
+  ensureFeastPinnedLoaded();
+
   const otherKey = slotKey === "snack" ? "dinner" : "snack";
   const next = pickFeastItem([feastPinned[otherKey], feastPinned[slotKey]]);
 
   if (!next) {
-    showRandomPopup("Es gibt keinen weiteren unbewerteten Eintrag mit hinterlegtem Link.");
+    showFeastPinNote("Kein weiterer unbewerteter Eintrag mit Link verfügbar.");
     return;
   }
 
   feastPinned[slotKey] = next.id;
+  feastPinAnimate[slotKey] = true;
   saveFeastPinned();
   renderFeastPinned();
 }
 
 function removeFeastPin(slotKey) {
+  ensureFeastPinnedLoaded();
   feastPinned[slotKey] = null;
   saveFeastPinned();
   renderFeastPinned();
 }
 
+function feastLinkHost(url) {
+  try {
+    return new URL(normalize(url.trim())).hostname.replace(/^www\./, "");
+  } catch (e) {
+    return "Link öffnen";
+  }
+}
+
 function renderFeastPinned() {
   const box = document.getElementById("feastPinned");
-  if (!box) return;
+  const grid = document.getElementById("feastPinnedGrid");
+  if (!box || !grid) return;
 
-  box.innerHTML = "";
-
-  if (!cardLists.feast.items.length) {
-    box.hidden = true;
-    return;
-  }
-
-  loadFeastPinned();
+  ensureFeastPinnedLoaded();
+  grid.replaceChildren();
 
   let changed = false;
 
@@ -10138,53 +10209,118 @@ function renderFeastPinned() {
 
     const item = findFeastItem(id);
 
+    /* Eintrag existiert nicht mehr (z. B. gelöscht) – erst entfernen, wenn Liste geladen ist */
     if (!item) {
-      feastPinned[slot.key] = null;
-      changed = true;
+      if (cardLists.feast.items.length) {
+        feastPinned[slot.key] = null;
+        changed = true;
+      }
       return;
     }
 
-    const card = document.createElement("div");
-    card.className = "feast-pin";
+    const hasUrl = !!(item.url && item.url.trim() !== "");
+    const href = hasUrl ? normalize(item.url.trim()) : "";
+    const title = item.name || "Unbenannt";
 
-    const label = document.createElement("span");
-    label.className = "feast-pin-label";
-    label.textContent = slot.label;
+    const tile = document.createElement("article");
+    tile.className = "feast-tile" + (feastPinAnimate[slot.key] ? " is-new" : "");
+    tile.dataset.slot = slot.key;
 
-    const name = document.createElement("span");
-    name.className = "feast-pin-name";
-    name.textContent = item.name || "Unbenannt";
-
-    if (item.url && item.url.trim() !== "") {
-      name.classList.add("has-link");
-      name.onclick = function() {
-        window.open(normalize(item.url.trim()), "_blank");
-      };
+    const media = document.createElement(hasUrl ? "a" : "div");
+    media.className = "feast-tile-media";
+    if (hasUrl) {
+      media.href = href;
+      media.target = "_blank";
+      media.rel = "noopener noreferrer";
+      media.setAttribute("aria-label", title + " öffnen");
     }
 
-    const rerollBtn = document.createElement("button");
-    rerollBtn.type = "button";
-    rerollBtn.className = "feast-pin-btn";
-    rerollBtn.textContent = "🎲";
-    rerollBtn.title = slot.label + " neu auswürfeln";
-    rerollBtn.setAttribute("aria-label", slot.label + " neu auswürfeln");
-    rerollBtn.onclick = function() { rerollFeastPin(slot.key); };
+    if (item.image) {
+      const img = document.createElement("img");
+      img.src = item.image;
+      img.alt = "Vorschaubild von " + title;
+      img.loading = "lazy";
+      img.decoding = "async";
+      media.appendChild(img);
+    } else {
+      const ph = document.createElement("div");
+      ph.className = "feast-tile-placeholder";
+      ph.setAttribute("aria-hidden", "true");
+      ph.textContent = slot.icon;
+      media.appendChild(ph);
+    }
+
+    const badge = document.createElement("span");
+    badge.className = "feast-tile-badge";
+    badge.textContent = slot.label;
+    media.appendChild(badge);
 
     const closeBtn = document.createElement("button");
     closeBtn.type = "button";
-    closeBtn.className = "feast-pin-btn";
+    closeBtn.className = "feast-tile-close";
     closeBtn.textContent = "✕";
     closeBtn.title = slot.label + " entfernen";
     closeBtn.setAttribute("aria-label", slot.label + " entfernen");
     closeBtn.onclick = function() { removeFeastPin(slot.key); };
 
-    card.append(label, name, rerollBtn, closeBtn);
-    box.appendChild(card);
+    const body = document.createElement("div");
+    body.className = "feast-tile-body";
+
+    const name = document.createElement("h3");
+    name.className = "feast-tile-name";
+    name.textContent = title;
+    name.title = title;
+
+    const actions = document.createElement("div");
+    actions.className = "feast-tile-actions";
+
+    if (hasUrl) {
+      const link = document.createElement("a");
+      link.className = "feast-tile-link";
+      link.href = href;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      link.textContent = "🔗 " + feastLinkHost(item.url);
+      link.title = href;
+      actions.appendChild(link);
+    }
+
+    const otherKey = slot.key === "snack" ? "dinner" : "snack";
+    const canReroll = pickFeastItem([feastPinned[otherKey], feastPinned[slot.key]]) !== null;
+
+    const rerollBtn = document.createElement("button");
+    rerollBtn.type = "button";
+    rerollBtn.className = "feast-tile-reroll";
+    rerollBtn.disabled = !canReroll;
+    rerollBtn.title = canReroll ? slot.label + " neu auswürfeln" : "Kein weiterer Eintrag verfügbar";
+    rerollBtn.setAttribute("aria-label", slot.label + " neu auswürfeln");
+    rerollBtn.innerHTML = '<span class="feast-dice" aria-hidden="true">🎲</span> Neu würfeln';
+    rerollBtn.onclick = function() { rerollFeastPin(slot.key); };
+    actions.appendChild(rerollBtn);
+
+    body.append(name, actions);
+
+    /* Desktop: Schließen-Button auf dem Bild; Mobil: im Textbereich (per CSS umgeschaltet) */
+    const closeMobile = closeBtn.cloneNode(true);
+    closeMobile.onclick = closeBtn.onclick;
+    closeBtn.classList.add("feast-close-media");
+    media.appendChild(closeBtn);
+    body.appendChild(closeMobile);
+
+    tile.append(media, body);
+    grid.appendChild(tile);
   });
+
+  feastPinAnimate = {};
 
   if (changed) saveFeastPinned();
 
-  box.hidden = box.children.length === 0;
+  box.hidden = grid.children.length === 0;
+
+  if (box.hidden) {
+    const note = document.getElementById("feastPinnedNote");
+    if (note) note.hidden = true;
+  }
 }
 
 function openRandomUnratedCard(type) {
