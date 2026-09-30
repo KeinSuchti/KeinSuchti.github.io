@@ -5192,6 +5192,76 @@ a.feast-tile-media:hover img{transform:scale(1.06)}
   #feastApp .btn{width:44px;min-width:44px;height:44px;min-height:44px}
   #feastApp .btn-del{margin-left:auto}
 }
+/* ===== Serien & Filme: überarbeitete Liste (Desktop + Mobil) ===== */
+#moviesApp .random-movie-button{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:52px;margin:0 0 16px;font-size:16px;font-weight:800;border-radius:14px}
+.movie-progress{margin:0 0 16px;padding:12px 14px;border:1px solid var(--border);border-radius:14px;background:rgba(23,35,58,.42)}
+.movie-progress-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:8px;font-size:14px}
+.movie-percent{color:var(--text-muted);font-size:13px;font-weight:700}
+.movie-progress-bar{height:8px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden}
+.movie-progress-bar span{display:block;height:100%;width:0;border-radius:inherit;background:linear-gradient(90deg,#2fbfae,#8ea7ff);transition:width .35s ease}
+#moviesApp .movie-toolbar{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:10px;margin:0 0 14px}
+#moviesApp .movie-toolbar > input,#moviesApp .movie-toolbar > select{margin:0;min-width:0;width:100%;min-height:44px}
+#moviesApp .movie-seg{grid-column:1/-1;display:flex;gap:4px;padding:4px;border:1px solid var(--border);border-radius:12px;background:rgba(10,27,49,.6)}
+#moviesApp .movie-seg button{flex:1 1 0;width:auto;min-width:0;min-height:40px;margin:0;padding:8px 10px;border:0;border-radius:9px;background:transparent;color:var(--text-muted);font-size:13px;font-weight:800;box-shadow:none;transform:none}
+#moviesApp .movie-seg button:hover{background:rgba(255,255,255,.06);color:var(--text)}
+#moviesApp .movie-seg button.is-active{background:rgba(34,121,123,.5);color:#d8fff9}
+#moviesApp .movie-seg button:focus-visible{outline:2px solid var(--accent-2);outline-offset:2px}
+.movie-seg-count{display:inline-block;min-width:22px;margin-left:4px;padding:1px 7px;border-radius:999px;background:rgba(255,255,255,.1);font-size:11px;font-weight:800}
+#moviesApp .movie-add-section{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;align-items:center;gap:10px;margin:0 0 18px;padding:12px;border:1px solid var(--border);border-radius:var(--radius-lg);background:rgba(23,35,58,.42)}
+#moviesApp .movie-add-section > *{margin:0;min-width:0;min-height:44px}
+#moviesApp .movie-add-section button{width:auto;white-space:nowrap;padding:0 18px}
+#moviesApp #movieList{display:grid;gap:10px}
+.movie-group-heading{margin:10px 2px 0;color:var(--text-muted);font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase}
+.movie-group-heading:first-child{margin-top:0}
+#moviesApp .movie-item{margin:0;padding:8px 14px 8px 8px;border-radius:14px}
+#moviesApp .movie-item.is-done{opacity:.72}
+#moviesApp .movie-item.is-done .movie-title{color:var(--text-muted);text-decoration:line-through;text-decoration-color:rgba(255,255,255,.3)}
+#moviesApp .movie-item.is-flash{animation:movieFlash .9s ease}
+@keyframes movieFlash{0%{box-shadow:0 0 0 2px rgba(105,230,215,.75)}100%{box-shadow:0 0 0 2px rgba(105,230,215,0)}}
+#moviesApp .movie-item-top{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:start;gap:4px 12px}
+#moviesApp .movie-left{display:flex;align-items:flex-start;gap:4px;min-width:0}
+#moviesApp .movie-check-wrap{position:relative;flex:0 0 44px;width:44px;height:44px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer}
+#moviesApp .movie-check-wrap input{position:absolute;inset:0;width:100%;height:100%;margin:0;padding:0;border:0;background:transparent;opacity:0;cursor:pointer;transform:none}
+.movie-check-box{display:flex;align-items:center;justify-content:center;width:26px;height:26px;border:2px solid rgba(160,185,220,.55);border-radius:8px;color:transparent;font-size:16px;font-weight:900;line-height:1;transition:background .15s,border-color .15s,color .15s}
+#moviesApp .movie-check-wrap:hover .movie-check-box{border-color:#69e6d7}
+#moviesApp .movie-check-wrap input:checked + .movie-check-box{background:#2fbfae;border-color:#2fbfae;color:#04211d}
+#moviesApp .movie-check-wrap input:focus-visible + .movie-check-box{outline:2px solid var(--accent-2);outline-offset:2px}
+.movie-main{flex:1 1 auto;min-width:0}
+.movie-title{display:flex;align-items:center;min-height:44px;font-size:17px;font-weight:700;line-height:1.3;overflow-wrap:anywhere}
+.movie-meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:-6px}
+.movie-meta:empty{display:none}
+.movie-chip{display:inline-flex;align-items:center;max-width:100%;padding:3px 10px;border:1px solid rgba(105,230,215,.4);border-radius:999px;background:rgba(34,121,123,.22);color:#d8fff9;font-size:12px;font-weight:700;text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.movie-chip:hover{background:rgba(34,121,123,.45)}
+.movie-note{margin:6px 0 4px;color:var(--text-muted);font-size:13px;line-height:1.4;cursor:text;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
+.movie-note[hidden],#moviesApp .note-open .movie-note{display:none}
+#moviesApp .movie-actions{display:flex;flex-wrap:nowrap;gap:6px;padding-top:3px}
+#moviesApp .movie-btn{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;width:38px;height:38px;padding:0;border:1px solid rgba(255,255,255,.1);border-radius:10px;background:rgba(255,255,255,.06);font-size:16px;cursor:pointer;user-select:none}
+#moviesApp .movie-btn:hover{background:rgba(255,255,255,.13)}
+#moviesApp .movie-btn-del{margin-left:8px}
+#moviesApp .movie-btn-del:hover{background:#d62f2f;border-color:#ff9a9a}
+#moviesApp .movie-btn:focus-visible{outline:2px solid var(--accent-2);outline-offset:2px}
+#moviesApp .movie-comment,#moviesApp .movie-link-input{margin:2px 0 6px 48px;width:calc(100% - 48px);min-height:44px}
+#moviesApp .movie-comment{min-height:72px;resize:vertical}
+#moviesApp .movie-footer{display:flex;justify-content:center;margin-top:20px}
+#moviesApp .movie-reset{width:auto;margin:0;padding:10px 16px;border:1px dashed rgba(255,118,118,.5);border-radius:10px;background:transparent;color:#ffb0aa;font-size:13px;font-weight:700;box-shadow:none}
+#moviesApp .movie-reset:hover{background:rgba(214,47,47,.14)}
+body.color-vision-mode #moviesApp .movie-reset{background:#1b2a38!important;border:2px dashed #E69F00!important;color:#FFC94D!important}
+body.color-vision-mode #moviesApp .movie-btn-del:hover{background:#2a3b4c!important;border-color:#FFC94D!important;color:#fff!important}
+@media (max-width:640px){
+  #moviesApp .movie-toolbar{grid-template-columns:minmax(0,1fr)}
+  #moviesApp .movie-add-section{grid-template-columns:minmax(0,1fr)}
+  #moviesApp .movie-add-section button{width:100%;min-height:48px}
+  #moviesApp .movie-item{padding:8px 12px 8px 6px}
+  #moviesApp .movie-item-top{grid-template-columns:minmax(0,1fr)}
+  #moviesApp .movie-actions{justify-content:flex-start;padding:0 0 4px 50px}
+  #moviesApp .movie-btn{width:44px;height:44px}
+  #moviesApp .movie-btn-del{margin-left:auto}
+  #moviesApp .movie-comment,#moviesApp .movie-link-input{margin-left:6px;width:calc(100% - 6px)}
+}
+@media (prefers-reduced-motion:reduce){
+  .movie-progress-bar span,.movie-check-box{transition:none}
+  #moviesApp .movie-item.is-flash{animation:none}
+}
 </style>
 
 
@@ -5667,20 +5737,38 @@ body.app-scene .skip-link:focus{left:12px}
         🎲 Zufälligen offenen Film / offene Serie wählen
       </button>
 
+      <div class="movie-progress">
+        <div class="movie-progress-head">
+          <strong id="movieProgressText" role="status" aria-live="polite">Lade …</strong>
+          <span id="moviePercent" class="movie-percent"></span>
+        </div>
+        <div class="movie-progress-bar" role="progressbar" aria-label="Fortschritt" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="movieProgressFill"></span></div>
+      </div>
+
+      <div class="movie-toolbar">
+        <input id="movieSearch" type="search" class="movie-search" placeholder="🔍 Suchen …" aria-label="Filme und Serien durchsuchen" autocomplete="off" oninput="setMovieQuery(this.value)">
+        <select id="movieSort" aria-label="Sortierung" onchange="setMovieSort(this.value)">
+          <option value="az">A–Z</option>
+          <option value="za">Z–A</option>
+          <option value="new">Zuletzt hinzugefügt</option>
+        </select>
+        <div class="movie-seg" role="group" aria-label="Nach Status filtern">
+          <button type="button" data-filter="all" class="is-active" aria-pressed="true" onclick="setMovieFilter('all')">Alle <span class="movie-seg-count" id="movieCountAll">0</span></button>
+          <button type="button" data-filter="open" aria-pressed="false" onclick="setMovieFilter('open')">Offen <span class="movie-seg-count" id="movieCountOpen">0</span></button>
+          <button type="button" data-filter="done" aria-pressed="false" onclick="setMovieFilter('done')">Gesehen <span class="movie-seg-count" id="movieCountDone">0</span></button>
+        </div>
+      </div>
+
       <div class="movie-add-section">
-        <input
-          type="text"
-          id="newMovieItem"
-          placeholder="Neues hinzufügen..."
-        >
-        <button onclick="addMovieItem()">+</button>
+        <input type="text" id="newMovieItem" placeholder="Name (Film oder Serie)" aria-label="Name" autocomplete="off" enterkeyhint="next">
+        <input type="text" id="newMovieLink" placeholder="Link (optional)" aria-label="Link" inputmode="url" autocomplete="off" enterkeyhint="done">
+        <button type="button" onclick="addMovieItem()">➕ Hinzufügen</button>
       </div>
 
       <div id="movieList"></div>
 
-      <div class="progress">
-        <p id="movieProgressText"></p>
-        <button onclick="resetMovieChecks()">Alle Haken entfernen</button>
+      <div class="movie-footer">
+        <button type="button" class="movie-reset" onclick="resetMovieChecks()">↺ Alle Haken entfernen</button>
       </div>
     </div>
 
@@ -6234,7 +6322,7 @@ function createSmallEditButton(onClick) {
 function shouldIgnoreEditDblClick(event) {
   return Boolean(
     event.target.closest(
-      "button, input, textarea, select, a, .btn, .btn-small, .star, .game-check, .game-column-header, .image, .game-image, .yugioh-image, .yugioh-image-placeholder, .game-image-placeholder"
+      "button, input, textarea, select, a, .btn, .btn-small, .movie-check-wrap, .movie-chip, .movie-note, .star, .game-check, .game-column-header, .image, .game-image, .yugioh-image, .yugioh-image-placeholder, .game-image-placeholder"
     )
   );
 }
@@ -9205,197 +9293,380 @@ async function loadMovieItems() {
   renderMovieItems();
 }
 
+/* ===== Serien & Filme: Ansicht (Filter, Sortierung, Suche) ===== */
+let movieView = { filter: "all", sort: "az", query: "" };
+let movieFlashId = null;
+const newMovieLinkInput = document.getElementById("newMovieLink");
+
+function setMovieFilter(filter) {
+  movieView.filter = filter;
+  renderMovieItems();
+}
+
+function setMovieSort(sort) {
+  movieView.sort = sort;
+  renderMovieItems();
+}
+
+function setMovieQuery(query) {
+  movieView.query = query || "";
+  renderMovieItems();
+}
+
+function createMovieButton(text, label, extraClass) {
+  const btn = document.createElement("div");
+  btn.className = "btn-small movie-btn" + (extraClass ? " " + extraClass : "");
+  btn.textContent = text;
+  btn.title = label;
+  btn.setAttribute("role", "button");
+  btn.setAttribute("tabindex", "0");
+  btn.setAttribute("aria-label", label);
+  btn.addEventListener("keydown", event => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      btn.click();
+    }
+  });
+  return btn;
+}
+
+function createMovieItemElement(item) {
+  const name = item.name || "Unbenannt";
+  const isDone = item.checked === true;
+
+  const div = document.createElement("div");
+  div.className = "movie-item" + (isDone ? " is-done" : "");
+  div.dataset.id = item.id;
+
+  if (movieFlashId !== null && String(movieFlashId) === String(item.id)) {
+    div.classList.add("is-flash");
+  }
+
+  const top = document.createElement("div");
+  top.className = "movie-item-top";
+
+  const left = document.createElement("div");
+  left.className = "movie-left";
+
+  /* Große, gut treffbare Checkbox */
+  const checkWrap = document.createElement("label");
+  checkWrap.className = "movie-check-wrap";
+
+  const checkbox = document.createElement("input");
+  checkbox.type = "checkbox";
+  checkbox.checked = isDone;
+  checkbox.setAttribute("aria-label", name + (isDone ? " als offen markieren" : " als gesehen markieren"));
+
+  const checkBox = document.createElement("span");
+  checkBox.className = "movie-check-box";
+  checkBox.setAttribute("aria-hidden", "true");
+  checkBox.textContent = "✓";
+
+  checkWrap.append(checkbox, checkBox);
+
+  checkbox.addEventListener("change", async () => {
+    const newValue = checkbox.checked;
+
+    /* Sofort anzeigen, bei Fehler zurücksetzen */
+    item.checked = newValue;
+    movieFlashId = item.id;
+    renderMovieItems();
+
+    const { error } = await supabaseClient
+      .from(MOVIE_TABLE)
+      .update({ checked: newValue })
+      .eq("id", item.id);
+
+    if (error) {
+      item.checked = !newValue;
+      renderMovieItems();
+      showSupabaseError("Fehler beim Speichern des Hakens", error);
+    }
+  });
+
+  const main = document.createElement("div");
+  main.className = "movie-main";
+
+  const title = document.createElement("div");
+  title.className = "movie-title";
+  title.textContent = name;
+
+  const meta = document.createElement("div");
+  meta.className = "movie-meta";
+
+  const note = document.createElement("div");
+  note.className = "movie-note";
+
+  main.append(title, meta, note);
+  left.append(checkWrap, main);
+
+  /* Aktionen */
+  const actions = document.createElement("div");
+  actions.className = "movie-actions";
+
+  const commentBtn = createMovieButton("💬", "Notiz");
+  const linkBtn = createMovieButton("🔗", "Link bearbeiten");
+  const deleteBtn = createMovieButton("❌", "Löschen", "movie-btn-del");
+  const editBtn = createSmallEditButton(() => openMovieEdit(item.id));
+  editBtn.classList.add("movie-btn");
+  editBtn.setAttribute("role", "button");
+  editBtn.setAttribute("tabindex", "0");
+  editBtn.setAttribute("aria-label", "Eintrag bearbeiten");
+  editBtn.addEventListener("keydown", event => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      editBtn.click();
+    }
+  });
+
+  actions.append(editBtn, commentBtn, linkBtn, deleteBtn);
+  top.append(left, actions);
+
+  /* Editoren */
+  const comment = document.createElement("textarea");
+  comment.className = "movie-comment";
+  comment.rows = 2;
+  comment.placeholder = "Notiz hinzufügen …";
+  comment.setAttribute("aria-label", "Notiz zu " + name);
+  comment.value = item.comment || "";
+
+  const linkInput = document.createElement("input");
+  linkInput.className = "movie-link-input";
+  linkInput.placeholder = "Link eingeben …";
+  linkInput.setAttribute("inputmode", "url");
+  linkInput.setAttribute("aria-label", "Link zu " + name);
+  linkInput.value = item.link || "";
+
+  function updateCommentIcon() {
+    const has = !!(item.comment && item.comment.trim() !== "");
+    commentBtn.classList.toggle("has-comment", has);
+    note.textContent = has ? item.comment.trim() : "";
+    note.hidden = !has;
+  }
+
+  function updateLinkIcon() {
+    const has = !!(item.link && item.link.trim() !== "");
+    linkBtn.classList.toggle("has-link", has);
+
+    const old = meta.querySelector(".movie-chip-link");
+    if (old) old.remove();
+
+    if (has) {
+      const href = normalize(item.link.trim());
+      const chip = document.createElement("a");
+      chip.className = "movie-chip movie-chip-link";
+      chip.href = href;
+      chip.target = "_blank";
+      chip.rel = "noopener noreferrer";
+      chip.title = href;
+      chip.textContent = "🔗 " + feastLinkHost(item.link) + " ↗";
+      meta.appendChild(chip);
+    }
+  }
+
+  updateCommentIcon();
+  updateLinkIcon();
+
+  function setNoteOpen(open) {
+    comment.classList.toggle("visible", open);
+    div.classList.toggle("note-open", open);
+    commentBtn.setAttribute("aria-expanded", open ? "true" : "false");
+    if (open) comment.focus();
+  }
+
+  function setLinkOpen(open) {
+    linkInput.classList.toggle("visible", open);
+    linkBtn.setAttribute("aria-expanded", open ? "true" : "false");
+    if (open) {
+      linkInput.focus();
+      linkInput.select();
+    }
+  }
+
+  commentBtn.onclick = () => setNoteOpen(!comment.classList.contains("visible"));
+  linkBtn.onclick = () => setLinkOpen(!linkInput.classList.contains("visible"));
+  note.onclick = () => setNoteOpen(true);
+
+  comment.addEventListener("keydown", event => {
+    if (event.key === "Escape") setNoteOpen(false);
+  });
+
+  linkInput.addEventListener("keydown", event => {
+    if (event.key === "Escape" || event.key === "Enter") {
+      event.preventDefault();
+      setLinkOpen(false);
+    }
+  });
+
+  const saveCommentDebounced = debounce(async (value) => {
+    const { error } = await supabaseClient
+      .from(MOVIE_TABLE)
+      .update({ comment: value })
+      .eq("id", item.id);
+
+    if (error) {
+      showSupabaseError("Fehler beim Speichern des Kommentars", error);
+    }
+  });
+
+  comment.addEventListener("input", () => {
+    item.comment = comment.value;
+    updateCommentIcon();
+    saveCommentDebounced(comment.value);
+  });
+
+  const saveLinkDebounced = debounce(async (value) => {
+    const normalizedValue = normalize(value.trim());
+
+    const { error } = await supabaseClient
+      .from(MOVIE_TABLE)
+      .update({ link: normalizedValue })
+      .eq("id", item.id);
+
+    if (error) {
+      showSupabaseError("Fehler beim Speichern des Links", error);
+      return;
+    }
+
+    item.link = normalizedValue;
+    linkInput.value = normalizedValue;
+    updateLinkIcon();
+  });
+
+  linkInput.addEventListener("input", () => {
+    item.link = linkInput.value;
+    updateLinkIcon();
+    saveLinkDebounced(linkInput.value);
+  });
+
+  deleteBtn.onclick = async () => {
+    const confirmed = confirm(`"${name}" wirklich löschen?`);
+
+    if (!confirmed) return;
+
+    const { error } = await supabaseClient
+      .from(MOVIE_TABLE)
+      .delete()
+      .eq("id", item.id);
+
+    if (error) {
+      showSupabaseError("Fehler beim Löschen", error);
+      return;
+    }
+
+    movieItems = movieItems.filter(entry => entry.id !== item.id);
+    renderMovieItems();
+  };
+
+  addDblClickEdit(div, () => openMovieEdit(item.id));
+
+  div.append(top, comment, linkInput);
+  return div;
+}
+
 function renderMovieItems() {
   movieList.innerHTML = "";
 
-  let checkedCount = 0;
+  const total = movieItems.length;
+  const doneCount = movieItems.filter(entry => entry.checked === true).length;
+  const openCount = total - doneCount;
+  const percent = total ? Math.round((doneCount / total) * 100) : 0;
 
-  movieItems.forEach((item) => {
-    const div = document.createElement("div");
-    div.className = "movie-item";
+  const setText = (id, text) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = text;
+  };
 
-    const top = document.createElement("div");
-    top.className = "movie-item-top";
+  /* Fortschritt + Zähler */
+  setText("movieProgressText", total ? `${doneCount} von ${total} gesehen` : "Noch keine Einträge");
+  setText("moviePercent", total ? percent + " %" : "");
+  setText("movieCountAll", total);
+  setText("movieCountOpen", openCount);
+  setText("movieCountDone", doneCount);
 
-    const left = document.createElement("div");
-    left.className = "movie-left";
+  const fill = document.getElementById("movieProgressFill");
+  if (fill) {
+    fill.style.width = percent + "%";
+    if (fill.parentElement) fill.parentElement.setAttribute("aria-valuenow", String(percent));
+  }
 
-    const checkbox = document.createElement("input");
-    checkbox.type = "checkbox";
-    checkbox.checked = item.checked === true;
-
-    if (checkbox.checked) {
-      checkedCount++;
-    }
-
-    checkbox.addEventListener("change", async () => {
-      const newValue = checkbox.checked;
-
-      const { error } = await supabaseClient
-        .from(MOVIE_TABLE)
-        .update({ checked: newValue })
-        .eq("id", item.id);
-
-      if (error) {
-        checkbox.checked = item.checked === true;
-        showSupabaseError("Fehler beim Speichern des Hakens", error);
-        return;
-      }
-
-      item.checked = newValue;
-      renderMovieItems();
-    });
-
-    const label = document.createElement("label");
-    label.textContent = item.name || "Unbenannt";
-
-    left.appendChild(checkbox);
-    left.appendChild(label);
-
-    const actions = document.createElement("div");
-    actions.className = "movie-actions";
-
-    const commentBtn = document.createElement("div");
-    commentBtn.className = "btn-small";
-    commentBtn.textContent = "💬";
-
-    const linkBtn = document.createElement("div");
-    linkBtn.className = "btn-small";
-    linkBtn.textContent = "🔗";
-
-    const editBtn = createSmallEditButton(() => openMovieEdit(item.id));
-
-    const deleteBtn = document.createElement("div");
-    deleteBtn.className = "btn-small";
-    deleteBtn.textContent = "❌";
-
-    function updateCommentIcon() {
-      if (item.comment && item.comment.trim() !== "") {
-        commentBtn.classList.add("has-comment");
-      } else {
-        commentBtn.classList.remove("has-comment");
-      }
-    }
-
-    function updateLinkIcon() {
-      if (item.link && item.link.trim() !== "") {
-        linkBtn.classList.add("has-link");
-      } else {
-        linkBtn.classList.remove("has-link");
-      }
-    }
-
-    updateCommentIcon();
-    updateLinkIcon();
-
-    actions.appendChild(editBtn);
-    actions.appendChild(commentBtn);
-    actions.appendChild(linkBtn);
-    actions.appendChild(deleteBtn);
-
-    top.appendChild(left);
-    top.appendChild(actions);
-
-    const comment = document.createElement("input");
-    comment.className = "movie-comment";
-    comment.placeholder = "Kommentar hinzufügen...";
-    comment.value = item.comment || "";
-
-    const linkInput = document.createElement("input");
-    linkInput.className = "movie-link-input";
-    linkInput.placeholder = "Link eingeben...";
-    linkInput.value = item.link || "";
-
-    commentBtn.onclick = () => {
-      comment.classList.toggle("visible");
-
-      if (comment.classList.contains("visible")) {
-        comment.focus();
-      }
-    };
-
-    linkBtn.onclick = () => {
-      linkInput.classList.toggle("visible");
-
-      if (linkInput.classList.contains("visible")) {
-        linkInput.focus();
-        linkInput.select();
-      }
-    };
-
-    const saveCommentDebounced = debounce(async (value) => {
-      const { error } = await supabaseClient
-        .from(MOVIE_TABLE)
-        .update({ comment: value })
-        .eq("id", item.id);
-
-      if (error) {
-        showSupabaseError("Fehler beim Speichern des Kommentars", error);
-      }
-    });
-
-    comment.addEventListener("input", () => {
-      item.comment = comment.value;
-      updateCommentIcon();
-      saveCommentDebounced(comment.value);
-    });
-
-    const saveLinkDebounced = debounce(async (value) => {
-      const normalizedValue = normalize(value.trim());
-
-      const { error } = await supabaseClient
-        .from(MOVIE_TABLE)
-        .update({ link: normalizedValue })
-        .eq("id", item.id);
-
-      if (error) {
-        showSupabaseError("Fehler beim Speichern des Links", error);
-        return;
-      }
-
-      item.link = normalizedValue;
-      linkInput.value = normalizedValue;
-      updateLinkIcon();
-    });
-
-    linkInput.addEventListener("input", () => {
-      item.link = linkInput.value;
-      updateLinkIcon();
-      saveLinkDebounced(linkInput.value);
-    });
-
-    deleteBtn.onclick = async () => {
-      const confirmed = confirm(
-        `"${item.name || "Unbenannt"}" wirklich löschen?`
-      );
-
-      if (!confirmed) return;
-
-      const { error } = await supabaseClient
-        .from(MOVIE_TABLE)
-        .delete()
-        .eq("id", item.id);
-
-      if (error) {
-        showSupabaseError("Fehler beim Löschen", error);
-        return;
-      }
-
-      movieItems = movieItems.filter(entry => entry.id !== item.id);
-      renderMovieItems();
-    };
-
-    addDblClickEdit(div, () => openMovieEdit(item.id));
-
-    div.appendChild(top);
-    div.appendChild(comment);
-    div.appendChild(linkInput);
-
-    movieList.appendChild(div);
+  document.querySelectorAll("#moviesApp .movie-seg button").forEach(btn => {
+    const active = btn.dataset.filter === movieView.filter;
+    btn.classList.toggle("is-active", active);
+    btn.setAttribute("aria-pressed", active ? "true" : "false");
   });
 
-  document.getElementById("movieProgressText").textContent =
-    `Fortschritt: ${checkedCount} / ${movieItems.length}`;
+  /* Filtern */
+  const query = movieView.query.trim().toLowerCase();
+
+  let items = movieItems.filter(entry => {
+    const done = entry.checked === true;
+
+    if (movieView.filter === "open" && done) return false;
+    if (movieView.filter === "done" && !done) return false;
+
+    if (query) {
+      const haystack = (String(entry.name || "") + " " + String(entry.comment || "")).toLowerCase();
+      if (!haystack.includes(query)) return false;
+    }
+
+    return true;
+  });
+
+  /* Sortieren: offene zuerst, danach gesehene – jeweils nach gewählter Sortierung */
+  const byName = (a, b) => String(a.name || "").localeCompare(String(b.name || ""), "de", { sensitivity: "base" });
+  const byNew = (a, b) => String(b.created_at || "").localeCompare(String(a.created_at || ""));
+  const compare = movieView.sort === "za" ? (a, b) => byName(b, a) : movieView.sort === "new" ? byNew : byName;
+
+  items.sort((a, b) => {
+    const aDone = a.checked === true ? 1 : 0;
+    const bDone = b.checked === true ? 1 : 0;
+    if (aDone !== bDone) return aDone - bDone;
+    return compare(a, b);
+  });
+
+  /* Leerzustände */
+  if (items.length === 0) {
+    const empty = document.createElement("div");
+    empty.className = "card-empty";
+
+    if (total === 0) {
+      empty.textContent = "Noch keine Einträge – füge oben den ersten Film oder die erste Serie hinzu.";
+    } else if (!query && movieView.filter === "open") {
+      empty.textContent = "🎉 Alles gesehen – hier ist nichts mehr offen.";
+    } else if (!query && movieView.filter === "done") {
+      empty.textContent = "Noch nichts als gesehen markiert.";
+    } else {
+      empty.textContent = "Keine Treffer für diese Auswahl.";
+    }
+
+    movieList.appendChild(empty);
+    movieFlashId = null;
+    return;
+  }
+
+  /* Gruppen-Überschriften, wenn offene und gesehene gemeinsam angezeigt werden */
+  const visibleOpen = items.filter(entry => entry.checked !== true).length;
+  const showGroups = visibleOpen > 0 && visibleOpen < items.length;
+  let lastGroup = null;
+
+  items.forEach(entry => {
+    const group = entry.checked === true ? "done" : "open";
+
+    if (showGroups && group !== lastGroup) {
+      const heading = document.createElement("div");
+      heading.className = "movie-group-heading";
+      heading.textContent = group === "open"
+        ? "Offen · " + visibleOpen
+        : "Gesehen · " + (items.length - visibleOpen);
+      movieList.appendChild(heading);
+    }
+
+    lastGroup = group;
+    movieList.appendChild(createMovieItemElement(entry));
+  });
+
+  movieFlashId = null;
 }
 
 function openRandomUncheckedMovie() {
@@ -9447,7 +9718,7 @@ async function addMovieItem() {
     id: crypto.randomUUID(),
     name: value,
     comment: "",
-    link: "",
+    link: newMovieLinkInput ? normalize(newMovieLinkInput.value.trim()) : "",
     checked: false,
     user_id: currentUser.id
   };
@@ -9464,13 +9735,22 @@ async function addMovieItem() {
   }
 
   newMovieItemInput.value = "";
+  if (newMovieLinkInput) newMovieLinkInput.value = "";
 
   if (data) {
     movieItems.push(data);
-    movieItems.sort((a, b) => {
-      return (a.name || "").localeCompare(b.name || "", "de");
-    });
+
+    /* Neuer Eintrag soll sichtbar sein: Suche zurücksetzen, ggf. Filter auf "Alle" */
+    movieView.query = "";
+    const searchEl = document.getElementById("movieSearch");
+    if (searchEl) searchEl.value = "";
+    if (movieView.filter === "done") movieView.filter = "all";
+
+    movieFlashId = data.id;
     renderMovieItems();
+
+    const added = movieList.querySelector('[data-id="' + String(data.id).replace(/"/g, '\"') + '"]');
+    if (added && added.scrollIntoView) added.scrollIntoView({ block: "nearest", behavior: "smooth" });
   } else {
     await loadMovieItems();
   }
@@ -11896,9 +12176,19 @@ emailInput.addEventListener("keydown", event => {
 
 newMovieItemInput.addEventListener("keydown", event => {
   if (event.key === "Enter") {
+    event.preventDefault();
     addMovieItem();
   }
 });
+
+if (newMovieLinkInput) {
+  newMovieLinkInput.addEventListener("keydown", event => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      addMovieItem();
+    }
+  });
+}
 
 cardLists.feast.nameInput.addEventListener("keydown", event => {
   if (event.key === "Enter") {
