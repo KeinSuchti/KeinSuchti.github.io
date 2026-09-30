@@ -5100,8 +5100,20 @@ body.color-vision-mode .availability-day-details .day-ok{color:#8fd0f5}
 body.color-vision-mode .beer-grade-slider::-webkit-slider-runnable-track,body.color-vision-mode .beer-grade-slider::-moz-range-track{background:#56B4E9}
 body.color-vision-mode .ds-team-select[data-team="2"]{--tc:var(--cv-t2)}
 /* ===== Yu-Gi-Oh!: Löschen nur in der Bearbeitungsansicht ===== */
-.edit-delete-button{display:block;width:100%;margin:16px 0 0;min-height:46px;border:1px solid rgba(255,118,118,.42);border-radius:12px;background:rgba(205,67,67,.12);color:#ffb0aa;font-weight:800}
-.edit-delete-button[hidden]{display:none}
+.edit-box .edit-delete-button{display:block;width:100%;margin:10px 0 0;min-height:46px;border:1px solid #ff7b7b;border-radius:12px;background:#d62f2f;color:#fff;font-weight:800;cursor:pointer;box-shadow:0 6px 16px rgba(214,47,47,.28)}
+.edit-box .edit-delete-button:hover{background:#e63b3b}
+.edit-box .edit-delete-button:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.edit-box .edit-delete-button[hidden]{display:none}
+/* ===== Feast: angeheftete Zufallsauswahl (Snack + Abendessen) ===== */
+#feastPinned{display:grid;gap:10px;margin:0 0 16px}
+#feastPinned[hidden]{display:none}
+.feast-pin{display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid rgba(99,218,207,.38);border-radius:14px;background:rgba(34,121,123,.16)}
+.feast-pin-label{flex:0 0 auto;padding:3px 10px;border-radius:999px;background:rgba(105,230,215,.18);color:#d8fff9;font-size:12px;font-weight:800;letter-spacing:.02em}
+.feast-pin-name{flex:1 1 auto;min-width:0;font-weight:700;overflow-wrap:anywhere}
+.feast-pin-name.has-link{cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.feast-pin-btn{flex:0 0 auto;width:38px;min-width:38px;height:38px;margin:0;padding:0;display:inline-flex;align-items:center;justify-content:center;border:1px solid rgba(101,141,207,.35);border-radius:10px;background:rgba(18,39,62,.72);color:var(--text);font-size:16px;line-height:1;cursor:pointer}
+.feast-pin-btn:hover{border-color:rgba(101,226,215,.6)}
+.feast-pin-btn:focus-visible{outline:2px solid var(--accent-2);outline-offset:2px}
 </style>
 
 
@@ -5598,7 +5610,7 @@ body.app-scene .skip-link:focus{left:12px}
     <div id="feastApp" class="app-panel" style="display:none;">
       <div class="list-panel-heading"><h2><span class="section-title-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 3v6m-3-6v4a3 3 0 0 0 6 0V3"></path><path d="M7 10v11"></path><path d="M16 3v18m0-18c3 2 4 5 4 8h-4"></path></svg></span>Feast Table</h2><button class="list-settings-button" type="button" onclick="openListSettings('feast')" aria-label="Einstellungen für Feast Table" title="Listeneinstellungen">⚙</button></div>
 
-      <button class="random-card-button" onclick="openRandomUnratedCard('feast')">
+      <button class="random-card-button" onclick="pinFeastPicks()">
         🎲 Was fressen wir?
       </button>
 
@@ -5626,6 +5638,7 @@ body.app-scene .skip-link:focus{left:12px}
         <button onclick="addCardItem('feast')">➕ Hinzufügen</button>
       </div>
 
+      <div id="feastPinned" hidden></div>
       <div id="feastList"></div>
 
     </div>
@@ -5864,11 +5877,11 @@ body.app-scene .skip-link:focus{left:12px}
 
     <div id="editEntryFields" class="edit-fields"></div>
 
-    <button type="button" id="editDeleteButton" class="edit-delete-button" hidden>🗑️ Deck löschen</button>
     <div class="edit-actions">
       <button onclick="saveEditedEntry()">💾 Speichern</button>
       <button class="edit-cancel-button" onclick="closeEditEntryModal()">Abbrechen</button>
     </div>
+    <button type="button" id="editDeleteButton" class="edit-delete-button" hidden>🗑️ Deck löschen</button>
   </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -9554,6 +9567,8 @@ function autoImage(type, url, itemId) {
 function renderCardItems(type) {
   const config = cardLists[type];
 
+  if (type === "feast") renderFeastPinned();
+
   config.listElement.innerHTML = "";
 
   let data = [...config.items];
@@ -9988,15 +10003,13 @@ function createCardButton(text, className) {
   return btn;
 }
 
-function openRandomUnratedCard(type) {
+/* Gemeinsame Zufalls-Bedingung: Eintrag ohne Bewertung (und mit hinterlegtem Link) */
+function getUnratedCardCandidates(type) {
   const config = cardLists[type];
 
-  if (!config || !Array.isArray(config.items)) {
-    showRandomPopup("Die Liste wurde noch nicht geladen.");
-    return;
-  }
+  if (!config || !Array.isArray(config.items)) return [];
 
-  const candidates = config.items.filter(function(item) {
+  return config.items.filter(function(item) {
     const rating = Number(item.rating || 0);
     const hasNoRating = rating === 0;
 
@@ -10006,6 +10019,183 @@ function openRandomUnratedCard(type) {
 
     return hasNoRating && hasValidUrl;
   });
+}
+
+/* ===== Feast: angeheftete Zufallsauswahl (Snack + Abendessen) ===== */
+const FEAST_PIN_SLOTS = [
+  { key: "snack", label: "Snack" },
+  { key: "dinner", label: "Abendessen" }
+];
+
+let feastPinned = { snack: null, dinner: null };
+
+function feastPinStorageKey() {
+  let userId = "anon";
+  try { if (currentUser && currentUser.id) userId = currentUser.id; } catch (e) {}
+  return "feastPinned:" + userId;
+}
+
+function loadFeastPinned() {
+  try {
+    const raw = localStorage.getItem(feastPinStorageKey());
+    const saved = raw ? JSON.parse(raw) : {};
+    feastPinned = {
+      snack: saved && saved.snack != null ? saved.snack : null,
+      dinner: saved && saved.dinner != null ? saved.dinner : null
+    };
+  } catch (e) {
+    feastPinned = { snack: null, dinner: null };
+  }
+}
+
+function saveFeastPinned() {
+  try {
+    localStorage.setItem(feastPinStorageKey(), JSON.stringify(feastPinned));
+  } catch (e) {}
+}
+
+function findFeastItem(id) {
+  if (id == null) return null;
+  return cardLists.feast.items.find(function(item) {
+    return String(item.id) === String(id);
+  }) || null;
+}
+
+function pickFeastItem(excludeIds) {
+  const excluded = excludeIds.filter(function(id) { return id != null; }).map(String);
+  const pool = getUnratedCardCandidates("feast").filter(function(item) {
+    return !excluded.includes(String(item.id));
+  });
+
+  if (pool.length === 0) return null;
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+
+function pinFeastPicks() {
+  const config = cardLists.feast;
+
+  if (!config || !Array.isArray(config.items)) {
+    showRandomPopup("Die Liste wurde noch nicht geladen.");
+    return;
+  }
+
+  const first = pickFeastItem([]);
+
+  if (!first) {
+    showRandomPopup("Es gibt keinen unbewerteten Eintrag mit hinterlegtem Link.");
+    return;
+  }
+
+  const second = pickFeastItem([first.id]);
+
+  feastPinned = { snack: first.id, dinner: second ? second.id : null };
+  saveFeastPinned();
+  renderFeastPinned();
+
+  if (!second) {
+    showRandomPopup("Es gibt nur einen unbewerteten Eintrag mit Link – deshalb wurde nur der Snack ausgewählt.");
+  }
+}
+
+function rerollFeastPin(slotKey) {
+  const otherKey = slotKey === "snack" ? "dinner" : "snack";
+  const next = pickFeastItem([feastPinned[otherKey], feastPinned[slotKey]]);
+
+  if (!next) {
+    showRandomPopup("Es gibt keinen weiteren unbewerteten Eintrag mit hinterlegtem Link.");
+    return;
+  }
+
+  feastPinned[slotKey] = next.id;
+  saveFeastPinned();
+  renderFeastPinned();
+}
+
+function removeFeastPin(slotKey) {
+  feastPinned[slotKey] = null;
+  saveFeastPinned();
+  renderFeastPinned();
+}
+
+function renderFeastPinned() {
+  const box = document.getElementById("feastPinned");
+  if (!box) return;
+
+  box.innerHTML = "";
+
+  if (!cardLists.feast.items.length) {
+    box.hidden = true;
+    return;
+  }
+
+  loadFeastPinned();
+
+  let changed = false;
+
+  FEAST_PIN_SLOTS.forEach(function(slot) {
+    const id = feastPinned[slot.key];
+    if (id == null) return;
+
+    const item = findFeastItem(id);
+
+    if (!item) {
+      feastPinned[slot.key] = null;
+      changed = true;
+      return;
+    }
+
+    const card = document.createElement("div");
+    card.className = "feast-pin";
+
+    const label = document.createElement("span");
+    label.className = "feast-pin-label";
+    label.textContent = slot.label;
+
+    const name = document.createElement("span");
+    name.className = "feast-pin-name";
+    name.textContent = item.name || "Unbenannt";
+
+    if (item.url && item.url.trim() !== "") {
+      name.classList.add("has-link");
+      name.onclick = function() {
+        window.open(normalize(item.url.trim()), "_blank");
+      };
+    }
+
+    const rerollBtn = document.createElement("button");
+    rerollBtn.type = "button";
+    rerollBtn.className = "feast-pin-btn";
+    rerollBtn.textContent = "🎲";
+    rerollBtn.title = slot.label + " neu auswürfeln";
+    rerollBtn.setAttribute("aria-label", slot.label + " neu auswürfeln");
+    rerollBtn.onclick = function() { rerollFeastPin(slot.key); };
+
+    const closeBtn = document.createElement("button");
+    closeBtn.type = "button";
+    closeBtn.className = "feast-pin-btn";
+    closeBtn.textContent = "✕";
+    closeBtn.title = slot.label + " entfernen";
+    closeBtn.setAttribute("aria-label", slot.label + " entfernen");
+    closeBtn.onclick = function() { removeFeastPin(slot.key); };
+
+    card.append(label, name, rerollBtn, closeBtn);
+    box.appendChild(card);
+  });
+
+  if (changed) saveFeastPinned();
+
+  box.hidden = box.children.length === 0;
+}
+
+function openRandomUnratedCard(type) {
+  const config = cardLists[type];
+
+  if (!config || !Array.isArray(config.items)) {
+    showRandomPopup("Die Liste wurde noch nicht geladen.");
+    return;
+  }
+
+  const candidates = getUnratedCardCandidates(type);
 
   if (candidates.length === 0) {
     showRandomPopup("Es gibt keinen unbewerteten Eintrag mit hinterlegtem Link.");
