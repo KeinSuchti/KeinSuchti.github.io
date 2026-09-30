@@ -5008,7 +5008,51 @@ button.yugioh-image-placeholder:hover{border-color:rgba(101,226,215,.7);color:#d
 .duel-player-card[data-team]::before{content:"";position:absolute;left:0;right:0;top:0;height:6px;border-radius:inherit;border-bottom-left-radius:0;border-bottom-right-radius:0;background:var(--team)}
 .duel-player-card[data-team] .duel-deck-name{color:var(--team);font-weight:800}
 @media(max-width:420px){.ds-row{grid-template-columns:minmax(0,1fr) 116px}.ds-seg button{min-width:0}}
+/* ===== Rechner: Schnellzeile, kleiner OK-Button ===== */
+.calculator-quick{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:7px;margin-bottom:10px}
+.calculator-quick button{box-sizing:border-box;min-width:0;width:100%;margin:0;min-height:44px;padding:6px 2px;border:1px solid rgba(125,158,224,.3);border-radius:10px;background:rgba(19,43,86,.7)!important;color:#ffb9b3;font-size:14px;font-weight:800;font-variant-numeric:tabular-nums;touch-action:manipulation}
+.calculator-quick button:last-child{color:#a6f0c6}.calculator-quick button:nth-child(4){color:#ffe29a}
+.calculator-quick button:active{background:rgba(40,70,130,.95)!important;transform:scale(.95)}
+.calculator-actions{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+.calculator-actions .calculator-cancel{order:4;grid-column:span 2!important}
+.calculator-actions .calculator-ok{order:5;grid-column:auto!important;background:linear-gradient(135deg,#2f9e6a,#22a7a0)!important;color:#fff!important;font-weight:900;letter-spacing:.04em}
+@media(max-width:900px){.calculator-quick button{min-height:48px;font-size:15px}}
+@media(max-height:520px) and (orientation:landscape){.calculator-quick{gap:5px;margin-bottom:6px}.calculator-quick button{min-height:34px;font-size:13px}.calculator-actions{grid-template-columns:repeat(5,minmax(0,1fr))!important}.calculator-actions .calculator-cancel,.calculator-actions .calculator-ok{order:0!important;grid-column:auto!important}}
+/* ===== Münzwurf / Würfel Animation ===== */
+.duel-fx{display:none;position:fixed;inset:0;z-index:12500;flex-direction:column;align-items:center;justify-content:center;gap:26px;padding:20px;background:radial-gradient(circle at 50% 45%,rgba(40,60,130,.55),rgba(3,8,20,.9));backdrop-filter:blur(3px);cursor:pointer;-webkit-tap-highlight-color:transparent}
+.fx-stage{position:relative;display:grid;place-items:center;width:240px;height:260px;perspective:900px}
+.fx-shadow{position:absolute;bottom:14px;width:120px;height:20px;border-radius:50%;background:rgba(0,0,0,.6);filter:blur(6px)}
+.fx-coin{position:relative;width:132px;height:132px;transform-style:preserve-3d}
+.fx-coin-face{position:absolute;inset:0;display:grid;place-content:center;justify-items:center;gap:2px;border-radius:50%;backface-visibility:hidden;-webkit-backface-visibility:hidden;color:#5a3d00;text-align:center;border:6px solid #c9971c;background:radial-gradient(circle at 32% 28%,#fff1b8,#f3c53b 45%,#c9971c);box-shadow:inset 0 0 0 4px rgba(255,255,255,.28),inset 0 -8px 16px rgba(120,80,0,.35),0 8px 24px rgba(0,0,0,.4)}
+.fx-coin-face b{font-size:44px;line-height:1}.fx-coin-face span{font-size:15px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
+.fx-back{transform:rotateY(180deg)}
+.fx-dice-wrap{position:relative}
+.fx-dice{--s:112px;position:relative;width:var(--s);height:var(--s);transform-style:preserve-3d}
+.fx-die-face{position:absolute;inset:0;display:grid;grid-template:repeat(3,1fr)/repeat(3,1fr);padding:15px;box-sizing:border-box;border-radius:18px;border:2px solid #cfd6e8;background:linear-gradient(145deg,#ffffff,#dfe5f3);backface-visibility:hidden;-webkit-backface-visibility:hidden;box-shadow:inset 0 0 14px rgba(90,110,160,.25)}
+.fx-die-face .pip{width:72%;height:72%;place-self:center;border-radius:50%;background:radial-gradient(circle at 35% 30%,#4a5a85,#131b33)}
+.fx-die-face.f1{transform:translateZ(calc(var(--s)/2))}.fx-die-face.f6{transform:rotateY(180deg) translateZ(calc(var(--s)/2))}
+.fx-die-face.f2{transform:rotateY(90deg) translateZ(calc(var(--s)/2))}.fx-die-face.f5{transform:rotateY(-90deg) translateZ(calc(var(--s)/2))}
+.fx-die-face.f3{transform:rotateX(90deg) translateZ(calc(var(--s)/2))}.fx-die-face.f4{transform:rotateX(-90deg) translateZ(calc(var(--s)/2))}
+.fx-die-face.f1 .pip{background:radial-gradient(circle at 35% 30%,#ff6b6b,#b3121b)}
+.fx-result{min-height:56px;font-size:40px;font-weight:900;color:#fff;letter-spacing:.04em;text-shadow:0 4px 18px rgba(0,0,0,.6);opacity:0;transform:scale(.7);transition:opacity .25s,transform .25s cubic-bezier(.3,1.6,.5,1)}
+.fx-result.is-shown{opacity:1;transform:scale(1)}
+.fx-tap{position:absolute;bottom:calc(18px + env(safe-area-inset-bottom));left:0;right:0;text-align:center;color:#8fa6cf;font-size:12px;letter-spacing:.05em}
+@media(max-height:520px){.fx-stage{transform:scale(.7);margin:-40px 0}.fx-result{font-size:30px;min-height:40px}.duel-fx{gap:0}}
+/* ===== Team-Setup: Layout-Fix (Kopf / Body scrollt / feste Fußleiste) ===== */
+.duel-setup-box{box-sizing:border-box;display:flex;flex-direction:column;padding:0!important;overflow:hidden!important;max-height:min(700px,calc(100dvh - 28px))}
+.duel-setup-box button{width:auto!important;margin:0!important;box-sizing:border-box}
+.ds-head{flex:0 0 auto;padding:18px 20px 0}
+.ds-body{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:0 20px 8px}
+.ds-actions{flex:0 0 auto;display:grid!important;grid-template-columns:auto minmax(0,1fr);gap:10px;margin:0!important;position:static!important;padding:12px 20px calc(12px + env(safe-area-inset-bottom))!important;background:#0b172c!important;border-top:1px solid rgba(125,158,224,.2)}
+.ds-actions button{min-height:48px!important;padding:0 16px!important;border-radius:12px!important;font-size:15px;font-weight:800;white-space:nowrap}
+.ds-actions .ds-cancel{padding:0 18px!important}
+.ds-actions .ds-start{background:linear-gradient(135deg,#2f6fdd,#22a7a0)!important;color:#fff!important;border:0!important}
+.ds-actions .ds-start:disabled{opacity:.45}
+.ds-seg button{width:auto!important;flex:1 1 130px}
+.ds-team-select{width:100%!important;box-sizing:border-box}
+@media(max-width:600px){.duel-setup-overlay{align-items:flex-end!important;padding:0!important}.duel-setup-box{width:100%!important;max-height:92dvh;border-radius:20px 20px 0 0!important;border-bottom:0!important}.ds-head,.ds-body{padding-left:16px;padding-right:16px}.ds-actions{padding-left:16px!important;padding-right:16px!important}}
 </style>
+
 
 
 
@@ -5714,6 +5758,7 @@ body.app-scene .skip-link:focus{left:12px}
   </div>
 </div>
 
+<div id="duelFxOverlay" class="duel-fx" role="dialog" aria-modal="true" aria-label="Wurf-Ergebnis" onclick="duelFxClose()"></div>
 <!-- Yu-Gi-Oh!-Duell-Setup (Teams) -->
 <div id="duelSetupOverlay" class="duel-setup-overlay" role="dialog" aria-modal="true" aria-labelledby="duelSetupTitle" onclick="if(event.target===this)duelSetupCancel()">
   <div id="duelSetupBox" class="duel-setup-box"></div>
@@ -5743,13 +5788,16 @@ body.app-scene .skip-link:focus{left:12px}
   <div class="calculator-box">
     <h4 id="yugiohCalculatorTitle">Lebenspunkte ändern</h4>
     <div id="yugiohCalculatorDisplay" class="calculator-display" aria-live="polite">8000</div>
+    <div class="calculator-quick" role="group" aria-label="Schnellauswahl">
+      <button type="button" onclick="yugiohCalcQuick(-100)">−100</button><button type="button" onclick="yugiohCalcQuick(-500)">−500</button><button type="button" onclick="yugiohCalcQuick(-1000)">−1000</button><button type="button" onclick="yugiohCalcQuick('half')" aria-label="Halbieren">½</button><button type="button" onclick="yugiohCalcQuick(500)">+500</button>
+    </div>
     <div class="calculator-grid">
       <button type="button" onclick="yugiohCalcInput('7')">7</button><button type="button" onclick="yugiohCalcInput('8')">8</button><button type="button" onclick="yugiohCalcInput('9')">9</button><button type="button" onclick="yugiohCalcInput('/')">÷</button>
       <button type="button" onclick="yugiohCalcInput('4')">4</button><button type="button" onclick="yugiohCalcInput('5')">5</button><button type="button" onclick="yugiohCalcInput('6')">6</button><button type="button" onclick="yugiohCalcInput('*')">×</button>
       <button type="button" onclick="yugiohCalcInput('1')">1</button><button type="button" onclick="yugiohCalcInput('2')">2</button><button type="button" onclick="yugiohCalcInput('3')">3</button><button type="button" onclick="yugiohCalcInput('-')">−</button>
       <button type="button" onclick="yugiohCalcInput('0')">0</button><button type="button" onclick="yugiohCalcInput('.')">.</button><button type="button" onclick="yugiohCalcBackspace()">⌫</button><button type="button" onclick="yugiohCalcInput('+')">+</button>
     </div>
-    <div class="calculator-actions"><button type="button" class="calculator-reset" onclick="resetYugiohCalculator()">Reset</button><button type="button" onclick="yugiohCalcClear()">C</button><button type="button" class="calculator-equals" onclick="yugiohCalcEquals()">=</button><button type="button" onclick="applyYugiohCalculator()">Übernehmen</button><button type="button" onclick="closeYugiohCalculator()">Abbrechen</button></div>
+    <div class="calculator-actions"><button type="button" class="calculator-reset" onclick="resetYugiohCalculator()">Reset</button><button type="button" onclick="yugiohCalcClear()">C</button><button type="button" class="calculator-equals" onclick="yugiohCalcEquals()">=</button><button type="button" class="calculator-ok" onclick="applyYugiohCalculator()" aria-label="Übernehmen">OK</button><button type="button" class="calculator-cancel" onclick="closeYugiohCalculator()">Abbrechen</button></div>
   </div>
 </div>
 <!-- Bearbeiten-Popup -->
@@ -6834,13 +6882,7 @@ function renderYugiohDuelArena() {
     });
     history.append(historyTitle, historyList);
     const head = document.createElement("div"); head.className = "duel-player-head"; head.append(name, deck);
-    const quick = document.createElement("div"); quick.className = "duel-quick";
-    [["−100",-100],["−500",-500],["−1000",-1000],["½","half"],["+500",500]].forEach(([label, v]) => {
-      const b = document.createElement("button"); b.type = "button"; b.textContent = label;
-      b.setAttribute("aria-label", `${player.playerName}: ${v === "half" ? "Lebenspunkte halbieren" : label + " Lebenspunkte"}`);
-      b.onclick = () => duelQuickChange(index, v, label); quick.appendChild(b);
-    });
-    card.append(head, lifeDisplay, quick, status, history); yugiohDuelArena.appendChild(card);
+    card.append(head, lifeDisplay, status, history); yugiohDuelArena.appendChild(card);
   });
   yugiohDuelArena.scrollTop = previousScroll;
   updateDuelBanner();
@@ -6949,8 +6991,39 @@ function duelNextTurn() {
   renderYugiohDuelArena();
   duelShowBanner(`▶ ${activeYugiohDuelPlayers[duelTurnIndex].playerName} ist am Zug`, 2500);
 }
-function duelCoin() { const r = duelRnd(2) ? "Kopf" : "Zahl"; duelShowBanner("🪙 Münzwurf: " + r, 4000); if (navigator.vibrate) navigator.vibrate(20); }
-function duelDice() { duelShowBanner("🎲 Würfel: " + (duelRnd(6) + 1), 4000); if (navigator.vibrate) navigator.vibrate(20); }
+let duelFxTimer = null;
+const duelReduceMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+function duelFxClose() { clearTimeout(duelFxTimer); const fx = document.getElementById("duelFxOverlay"); if (fx) { fx.style.display = "none"; fx.innerHTML = ""; } }
+function duelFxShow(html) { const fx = document.getElementById("duelFxOverlay"); clearTimeout(duelFxTimer); fx.innerHTML = html + '<div class="fx-tap">Tippen zum Schließen</div>'; fx.style.display = "flex"; return fx; }
+function duelFxDone(text, bannerText) {
+  const r = document.getElementById("fxResult"); if (r) { r.textContent = text; r.classList.add("is-shown"); }
+  if (navigator.vibrate) navigator.vibrate([20, 40, 20]);
+  duelShowBanner(bannerText, 4000);
+  duelFxTimer = setTimeout(duelFxClose, 3200);
+}
+function duelCoin() {
+  const res = duelRnd(2), fx = duelFxShow(`<div class="fx-stage"><div class="fx-shadow" id="fxShadow"></div><div class="fx-coin" id="fxCoin"><div class="fx-coin-face fx-front"><b>👑</b><span>Kopf</span></div><div class="fx-coin-face fx-back"><b>1</b><span>Zahl</span></div></div></div><div class="fx-result" id="fxResult" role="status"></div>`);
+  const coin = fx.querySelector("#fxCoin"), shadow = fx.querySelector("#fxShadow"), turns = 1800 + (res ? 180 : 0), d = duelReduceMotion() ? 1 : 2000;
+  shadow.animate([{ transform: "scale(.9)", opacity: .5 }, { transform: "scale(.45)", opacity: .2, offset: .5 }, { transform: "scale(1)", opacity: .5 }], { duration: d, easing: "ease-in-out", fill: "forwards" });
+  coin.animate([{ transform: "translateY(0) scale(1) rotateY(0deg)" }, { transform: `translateY(-170px) scale(1.3) rotateY(${turns / 2}deg)`, offset: .5, easing: "cubic-bezier(.4,0,.6,1)" }, { transform: `translateY(0) scale(1) rotateY(${turns}deg)` }], { duration: d, easing: "cubic-bezier(.3,.7,.4,1)", fill: "forwards" }).onfinish = () => duelFxDone(res ? "Zahl" : "Kopf", "🪙 Münzwurf: " + (res ? "Zahl" : "Kopf"));
+}
+function duelDice() {
+  const res = duelRnd(6) + 1, pips = { 1: [5], 2: [1, 9], 3: [1, 5, 9], 4: [1, 3, 7, 9], 5: [1, 3, 5, 7, 9], 6: [1, 3, 4, 6, 7, 9] };
+  const face = n => `<div class="fx-die-face f${n}">${Array.from({ length: 9 }, (_, i) => pips[n].includes(i + 1) ? '<i class="pip"></i>' : "<i></i>").join("")}</div>`;
+  const fx = duelFxShow(`<div class="fx-stage"><div class="fx-shadow" id="fxShadow"></div><div class="fx-dice-wrap" id="fxWrap"><div class="fx-dice" id="fxDice">${[1, 2, 3, 4, 5, 6].map(face).join("")}</div></div></div><div class="fx-result" id="fxResult" role="status"></div>`);
+  const target = { 1: [0, 0], 2: [0, -90], 3: [-90, 0], 4: [90, 0], 5: [0, 90], 6: [0, 180] }[res], d = duelReduceMotion() ? 1 : 1900;
+  fx.querySelector("#fxShadow").animate([{ transform: "scale(.5)", opacity: .15 }, { transform: "scale(1)", opacity: .5, offset: .45 }, { transform: "scale(.8)", opacity: .35, offset: .62 }, { transform: "scale(1)", opacity: .5 }], { duration: d, fill: "forwards" });
+  fx.querySelector("#fxWrap").animate([{ transform: "translateY(-280px)" }, { transform: "translateY(0)", offset: .45, easing: "ease-in" }, { transform: "translateY(-70px)", offset: .62, easing: "ease-out" }, { transform: "translateY(0)", offset: .78, easing: "ease-in" }, { transform: "translateY(-14px)", offset: .88, easing: "ease-out" }, { transform: "translateY(0)" }], { duration: d, fill: "forwards" });
+  fx.querySelector("#fxDice").animate([{ transform: `rotateX(${target[0] - 720}deg) rotateY(${target[1] - 540}deg)` }, { transform: `rotateX(${target[0]}deg) rotateY(${target[1]}deg)` }], { duration: d, easing: "cubic-bezier(.2,.7,.3,1)", fill: "forwards" }).onfinish = () => duelFxDone(String(res), "🎲 Würfel: " + res);
+}
+document.addEventListener("keydown", e => { if (e.key === "Escape" && document.getElementById("duelFxOverlay")?.style.display === "flex") { duelFxClose(); e.stopImmediatePropagation(); } }, true);
+function yugiohCalcQuick(v) {
+  yugiohCalcEquals();
+  const cur = Number(activeYugiohCalculatorExpression);
+  if (!Number.isFinite(cur)) return;
+  activeYugiohCalculatorExpression = String(Math.max(0, v === "half" ? Math.ceil(cur / 2) : cur + v));
+  yugiohCalculatorDisplay.textContent = activeYugiohCalculatorExpression;
+}
 function duelRematch() {
   if (!confirm("Alle Lebenspunkte auf 8000 zurücksetzen und neu starten?")) return;
   activeYugiohDuelPlayers.forEach(p => { p.lifePoints = 8000; p.lifeHistory = [{ type: "initial", label: "Startwert", from: null, to: 8000, expression: "8000", timestamp: Date.now() }]; });
@@ -6999,18 +7072,18 @@ function renderDuelSetup() {
   const st = duelSetup, box = document.getElementById("duelSetupBox"), teams = st.mode === "teams";
   const seg = (key, opts) => `<div class="ds-seg" role="group">${opts.map(([v, l]) => `<button type="button" class="${st[key] === v ? "is-active" : ""}" aria-pressed="${st[key] === v}" onclick="duelSetupSet('${key}',${typeof v === "string" ? `'${v}'` : v})">${l}</button>`).join("")}</div>`;
   const used = new Set(st.teams), valid = Array.from({ length: st.teamCount }, (_, i) => used.has(i)).every(Boolean);
-  let html = `<h3 id="duelSetupTitle">⚔️ Duell einrichten</h3><p class="ds-hint">${st.n} Spieler – wie soll gespielt werden?</p>
-    <div class="ds-group"><div class="ds-label">Spielmodus</div>${seg("mode", [["solo", "Jeder für sich"], ["teams", "Teams"]])}</div>`;
+  let body = `<div class="ds-group"><div class="ds-label">Spielmodus</div>${seg("mode", [["solo", "Jeder für sich"], ["teams", "Teams"]])}</div>`;
   if (teams) {
-    html += `<div class="ds-group"><div class="ds-label">Anzahl Teams</div>${seg("teamCount", DUEL_TEAM_OPTIONS[st.n].map(c => [c, `${c} Teams`]))}</div>
+    body += `<div class="ds-group"><div class="ds-label">Anzahl Teams</div>${seg("teamCount", DUEL_TEAM_OPTIONS[st.n].map(c => [c, `${c} Teams`]))}</div>
     <div class="ds-group"><div class="ds-label">Lebenspunkte</div>${seg("shared", [[true, "Gemeinsam pro Team"], [false, "Pro Spieler einzeln"]])}
       <p class="ds-hint">${st.shared ? "Jedes Team hat zusammen 8000 LP." : "Jeder Spieler hat 8000 LP. Ein Team gewinnt, wenn alle Gegner besiegt sind."}</p></div>
     <div class="ds-group"><div class="ds-label">Team-Zuordnung</div><div class="ds-rows">${activeYugiohAssignments.map((a, i) => `<label class="ds-row"><span class="ds-name">${escapeHtml(a.playerName)}</span>
       <select class="ds-team-select" data-team="${st.teams[i] % 4}" onchange="duelSetupTeam(${i},this.value)" aria-label="Team für ${escapeHtml(a.playerName)}">${Array.from({ length: st.teamCount }, (_, t) => `<option value="${t}" ${st.teams[i] === t ? "selected" : ""}>Team ${t + 1}</option>`).join("")}</select></label>`).join("")}</div>
       ${valid ? "" : '<p class="ds-error">Jedes Team braucht mindestens einen Spieler.</p>'}</div>`;
   }
-  html += `<div class="ds-actions"><button type="button" class="ds-cancel" onclick="duelSetupCancel()">Zurück</button><button type="button" class="ds-start" onclick="duelSetupStart()" ${teams && !valid ? "disabled" : ""}>⚔️ Duell starten</button></div>`;
-  box.innerHTML = html;
+  box.innerHTML = `<div class="ds-head"><h3 id="duelSetupTitle">⚔️ Duell einrichten</h3><p class="ds-hint">${st.n} Spieler – wie soll gespielt werden?</p></div>
+    <div class="ds-body">${body}</div>
+    <div class="ds-actions"><button type="button" class="ds-cancel" onclick="duelSetupCancel()">Zurück</button><button type="button" class="ds-start" onclick="duelSetupStart()" ${teams && !valid ? "disabled" : ""}>⚔️ Duell starten</button></div>`;
 }
 
 /* Auth */
