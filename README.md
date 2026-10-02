@@ -1,5 +1,28 @@
 # Serien
 
+## Desktop-App und Android-APK
+
+Die Apps laden die veröffentlichte Webseite `https://keinsuchti.github.io/` in einer
+Desktop- bzw. Android-Webview. Eine Internetverbindung ist erforderlich; Anmeldung,
+Konten und Passwort-Links verwenden weiterhin die vorhandene Webseite.
+
+Die Builds starten automatisch bei Änderungen an den App-Dateien auf `main` oder lassen
+sich unter **Actions > Build desktop app and Android APK > Run workflow** manuell starten.
+Nach einem erfolgreichen Lauf können der Windows-Installer und die Android-Debug-APK unter
+**Actions > Artifacts** heruntergeladen werden. Die APK ist nicht für den Play Store signiert.
+
+Für lokale Builds Node.js 20 oder neuer installieren und im Projektordner ausführen:
+
+```sh
+npm install
+npm run build:desktop
+npm run app:android:add
+npm run app:android:sync
+```
+
+Den Android-Build anschließend im erzeugten `android`-Projekt mit Android Studio oder
+`gradlew assembleDebug` erstellen. Dafür werden außerdem JDK 21 und das Android SDK benötigt.
+
 ## Supabase-Konten einrichten
 
 Für Registrierungslinks, Nutzernamen-Login, Kontoverwaltung und Rollenverwaltung zuerst
