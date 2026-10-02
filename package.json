@@ -6,7 +6,7 @@
   "main": "desktop/main.cjs",
   "scripts": {
     "app:desktop": "electron .",
-    "build:desktop": "electron-builder --win nsis",
+    "build:desktop": "electron-builder --win nsis --publish never",
     "app:android:add": "cap add android",
     "app:android:sync": "cap sync android"
   },
