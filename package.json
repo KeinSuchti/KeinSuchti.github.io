@@ -1,0 +1,36 @@
+{
+  "name": "watch-feast-and-game-app",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Desktop- und Android-App für Watch, Feast and Game",
+  "main": "desktop/main.cjs",
+  "scripts": {
+    "app:desktop": "electron .",
+    "build:desktop": "electron-builder --win nsis",
+    "app:android:add": "cap add android",
+    "app:android:sync": "cap sync android"
+  },
+  "dependencies": {
+    "@capacitor/android": "^7.4.3",
+    "@capacitor/core": "^7.4.3"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^7.4.3",
+    "electron": "^37.3.0",
+    "electron-builder": "^26.0.12"
+  },
+  "build": {
+    "appId": "de.keinsuchti.watchfeastandgame",
+    "productName": "Watch, Feast and Game",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "desktop/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": "nsis"
+    }
+  }
+}

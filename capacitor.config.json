@@ -1,0 +1,12 @@
+{
+  "appId": "de.keinsuchti.watchfeastandgame",
+  "appName": "Watch, Feast and Game",
+  "webDir": "app",
+  "server": {
+    "url": "https://keinsuchti.github.io/",
+    "cleartext": false,
+    "allowNavigation": [
+      "keinsuchti.github.io"
+    ]
+  }
+}
