@@ -7449,15 +7449,11 @@ function applyYugiohCalculator() {
 
 /* ===== Battle Arena: Zusatzfunktionen ===== */
 let duelUndoStack = [], duelWakeLock = null, duelBannerTimer = null, duelLifePointSoundRun = 0;
-let duelMusicResumeAfterSound = false, duelMusicStopTimer = null, duelMusicStoppedAfterWinner = false;
+let duelMusicResumeAfterSound = false;
 const duelRnd = n => { const a = new Uint32Array(1); crypto.getRandomValues(a); return a[0] % n; };
 function pauseDuelBackgroundMusicForSound() {
   const music = document.getElementById("duelBackgroundAudio");
   if (!music.paused) {
-    if (duelMusicStopTimer !== null) {
-      clearTimeout(duelMusicStopTimer);
-      duelMusicStopTimer = null;
-    }
     music.pause();
     duelMusicResumeAfterSound = true;
   }
@@ -7470,47 +7466,23 @@ function resumeDuelBackgroundMusicAfterSound() {
     );
     if (anotherSoundIsPlaying) return;
     duelMusicResumeAfterSound = false;
-    if (yugiohDuelOverlay.style.display === "flex" && !duelMusicStoppedAfterWinner) {
+    if (yugiohDuelOverlay.style.display === "flex") {
       const music = document.getElementById("duelBackgroundAudio");
       void music.play().catch(error => console.warn("Battle-Arena-Hintergrundmusik konnte nicht fortgesetzt werden:", error));
-      if (document.getElementById("duelBanner")?.dataset.kind === "winner") {
-        scheduleDuelBackgroundMusicStop();
-      }
     }
   }, 0);
 }
 function startDuelBackgroundMusic() {
-  clearTimeout(duelMusicStopTimer);
-  duelMusicStopTimer = null;
-  duelMusicStoppedAfterWinner = false;
   duelMusicResumeAfterSound = false;
   const music = document.getElementById("duelBackgroundAudio");
   music.currentTime = 0;
   void music.play().catch(error => console.warn("Battle-Arena-Hintergrundmusik konnte nicht abgespielt werden:", error));
 }
 function stopDuelBackgroundMusic() {
-  clearTimeout(duelMusicStopTimer);
-  duelMusicStopTimer = null;
-  duelMusicStoppedAfterWinner = false;
   duelMusicResumeAfterSound = false;
   const music = document.getElementById("duelBackgroundAudio");
   music.pause();
   music.currentTime = 0;
-}
-function scheduleDuelBackgroundMusicStop() {
-  const anotherSoundIsPlaying = [...document.querySelectorAll("audio")].some(audio =>
-    audio.id !== "duelBackgroundAudio" && !audio.paused && !audio.ended
-  );
-  if (anotherSoundIsPlaying) return;
-  clearTimeout(duelMusicStopTimer);
-  duelMusicStopTimer = setTimeout(() => {
-    const music = document.getElementById("duelBackgroundAudio");
-    music.pause();
-    music.currentTime = 0;
-    duelMusicResumeAfterSound = false;
-    duelMusicStoppedAfterWinner = true;
-    duelMusicStopTimer = null;
-  }, 10000);
 }
 document.addEventListener("play", event => {
   if (event.target instanceof HTMLAudioElement && event.target.id !== "duelBackgroundAudio") {
@@ -7587,17 +7559,7 @@ function updateDuelBanner(force) {
         text = `🏆 Team ${tid + 1} (${members}) gewinnt!`;
       } else text = `🏆 ${alive[0].playerName} gewinnt!`;
     }
-    scheduleDuelBackgroundMusicStop();
     el.textContent = text; el.dataset.kind = "winner"; el.hidden = false; return;
-  }
-  if (duelMusicStopTimer !== null) {
-    clearTimeout(duelMusicStopTimer);
-    duelMusicStopTimer = null;
-  }
-  if (duelMusicStoppedAfterWinner) {
-    duelMusicStoppedAfterWinner = false;
-    const music = document.getElementById("duelBackgroundAudio");
-    void music.play().catch(error => console.warn("Battle-Arena-Hintergrundmusik konnte nicht fortgesetzt werden:", error));
   }
   if (el.dataset.kind === "winner" || force) { el.hidden = true; el.dataset.kind = ""; }
 }
