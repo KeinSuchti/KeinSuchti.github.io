@@ -7320,7 +7320,7 @@ function startYugiohDuel(cfg = { mode: "solo" }) {
   }));
   applyDuelTeams(cfg);
   duelUndoStack = [];
-  renderYugiohDuelArena();
+  renderYugiohDuelArena({ animateLifePoints: false });
   yugiohDuelOverlay.style.display = "flex";
   duelRequestWakeLock();
   document.documentElement.classList.add("duel-open");
@@ -7329,8 +7329,14 @@ function startYugiohDuel(cfg = { mode: "solo" }) {
   if (duelCloseButton && duelCloseButton.offsetParent !== null) duelCloseButton.focus({ preventScroll: true });
 }
 
-function renderYugiohDuelArena() {
+function renderYugiohDuelArena({ animateLifePoints = true } = {}) {
   const previousScroll = yugiohDuelArena.scrollTop;
+  const previousValues = [...yugiohDuelArena.querySelectorAll(".duel-life-number")]
+    .map(element => Number(element.dataset.value));
+  if (!animateLifePoints) {
+    duelLifePointAnimationFrames.forEach(frame => cancelAnimationFrame(frame));
+    duelLifePointAnimationFrames.clear();
+  }
   yugiohDuelArena.replaceChildren();
   yugiohDuelArena.dataset.count = String(activeYugiohDuelPlayers.length);
   activeYugiohDuelPlayers.forEach((player, index) => {
@@ -7345,11 +7351,16 @@ function renderYugiohDuelArena() {
     const lifeDisplay = document.createElement("div"); lifeDisplay.className = "duel-life-display"; lifeDisplay.setAttribute("role", "button"); lifeDisplay.setAttribute("tabindex", "0"); lifeDisplay.setAttribute("aria-label", `Lebenspunkte von ${player.playerName} ändern`); lifeDisplay.title = "Klicken, um die Lebenspunkte zu ändern";
     lifeDisplay.onclick = () => openYugiohCalculator(index);
     lifeDisplay.onkeydown = event => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); openYugiohCalculator(index); } };
-    const lifeNumber = document.createElement("div"); lifeNumber.className = "duel-life-number"; lifeNumber.textContent = player.lifePoints.toLocaleString("de-DE");
+    const lifeNumber = document.createElement("div"); lifeNumber.className = "duel-life-number";
+    const previousValue = previousValues[index];
+    const shouldAnimateLifePoints = animateLifePoints && Number.isFinite(previousValue) && previousValue !== player.lifePoints;
+    lifeNumber.dataset.value = String(shouldAnimateLifePoints ? previousValue : player.lifePoints);
+    lifeNumber.textContent = Number(lifeNumber.dataset.value).toLocaleString("de-DE");
     const lifeCaption = document.createElement("div"); lifeCaption.className = "duel-life-caption"; lifeCaption.textContent = "Lebenspunkte · klicken zum Ändern";
     const meter = document.createElement("div"); meter.className = "duel-life-meter";
     const meterFill = document.createElement("span"); meterFill.style.width = Math.max(0, Math.min(100, player.lifePoints / 8000 * 100)) + "%"; meter.appendChild(meterFill);
     lifeDisplay.append(lifeNumber, lifeCaption, meter);
+    if (shouldAnimateLifePoints) animateDuelLifePoints(lifeNumber, index, previousValue, player.lifePoints);
     const status = document.createElement("div"); status.className = "duel-status"; status.textContent = defeated ? "Im Reich der Schatten" : "Im Spiel";
     const history = document.createElement("div"); history.className = "duel-history" + (player.historyOpen ? " is-open" : "");
     const changeCount = (player.lifeHistory || []).filter(entry => entry.type !== "initial").length;
@@ -7496,6 +7507,34 @@ function duelUndo() {
 }
 let duelFxTimer = null;
 const duelReduceMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const duelLifePointAnimationFrames = new Map();
+function animateDuelLifePoints(element, index, from, to) {
+  const previousFrame = duelLifePointAnimationFrames.get(index);
+  if (previousFrame) cancelAnimationFrame(previousFrame);
+  if (from === to || duelReduceMotion()) {
+    element.dataset.value = String(to);
+    element.textContent = to.toLocaleString("de-DE");
+    duelLifePointAnimationFrames.delete(index);
+    return;
+  }
+
+  const soundDuration = document.getElementById("duelLifePointAudio").duration;
+  const duration = Number.isFinite(soundDuration) && soundDuration > 0 ? soundDuration * 1000 : 650;
+  const startedAt = performance.now();
+  const tick = now => {
+    const progress = Math.min(1, (now - startedAt) / duration);
+    const easedProgress = 1 - Math.pow(1 - progress, 3);
+    const value = Math.round(from + (to - from) * easedProgress);
+    element.dataset.value = String(value);
+    element.textContent = value.toLocaleString("de-DE");
+    if (progress < 1) {
+      duelLifePointAnimationFrames.set(index, requestAnimationFrame(tick));
+    } else {
+      duelLifePointAnimationFrames.delete(index);
+    }
+  };
+  duelLifePointAnimationFrames.set(index, requestAnimationFrame(tick));
+}
 function duelFxClose() { clearTimeout(duelFxTimer); const fx = document.getElementById("duelFxOverlay"); if (fx) { fx.style.display = "none"; fx.innerHTML = ""; } }
 function duelFxShow(html) { const fx = document.getElementById("duelFxOverlay"); clearTimeout(duelFxTimer); fx.innerHTML = html + '<div class="fx-tap">Tippen zum Schließen</div>'; fx.style.display = "flex"; return fx; }
 function duelFxDone(text, bannerText) {
