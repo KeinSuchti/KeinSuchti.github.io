@@ -4946,8 +4946,13 @@ button:not(:disabled):active{transform:scale(.98)}
 .yugioh-chips{display:flex;flex-wrap:wrap;gap:7px}
 .yugioh-chip{display:inline-flex;align-items:center;gap:7px;padding:4px 10px;border-radius:999px;border:1px solid rgba(101,141,207,.26);background:rgba(28,46,69,.62);color:#d4e0f0;font-size:13px;font-weight:600;max-width:100%}
 .yugioh-chip.is-empty{opacity:.6;font-style:italic}
-.yugioh-category-select{width:auto!important;max-width:100%;min-height:30px;margin:0!important;padding:2px 24px 2px 8px!important;border:0!important;border-radius:7px!important;background:transparent!important;color:inherit!important;font-size:13px!important;font-weight:700;cursor:pointer}
-.yugioh-category-select:focus-visible{outline:2px solid var(--accent-2);outline-offset:1px}
+.yugioh-category-chip,.yugioh-category-chip.is-empty{gap:8px;padding:5px 9px;border-color:rgba(101,226,215,.22);background:rgba(21,48,64,.72);color:#b8d7dd;font-style:normal;opacity:1}
+.yugioh-category-label{white-space:nowrap;font-size:12px;font-weight:700}
+.yugioh-category-select{width:auto!important;min-width:142px;max-width:100%;min-height:38px;margin:0!important;padding:6px 30px 6px 10px!important;border:1px solid rgba(101,226,215,.3)!important;border-radius:9px!important;background:var(--surface-2)!important;color:var(--text)!important;font-size:13px!important;font-weight:700;line-height:1.2;cursor:pointer;color-scheme:dark}
+.yugioh-category-select:hover:not(:disabled){border-color:rgba(101,226,215,.62)!important;background:var(--surface-3)!important}
+.yugioh-category-select option{background:var(--surface-2);color:var(--text)}
+.yugioh-category-select:focus-visible{outline:2px solid var(--accent-2);outline-offset:2px}
+.yugioh-category-select:disabled{opacity:.65;cursor:wait}
 .yugioh-swatch{width:12px;height:12px;border-radius:50%;border:1.5px solid rgba(255,255,255,.55);flex:0 0 12px}
 button.yugioh-image-placeholder{width:100%;height:100%;margin:0;border:2px dashed rgba(101,141,207,.35);border-radius:inherit;background:transparent;color:#8ea3c2;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:26px}
 button.yugioh-image-placeholder small{font-size:11px;font-weight:700}
@@ -12426,7 +12431,10 @@ function renderYugiohDecks() {
     const deckCategories = normalizeYugiohCategories(deck.category);
     const categoryChip = document.createElement("label");
     categoryChip.className = "yugioh-chip yugioh-category-chip" + (deckCategories.length ? "" : " is-empty");
-    categoryChip.appendChild(document.createTextNode("🏷️ "));
+    const categoryLabel = document.createElement("span");
+    categoryLabel.className = "yugioh-category-label";
+    categoryLabel.textContent = "🏷️ Kategorie";
+    categoryChip.appendChild(categoryLabel);
     const categorySelect = document.createElement("select");
     categorySelect.className = "yugioh-category-select";
     categorySelect.setAttribute("aria-label", `Kategorie für ${name}`);
