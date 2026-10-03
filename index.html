@@ -4946,6 +4946,8 @@ button:not(:disabled):active{transform:scale(.98)}
 .yugioh-chips{display:flex;flex-wrap:wrap;gap:7px}
 .yugioh-chip{display:inline-flex;align-items:center;gap:7px;padding:4px 10px;border-radius:999px;border:1px solid rgba(101,141,207,.26);background:rgba(28,46,69,.62);color:#d4e0f0;font-size:13px;font-weight:600;max-width:100%}
 .yugioh-chip.is-empty{opacity:.6;font-style:italic}
+.yugioh-category-select{width:auto!important;max-width:100%;min-height:30px;margin:0!important;padding:2px 24px 2px 8px!important;border:0!important;border-radius:7px!important;background:transparent!important;color:inherit!important;font-size:13px!important;font-weight:700;cursor:pointer}
+.yugioh-category-select:focus-visible{outline:2px solid var(--accent-2);outline-offset:1px}
 .yugioh-swatch{width:12px;height:12px;border-radius:50%;border:1.5px solid rgba(255,255,255,.55);flex:0 0 12px}
 button.yugioh-image-placeholder{width:100%;height:100%;margin:0;border:2px dashed rgba(101,141,207,.35);border-radius:inherit;background:transparent;color:#8ea3c2;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:26px}
 button.yugioh-image-placeholder small{font-size:11px;font-weight:700}
@@ -12422,9 +12424,29 @@ function renderYugiohDecks() {
     if (col) { const sw=document.createElement("i"); sw.className="yugioh-swatch"; sw.style.background=col; sw.setAttribute("aria-hidden","true"); sleeveChip.appendChild(sw); }
     sleeveChip.appendChild(document.createTextNode(deck.sleeve_color ? "Hüllen: " + deck.sleeve_color : "keine Hüllenfarbe"));
     const deckCategories = normalizeYugiohCategories(deck.category);
-    const categoryChip = document.createElement("span");
-    categoryChip.className = "yugioh-chip" + (deckCategories.length ? "" : " is-empty");
-    categoryChip.textContent = "🏷️ " + (deckCategories.length ? deckCategories.join(", ") : "keine Kategorie");
+    const categoryChip = document.createElement("label");
+    categoryChip.className = "yugioh-chip yugioh-category-chip" + (deckCategories.length ? "" : " is-empty");
+    categoryChip.appendChild(document.createTextNode("🏷️ "));
+    const categorySelect = document.createElement("select");
+    categorySelect.className = "yugioh-category-select";
+    categorySelect.setAttribute("aria-label", `Kategorie für ${name}`);
+    categorySelect.title = "Kategorie direkt in der Liste ändern";
+    const categoryOptions = [{ value: "", label: "Keine Kategorie" }, ...YUGIOH_CATEGORIES.map(category => ({ value: category, label: category }))];
+    const currentCategory = deckCategories[0] || "";
+    if (currentCategory && !YUGIOH_CATEGORIES.includes(currentCategory)) {
+      categoryOptions.push({ value: currentCategory, label: `${currentCategory} (bisherig)` });
+    }
+    categoryOptions.forEach(({ value, label }) => {
+      const option = document.createElement("option");
+      option.value = value;
+      option.textContent = label;
+      categorySelect.appendChild(option);
+    });
+    categorySelect.value = currentCategory;
+    categorySelect.addEventListener("click", event => event.stopPropagation());
+    categorySelect.addEventListener("dblclick", event => event.stopPropagation());
+    categorySelect.addEventListener("change", () => updateYugiohDeckCategory(deck.id, categorySelect));
+    categoryChip.appendChild(categorySelect);
     chips.append(ownerChip, sleeveChip, categoryChip);
 
     const actions = document.createElement("div");
@@ -12439,6 +12461,30 @@ function renderYugiohDecks() {
     card.appendChild(main);
     yugiohDeckList.appendChild(card);
   });
+}
+
+async function updateYugiohDeckCategory(deckId, select) {
+  const deck = yugiohDecks.find(entry => entry.id === deckId);
+  if (!deck) return;
+  const previousCategory = deck.category || "";
+  const category = select.value;
+  if (category === previousCategory) return;
+
+  select.disabled = true;
+  const { error } = await supabaseClient
+    .from("yugioh_decks")
+    .update({ category })
+    .eq("id", deckId);
+  select.disabled = false;
+
+  if (error) {
+    select.value = previousCategory;
+    showSupabaseError("Fehler beim Ändern der Deck-Kategorie", error);
+    return;
+  }
+
+  deck.category = category;
+  renderYugiohDecks();
 }
 
 function getSelectedYugiohOwners() {
