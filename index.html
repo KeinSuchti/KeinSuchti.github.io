@@ -5613,7 +5613,7 @@ body.app-scene .skip-link:focus{left:12px}
           <div id="customListCards" class="custom-list-cards"></div>
           <button class="dashboard-card card-custom-list" type="button" onclick="openCreateListDialog()">
             <div class="dashboard-card-image custom-list-image" aria-hidden="true"></div>
-            <div class="dashboard-card-body"><span class="card-icon">✦</span><div><h3>Neue Liste</h3><p>Eigene Liste mit Sortierung, Filtern und Zufallsauswahl anlegen.</p></div></div>
+            <div class="dashboard-card-body"><span class="card-icon">✦</span><div><h3>Neue Liste</h3><p>Leere Liste erstellen oder eine bestehende ohne Einträge kopieren.</p></div></div>
           </button>
         </div>
       </main>
@@ -6095,6 +6095,8 @@ body.app-scene .skip-link:focus{left:12px}
   <div class="popup-box create-list-dialog-box">
     <h3>✦ Neue Liste anlegen</h3>
     <p>Die Liste wird in Supabase gespeichert und kann später erweitert werden.</p>
+    <label class="edit-field"><span>Erstellen aus</span><select id="newListTemplate" onchange="applyCustomListTemplate()"><option value="">Leere Liste erstellen</option></select></label>
+    <p>Beim Kopieren werden nur Name, Beschreibung und Einstellungen übernommen. Einträge werden nicht kopiert.</p>
     <label class="edit-field"><span>Name der Liste</span><input id="newListName" placeholder="z. B. Reiseziele"></label>
     <label class="edit-field"><span>Beschreibung</span><input id="newListDescription" placeholder="Wofür ist diese Liste gedacht?"></label>
     <label class="edit-field"><span>Standardsortierung</span><select id="newListSort"><option value="created_desc">Neueste zuerst</option><option value="name_asc">Name A–Z</option><option value="rating_desc">Bewertung zuerst</option></select></label>
@@ -7006,8 +7008,25 @@ function saveListSettings() {
 }
 function openCreateListDialog() {
   if (!currentUser) { showLogin(); return; }
+  const templateSelect = document.getElementById("newListTemplate");
+  templateSelect.replaceChildren(new Option("Leere Liste erstellen", ""));
+  customLists.forEach(list => templateSelect.add(new Option(list.name, list.id)));
+  templateSelect.value = "";
+  document.getElementById("newListName").value = "";
+  document.getElementById("newListDescription").value = "";
+  document.getElementById("newListSort").value = "created_desc";
+  document.getElementById("newListFilter").value = "all";
+  document.getElementById("newListRandom").value = "all";
   document.getElementById("createListDialog").style.display = "flex";
   document.getElementById("newListName").focus();
+}
+function applyCustomListTemplate() {
+  const template = customLists.find(list => list.id === document.getElementById("newListTemplate").value);
+  document.getElementById("newListName").value = template ? `${template.name} (Kopie)` : "";
+  document.getElementById("newListDescription").value = template?.description || "";
+  document.getElementById("newListSort").value = template?.sort_mode || "created_desc";
+  document.getElementById("newListFilter").value = template?.filter_mode || "all";
+  document.getElementById("newListRandom").value = template?.random_mode || "all";
 }
 function closeCreateListDialog() {
   document.getElementById("createListDialog").style.display = "none";
