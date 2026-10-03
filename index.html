@@ -4688,6 +4688,7 @@ body.color-vision-mode .beer-grade-slider::-moz-range-thumb {
 .duel-player-card.is-defeated .duel-life-display { background:radial-gradient(circle at 50% 48%,rgba(127,65,108,.84),rgba(69,32,86,.96) 58%,rgba(29,12,42,1) 100%); }
 .duel-player-card.is-defeated .duel-life-number { color:#ff776e; text-shadow:3px 4px 0 #1e060b,0 0 14px rgba(255,67,67,.7); }
 .duel-status { min-height:18px; color:#69dfd4; font-size:11px; font-weight:800; text-align:center; }
+.duel-player-card.is-defeated .duel-status { overflow-wrap:anywhere; }
 .duel-player-card.is-defeated .duel-status { color:#ff9289; }
 .duel-history { display:grid; gap:5px; margin-top:1px; padding-top:10px; border-top:1px solid rgba(117,151,210,.2); }
 .duel-history-title { color:#86a5d0; font-size:10px; font-weight:800; letter-spacing:.09em; text-transform:uppercase; }
@@ -4811,6 +4812,10 @@ html.duel-open, html.duel-open body { overflow:hidden; }
 @media (max-width:900px) and (min-height:650px) {
   .duel-arena { overflow:hidden; }
   .duel-player-card { min-height:0; }
+}
+@supports (font-size:1cqi) {
+  .duel-life-display { container-type:inline-size; }
+  .duel-life-number { max-width:100%; white-space:nowrap; font-size:clamp(14px,16cqi,88px)!important; letter-spacing:0; line-height:1; }
 }
 @media (prefers-reduced-motion:reduce) { .calculator-box { animation:none; } }
 /* ===== Lokaler Termin-Testmodus / UX-Überarbeitung ===== */
@@ -7318,7 +7323,7 @@ function renderYugiohDuelArena() {
     const meter = document.createElement("div"); meter.className = "duel-life-meter";
     const meterFill = document.createElement("span"); meterFill.style.width = Math.max(0, Math.min(100, player.lifePoints / 8000 * 100)) + "%"; meter.appendChild(meterFill);
     lifeDisplay.append(lifeNumber, lifeCaption, meter);
-    const status = document.createElement("div"); status.className = "duel-status"; status.textContent = defeated ? "Verloren" : "Im Spiel";
+    const status = document.createElement("div"); status.className = "duel-status"; status.textContent = defeated ? "Im Reich der Schatten" : "Im Spiel";
     const history = document.createElement("div"); history.className = "duel-history" + (player.historyOpen ? " is-open" : "");
     const changeCount = (player.lifeHistory || []).filter(entry => entry.type !== "initial").length;
     const historyTitle = document.createElement("button"); historyTitle.type = "button"; historyTitle.className = "duel-history-toggle"; historyTitle.textContent = "Änderungsverlauf" + (changeCount ? " (" + changeCount + ")" : "");
