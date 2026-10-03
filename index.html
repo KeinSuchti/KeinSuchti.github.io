@@ -4928,7 +4928,7 @@ button:not(:disabled):active{transform:scale(.98)}
 .poll-save-button.is-dirty{box-shadow:0 0 0 3px rgba(255,196,64,.45),0 10px 28px rgba(0,0,0,.32)}
 .availability-day-details .day-warn{color:#ffd58a}.availability-day-details .day-ok{color:#9ff1c7}
 /* ===== Yu-Gi-Oh!: UI/UX-Optimierung ===== */
-.yugioh-add-form{display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:10px;align-items:center}
+.yugioh-add-form{display:grid;grid-template-columns:2fr 1fr 1fr 1fr auto;gap:10px;align-items:center}
 .yugioh-add-form button{width:auto;margin:0;white-space:nowrap}
 .yugioh-player-panel>summary{cursor:pointer;list-style:none;font-weight:800;font-size:16px;display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;min-height:36px}
 .yugioh-player-panel>summary::-webkit-details-marker{display:none}
@@ -4970,9 +4970,11 @@ button.yugioh-image-placeholder:hover{border-color:rgba(101,226,215,.7);color:#d
 @media(max-width:520px){.number-stepper{grid-template-columns:56px minmax(72px,1fr) 56px;width:100%}.number-stepper .stepper-btn{min-height:52px;font-size:26px}}
 /* ===== Yu-Gi-Oh! mobil ===== */
 @media(max-width:760px){
-  .yugioh-filter-bar{display:grid!important;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"label count" "drop drop" "search sort";gap:8px!important;padding:10px!important}
-  .yugioh-filter-bar>label{grid-area:label}
-  .yugioh-filter-bar .yugioh-filter-dropdown{grid-area:drop;width:100%!important}
+  .yugioh-filter-bar{display:grid!important;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"owner-label count" "owner owner" "category-label category-label" "category category" "search sort";gap:8px!important;padding:10px!important}
+  .yugioh-filter-bar .yugioh-owner-filter-label{grid-area:owner-label}
+  .yugioh-filter-bar .yugioh-category-filter-label{grid-area:category-label}
+  .yugioh-filter-bar .yugioh-owner-filter-dropdown{grid-area:owner;width:100%!important}
+  .yugioh-filter-bar .yugioh-category-filter-dropdown{grid-area:category;width:100%!important}
   .yugioh-filter-bar .yugioh-search{grid-area:search;flex:none!important;width:100%;height:40px;min-height:40px;padding:0 12px;border-radius:12px;font-size:16px!important}
   .yugioh-filter-bar .yugioh-sort{grid-area:sort;flex:none!important;width:auto;height:40px;min-height:40px;padding:0 10px;border-radius:12px;font-size:14px!important}
   .yugioh-filter-bar .yugioh-count{grid-area:count;justify-self:end;font-size:12px}
@@ -5730,8 +5732,9 @@ body.app-scene .skip-link:focus{left:12px}
         <input id="newYugiohTheme" placeholder="Thema / Deckname" aria-label="Thema / Deckname" enterkeyhint="next">
         <input id="newYugiohSleeveColor" list="yugiohSleeveOptions" placeholder="Hüllenfarbe" aria-label="Hüllenfarbe" enterkeyhint="next">
         <input id="newYugiohOwner" list="yugiohOwnerOptions" placeholder="Besitzer" aria-label="Besitzer" enterkeyhint="done">
+        <input id="newYugiohCategory" list="yugiohCategoryOptions" placeholder="Kategorie" aria-label="Kategorie" enterkeyhint="done">
         <button type="submit" id="addYugiohButton">➕ Deck hinzufügen</button>
-        <datalist id="yugiohSleeveOptions"></datalist><datalist id="yugiohOwnerOptions"></datalist>
+        <datalist id="yugiohSleeveOptions"></datalist><datalist id="yugiohOwnerOptions"></datalist><datalist id="yugiohCategoryOptions"></datalist>
       </form>
 
       <details class="yugioh-player-panel">
@@ -5753,10 +5756,15 @@ body.app-scene .skip-link:focus{left:12px}
       </details>
 
       <div class="yugioh-filter-bar">
-        <label for="yugiohOwnerFilterToggle">Besitzer filtern:</label>
-        <div class="yugioh-filter-dropdown">
+        <label class="yugioh-owner-filter-label" for="yugiohOwnerFilterToggle">Besitzer filtern:</label>
+        <div class="yugioh-filter-dropdown yugioh-owner-filter-dropdown">
           <button type="button" id="yugiohOwnerFilterToggle" class="yugioh-filter-dropdown-toggle" aria-expanded="false" aria-controls="yugiohOwnerFilter" onclick="toggleYugiohOwnerFilter(event)">Besitzer auswählen <span id="yugiohOwnerFilterSummary">Alle Besitzer</span> ▾</button>
           <div id="yugiohOwnerFilter" class="yugioh-owner-filter-select yugioh-filter-dropdown-menu" role="group" aria-label="Mehrere Besitzer auswählen" hidden></div>
+        </div>
+        <label class="yugioh-category-filter-label" for="yugiohCategoryFilterToggle">Kategorie filtern:</label>
+        <div class="yugioh-filter-dropdown yugioh-category-filter-dropdown">
+          <button type="button" id="yugiohCategoryFilterToggle" class="yugioh-filter-dropdown-toggle" aria-expanded="false" aria-controls="yugiohCategoryFilter" onclick="toggleYugiohCategoryFilter(event)">Kategorie auswählen <span id="yugiohCategoryFilterSummary">Alle Kategorien</span> ▾</button>
+          <div id="yugiohCategoryFilter" class="yugioh-owner-filter-select yugioh-filter-dropdown-menu" role="group" aria-label="Mehrere Kategorien auswählen" hidden></div>
         </div>
         <input type="search" id="yugiohSearch" class="yugioh-search" placeholder="🔍 Decks suchen …" aria-label="Decks durchsuchen" oninput="renderYugiohDecks()">
         <select id="yugiohSort" class="yugioh-sort" aria-label="Sortierung" onchange="renderYugiohDecks()"><option value="theme">A–Z</option><option value="owner">Nach Besitzer</option><option value="new">Neueste zuerst</option></select>
@@ -6174,6 +6182,7 @@ body.app-scene .skip-link:focus{left:12px}
 <div id="duelFxOverlay" class="duel-fx" role="dialog" aria-modal="true" aria-label="Wurf-Ergebnis" onclick="duelFxClose()"></div>
 <audio id="duelStartAudio" src="assets/duel-start.mp3" preload="auto"></audio>
 <audio id="duelDefeatAudio" src="assets/duel-defeat.mp3" preload="auto"></audio>
+<audio id="duelLifePointAudio" src="assets/duel-life-points.mp3" preload="auto"></audio>
 <!-- Yu-Gi-Oh!-Duell-Setup (Teams) -->
 <div id="duelSetupOverlay" class="duel-setup-overlay" role="dialog" aria-modal="true" aria-labelledby="duelSetupTitle" onclick="if(event.target===this)duelSetupCancel()">
   <div id="duelSetupBox" class="duel-setup-box"></div>
@@ -6316,6 +6325,7 @@ const yugiohOwnerFilter = document.getElementById("yugiohOwnerFilter");
 const newYugiohThemeInput = document.getElementById("newYugiohTheme");
 const newYugiohSleeveColorInput = document.getElementById("newYugiohSleeveColor");
 const newYugiohOwnerInput = document.getElementById("newYugiohOwner");
+const newYugiohCategoryInput = document.getElementById("newYugiohCategory");
 const yugiohPlayerCountInput = document.getElementById("yugiohPlayerCount");
 const yugiohPlayerInputs = document.getElementById("yugiohPlayerInputs");
 const yugiohAssignmentResults = document.getElementById("yugiohAssignmentResults");
@@ -6356,6 +6366,7 @@ let activeYugiohDuelPlayers = [];
 let activeYugiohCalculatorIndex = -1;
 let activeYugiohCalculatorExpression = "";
 let selectedYugiohOwnerValues = new Set();
+let selectedYugiohCategoryValues = new Set();
 
 const cardLists = {
   feast: {
@@ -6740,7 +6751,8 @@ function openYugiohEdit(deckId) {
   renderEditFields("Yu-Gi-Oh!-Deck bearbeiten", [
     { key: "theme", label: "Thema / Deckname", value: deck.theme || "" },
     { key: "sleeve_color", label: "Hüllenfarbe", value: deck.sleeve_color || "" },
-    { key: "owner", label: "Besitzer", value: deck.owner || "" }
+    { key: "owner", label: "Besitzer", value: deck.owner || "" },
+    { key: "category", label: "Kategorie", value: deck.category || "" }
   ]);
   const delBtn = document.getElementById("editDeleteButton");
   if (delBtn) {
@@ -6943,7 +6955,8 @@ async function saveYugiohEdit() {
   const changes = {
     theme,
     sleeve_color: getEditInputValue("sleeve_color"),
-    owner: getEditInputValue("owner")
+    owner: getEditInputValue("owner"),
+    category: getEditInputValue("category")
   };
 
   const { error } = await supabaseClient
@@ -7379,7 +7392,7 @@ function applyYugiohCalculator() {
     player.lifeHistory = Array.isArray(player.lifeHistory) ? player.lifeHistory : [];
     player.lifeHistory.push({ type: "change", label: "Änderung", from: previousValue, to: nextValue, expression: activeYugiohCalculatorExpression, timestamp: Date.now() });
     duelUndoStack.push({ index: activeYugiohCalculatorIndex, from: previousValue });
-    playDuelDefeatSound(previousValue, nextValue);
+    playDuelLifePointSound(previousValue, nextValue);
     player.lifePoints = nextValue;
     if (navigator.vibrate) navigator.vibrate(nextValue < previousValue ? 40 : 15);
   }
@@ -7389,13 +7402,35 @@ function applyYugiohCalculator() {
 
 
 /* ===== Battle Arena: Zusatzfunktionen ===== */
-let duelUndoStack = [], duelWakeLock = null, duelBannerTimer = null;
+let duelUndoStack = [], duelWakeLock = null, duelBannerTimer = null, duelLifePointSoundRun = 0;
 const duelRnd = n => { const a = new Uint32Array(1); crypto.getRandomValues(a); return a[0] % n; };
-function playDuelDefeatSound(previousLifePoints, nextLifePoints) {
-  if (previousLifePoints <= 0 || nextLifePoints > 0) return;
+function playDuelDefeatSound() {
   const audio = document.getElementById("duelDefeatAudio");
+  audio.pause();
   audio.currentTime = 0;
   void audio.play().catch(error => console.warn("Duell-Verlierersound konnte nicht abgespielt werden:", error));
+}
+function playDuelLifePointSound(previousLifePoints, nextLifePoints) {
+  if (previousLifePoints === nextLifePoints) return;
+  const audio = document.getElementById("duelLifePointAudio");
+  const run = ++duelLifePointSoundRun;
+  const playDefeatAfterLifePointSound = previousLifePoints > 0 && nextLifePoints <= 0;
+  let defeatSoundStarted = false;
+  const playDefeat = () => {
+    if (defeatSoundStarted) return;
+    defeatSoundStarted = true;
+    if (run === duelLifePointSoundRun) playDuelDefeatSound();
+  };
+  audio.pause();
+  audio.currentTime = 0;
+  if (playDefeatAfterLifePointSound) {
+    audio.addEventListener("ended", playDefeat, { once: true });
+    audio.addEventListener("error", playDefeat, { once: true });
+  }
+  void audio.play().catch(error => {
+    console.warn("Lebenspunkte-Sound konnte nicht abgespielt werden:", error);
+    if (playDefeatAfterLifePointSound) playDefeat();
+  });
 }
 async function duelRequestWakeLock() { try { if ("wakeLock" in navigator) duelWakeLock = await navigator.wakeLock.request("screen"); } catch (e) {} }
 function duelReleaseWakeLock() { try { duelWakeLock?.release(); } catch (e) {} duelWakeLock = null; }
@@ -7433,7 +7468,7 @@ function duelQuickChange(index, v, label) {
   if (to === from) return;
   p.lifeHistory = p.lifeHistory || [];
   p.lifeHistory.push({ type: "change", label: "Änderung", from, to, expression: label, timestamp: Date.now() });
-  duelUndoStack.push({ index, from }); playDuelDefeatSound(from, to); p.lifePoints = to;
+  duelUndoStack.push({ index, from }); playDuelLifePointSound(from, to); p.lifePoints = to;
   if (navigator.vibrate) navigator.vibrate(to < from ? 40 : 15);
   renderYugiohDuelArena();
 }
@@ -7442,6 +7477,7 @@ function duelUndo() {
   if (!last) { duelShowBanner("Nichts zum Rückgängigmachen."); return; }
   const p = activeYugiohDuelPlayers[last.index]; if (!p) return;
   p.lifeHistory.push({ type: "change", label: "Rückgängig", from: p.lifePoints, to: last.from, expression: "↶", timestamp: Date.now() });
+  playDuelLifePointSound(p.lifePoints, last.from);
   p.lifePoints = last.from; renderYugiohDuelArena();
   duelShowBanner(`↶ ${p.playerName}: zurück auf ${last.from.toLocaleString("de-DE")} LP`);
 }
@@ -12226,7 +12262,7 @@ async function loadYugiohDecks() {
 
   const { data, error } = await supabaseClient
     .from("yugioh_decks")
-    .select("id, theme, sleeve_color, owner, image, user_id, created_at")
+    .select("id, theme, sleeve_color, owner, category, image, user_id, created_at")
     .order("theme", { ascending: true });
 
   if (error) {
@@ -12251,11 +12287,14 @@ function updateYugiohDatalists(){
   const uniq=k=>[...new Set(yugiohDecks.map(d=>String(d[k]||"").trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"de"));
   const fill=(id,list)=>{const el=document.getElementById(id);if(el)el.innerHTML=list.map(v=>`<option value="${escapeHtml(v)}"></option>`).join("");};
   fill("yugiohOwnerOptions",uniq("owner"));
+  fill("yugiohCategoryOptions",uniq("category"));
   fill("yugiohSleeveOptions",[...new Set([...uniq("sleeve_color"),"Schwarz","Wei\u00df","Rot","Blau","Gr\u00fcn","Gelb","Lila","Orange","Transparent"])]);
 }
 function clearYugiohFilters(){
   const q=document.getElementById("yugiohSearch"); if(q)q.value="";
-  resetYugiohOwnerFilter();
+  selectedYugiohOwnerValues.clear();
+  selectedYugiohCategoryValues.clear();
+  closeYugiohFilterMenus();
   renderYugiohDecks();
 }
 function yugiohEmptyState(icon,title,text,btnLabel,onclick){
@@ -12267,6 +12306,7 @@ function yugiohEmptyState(icon,title,text,btnLabel,onclick){
 function renderYugiohDecks() {
   yugiohDeckList.innerHTML = "";
   updateYugiohOwnerFilter();
+  updateYugiohCategoryFilter();
   updateYugiohDatalists();
   const countEl=document.getElementById("yugiohCount");
 
@@ -12326,7 +12366,10 @@ function renderYugiohDecks() {
     const col = yugiohSwatchColor(deck.sleeve_color);
     if (col) { const sw=document.createElement("i"); sw.className="yugioh-swatch"; sw.style.background=col; sw.setAttribute("aria-hidden","true"); sleeveChip.appendChild(sw); }
     sleeveChip.appendChild(document.createTextNode(deck.sleeve_color ? "Hüllen: " + deck.sleeve_color : "keine Hüllenfarbe"));
-    chips.appendChild(ownerChip); chips.appendChild(sleeveChip);
+    const categoryChip = document.createElement("span");
+    categoryChip.className = "yugioh-chip" + (deck.category ? "" : " is-empty");
+    categoryChip.textContent = "🏷️ " + (deck.category || "keine Kategorie");
+    chips.append(ownerChip, sleeveChip, categoryChip);
 
     const actions = document.createElement("div");
     actions.className = "yugioh-actions";
@@ -12354,6 +12397,14 @@ function toggleYugiohOwnerFilter(event) {
   menu.hidden = !willOpen;
   toggle.setAttribute("aria-expanded", String(willOpen));
 }
+function toggleYugiohCategoryFilter(event) {
+  if (event) event.stopPropagation();
+  const menu = document.getElementById("yugiohCategoryFilter");
+  const toggle = document.getElementById("yugiohCategoryFilterToggle");
+  const willOpen = menu.hidden;
+  menu.hidden = !willOpen;
+  toggle.setAttribute("aria-expanded", String(willOpen));
+}
 
 function updateYugiohOwnerFilterSummary() {
   const summary = document.getElementById("yugiohOwnerFilterSummary");
@@ -12365,12 +12416,7 @@ function updateYugiohOwnerFilterSummary() {
 }
 
 document.addEventListener("click", event => {
-  const dropdown = document.querySelector(".yugioh-filter-dropdown");
-  if (dropdown && !dropdown.contains(event.target)) {
-    const menu = document.getElementById("yugiohOwnerFilter");
-    const toggle = document.getElementById("yugiohOwnerFilterToggle");
-    if (menu && !menu.hidden) { menu.hidden = true; toggle.setAttribute("aria-expanded", "false"); }
-  }
+  if (!event.target.closest(".yugioh-filter-dropdown")) closeYugiohFilterMenus();
 });
 
 function renderYugiohOwnerFilterOptions() {
@@ -12414,15 +12460,67 @@ function resetYugiohOwnerFilter() {
 function updateYugiohOwnerFilter() {
   renderYugiohOwnerFilterOptions();
 }
+function updateYugiohCategoryFilter() {
+  renderYugiohFilterOptions({
+    values: yugiohDecks.map(deck => deck.category),
+    selected: selectedYugiohCategoryValues,
+    menuId: "yugiohCategoryFilter",
+    summaryId: "yugiohCategoryFilterSummary",
+    allLabel: "Alle Kategorien",
+    itemPrefix: "category",
+    onChange: handleYugiohCategoryFilterChange
+  });
+}
+function renderYugiohFilterOptions({ values, selected, menuId, summaryId, allLabel, itemPrefix, onChange }) {
+  const menu = document.getElementById(menuId);
+  const options = [...new Set(values.map(value => String(value || "").trim()).filter(Boolean))]
+    .sort((a, b) => a.localeCompare(b, "de"));
+  const hasUnassignedValues = values.some(value => !String(value || "").trim());
+  menu.replaceChildren();
+  const entries = [{ value: "", label: allLabel }, ...options.map(value => ({ value: `${itemPrefix}:${encodeURIComponent(value)}`, label: value }))];
+  if (hasUnassignedValues) entries.push({ value: "unassigned", label: "Nicht angegeben" });
+  entries.forEach(({ value, label }) => {
+    const wrapper = document.createElement("label");
+    wrapper.className = "yugioh-owner-filter-option";
+    const input = document.createElement("input");
+    input.type = "checkbox";
+    input.value = value;
+    input.checked = value === "" ? selected.size === 0 : selected.has(value);
+    input.addEventListener("change", onChange);
+    const text = document.createElement("span");
+    text.textContent = label;
+    wrapper.append(input, text);
+    menu.appendChild(wrapper);
+  });
+  const summary = document.getElementById(summaryId);
+  const labels = [...menu.querySelectorAll("input:checked + span")].map(node => node.textContent);
+  summary.textContent = selected.size === 0 ? allLabel : labels.length > 2 ? `${labels.slice(0, 2).join(", ")} +${labels.length - 2}` : labels.join(", ");
+}
+function closeYugiohFilterMenus() {
+  ["yugiohOwnerFilter", "yugiohCategoryFilter"].forEach(id => {
+    const menu = document.getElementById(id), toggle = document.getElementById(id + "Toggle");
+    if (menu) menu.hidden = true;
+    if (toggle) toggle.setAttribute("aria-expanded", "false");
+  });
+}
+function handleYugiohCategoryFilterChange(event) {
+  selectedYugiohCategoryValues = event.target.value === "" ? new Set() : new Set([...document.querySelectorAll('#yugiohCategoryFilter input[type="checkbox"]:checked')]
+    .map(input => input.value).filter(Boolean));
+  renderYugiohDecks();
+}
 
 function getFilteredYugiohDecks() {
   const selectedOwners = getSelectedYugiohOwners();
-  let list = selectedOwners.length === 0 ? [...yugiohDecks] : yugiohDecks.filter(deck => {
+  const selectedCategories = [...selectedYugiohCategoryValues];
+  let list = yugiohDecks.filter(deck => {
     const owner = String(deck.owner || "").trim();
-    return selectedOwners.some(value => value === "unassigned" ? !owner : value === `owner:${encodeURIComponent(owner)}`);
+    const ownerMatches = selectedOwners.length === 0 || selectedOwners.some(value => value === "unassigned" ? !owner : value === `owner:${encodeURIComponent(owner)}`);
+    const category = String(deck.category || "").trim();
+    const categoryMatches = selectedCategories.length === 0 || selectedCategories.some(value => value === "unassigned" ? !category : value === `category:${encodeURIComponent(category)}`);
+    return ownerMatches && categoryMatches;
   });
   const q = (document.getElementById("yugiohSearch")?.value || "").trim().toLowerCase();
-  if (q) list = list.filter(d => [d.theme, d.owner, d.sleeve_color].some(v => String(v || "").toLowerCase().includes(q)));
+  if (q) list = list.filter(d => [d.theme, d.owner, d.category, d.sleeve_color].some(v => String(v || "").toLowerCase().includes(q)));
   const cmp = (a, b) => String(a || "").localeCompare(String(b || ""), "de");
   const mode = document.getElementById("yugiohSort")?.value || "theme";
   list.sort(mode === "owner" ? (a, b) => cmp(a.owner, b.owner) || cmp(a.theme, b.theme)
@@ -12533,6 +12631,7 @@ async function addYugiohDeck() {
   const theme = newYugiohThemeInput.value.trim();
   const sleeveColor = newYugiohSleeveColorInput.value.trim();
   const owner = newYugiohOwnerInput.value.trim();
+  const category = newYugiohCategoryInput.value.trim();
 
   if (!theme) {
     alert("Bitte ein Thema / einen Decknamen eingeben.");
@@ -12543,6 +12642,7 @@ async function addYugiohDeck() {
     theme,
     sleeve_color: sleeveColor,
     owner,
+    category,
     image: "",
     user_id: currentUser.id
   };
@@ -12552,7 +12652,7 @@ async function addYugiohDeck() {
   const { data, error } = await supabaseClient
     .from("yugioh_decks")
     .insert(newDeck)
-    .select("id, theme, sleeve_color, owner, image, user_id, created_at")
+    .select("id, theme, sleeve_color, owner, category, image, user_id, created_at")
     .single();
 
   if (addBtn) { addBtn.disabled = false; addBtn.textContent = "➕ Deck hinzufügen"; }
@@ -12563,6 +12663,7 @@ async function addYugiohDeck() {
 
   newYugiohThemeInput.value = "";
   newYugiohSleeveColorInput.value = "";
+  newYugiohCategoryInput.value = "";
   // Besitzer bleibt stehen: mehrere Decks derselben Person lassen sich schneller anlegen.
   setStatus(`Deck „${theme}“ hinzugefügt.`);
   setTimeout(() => setStatus(""), 3500);

@@ -25,6 +25,10 @@ Den Android-Build anschließend im erzeugten `android`-Projekt mit Android Studi
 
 ## Supabase-Konten einrichten
 
+Für Yu-Gi-Oh!-Deckkategorien zuerst
+[`supabase/migrations/20261003000000_add_yugioh_deck_category.sql`](supabase/migrations/20261003000000_add_yugioh_deck_category.sql)
+im Supabase SQL Editor ausführen. Dadurch wird die Kategorie-Spalte für bestehende Decks ergänzt.
+
 Für Registrierungslinks, Nutzernamen-Login, Kontoverwaltung und Rollenverwaltung zuerst
 [`supabase-account-setup.sql`](supabase-account-setup.sql) vollständig im Supabase SQL Editor ausführen.
 Falls das Kontoschema bereits eingerichtet wurde, führe das aktualisierte SQL-Script erneut aus,
