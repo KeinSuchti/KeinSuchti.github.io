@@ -7475,7 +7475,7 @@ function resumeDuelBackgroundMusicAfterSound() {
 function startDuelBackgroundMusic() {
   duelMusicResumeAfterSound = false;
   const music = document.getElementById("duelBackgroundAudio");
-  music.volume = 0.5;
+  music.volume = 0.3;
   music.currentTime = 0;
   void music.play().catch(error => console.warn("Battle-Arena-Hintergrundmusik konnte nicht abgespielt werden:", error));
 }
