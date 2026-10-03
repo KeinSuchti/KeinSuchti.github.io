@@ -7283,9 +7283,14 @@ function showYugiohAssignmentPopup(assignments) {
     owner.className = "assignment-deck-meta";
     owner.textContent = "Besitzer: " + (deck.owner || "nicht angegeben");
 
+    const category = document.createElement("div");
+    category.className = "assignment-deck-meta";
+    category.textContent = "Kategorie: " + (deck.category || "nicht angegeben");
+
     card.appendChild(player);
     card.appendChild(imageWrapper);
     card.appendChild(theme);
+    card.appendChild(category);
     card.appendChild(sleeve);
     card.appendChild(owner);
 
