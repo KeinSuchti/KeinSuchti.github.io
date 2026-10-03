@@ -6197,6 +6197,7 @@ body.app-scene .skip-link:focus{left:12px}
 </div>
 
 <div id="duelFxOverlay" class="duel-fx" role="dialog" aria-modal="true" aria-label="Wurf-Ergebnis" onclick="duelFxClose()"></div>
+<audio id="duelBackgroundAudio" src="assets/duel-background.mp3" preload="none" loop></audio>
 <audio id="duelStartAudio" src="assets/duel-start.mp3" preload="auto"></audio>
 <audio id="duelDefeatAudio" src="assets/duel-defeat.mp3" preload="auto"></audio>
 <audio id="duelLifePointAudio" src="assets/duel-life-points.mp3" preload="auto"></audio>
@@ -7324,9 +7325,14 @@ function startYugiohDuel(cfg = { mode: "solo" }) {
     alert("Bitte zuerst Decks zufällig zuteilen.");
     return;
   }
+  startDuelBackgroundMusic();
   const startAudio = document.getElementById("duelStartAudio");
   startAudio.currentTime = 0;
-  void startAudio.play().catch(error => console.warn("Duell-Startsound konnte nicht abgespielt werden:", error));
+  pauseDuelBackgroundMusicForSound();
+  void startAudio.play().catch(error => {
+    console.warn("Duell-Startsound konnte nicht abgespielt werden:", error);
+    resumeDuelBackgroundMusicAfterSound();
+  });
   closeYugiohAssignmentPopup();
   activeYugiohDuelPlayers = activeYugiohAssignments.map(assignment => ({
     playerName: assignment.playerName,
@@ -7399,7 +7405,7 @@ function renderYugiohDuelArena({ animateLifePoints = true } = {}) {
   updateDuelBanner();
 }
 
-function closeYugiohDuel() { duelReleaseWakeLock(); yugiohDuelOverlay.style.display = "none"; document.documentElement.classList.remove("duel-open"); closeYugiohCalculator(); }
+function closeYugiohDuel() { stopDuelBackgroundMusic(); duelReleaseWakeLock(); yugiohDuelOverlay.style.display = "none"; document.documentElement.classList.remove("duel-open"); closeYugiohCalculator(); }
 function closeYugiohDuelOnOverlay(event) { if (event.target === yugiohDuelOverlay) closeYugiohDuel(); }
 function openYugiohCalculator(index) {
   activeYugiohCalculatorIndex = index;
@@ -7443,12 +7449,93 @@ function applyYugiohCalculator() {
 
 /* ===== Battle Arena: Zusatzfunktionen ===== */
 let duelUndoStack = [], duelWakeLock = null, duelBannerTimer = null, duelLifePointSoundRun = 0;
+let duelMusicResumeAfterSound = false, duelMusicStopTimer = null, duelMusicStoppedAfterWinner = false;
 const duelRnd = n => { const a = new Uint32Array(1); crypto.getRandomValues(a); return a[0] % n; };
+function pauseDuelBackgroundMusicForSound() {
+  const music = document.getElementById("duelBackgroundAudio");
+  if (!music.paused) {
+    if (duelMusicStopTimer !== null) {
+      clearTimeout(duelMusicStopTimer);
+      duelMusicStopTimer = null;
+    }
+    music.pause();
+    duelMusicResumeAfterSound = true;
+  }
+}
+function resumeDuelBackgroundMusicAfterSound() {
+  if (!duelMusicResumeAfterSound) return;
+  setTimeout(() => {
+    const anotherSoundIsPlaying = [...document.querySelectorAll("audio")].some(audio =>
+      audio.id !== "duelBackgroundAudio" && !audio.paused && !audio.ended
+    );
+    if (anotherSoundIsPlaying) return;
+    duelMusicResumeAfterSound = false;
+    if (yugiohDuelOverlay.style.display === "flex" && !duelMusicStoppedAfterWinner) {
+      const music = document.getElementById("duelBackgroundAudio");
+      void music.play().catch(error => console.warn("Battle-Arena-Hintergrundmusik konnte nicht fortgesetzt werden:", error));
+      if (document.getElementById("duelBanner")?.dataset.kind === "winner") {
+        scheduleDuelBackgroundMusicStop();
+      }
+    }
+  }, 0);
+}
+function startDuelBackgroundMusic() {
+  clearTimeout(duelMusicStopTimer);
+  duelMusicStopTimer = null;
+  duelMusicStoppedAfterWinner = false;
+  duelMusicResumeAfterSound = false;
+  const music = document.getElementById("duelBackgroundAudio");
+  music.currentTime = 0;
+  void music.play().catch(error => console.warn("Battle-Arena-Hintergrundmusik konnte nicht abgespielt werden:", error));
+}
+function stopDuelBackgroundMusic() {
+  clearTimeout(duelMusicStopTimer);
+  duelMusicStopTimer = null;
+  duelMusicStoppedAfterWinner = false;
+  duelMusicResumeAfterSound = false;
+  const music = document.getElementById("duelBackgroundAudio");
+  music.pause();
+  music.currentTime = 0;
+}
+function scheduleDuelBackgroundMusicStop() {
+  const anotherSoundIsPlaying = [...document.querySelectorAll("audio")].some(audio =>
+    audio.id !== "duelBackgroundAudio" && !audio.paused && !audio.ended
+  );
+  if (anotherSoundIsPlaying) return;
+  clearTimeout(duelMusicStopTimer);
+  duelMusicStopTimer = setTimeout(() => {
+    const music = document.getElementById("duelBackgroundAudio");
+    music.pause();
+    music.currentTime = 0;
+    duelMusicResumeAfterSound = false;
+    duelMusicStoppedAfterWinner = true;
+    duelMusicStopTimer = null;
+  }, 10000);
+}
+document.addEventListener("play", event => {
+  if (event.target instanceof HTMLAudioElement && event.target.id !== "duelBackgroundAudio") {
+    pauseDuelBackgroundMusicForSound();
+  }
+}, true);
+document.addEventListener("ended", event => {
+  if (event.target instanceof HTMLAudioElement && event.target.id !== "duelBackgroundAudio") {
+    resumeDuelBackgroundMusicAfterSound();
+  }
+}, true);
+document.addEventListener("error", event => {
+  if (event.target instanceof HTMLAudioElement && event.target.id !== "duelBackgroundAudio") {
+    resumeDuelBackgroundMusicAfterSound();
+  }
+}, true);
 function playDuelDefeatSound() {
   const audio = document.getElementById("duelDefeatAudio");
   audio.pause();
   audio.currentTime = 0;
-  void audio.play().catch(error => console.warn("Duell-Verlierersound konnte nicht abgespielt werden:", error));
+  pauseDuelBackgroundMusicForSound();
+  void audio.play().catch(error => {
+    console.warn("Duell-Verlierersound konnte nicht abgespielt werden:", error);
+    resumeDuelBackgroundMusicAfterSound();
+  });
 }
 function playDuelLifePointSound(previousLifePoints, nextLifePoints) {
   if (previousLifePoints === nextLifePoints) return;
@@ -7463,12 +7550,14 @@ function playDuelLifePointSound(previousLifePoints, nextLifePoints) {
   };
   audio.pause();
   audio.currentTime = 0;
+  pauseDuelBackgroundMusicForSound();
   if (playDefeatAfterLifePointSound) {
     audio.addEventListener("ended", playDefeat, { once: true });
     audio.addEventListener("error", playDefeat, { once: true });
   }
   void audio.play().catch(error => {
     console.warn("Lebenspunkte-Sound konnte nicht abgespielt werden:", error);
+    resumeDuelBackgroundMusicAfterSound();
     if (playDefeatAfterLifePointSound) playDefeat();
   });
 }
@@ -7498,7 +7587,17 @@ function updateDuelBanner(force) {
         text = `🏆 Team ${tid + 1} (${members}) gewinnt!`;
       } else text = `🏆 ${alive[0].playerName} gewinnt!`;
     }
+    scheduleDuelBackgroundMusicStop();
     el.textContent = text; el.dataset.kind = "winner"; el.hidden = false; return;
+  }
+  if (duelMusicStopTimer !== null) {
+    clearTimeout(duelMusicStopTimer);
+    duelMusicStopTimer = null;
+  }
+  if (duelMusicStoppedAfterWinner) {
+    duelMusicStoppedAfterWinner = false;
+    const music = document.getElementById("duelBackgroundAudio");
+    void music.play().catch(error => console.warn("Battle-Arena-Hintergrundmusik konnte nicht fortgesetzt werden:", error));
   }
   if (el.dataset.kind === "winner" || force) { el.hidden = true; el.dataset.kind = ""; }
 }
