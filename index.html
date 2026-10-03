@@ -6173,6 +6173,7 @@ body.app-scene .skip-link:focus{left:12px}
 
 <div id="duelFxOverlay" class="duel-fx" role="dialog" aria-modal="true" aria-label="Wurf-Ergebnis" onclick="duelFxClose()"></div>
 <audio id="duelStartAudio" src="assets/duel-start.mp3" preload="auto"></audio>
+<audio id="duelDefeatAudio" src="assets/duel-defeat.mp3" preload="auto"></audio>
 <!-- Yu-Gi-Oh!-Duell-Setup (Teams) -->
 <div id="duelSetupOverlay" class="duel-setup-overlay" role="dialog" aria-modal="true" aria-labelledby="duelSetupTitle" onclick="if(event.target===this)duelSetupCancel()">
   <div id="duelSetupBox" class="duel-setup-box"></div>
@@ -7378,6 +7379,7 @@ function applyYugiohCalculator() {
     player.lifeHistory = Array.isArray(player.lifeHistory) ? player.lifeHistory : [];
     player.lifeHistory.push({ type: "change", label: "Änderung", from: previousValue, to: nextValue, expression: activeYugiohCalculatorExpression, timestamp: Date.now() });
     duelUndoStack.push({ index: activeYugiohCalculatorIndex, from: previousValue });
+    playDuelDefeatSound(previousValue, nextValue);
     player.lifePoints = nextValue;
     if (navigator.vibrate) navigator.vibrate(nextValue < previousValue ? 40 : 15);
   }
@@ -7389,6 +7391,12 @@ function applyYugiohCalculator() {
 /* ===== Battle Arena: Zusatzfunktionen ===== */
 let duelUndoStack = [], duelWakeLock = null, duelBannerTimer = null;
 const duelRnd = n => { const a = new Uint32Array(1); crypto.getRandomValues(a); return a[0] % n; };
+function playDuelDefeatSound(previousLifePoints, nextLifePoints) {
+  if (previousLifePoints <= 0 || nextLifePoints > 0) return;
+  const audio = document.getElementById("duelDefeatAudio");
+  audio.currentTime = 0;
+  void audio.play().catch(error => console.warn("Duell-Verlierersound konnte nicht abgespielt werden:", error));
+}
 async function duelRequestWakeLock() { try { if ("wakeLock" in navigator) duelWakeLock = await navigator.wakeLock.request("screen"); } catch (e) {} }
 function duelReleaseWakeLock() { try { duelWakeLock?.release(); } catch (e) {} duelWakeLock = null; }
 document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible" && yugiohDuelOverlay.style.display === "flex") duelRequestWakeLock(); });
@@ -7425,7 +7433,7 @@ function duelQuickChange(index, v, label) {
   if (to === from) return;
   p.lifeHistory = p.lifeHistory || [];
   p.lifeHistory.push({ type: "change", label: "Änderung", from, to, expression: label, timestamp: Date.now() });
-  duelUndoStack.push({ index, from }); p.lifePoints = to;
+  duelUndoStack.push({ index, from }); playDuelDefeatSound(from, to); p.lifePoints = to;
   if (navigator.vibrate) navigator.vibrate(to < from ? 40 : 15);
   renderYugiohDuelArena();
 }
