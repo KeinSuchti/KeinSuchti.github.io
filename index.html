@@ -4754,6 +4754,11 @@ html.duel-open, html.duel-open body { overflow:hidden; }
   .duel-history-entry span { min-width:0; overflow-wrap:anywhere; }
   .duel-history-entry strong { flex:0 0 auto; }
 
+  .duel-arena[data-count="2"] { grid-template-columns:repeat(2,minmax(0,1fr)); grid-auto-rows:minmax(0,1fr); }
+  .duel-arena[data-count="2"] .duel-player-card { min-height:0; padding:8px; gap:6px; }
+  .duel-arena[data-count="2"] .duel-life-display { min-height:clamp(76px,12vh,150px); }
+  .duel-arena[data-count="2"] .duel-life-number { font-size:clamp(42px,18vw,86px); }
+
   /* Rechner als Bottom-Sheet */
   .calculator-overlay { align-items:flex-end; justify-content:center; padding:0; overscroll-behavior:contain; }
   .calculator-box { width:100%; max-width:560px; max-height:94vh; max-height:94dvh; padding:14px 14px calc(14px + env(safe-area-inset-bottom)); border-radius:22px 22px 0 0; border-bottom:0; animation:duelSheetUp 220ms cubic-bezier(.2,.7,.3,1); }
@@ -4776,9 +4781,9 @@ html.duel-open, html.duel-open body { overflow:hidden; }
   .duel-arena[data-count="2"] { --duel-cols:2; }
   .duel-arena[data-count="3"] { --duel-cols:3; }
   .duel-arena[data-count="4"], .duel-arena[data-count="5"], .duel-arena[data-count="6"] { grid-template-columns:repeat(4,minmax(0,1fr)); }
-  .duel-arena { grid-auto-rows:minmax(max-content,1fr); gap:8px; }
-  .duel-player-card { padding:8px 10px; gap:5px; }
-  .duel-life-display { min-height:64px; }
+  .duel-arena { grid-auto-rows:minmax(0,1fr); gap:8px; }
+  .duel-player-card { min-height:0; padding:8px 10px; gap:5px; }
+  .duel-life-display { min-height:clamp(56px,12vh,110px); }
   .duel-life-number, .duel-arena[data-count] .duel-life-number { font-size:clamp(34px,15vh,72px); -webkit-text-stroke:2px #050508; text-shadow:2px 3px 0 #050508; }
   .duel-arena[data-count="4"] .duel-life-number, .duel-arena[data-count="5"] .duel-life-number, .duel-arena[data-count="6"] .duel-life-number { font-size:clamp(28px,11vh,52px); }
   .duel-history-list { max-height:80px; }
@@ -4795,6 +4800,17 @@ html.duel-open, html.duel-open body { overflow:hidden; }
 @media (max-width:360px) {
   .duel-box h3 { font-size:17px; }
   .duel-life-number { font-size:clamp(48px,22vw,96px); }
+}
+@media (max-width:420px) {
+  .duel-topbar { gap:4px; }
+  .duel-box h3 { font-size:clamp(13px,4vw,17px); letter-spacing:0; }
+  .duel-tools { gap:2px; }
+  .duel-tools button { min-width:34px; width:34px; height:38px; padding:0; font-size:16px; }
+  .duel-close { width:36px; height:38px; flex-basis:36px; }
+}
+@media (max-width:900px) and (min-height:650px) {
+  .duel-arena { overflow:hidden; }
+  .duel-player-card { min-height:0; }
 }
 @media (prefers-reduced-motion:reduce) { .calculator-box { animation:none; } }
 /* ===== Lokaler Termin-Testmodus / UX-Überarbeitung ===== */
@@ -4983,7 +4999,7 @@ button.yugioh-image-placeholder:hover{border-color:rgba(101,226,215,.7);color:#d
 .duel-quick button:active{background:rgba(40,70,130,.95)!important;transform:scale(.95)}
 .duel-player-card.is-defeated .duel-quick{display:none}
 @media(max-width:900px){.duel-topbar{flex-wrap:nowrap}.duel-box h3{white-space:nowrap}.duel-tools button span{display:none}.duel-tools button{min-width:40px;padding:0 6px}.duel-tools{gap:4px}}
-@media(max-width:420px){.duel-arena[data-count="5"] .duel-quick,.duel-arena[data-count="6"] .duel-quick{grid-template-columns:repeat(3,minmax(0,1fr))}.duel-arena[data-count="5"] .duel-quick button:nth-child(n+4),.duel-arena[data-count="6"] .duel-quick button:nth-child(n+4){display:none}}
+@media(max-width:900px){.duel-arena[data-count="2"] .duel-quick,.duel-arena[data-count="3"] .duel-quick,.duel-arena[data-count="4"] .duel-quick,.duel-arena[data-count="5"] .duel-quick,.duel-arena[data-count="6"] .duel-quick{grid-template-columns:repeat(3,minmax(0,1fr))}}
 /* ===== Battle Arena: Team-Setup ===== */
 .duel-setup-overlay{display:none;position:fixed;inset:0;z-index:10060;align-items:center;justify-content:center;padding:14px;background:rgba(3,8,20,.82);backdrop-filter:blur(4px)}
 .duel-setup-box{width:min(520px,100%);max-height:calc(100dvh - 28px);overflow-y:auto;overscroll-behavior:contain;padding:18px;border-radius:18px;border:1px solid rgba(125,158,224,.34);background:#0e1c34;color:#e6efff;box-shadow:0 24px 60px rgba(0,0,0,.5)}
@@ -6151,6 +6167,7 @@ body.app-scene .skip-link:focus{left:12px}
 </div>
 
 <div id="duelFxOverlay" class="duel-fx" role="dialog" aria-modal="true" aria-label="Wurf-Ergebnis" onclick="duelFxClose()"></div>
+<audio id="duelStartAudio" src="assets/duel-start.mp3" preload="auto"></audio>
 <!-- Yu-Gi-Oh!-Duell-Setup (Teams) -->
 <div id="duelSetupOverlay" class="duel-setup-overlay" role="dialog" aria-modal="true" aria-labelledby="duelSetupTitle" onclick="if(event.target===this)duelSetupCancel()">
   <div id="duelSetupBox" class="duel-setup-box"></div>
@@ -7259,6 +7276,9 @@ function startYugiohDuel(cfg = { mode: "solo" }) {
     alert("Bitte zuerst Decks zufällig zuteilen.");
     return;
   }
+  const startAudio = document.getElementById("duelStartAudio");
+  startAudio.currentTime = 0;
+  void startAudio.play().catch(error => console.warn("Duell-Startsound konnte nicht abgespielt werden:", error));
   closeYugiohAssignmentPopup();
   activeYugiohDuelPlayers = activeYugiohAssignments.map(assignment => ({
     playerName: assignment.playerName,
@@ -7423,10 +7443,10 @@ function duelFxDone(text, bannerText) {
   duelFxTimer = setTimeout(duelFxClose, 3200);
 }
 function duelCoin() {
-  const res = duelRnd(2), fx = duelFxShow(`<div class="fx-stage"><div class="fx-shadow" id="fxShadow"></div><div class="fx-coin" id="fxCoin"><div class="fx-coin-face fx-front"><b>👑</b><span>Kopf</span></div><div class="fx-coin-face fx-back"><b>1</b><span>Zahl</span></div></div></div><div class="fx-result" id="fxResult" role="status"></div>`);
+  const res = duelRnd(2), result = res ? "Zahl" : "Knopf", fx = duelFxShow(`<div class="fx-stage"><div class="fx-shadow" id="fxShadow"></div><div class="fx-coin" id="fxCoin"><div class="fx-coin-face fx-front"><b>K</b><span>Knopf</span></div><div class="fx-coin-face fx-back"><b>Z</b><span>Zahl</span></div></div></div><div class="fx-result" id="fxResult" role="status" aria-live="assertive"></div>`);
   const coin = fx.querySelector("#fxCoin"), shadow = fx.querySelector("#fxShadow"), turns = 1800 + (res ? 180 : 0), d = duelReduceMotion() ? 1 : 2000;
   shadow.animate([{ transform: "scale(.9)", opacity: .5 }, { transform: "scale(.45)", opacity: .2, offset: .5 }, { transform: "scale(1)", opacity: .5 }], { duration: d, easing: "ease-in-out", fill: "forwards" });
-  coin.animate([{ transform: "translateY(0) scale(1) rotateY(0deg)" }, { transform: `translateY(-170px) scale(1.3) rotateY(${turns / 2}deg)`, offset: .5, easing: "cubic-bezier(.4,0,.6,1)" }, { transform: `translateY(0) scale(1) rotateY(${turns}deg)` }], { duration: d, easing: "cubic-bezier(.3,.7,.4,1)", fill: "forwards" }).onfinish = () => duelFxDone(res ? "Zahl" : "Kopf", "🪙 Münzwurf: " + (res ? "Zahl" : "Kopf"));
+  coin.animate([{ transform: "translateY(0) scale(1) rotateY(0deg)" }, { transform: `translateY(-170px) scale(1.3) rotateY(${turns / 2}deg)`, offset: .5, easing: "cubic-bezier(.4,0,.6,1)" }, { transform: `translateY(0) scale(1) rotateY(${turns}deg)` }], { duration: d, easing: "cubic-bezier(.3,.7,.4,1)", fill: "forwards" }).onfinish = () => duelFxDone(result, "🪙 Münzwurf: " + result);
 }
 function duelDice() {
   const res = duelRnd(6) + 1, pips = { 1: [5], 2: [1, 9], 3: [1, 5, 9], 4: [1, 3, 7, 9], 5: [1, 3, 5, 7, 9], 6: [1, 3, 4, 6, 7, 9] };
