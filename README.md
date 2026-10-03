@@ -27,7 +27,7 @@ Den Android-Build anschließend im erzeugten `android`-Projekt mit Android Studi
 
 Für Yu-Gi-Oh!-Deckkategorien zuerst
 [`supabase/migrations/20261003000000_add_yugioh_deck_category.sql`](supabase/migrations/20261003000000_add_yugioh_deck_category.sql)
-im Supabase SQL Editor ausführen. Dadurch wird die Kategorie-Spalte für bestehende Decks ergänzt.
+im Supabase SQL Editor ausführen. Dadurch wird die Kategorie-Spalte für bestehende Decks ergänzt. Jedes Deck erhält genau eine der Kategorien „Sonntagsdeck“, „Kartenstapel“ oder „Spielbar“; im Filter können mehrere Kategorien gleichzeitig ausgewählt werden.
 
 Für Registrierungslinks, Nutzernamen-Login, Kontoverwaltung und Rollenverwaltung zuerst
 [`supabase-account-setup.sql`](supabase-account-setup.sql) vollständig im Supabase SQL Editor ausführen.
