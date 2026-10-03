@@ -9,6 +9,7 @@ on:
       - "desktop/**"
       - "capacitor.config.json"
       - "package.json"
+      - "package-lock.json"
       - ".github/workflows/build-apps.yml"
 
 permissions:
@@ -23,9 +24,10 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
+          cache: npm
       - name: Install dependencies
-        run: npm install
+        run: npm ci
       - name: Build Windows installer
         run: npm run build:desktop
       - name: Upload Windows installer
@@ -43,7 +45,8 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
+          cache: npm
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
@@ -52,7 +55,7 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
       - name: Install dependencies
-        run: npm install
+        run: npm ci
       - name: Generate Android project
         run: npm run app:android:add
       - name: Sync Capacitor

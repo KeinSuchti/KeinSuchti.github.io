@@ -11,10 +11,10 @@ sich unter **Actions > Build desktop app and Android APK > Run workflow** manuel
 Nach einem erfolgreichen Lauf können der Windows-Installer und die Android-Debug-APK unter
 **Actions > Artifacts** heruntergeladen werden. Die APK ist nicht für den Play Store signiert.
 
-Für lokale Builds Node.js 20 oder neuer installieren und im Projektordner ausführen:
+Für lokale Builds Node.js 22 oder neuer installieren und im Projektordner ausführen:
 
 ```sh
-npm install
+npm ci
 npm run build:desktop
 npm run app:android:add
 npm run app:android:sync
