@@ -4992,8 +4992,12 @@ button.yugioh-image-placeholder:hover{border-color:rgba(101,226,215,.7);color:#d
   .yugioh-image-wrapper{grid-column:1;grid-row:1/span 2;width:84px!important;height:auto!important;min-height:0!important;aspect-ratio:3/4}
   .yugioh-image-wrapper .yugioh-image{width:100%!important;height:100%!important;object-fit:cover}
   button.yugioh-image-placeholder{font-size:22px}button.yugioh-image-placeholder small{font-size:9px;text-align:center}
-  .yugioh-deck-card .yugioh-theme{grid-column:2;grid-row:1;margin:0!important;font-size:17px!important;align-self:end;overflow-wrap:anywhere}
-  .yugioh-chips{grid-column:2;grid-row:2;align-self:start}
+  .yugioh-deck-card .yugioh-theme{grid-column:2;grid-row:1;margin:0!important;font-size:17px!important;align-self:end;overflow-wrap:anywhere;min-width:0}
+  .yugioh-chips{grid-column:1/-1;grid-row:3;align-self:start;min-width:0}
+  .yugioh-chip{min-width:0;max-width:100%;overflow-wrap:anywhere}
+  .yugioh-category-chip{flex:1 1 100%;flex-wrap:wrap}
+  .yugioh-category-label{white-space:normal}
+  .yugioh-category-select{flex:1 1 100%;width:100%!important;min-width:0;box-sizing:border-box}
   .yugioh-actions{grid-column:1/-1;display:grid!important;grid-template-columns:1fr 1fr;gap:8px;margin-top:2px}
   .yugioh-actions button{min-height:42px;margin:0!important}
   .yugioh-actions .yugioh-delete-button{grid-column:1/-1;min-height:38px}
