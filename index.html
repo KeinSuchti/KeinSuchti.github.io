@@ -5876,9 +5876,6 @@ body.app-scene .skip-link:focus{left:12px}
               <div class="dashboard-kicker">Aktueller Termin</div>
               <div id="nextAppointmentEntry"></div>
             </div>
-            <div id="appointmentDeleteConfirm" class="inline-confirm" hidden>
-              <span>Termin wirklich entfernen?</span><button type="button" onclick="confirmClearAppointment()">Entfernen</button><button type="button" onclick="cancelClearAppointment()">Abbrechen</button>
-            </div>
           </section>
         </div>
       </section>
@@ -8922,7 +8919,7 @@ function renderSavedAppointment() {
     return;
   }
   summary.hidden = false;
-  host.innerHTML = `<div class="saved-appointment-main"><div class="saved-appointment-title">${escapeHtml(nextAppointment.title || "Gemeinsamer Termin")}</div><div class="saved-appointment-meta">📅 ${escapeHtml(formatAppointmentDate(nextAppointment.start_at))}</div>${nextAppointment.location ? `<div class="saved-appointment-meta">⌖ ${escapeHtml(nextAppointment.location)}</div>` : ""}${nextAppointment.note ? `<div class="saved-appointment-meta">${escapeHtml(nextAppointment.note)}</div>` : ""}<div class="saved-appointment-actions"><button type="button" onclick="editSavedAppointment()">Ändern</button><button type="button" class="ics-button" onclick="downloadAppointmentIcs()">📆 Zum Kalender hinzufügen</button><button type="button" class="danger-button" onclick="requestClearAppointment()">Termin entfernen</button></div></div>`;
+  host.innerHTML = `<div class="saved-appointment-main"><div class="saved-appointment-title">${escapeHtml(nextAppointment.title || "Gemeinsamer Termin")}</div><div class="saved-appointment-meta">📅 ${escapeHtml(formatAppointmentDate(nextAppointment.start_at))}</div>${nextAppointment.location ? `<div class="saved-appointment-meta">⌖ ${escapeHtml(nextAppointment.location)}</div>` : ""}${nextAppointment.note ? `<div class="saved-appointment-meta">${escapeHtml(nextAppointment.note)}</div>` : ""}<div class="saved-appointment-actions"><button type="button" onclick="editSavedAppointment()">Ändern</button><button type="button" class="ics-button" onclick="downloadAppointmentIcs()">📆 Zum Kalender hinzufügen</button><button type="button" class="danger-button" onclick="confirmClearAppointment()">Termin entfernen</button></div></div>`;
 }
 function tickAppointmentCountdown() { if (currentView === "menu") renderNextAppointment(); }
 async function loadNextAppointment() {
@@ -9092,15 +9089,13 @@ function setAppointmentStatus(text,type="") {
   el.classList.toggle("status-error",type==="error");
 }
 function editSavedAppointment() { if (!nextAppointment) return; fillAppointmentFormFromCurrent(); switchAppointmentStep("appointment"); setAppointmentStatus("Du kannst den aktuellen Termin ändern."); }
-function requestClearAppointment() { const el=document.getElementById("appointmentDeleteConfirm"); if(el) el.hidden=false; }
-function cancelClearAppointment() { const el=document.getElementById("appointmentDeleteConfirm"); if(el) el.hidden=true; }
 async function confirmClearAppointment() {
   if (!currentUser || !supabaseClient || !nextAppointment?.id) return;
+  if (!window.confirm("Möchtest du den gemeinsamen Termin wirklich entfernen?")) return;
   try {
     const { error } = await supabaseClient.from("shared_events").delete().eq("id", nextAppointment.id);
     if (error) throw error;
     nextAppointment = null;
-    cancelClearAppointment();
     setAppointmentStatus("Termin entfernt.", "success");
     renderSavedAppointment(); renderNextAppointment(); renderAppointmentCalendar();
   } catch (error) {
@@ -9108,7 +9103,7 @@ async function confirmClearAppointment() {
     setAppointmentStatus("Termin konnte nicht entfernt werden.", "error");
   }
 }
-function clearNextAppointment() { requestClearAppointment(); }
+function clearNextAppointment() { confirmClearAppointment(); }
 function switchAppointmentStep(step) {
   const availability = step === "availability";
   const a=document.getElementById("availabilityStep"), b=document.getElementById("appointmentStep"), ta=document.getElementById("availabilityTab"), tb=document.getElementById("appointmentTab");
