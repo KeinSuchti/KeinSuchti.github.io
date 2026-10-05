@@ -5419,6 +5419,98 @@ body.color-vision-mode #moviesApp .movie-btn-del:hover{background:#2a3b4c!import
   #gamesApp .game-check-box{transition:none}
 }
 body.color-vision-mode #gamesApp .game-icon-btn-del:hover{background:#2a3b4c!important;border-color:#FFC94D!important;color:#fff!important}
+
+/* ===== Einheitliche Listenbedienung ===== */
+.list-panel-heading{margin-bottom:18px}
+.list-panel-heading h2{line-height:1.2}
+.card-controls select,.card-controls input[type=search],.games-toolbar select,.games-toolbar input[type=search]{min-height:44px}
+.card-count,.games-count,.yugioh-count{display:inline-flex;align-items:center;justify-content:center;min-height:30px;padding:4px 10px;border:1px solid var(--border);border-radius:999px;background:var(--surface);color:var(--text-muted);font-size:12px;font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap}
+.movie-item,.card-item,.yugioh-deck-card,.game-mobile-card,.custom-item-row{transition:border-color .18s ease,background-color .18s ease,box-shadow .18s ease}
+.movie-item:focus-within,.card-item:focus-within,.yugioh-deck-card:focus-within,.game-mobile-card:focus-within,.custom-item-row:focus-within{border-color:rgba(101,226,215,.55);box-shadow:0 0 0 3px rgba(101,226,215,.09)}
+.movie-item.is-done{opacity:.82}
+.movie-item.is-done .movie-title{text-decoration-thickness:1px}
+#feastApp #feastList,#beerApp #beerList,#cocktailApp #cocktailList{display:grid;gap:12px}
+#beerApp .card-controls,#cocktailApp .card-controls{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr) minmax(0,1fr) auto;gap:10px;align-items:center;margin:0 0 14px}
+#beerApp .card-controls>*,#cocktailApp .card-controls>*{width:100%;min-width:0;margin:0}
+#beerApp .card-controls .card-count,#cocktailApp .card-controls .card-count{width:auto;justify-self:end}
+#beerApp .card-add-form,#cocktailApp .card-add-form{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;align-items:center;gap:10px;margin:0 0 18px;padding:12px;border:1px solid var(--border);border-radius:var(--radius-lg);background:rgba(23,35,58,.42)}
+#beerApp .card-add-form>*,#cocktailApp .card-add-form>*{min-width:0;min-height:44px;margin:0}
+#beerApp .card-add-form button,#cocktailApp .card-add-form button{width:auto;white-space:nowrap;padding-inline:16px}
+#beerApp .card-item,#cocktailApp .card-item{margin:0;padding:14px;border-radius:16px}
+#beerApp .card-item-header,#cocktailApp .card-item-header{align-items:center;gap:14px}
+#beerApp .card-title,#cocktailApp .card-title{margin:0;font-size:17px;line-height:1.35}
+#beerApp .card-actions,#cocktailApp .card-actions{margin-top:0}
+#beerApp .beer-grade-wrapper{margin-top:12px;padding:11px 12px;border:1px solid var(--border);border-radius:12px;background:var(--surface)}
+#beerApp .beer-grade-label{font-size:13px;font-weight:800}
+#beerApp .beer-grade-slider{min-height:32px}
+#cocktailApp .card-stars{display:flex;align-items:center;flex-wrap:wrap;margin-top:8px}
+#cocktailApp .card-stars .star{min-width:36px;min-height:40px;display:inline-flex;align-items:center;justify-content:center}
+#yugiohDeckList{display:grid;gap:12px}
+#yugiohApp .yugioh-filter-dropdown-toggle{min-height:44px}
+#yugiohApp .yugioh-add-form input,#yugiohApp .yugioh-add-form select{min-height:44px}
+#gamesApp .games-table-wrapper{scrollbar-gutter:stable;overscroll-behavior:contain}
+#gamesApp .games-table{min-width:max-content}
+#gamesApp .games-table th:first-child,#gamesApp .games-table td:first-child{min-width:260px}
+#gamesApp .game-mobile-check-row{min-height:48px}
+#gamesApp .games-column-chip{box-shadow:0 2px 8px rgba(0,0,0,.12)}
+#customListApp .custom-list-controls{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr) minmax(0,1fr) auto;gap:10px;align-items:center}
+#customListApp .custom-list-controls>*{width:100%;min-width:0;margin:0}
+#customListApp .custom-list-controls .card-count{width:auto;justify-self:end}
+#customListApp .custom-list-add-form{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1.2fr) minmax(130px,.7fr) auto;align-items:center;gap:10px;margin:0 0 18px;padding:12px;border:1px solid var(--border);border-radius:var(--radius-lg);background:rgba(23,35,58,.42)}
+#customListApp .custom-list-add-form>*{min-width:0;min-height:44px;margin:0}
+#customListApp .custom-list-add-form button{width:auto;white-space:nowrap;padding-inline:16px}
+#customListApp .custom-item-list{display:grid;gap:9px}
+#customListApp .custom-item-row{display:grid;grid-template-columns:44px minmax(0,1fr) auto;align-items:center;gap:12px;min-width:0;padding:10px 12px;border:1px solid var(--border);border-radius:14px;background:var(--surface-2);box-shadow:var(--shadow-card)}
+#customListApp .custom-item-row:hover{border-color:var(--border-strong);background:var(--surface-3)}
+#customListApp .custom-item-row.is-checked .custom-item-title{color:var(--text-muted);text-decoration:line-through;text-decoration-color:rgba(255,255,255,.35)}
+#customListApp .custom-item-check{position:relative;display:grid;place-items:center;width:44px;height:44px;cursor:pointer}
+#customListApp .custom-item-check input{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:pointer}
+#customListApp .custom-item-checkmark{display:grid;place-items:center;width:25px;height:25px;border:2px solid rgba(160,185,220,.55);border-radius:8px;color:transparent;font-size:15px;font-weight:900;line-height:1}
+#customListApp .custom-item-check input:checked+.custom-item-checkmark{border-color:var(--accent);background:var(--accent);color:var(--accent-ink)}
+#customListApp .custom-item-check input:focus-visible+.custom-item-checkmark{outline:2px solid var(--accent);outline-offset:3px}
+#customListApp .custom-item-main{display:grid;gap:4px;min-width:0}
+#customListApp .custom-item-title{min-width:0;color:var(--text);font-size:15px;font-weight:800;line-height:1.35;overflow-wrap:anywhere;text-decoration:none}
+#customListApp a.custom-item-title:hover{text-decoration:underline;text-underline-offset:3px}
+#customListApp .custom-item-link-hint{color:var(--text-faint);font-size:11px}
+#customListApp .custom-item-actions{display:flex;align-items:center;gap:8px}
+#customListApp .custom-item-rating{color:var(--text-muted);font-size:12px;font-weight:800;white-space:nowrap}
+#customListApp .custom-delete-item{width:auto;min-height:40px;margin:0;padding:7px 11px;font-size:12px}
+.own-avail-row{min-height:58px}
+.own-avail-row input[type=time]{min-height:44px}
+.best-day-row{transition:border-color .18s ease,transform .18s ease,background-color .18s ease}
+.best-day-row:hover{transform:translateY(-1px);border-color:rgba(101,226,215,.32)!important}
+.availability-entry{align-items:center}
+.admin-users{gap:12px}
+.admin-user-row{min-height:72px;padding:15px;border-radius:14px;transition:border-color .18s ease,background-color .18s ease}
+.admin-user-row:hover{border-color:rgba(101,226,215,.38);background:rgba(14,35,62,.72)}
+.admin-user-row select{min-height:42px}
+.admin-user-actions button{min-height:40px}
+
+@media(max-width:760px){
+  #beerApp .card-controls,#cocktailApp .card-controls,#customListApp .custom-list-controls{grid-template-columns:repeat(2,minmax(0,1fr))}
+  #beerApp .card-controls .card-search,#cocktailApp .card-controls .card-search,#customListApp .custom-list-controls .card-search{grid-column:1/-1}
+  #beerApp .card-controls .card-count,#cocktailApp .card-controls .card-count,#customListApp .custom-list-controls .card-count{grid-column:1/-1;justify-self:start}
+  #beerApp .card-add-form,#cocktailApp .card-add-form{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  #beerApp .card-add-form button,#cocktailApp .card-add-form button{grid-column:1/-1;width:100%;min-height:48px}
+  #customListApp .custom-list-add-form{grid-template-columns:repeat(2,minmax(0,1fr))}
+  #customListApp .custom-list-add-form button{grid-column:1/-1;width:100%;min-height:48px}
+  #customListApp .custom-item-row{grid-template-columns:44px minmax(0,1fr);gap:8px 10px;padding:10px}
+  #customListApp .custom-item-actions{grid-column:2;justify-content:space-between}
+  #customListApp .custom-delete-item{min-height:44px}
+  .admin-user-actions{justify-content:flex-start}
+  .admin-user-actions button{flex:1 1 145px;min-height:44px}
+}
+@media(max-width:480px){
+  #beerApp .card-controls,#cocktailApp .card-controls,#customListApp .custom-list-controls{grid-template-columns:minmax(0,1fr)}
+  #beerApp .card-controls .card-search,#cocktailApp .card-controls .card-search,#customListApp .custom-list-controls .card-search,#beerApp .card-controls .card-count,#cocktailApp .card-controls .card-count,#customListApp .custom-list-controls .card-count{grid-column:auto}
+  #beerApp .card-add-form,#cocktailApp .card-add-form,#customListApp .custom-list-add-form{grid-template-columns:minmax(0,1fr)}
+  #beerApp .card-add-form button,#cocktailApp .card-add-form button,#customListApp .custom-list-add-form button{grid-column:auto}
+  #beerApp .card-item,#cocktailApp .card-item{padding:11px}
+  #beerApp .card-item-header,#cocktailApp .card-item-header{align-items:flex-start}
+  #customListApp .custom-item-row{grid-template-columns:40px minmax(0,1fr);padding:9px}
+  #customListApp .custom-item-check{width:40px;height:44px}
+}
+@media(prefers-reduced-motion:reduce){.movie-item,.card-item,.yugioh-deck-card,.game-mobile-card,.custom-item-row,.best-day-row,.admin-user-row{transition:none}}
 </style>
 
 
@@ -6015,13 +6107,14 @@ body.app-scene .skip-link:focus{left:12px}
       <div class="list-panel-heading"><h2><span class="section-title-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 8h12l-1.2 12H6.2L5 8Z"></path><path d="M5 11h12"></path><path d="M8 5a2 2 0 0 1 4 0c0-2 4-2 4 1v2"></path><path d="M17 11h2a2 2 0 0 1 0 4h-2"></path></svg></span>Bier</h2><button class="list-settings-button" type="button" onclick="openListSettings('beer')" aria-label="Einstellungen für Bier" title="Listeneinstellungen">⚙</button></div>
 
       <div class="card-controls">
-        <select id="beerSort" onchange="renderCardItems('beer')">
+        <input id="beerSearch" type="search" class="card-search" placeholder="🔍 Bier suchen …" aria-label="Biere durchsuchen" autocomplete="off" oninput="renderCardItems('beer')">
+        <select id="beerSort" aria-label="Biere sortieren" onchange="renderCardItems('beer')">
           <option value="none">Sortierung</option>
           <option value="best">Beste Note zuerst</option>
           <option value="worst">Schlechteste Note zuerst</option>
         </select>
 
-        <select id="beerFilter" onchange="renderCardItems('beer')">
+        <select id="beerFilter" aria-label="Biere nach Bewertung filtern" onchange="renderCardItems('beer')">
           <option value="all">Alle Bewertungen</option>
           <option value="unrated">Noch nicht bewertet</option>
           <option value="1">Note 1,x</option>
@@ -6031,14 +6124,16 @@ body.app-scene .skip-link:focus{left:12px}
           <option value="5">Note 5,x</option>
           <option value="6">Note 6,0</option>
         </select>
+        <span id="beerCount" class="card-count" aria-live="polite"></span>
       </div>
 
       <div class="card-add-form">
-        <input id="newBeerName" placeholder="Name">
+        <input id="newBeerName" placeholder="Name" aria-label="Biername" autocomplete="off">
         <input
           id="newBeerRating"
           class="beer-add-rating-input"
           placeholder="Bewertung optional, z. B. 2,6"
+          aria-label="Optionale Bierbewertung"
           inputmode="decimal"
         >
 
@@ -6058,13 +6153,14 @@ body.app-scene .skip-link:focus{left:12px}
       </button>
 
       <div class="card-controls">
-        <select id="cocktailSort" onchange="renderCardItems('cocktail')">
+        <input id="cocktailSearch" type="search" class="card-search" placeholder="🔍 Cocktails suchen …" aria-label="Cocktails durchsuchen" autocomplete="off" oninput="renderCardItems('cocktail')">
+        <select id="cocktailSort" aria-label="Cocktails sortieren" onchange="renderCardItems('cocktail')">
           <option value="none">Sortierung</option>
           <option value="high">Bewertung ↓</option>
           <option value="low">Bewertung ↑</option>
         </select>
 
-        <select id="cocktailFilter" onchange="renderCardItems('cocktail')">
+        <select id="cocktailFilter" aria-label="Cocktails nach Bewertung filtern" onchange="renderCardItems('cocktail')">
           <option value="0">Alle Bewertungen</option>
           <option value="1">⭐ 1+</option>
           <option value="2">⭐ 2+</option>
@@ -6072,11 +6168,12 @@ body.app-scene .skip-link:focus{left:12px}
           <option value="4">⭐ 4+</option>
           <option value="5">⭐ 5</option>
         </select>
+        <span id="cocktailCount" class="card-count" aria-live="polite"></span>
       </div>
 
       <div class="card-add-form">
-        <input id="newCocktailName" placeholder="Name">
-        <input id="newCocktailUrl" placeholder="Link">
+        <input id="newCocktailName" placeholder="Name" aria-label="Cocktailname" autocomplete="off">
+        <input id="newCocktailUrl" placeholder="Link (optional)" aria-label="Cocktail-Link" inputmode="url" autocomplete="url">
 
         <button onclick="addCardItem('cocktail')">➕ Hinzufügen</button>
       </div>
@@ -6098,23 +6195,25 @@ body.app-scene .skip-link:focus{left:12px}
     <div class="custom-list-heading-actions"><button class="random-card-button" type="button" onclick="openRandomCustomItem()">🎲 Zufällige Auswahl</button><button class="list-settings-button" type="button" onclick="openListSettings('custom')" aria-label="Einstellungen für eigene Liste" title="Listeneinstellungen">⚙</button></div>
   </div>
   <div class="card-controls custom-list-controls">
+    <input id="customListSearch" type="search" class="card-search" placeholder="🔍 Einträge suchen …" aria-label="Einträge in dieser Liste durchsuchen" autocomplete="off" oninput="renderCustomListItems()">
     <select id="customListSort" onchange="renderCustomListItems()" aria-label="Sortierung">
       <option value="created_desc">Neueste zuerst</option>
       <option value="name_asc">Name A–Z</option>
       <option value="name_desc">Name Z–A</option>
       <option value="rating_desc">Bewertung zuerst</option>
     </select>
-    <select id="customListFilter" onchange="renderCustomListItems()" aria-label="Filter">
+    <select id="customListFilter" onchange="renderCustomListItems()" aria-label="Einträge nach Status oder Bewertung filtern">
       <option value="all">Alle Einträge</option>
       <option value="open">Nur offene</option>
       <option value="checked">Nur erledigte</option>
       <option value="rated">Nur bewertete</option>
     </select>
+    <span id="customListCount" class="card-count" aria-live="polite"></span>
   </div>
   <div class="card-add-form custom-list-add-form">
-    <input id="newCustomItemName" placeholder="Name des neuen Eintrags">
-    <input id="newCustomItemUrl" placeholder="Link (optional)">
-    <input id="newCustomItemRating" type="number" min="0" max="5" step="1" placeholder="Bewertung 0–5">
+    <input id="newCustomItemName" placeholder="Name des neuen Eintrags" aria-label="Name des neuen Eintrags" autocomplete="off">
+    <input id="newCustomItemUrl" placeholder="Link (optional)" aria-label="Link zum neuen Eintrag" inputmode="url" autocomplete="url">
+    <input id="newCustomItemRating" type="number" min="0" max="5" step="1" placeholder="Bewertung 0–5" aria-label="Bewertung zwischen 0 und 5">
     <button type="button" onclick="addCustomListItem()">➕ Hinzufügen</button>
   </div>
   <div id="customListItems"></div>
@@ -7176,13 +7275,117 @@ function getVisibleCustomListItems() {
 function renderCustomListItems() {
   if (!customListItemsElement) return;
   customListItemsElement.innerHTML = "";
-  getVisibleCustomListItems().forEach(item => {
-    const row = document.createElement("div"); row.className = "movie-item";
-    row.innerHTML = `<div class="movie-item-top"><div class="movie-left"><input type="checkbox"><label></label></div><div class="movie-actions"><span class="btn-small">${Number(item.rating||0) ? "⭐".repeat(Number(item.rating)) : "☆"}</span><span class="btn-small custom-delete-item">❌</span></div></div>`;
-    const checkbox=row.querySelector("input"); checkbox.checked=!!item.checked; checkbox.onchange=async()=>{const {error}=await supabaseClient.from("custom_list_items").update({checked:checkbox.checked}).eq("id",item.id);if(!error){item.checked=checkbox.checked;renderCustomListItems();}else showSupabaseError("Fehler beim Aktualisieren des Eintrags",error);};
-    row.querySelector("label").textContent=item.name||"Unbenannt";
-    row.querySelector("label").onclick=()=>item.url&&window.open(item.url,"_blank");
-    row.querySelector(".custom-delete-item").onclick=async()=>{if(!confirm(`"${item.name}" wirklich löschen?`))return;const {error}=await supabaseClient.from("custom_list_items").delete().eq("id",item.id);if(!error){activeCustomListItems=activeCustomListItems.filter(x=>x.id!==item.id);renderCustomListItems();}else showSupabaseError("Fehler beim Löschen",error);};
+  customListItemsElement.classList.add("custom-item-list");
+
+  const query = document.getElementById("customListSearch")?.value.trim().toLocaleLowerCase("de") || "";
+  const allItems = getVisibleCustomListItems();
+  const items = query
+    ? allItems.filter(item => `${item.name || ""} ${item.url || ""}`.toLocaleLowerCase("de").includes(query))
+    : allItems;
+  const count = document.getElementById("customListCount");
+  if (count) {
+    count.textContent = items.length === activeCustomListItems.length
+      ? `${items.length} ${items.length === 1 ? "Eintrag" : "Einträge"}`
+      : `${items.length} von ${activeCustomListItems.length}`;
+  }
+
+  if (!items.length) {
+    const empty = document.createElement("div");
+    empty.className = "card-empty";
+    empty.textContent = activeCustomListItems.length
+      ? "Keine Einträge passen zu Suche oder Filter."
+      : "Noch keine Einträge vorhanden. Füge oben den ersten hinzu.";
+    customListItemsElement.appendChild(empty);
+    return;
+  }
+
+  items.forEach(item => {
+    const checked = Boolean(item.checked);
+    const row = document.createElement("div");
+    row.className = "custom-item-row";
+    row.classList.toggle("is-checked", checked);
+    row.dataset.id = item.id;
+
+    const label = document.createElement("label");
+    label.className = "custom-item-check";
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.checked = checked;
+    checkbox.setAttribute("aria-label", `${item.name || "Eintrag"} als ${checked ? "offen" : "erledigt"} markieren`);
+    const checkmark = document.createElement("span");
+    checkmark.className = "custom-item-checkmark";
+    checkmark.setAttribute("aria-hidden", "true");
+    checkmark.textContent = "✓";
+    label.append(checkbox, checkmark);
+
+    checkbox.onchange = async () => {
+      checkbox.disabled = true;
+      const { error } = await supabaseClient
+        .from("custom_list_items")
+        .update({ checked: checkbox.checked })
+        .eq("id", item.id);
+      if (!error) {
+        item.checked = checkbox.checked;
+        renderCustomListItems();
+      } else {
+        checkbox.disabled = false;
+        checkbox.checked = !checkbox.checked;
+        showSupabaseError("Fehler beim Aktualisieren des Eintrags", error);
+      }
+    };
+
+    const name = item.name || "Unbenannt";
+    const title = item.url ? document.createElement("a") : document.createElement("span");
+    title.className = "custom-item-title";
+    title.textContent = name;
+    if (item.url) {
+      title.href = normalize(item.url);
+      title.target = "_blank";
+      title.rel = "noopener noreferrer";
+      title.setAttribute("aria-label", `${name} in neuem Tab öffnen`);
+    }
+
+    const main = document.createElement("div");
+    main.className = "custom-item-main";
+    main.appendChild(title);
+    if (item.url) {
+      const linkHint = document.createElement("span");
+      linkHint.className = "custom-item-link-hint";
+      linkHint.textContent = "Link verfügbar";
+      main.appendChild(linkHint);
+    }
+
+    const rating = Number(item.rating || 0);
+    const ratingBadge = document.createElement("span");
+    ratingBadge.className = "custom-item-rating";
+    ratingBadge.textContent = rating ? `★ ${rating}/5` : "Unbewertet";
+    ratingBadge.setAttribute("aria-label", rating ? `Bewertung ${rating} von 5` : "Unbewertet");
+
+    const deleteButton = document.createElement("button");
+    deleteButton.type = "button";
+    deleteButton.className = "custom-delete-item danger-button";
+    deleteButton.textContent = "Löschen";
+    deleteButton.setAttribute("aria-label", `${name} löschen`);
+    deleteButton.onclick = async () => {
+      if (!confirm(`"${name}" wirklich löschen?`)) return;
+      deleteButton.disabled = true;
+      const { error } = await supabaseClient
+        .from("custom_list_items")
+        .delete()
+        .eq("id", item.id);
+      if (!error) {
+        activeCustomListItems = activeCustomListItems.filter(entry => entry.id !== item.id);
+        renderCustomListItems();
+      } else {
+        deleteButton.disabled = false;
+        showSupabaseError("Fehler beim Löschen", error);
+      }
+    };
+
+    const actions = document.createElement("div");
+    actions.className = "custom-item-actions";
+    actions.append(ratingBadge, deleteButton);
+    row.append(label, main, actions);
     customListItemsElement.appendChild(row);
   });
 }
