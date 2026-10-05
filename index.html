@@ -5510,6 +5510,102 @@ body.color-vision-mode #gamesApp .game-icon-btn-del:hover{background:#2a3b4c!imp
   #customListApp .custom-item-row{grid-template-columns:40px minmax(0,1fr);padding:9px}
   #customListApp .custom-item-check{width:40px;height:44px}
 }
+/* ===== Mobile breakpoint audit: prevent clipped controls and overflow ===== */
+@media(max-width:900px){
+  body.app-scene .app-panel{min-width:0;overflow:visible}
+  body.app-scene .app-panel :is(button,input,select,textarea){min-width:0;max-width:100%}
+  body.app-scene .app-panel button{min-height:44px}
+  body.app-scene .list-panel-heading>div{min-width:0}
+  body.app-scene .list-panel-heading h2,
+  body.app-scene .step-heading h3,
+  body.app-scene .panel-subtitle{overflow-wrap:anywhere}
+  #appointmentsApp .calendar-day,#appointmentsApp .time-chip,#appointmentsApp .calendar-nav-button{min-height:44px}
+}
+@media(max-width:760px){
+  body.app-scene .app-panel button{white-space:normal;overflow-wrap:anywhere;line-height:1.25}
+  #moviesApp .movie-add-section button{grid-column:1/-1;width:100%;min-height:48px}
+  #feastApp .card-add-form,#gamesApp .games-column-form,#gamesApp .games-add-form{grid-template-columns:minmax(0,1fr)}
+  #feastApp .card-add-form button,#gamesApp .games-column-form button,#gamesApp .games-add-form button{grid-column:1/-1;width:100%;min-height:48px;white-space:normal}
+  #beerApp .card-actions,#cocktailApp .card-actions{flex-wrap:wrap;gap:7px}
+  #beerApp .card-actions .btn,#cocktailApp .card-actions .btn{flex:0 0 44px;width:44px;min-width:44px;height:44px}
+  #beerApp .card-actions .btn-del,#cocktailApp .card-actions .btn-del{margin-left:auto}
+  #cocktailApp .card-stars .star{min-height:44px}
+  #yugiohApp .yugioh-actions button{min-height:44px}
+  #appointmentsApp .appointment-tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+  #appointmentsApp .appointment-tab{min-width:0;min-height:46px;padding:8px 10px;white-space:normal}
+  #appointmentsApp .calendar-legend{row-gap:8px}
+  #appointmentsApp .saved-appointment-actions button{min-height:44px}
+  #gamesApp .games-table-wrapper{overscroll-behavior-x:contain}
+  #gamesApp .game-mobile-check-title{white-space:normal;overflow-wrap:anywhere;line-height:1.35}
+  #gamesApp .game-mobile-check-row{min-width:0}
+  #gamesApp .game-check-wrap--row{min-width:0}
+  #gamesApp .games-column-chip-name{max-width:min(60vw,260px);white-space:normal;overflow-wrap:anywhere}
+  .feast-tile-link,.feast-tile-reroll{min-height:44px;white-space:normal;overflow-wrap:anywhere;overflow:visible;text-overflow:clip;line-height:1.25}
+  .assignment-popup-box{width:100%;max-width:100%;max-height:calc(100dvh - 24px);padding:18px 14px}
+  .assignment-popup-results{grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr))}
+  .assignment-popup-actions button{min-width:0;min-height:44px;white-space:normal;overflow-wrap:anywhere}
+}
+@media(max-width:600px){
+  #moviesApp .movie-toolbar,#gamesApp .games-toolbar{grid-template-columns:minmax(0,1fr)}
+  #moviesApp .movie-add-section{grid-template-columns:minmax(0,1fr)}
+  #moviesApp .movie-add-section button{grid-column:auto}
+  #beerApp .card-add-form,#cocktailApp .card-add-form{grid-template-columns:minmax(0,1fr)}
+  #beerApp .card-add-form button,#cocktailApp .card-add-form button{grid-column:auto}
+  #beerApp .card-actions,#cocktailApp .card-actions{width:100%}
+  #customListApp .custom-list-add-form{grid-template-columns:minmax(0,1fr)}
+  #customListApp .custom-list-add-form button{grid-column:auto}
+  #customListApp .custom-item-actions{min-width:0;flex-wrap:wrap}
+  #customListApp .custom-item-rating{white-space:normal}
+  #appointmentsApp .best-day-title{flex-wrap:wrap;gap:6px}
+  #appointmentsApp .best-day-badge{margin-left:0}
+  #appointmentsApp .calendar-legend>span{max-width:100%;flex-wrap:wrap}
+  .assignment-popup-actions{grid-template-columns:minmax(0,1fr)}
+  .assignment-popup-actions .assignment-duel-button{grid-column:auto}
+}
+@media(max-width:480px){
+  body.app-scene .app-panel{padding-inline:10px}
+  body.app-scene .list-panel-heading{align-items:flex-start}
+  body.app-scene .list-panel-heading h2{font-size:clamp(17px,5vw,19px)}
+  #moviesApp .movie-seg{flex-wrap:wrap}
+  #moviesApp .movie-seg button{flex:1 1 30%;min-width:72px;padding-inline:6px}
+  #gamesApp .games-seg button{flex:1 1 45%;min-width:0;padding-inline:7px;white-space:normal}
+  #gamesApp .game-mobile-card .game-row-main{gap:9px}
+  #gamesApp .game-mobile-card .game-image-wrapper{width:72px;flex:0 0 72px}
+  #gamesApp .game-mobile-checks{grid-template-columns:minmax(0,1fr)}
+  #yugiohApp .yugioh-add-form{grid-template-columns:minmax(0,1fr)}
+  #yugiohApp .yugioh-add-form>*{grid-column:1/-1;min-width:0}
+  #yugiohApp .yugioh-filter-bar .yugioh-sort{width:100%;min-width:0}
+  #yugiohApp .yugioh-actions{grid-template-columns:minmax(0,1fr)}
+  #yugiohApp .yugioh-actions .yugioh-delete-button{grid-column:auto}
+  #customListApp .custom-item-row{grid-template-columns:36px minmax(0,1fr)}
+  #appointmentsApp .step-heading>.local-only-badge{justify-self:start;max-width:100%;white-space:normal}
+  #appointmentsApp .own-avail-row{grid-template-columns:minmax(0,1fr) auto auto;gap:6px;padding:9px}
+  #appointmentsApp .own-avail-row input[type=time]{width:104px;min-width:0}
+  #appointmentsApp .own-avail-date{font-size:12px;overflow-wrap:anywhere}
+  #appointmentsApp .own-avail-remove{width:40px!important}
+  #appointmentsApp .saved-appointment-actions{display:grid;grid-template-columns:minmax(0,1fr)}
+  #appointmentsApp .saved-appointment-actions button{width:100%;min-width:0}
+  .assignment-popup-actions{grid-template-columns:minmax(0,1fr)}
+}
+@media(max-width:380px){
+  body.app-scene .app-panel{padding-inline:8px}
+  #moviesApp .movie-actions{flex-wrap:wrap}
+  #moviesApp .movie-btn-del{margin-left:0}
+  #feastApp .card-actions{flex-wrap:wrap}
+  #feastApp .btn-del{margin-left:auto}
+  #beerApp .card-actions .btn-del,#cocktailApp .card-actions .btn-del{margin-left:0}
+  #customListApp .custom-item-actions{grid-column:1/-1;padding-left:36px}
+  #customListApp .custom-delete-item{flex:1 1 auto}
+  #appointmentsApp .calendar-day{min-height:44px!important}
+  #appointmentsApp .calendar-toolbar{grid-template-columns:38px minmax(0,1fr) 38px}
+  #appointmentsApp .calendar-toolbar button{width:38px;height:38px}
+  #appointmentsApp .own-avail-row{grid-template-columns:minmax(0,1fr) auto}
+  #appointmentsApp .own-avail-row input[type=time]{grid-column:1}
+  #appointmentsApp .own-avail-remove{grid-column:2;grid-row:1/3}
+  .duel-quick{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .duel-topbar{min-width:0}
+  .duel-box h3{white-space:normal;overflow-wrap:anywhere}
+}
 @media(prefers-reduced-motion:reduce){.movie-item,.card-item,.yugioh-deck-card,.game-mobile-card,.custom-item-row,.best-day-row,.admin-user-row{transition:none}}
 </style>
 
