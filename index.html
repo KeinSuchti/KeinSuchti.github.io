@@ -9046,23 +9046,26 @@ async function saveNextAppointment() {
   try {
     const payload = { title, start_at:startAt.toISOString(), location, note, user_id:currentUser.id };
 
-    // Es gibt genau einen gemeinsamen nächsten Termin: den vorhandenen
-    // (egal von wem) aktualisieren, sonst neu anlegen.
-    const existingResult = await supabaseClient
+    // Der gemeinsame Termin darf pro Nutzer nur genau einmal existieren.
+    // Deshalb den eigenen Eintrag aktualisieren, statt den nächsten fremden
+    // Eintrag zu überschreiben und damit einen Unique-Constraint-Fehler zu
+    // erzeugen, wenn auf user_id in shared_events ein Unique-Index liegt.
+    const ownLookup = await supabaseClient
       .from("shared_events")
-      .select("id")
-      .gte("start_at", new Date().toISOString())
-      .order("start_at", { ascending: true })
+      .select("id,user_id,created_at")
+      .eq("user_id", currentUser.id)
+      .order("created_at", { ascending: false })
       .limit(1);
-    if (existingResult.error) throw existingResult.error;
+    if (ownLookup.error) throw ownLookup.error;
 
     let result;
-    const existing = existingResult.data?.[0];
+    const existing = ownLookup.data?.[0] || null;
     if (existing?.id) {
       result = await supabaseClient
         .from("shared_events")
         .update({ title, start_at:startAt.toISOString(), location, note })
-        .eq("id", existing.id);
+        .eq("id", existing.id)
+        .eq("user_id", currentUser.id);
     } else {
       result = await supabaseClient
         .from("shared_events")
