@@ -5174,6 +5174,7 @@ a.feast-tile-media:hover img{transform:scale(1.06)}
 .feast-tile-close:focus-visible,.feast-tile-link:focus-visible,.feast-tile-reroll:focus-visible,a.feast-tile-media:focus-visible{outline:2px solid var(--accent-2);outline-offset:2px}
 .feast-pin-note{margin:10px 2px 0;padding:8px 12px;border-radius:10px;border:1px dashed rgba(230,190,90,.55);background:rgba(230,190,90,.08);color:#f2dca0;font-size:13px;font-weight:600}
 .feast-pin-note[hidden]{display:none}
+.feast-shared-caption{margin:-8px 0 16px;color:var(--text-muted);font-size:12px;text-align:center}
 @media (max-width:760px){
   .feast-pinned-grid{grid-template-columns:1fr;gap:10px}
 }
@@ -6159,6 +6160,7 @@ body.app-scene .skip-link:focus{left:12px}
       <button class="random-card-button" onclick="pinFeastPicks()">
         🎲 Was fressen wir?
       </button>
+      <p class="feast-shared-caption">Die aktuelle Auswahl ist für alle Nutzer sichtbar.</p>
 
       <section id="feastPinned" aria-label="Heutige Auswahl" hidden>
         <div id="feastPinnedGrid" class="feast-pinned-grid"></div>
@@ -10473,6 +10475,11 @@ async function loadCardItems(type) {
 
   config.items = data || [];
 
+  if (type === "feast") {
+    await loadFeastPinned();
+    startFeastPicksRealtime();
+  }
+
   setStatus("");
   renderCardItems(type);
 }
@@ -11176,36 +11183,101 @@ let feastPinned = { snack: null, dinner: null };
 let feastPinnedLoadedFor = null;
 let feastPinAnimate = {};
 let feastPinNoteTimer = null;
+let feastPinnedLoadError = "";
+let feastPinnedSaving = false;
+let feastPinnedLoadGeneration = 0;
+let feastPicksRealtimeChannel = null;
 
-function feastPinStorageKey() {
-  let userId = "anon";
-  try { if (currentUser && currentUser.id) userId = currentUser.id; } catch (e) {}
-  return "feastPinned:" + userId;
+function ensureFeastPinnedLoaded() {
+  return !!currentUser && feastPinnedLoadedFor === currentUser.id;
 }
 
-/* Laden nur einmal pro Nutzer, nicht bei jedem Rendern */
-function ensureFeastPinnedLoaded() {
-  const key = feastPinStorageKey();
-  if (feastPinnedLoadedFor === key) return;
-
-  feastPinnedLoadedFor = key;
-
-  try {
-    const raw = localStorage.getItem(key);
-    const saved = raw ? JSON.parse(raw) : {};
-    feastPinned = {
-      snack: saved && saved.snack != null ? saved.snack : null,
-      dinner: saved && saved.dinner != null ? saved.dinner : null
-    };
-  } catch (e) {
+async function loadFeastPinned() {
+  if (!currentUser || !supabaseClient) return false;
+  const userId = currentUser.id;
+  const generation = ++feastPinnedLoadGeneration;
+  if (feastPinnedLoadedFor !== userId) {
     feastPinned = { snack: null, dinner: null };
+    feastPinnedLoadedFor = null;
+  }
+
+  const { data, error } = await supabaseClient
+    .from("feast_pinned_selection")
+    .select("snack_item_id,dinner_item_id")
+    .eq("id", 1)
+    .maybeSingle();
+
+  if (generation !== feastPinnedLoadGeneration || currentUser?.id !== userId) return false;
+  if (error) {
+    console.error("Gemeinsame Feast-Auswahl konnte nicht geladen werden:", error);
+    feastPinnedLoadError = `Gemeinsame Auswahl konnte nicht geladen werden (${error.message || "unbekannter Fehler"}). Bitte die Feast-Auswahl-Migration ausführen.`;
+    renderFeastPinned();
+    return false;
+  }
+
+  feastPinned = {
+    snack: data?.snack_item_id ?? null,
+    dinner: data?.dinner_item_id ?? null
+  };
+  feastPinnedLoadedFor = userId;
+  if (feastPinnedLoadError) {
+    const note = document.getElementById("feastPinnedNote");
+    if (note) note.hidden = true;
+  }
+  feastPinnedLoadError = "";
+  renderFeastPinned();
+  return true;
+}
+
+async function saveFeastPinned(next) {
+  if (!ensureFeastPinnedLoaded() || feastPinnedSaving) return false;
+
+  feastPinnedSaving = true;
+  renderFeastPinned();
+  const payload = {
+    id: 1,
+    snack_item_id: next.snack == null ? null : String(next.snack),
+    dinner_item_id: next.dinner == null ? null : String(next.dinner)
+  };
+  try {
+    const { error } = await supabaseClient
+      .from("feast_pinned_selection")
+      .upsert(payload, { onConflict: "id" });
+    if (error) throw error;
+    feastPinned = { snack: payload.snack_item_id, dinner: payload.dinner_item_id };
+    if (feastPinnedLoadError) {
+      const note = document.getElementById("feastPinnedNote");
+      if (note) note.hidden = true;
+    }
+    feastPinnedLoadError = "";
+    return true;
+  } catch (error) {
+    console.error("Gemeinsame Feast-Auswahl konnte nicht gespeichert werden:", error);
+    feastPinnedLoadError = `Gemeinsame Auswahl konnte nicht gespeichert werden (${error?.message || "unbekannter Fehler"}).`;
+    return false;
+  } finally {
+    feastPinnedSaving = false;
+    renderFeastPinned();
   }
 }
 
-function saveFeastPinned() {
+function startFeastPicksRealtime() {
+  if (feastPicksRealtimeChannel || !supabaseClient || !currentUser) return;
   try {
-    localStorage.setItem(feastPinStorageKey(), JSON.stringify(feastPinned));
-  } catch (e) {}
+    feastPicksRealtimeChannel = supabaseClient.channel("feast-pinned-selection")
+      .on("postgres_changes", {
+        event: "*",
+        schema: "public",
+        table: "feast_pinned_selection"
+      }, () => loadFeastPinned())
+      .subscribe((status) => {
+        if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
+          console.error("Live-Synchronisierung der Feast-Auswahl fehlgeschlagen:", status);
+        }
+      });
+  } catch (error) {
+    console.error("Live-Synchronisierung der Feast-Auswahl konnte nicht gestartet werden:", error);
+  }
 }
 
 function findFeastItem(id) {
@@ -11236,7 +11308,7 @@ function showFeastPinNote(message) {
   feastPinNoteTimer = setTimeout(function() { note.hidden = true; }, 5000);
 }
 
-function pinFeastPicks() {
+async function pinFeastPicks() {
   const config = cardLists.feast;
 
   if (!config || !Array.isArray(config.items)) {
@@ -11244,7 +11316,12 @@ function pinFeastPicks() {
     return;
   }
 
-  ensureFeastPinnedLoaded();
+  if (!ensureFeastPinnedLoaded()) {
+    if (!await loadFeastPinned()) {
+      showRandomPopup("Die gemeinsame Auswahl konnte nicht geladen werden. Bitte später erneut versuchen.");
+      return;
+    }
+  }
 
   const first = pickFeastItem([]);
 
@@ -11255,9 +11332,9 @@ function pinFeastPicks() {
 
   const second = pickFeastItem([first.id]);
 
-  feastPinned = { snack: first.id, dinner: second ? second.id : null };
+  const next = { snack: first.id, dinner: second ? second.id : null };
+  if (!await saveFeastPinned(next)) return;
   feastPinAnimate = { snack: true, dinner: true };
-  saveFeastPinned();
   renderFeastPinned();
 
   if (!second) {
@@ -11268,8 +11345,8 @@ function pinFeastPicks() {
   if (box && box.scrollIntoView) box.scrollIntoView({ block: "nearest", behavior: "smooth" });
 }
 
-function rerollFeastPin(slotKey) {
-  ensureFeastPinnedLoaded();
+async function rerollFeastPin(slotKey) {
+  if (!ensureFeastPinnedLoaded() || feastPinnedSaving) return;
 
   const otherKey = slotKey === "snack" ? "dinner" : "snack";
   const next = pickFeastItem([feastPinned[otherKey], feastPinned[slotKey]]);
@@ -11279,17 +11356,15 @@ function rerollFeastPin(slotKey) {
     return;
   }
 
-  feastPinned[slotKey] = next.id;
+  const updated = { ...feastPinned, [slotKey]: next.id };
+  if (!await saveFeastPinned(updated)) return;
   feastPinAnimate[slotKey] = true;
-  saveFeastPinned();
   renderFeastPinned();
 }
 
-function removeFeastPin(slotKey) {
-  ensureFeastPinnedLoaded();
-  feastPinned[slotKey] = null;
-  saveFeastPinned();
-  renderFeastPinned();
+async function removeFeastPin(slotKey) {
+  if (!ensureFeastPinnedLoaded() || feastPinnedSaving) return;
+  await saveFeastPinned({ ...feastPinned, [slotKey]: null });
 }
 
 function feastLinkHost(url) {
@@ -11305,7 +11380,8 @@ function renderFeastPinned() {
   const grid = document.getElementById("feastPinnedGrid");
   if (!box || !grid) return;
 
-  ensureFeastPinnedLoaded();
+  const pickButton = document.querySelector("#feastApp > .random-card-button");
+  if (pickButton) pickButton.disabled = feastPinnedSaving;
   grid.replaceChildren();
 
   let changed = false;
@@ -11326,14 +11402,27 @@ function renderFeastPinned() {
     }
   });
 
-  if (changed) saveFeastPinned();
+  if (changed && ensureFeastPinnedLoaded() && !feastPinnedSaving) {
+    saveFeastPinned(feastPinned);
+    return;
+  }
 
   /* Ohne jede Auswahl bleibt der Bereich ausgeblendet */
-  if (Object.keys(resolved).length === 0) {
+  if (Object.keys(resolved).length === 0 && !feastPinnedLoadError) {
     box.hidden = true;
     const note = document.getElementById("feastPinnedNote");
     if (note) note.hidden = true;
     feastPinAnimate = {};
+    return;
+  }
+
+  if (Object.keys(resolved).length === 0) {
+    box.hidden = false;
+    const note = document.getElementById("feastPinnedNote");
+    if (note) {
+      note.textContent = feastPinnedLoadError;
+      note.hidden = false;
+    }
     return;
   }
 
@@ -11392,6 +11481,7 @@ function renderFeastPinned() {
       closeBtn.type = "button";
       closeBtn.className = "feast-tile-close";
       closeBtn.textContent = "✕";
+      closeBtn.disabled = feastPinnedSaving;
       closeBtn.title = slot.label + " entfernen";
       closeBtn.setAttribute("aria-label", slot.label + " entfernen");
       closeBtn.onclick = function(event) {
@@ -11424,7 +11514,7 @@ function renderFeastPinned() {
     const rerollBtn = document.createElement("button");
     rerollBtn.type = "button";
     rerollBtn.className = "feast-tile-reroll";
-    rerollBtn.disabled = !canReroll;
+    rerollBtn.disabled = !canReroll || feastPinnedSaving;
     rerollBtn.title = canReroll ? slot.label + " neu auswürfeln" : "Kein weiterer Eintrag verfügbar";
     rerollBtn.setAttribute("aria-label", slot.label + " neu auswürfeln");
     rerollBtn.innerHTML = '<span class="feast-dice" aria-hidden="true">🎲</span> Neu würfeln';
@@ -11438,6 +11528,11 @@ function renderFeastPinned() {
 
   feastPinAnimate = {};
   box.hidden = false;
+  const note = document.getElementById("feastPinnedNote");
+  if (note && feastPinnedLoadError) {
+    note.textContent = feastPinnedLoadError;
+    note.hidden = false;
+  }
 }
 
 function openRandomUnratedCard(type) {
