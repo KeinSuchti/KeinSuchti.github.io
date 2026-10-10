@@ -1,5 +1,12 @@
 # Serien
 
+## Gemeinsame Feast-Auswahl
+
+Damit die ausgewürfelten Snack- und Abendessen-Einträge für alle angemeldeten Nutzer sichtbar
+sind und live synchronisiert werden, führe
+[`supabase/migrations/20261010000000_add_shared_feast_selection.sql`](supabase/migrations/20261010000000_add_shared_feast_selection.sql)
+im Supabase SQL Editor aus.
+
 ## Desktop-App und Android-APK
 
 Die Apps laden die veröffentlichte Webseite `https://keinsuchti.github.io/` in einer
