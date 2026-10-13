@@ -84,27 +84,31 @@ create policy custom_list_items_authenticated_shared_read
   using ((select auth.uid()) is not null);
 
 insert into public.item_ratings (item_type, item_id, user_id, rating)
-select 'feast', id::text, user_id, rating::numeric
-from public.feast_items
-where user_id is not null and rating > 0 and rating <= 5
+select 'feast', item.id::text, owner.id, item.rating::numeric
+from public.feast_items as item
+join auth.users as owner on owner.id::text = item.user_id::text
+where item.rating > 0 and item.rating <= 5
 on conflict (item_type, item_id, user_id) do nothing;
 
 insert into public.item_ratings (item_type, item_id, user_id, rating)
-select 'beer', id::text, user_id, rating::numeric
-from public.beer_items
-where user_id is not null and rating >= 1 and rating <= 6
+select 'beer', item.id::text, owner.id, item.rating::numeric
+from public.beer_items as item
+join auth.users as owner on owner.id::text = item.user_id::text
+where item.rating >= 1 and item.rating <= 6
 on conflict (item_type, item_id, user_id) do nothing;
 
 insert into public.item_ratings (item_type, item_id, user_id, rating)
-select 'cocktail', id::text, user_id, rating::numeric
-from public.cocktail_items
-where user_id is not null and rating > 0 and rating <= 5
+select 'cocktail', item.id::text, owner.id, item.rating::numeric
+from public.cocktail_items as item
+join auth.users as owner on owner.id::text = item.user_id::text
+where item.rating > 0 and item.rating <= 5
 on conflict (item_type, item_id, user_id) do nothing;
 
 insert into public.item_ratings (item_type, item_id, user_id, rating)
-select 'custom_list', id::text, user_id, rating::numeric
-from public.custom_list_items
-where user_id is not null and rating > 0 and rating <= 5
+select 'custom_list', item.id::text, owner.id, item.rating::numeric
+from public.custom_list_items as item
+join auth.users as owner on owner.id::text = item.user_id::text
+where item.rating > 0 and item.rating <= 5
 on conflict (item_type, item_id, user_id) do nothing;
 
 commit;
