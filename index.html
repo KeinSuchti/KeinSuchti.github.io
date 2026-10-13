@@ -560,6 +560,23 @@ input[type="checkbox"] {
   opacity: 1;
 }
 
+.card-stars .star,
+.custom-item-ratings .star {
+  padding: 4px;
+  border: 0;
+  background: transparent;
+  color: var(--star);
+  font: inherit;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.rating-average {
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
 .card-add-form {
   margin-top: 15px;
   display: grid;
@@ -5475,7 +5492,10 @@ body.color-vision-mode #gamesApp .game-icon-btn-del:hover{background:#2a3b4c!imp
 #customListApp .custom-item-link-hint{color:var(--text-faint);font-size:11px}
 #customListApp .custom-item-actions{display:flex;align-items:center;gap:8px}
 #customListApp .custom-item-rating{color:var(--text-muted);font-size:12px;font-weight:800;white-space:nowrap}
+#customListApp .custom-item-ratings{display:flex;align-items:center;flex-wrap:wrap;gap:2px}
 #customListApp .custom-delete-item{width:auto;min-height:40px;margin:0;padding:7px 11px;font-size:12px}
+#customListApp .custom-delete-item[hidden]{display:none}
+#customListApp .custom-list-add-form[hidden]{display:none}
 .own-avail-row{min-height:58px}
 .own-avail-row input[type=time]{min-height:44px}
 .best-day-row{transition:border-color .18s ease,transform .18s ease,background-color .18s ease}
@@ -6230,7 +6250,7 @@ body.app-scene .skip-link:focus{left:12px}
         <input
           id="newBeerRating"
           class="beer-add-rating-input"
-          placeholder="Bewertung optional, z. B. 2,6"
+          placeholder="Deine Note optional, z. B. 2,6"
           aria-label="Optionale Bierbewertung"
           inputmode="decimal"
         >
@@ -6311,7 +6331,7 @@ body.app-scene .skip-link:focus{left:12px}
   <div class="card-add-form custom-list-add-form">
     <input id="newCustomItemName" placeholder="Name des neuen Eintrags" aria-label="Name des neuen Eintrags" autocomplete="off">
     <input id="newCustomItemUrl" placeholder="Link (optional)" aria-label="Link zum neuen Eintrag" inputmode="url" autocomplete="url">
-    <input id="newCustomItemRating" type="number" min="0" max="5" step="1" placeholder="Bewertung 0–5" aria-label="Bewertung zwischen 0 und 5">
+    <input id="newCustomItemRating" type="number" min="0" max="5" step="1" placeholder="Deine Bewertung 0–5" aria-label="Deine Bewertung zwischen 0 und 5">
     <button type="button" onclick="addCustomListItem()">➕ Hinzufügen</button>
   </div>
   <div id="customListItems"></div>
@@ -6677,13 +6697,15 @@ function normalize(url) {
 function debounce(callback, delay = 700) {
   let timeout;
 
-  return function (...args) {
+  const debounced = function (...args) {
     clearTimeout(timeout);
 
     timeout = setTimeout(() => {
       callback(...args);
     }, delay);
   };
+  debounced.cancel = () => clearTimeout(timeout);
+  return debounced;
 }
 
 
@@ -6886,23 +6908,6 @@ function openCardEdit(type, itemId) {
 
   if (type !== "beer") {
     fields.push({ key: "url", label: "Link", value: item.url || "", placeholder: "https://..." });
-    fields.push({
-      key: "rating",
-      label: "Bewertung 0–5 Sterne",
-      type: "number",
-      min: "0",
-      max: "5",
-      step: "1",
-      value: String(Number(item.rating || 0))
-    });
-  } else {
-    fields.push({
-      key: "rating",
-      label: "Bier-Note 1,0–6,0 oder leer für ohne Bewertung",
-      value: Number(item.rating || 0) > 0 ? formatBeerGrade(item.rating) : "",
-      inputMode: "decimal",
-      placeholder: "z. B. 2,6"
-    });
   }
 
   fields.push({ key: "comment", label: "Kommentar", type: "textarea", value: item.comment || "" });
@@ -7054,29 +7059,11 @@ async function saveCardEdit() {
   };
 
   let shouldTryAutoImage = false;
-
-  if (type === "beer") {
-    const ratingText = getEditInputValue("rating");
-    const rating = parseBeerRatingInput(ratingText);
-
-    if (rating === null) {
-      alert("Bitte eine gültige Bier-Bewertung zwischen 1,0 und 6,0 eingeben oder das Feld leer lassen.");
-      return;
-    }
-
-    changes.rating = rating;
-  } else {
+  if (type !== "beer") {
     const rawUrl = getEditInputValue("url");
     const normalizedUrl = rawUrl ? normalize(rawUrl) : "";
-    const rating = Number(getEditInputValue("rating") || 0);
-
-    if (!Number.isInteger(rating) || rating < 0 || rating > 5) {
-      alert("Bitte eine Bewertung zwischen 0 und 5 eingeben.");
-      return;
-    }
 
     changes.url = normalizedUrl;
-    changes.rating = rating;
     shouldTryAutoImage = normalizedUrl && normalizedUrl !== (item.url || "") && !item.image;
   }
 
@@ -7229,6 +7216,7 @@ function listSettingsStorageKey(key, suffix) { return `wfg-list-setting:${curren
 function getListSetting(key, suffix, fallback) { return localStorage.getItem(listSettingsStorageKey(key, suffix)) || fallback; }
 function openListSettings(key) {
   if (!currentUser) { showLogin(); return; }
+  if (key === "custom" && activeCustomList?.user_id !== currentUser.id) return;
   activeSettingsKey = key;
   document.getElementById("listSettingsHint").textContent = `Einstellungen für ${listSettingsNames[key] || "diese Liste"}`;
   document.getElementById("listSettingsRandom").value = getListSetting(key, "random", "all");
@@ -7242,6 +7230,10 @@ function closeListSettings() { document.getElementById("listSettingsDialog").sty
 function closeListSettingsOnOverlay(event) { if (event.target.id === "listSettingsDialog") closeListSettings(); }
 function saveListSettings() {
   if (!activeSettingsKey) return;
+  if (activeSettingsKey === "custom" && activeCustomList?.user_id !== currentUser?.id) {
+    closeListSettings();
+    return;
+  }
   const randomMode = document.getElementById("listSettingsRandom").value;
   const filterMode = document.getElementById("listSettingsFilter").value;
   localStorage.setItem(listSettingsStorageKey(activeSettingsKey, "random"), randomMode);
@@ -7334,14 +7326,16 @@ function renderCustomListCards() {
     const body = document.createElement("div"); body.className = "dashboard-card-body";
     body.innerHTML = `<span class="card-icon">✦</span><div><h3></h3><p></p></div>`;
     body.querySelector("h3").textContent = list.name;
-    body.querySelector("p").textContent = list.description || "Eigene konfigurierbare Liste.";
+    body.querySelector("p").textContent = list.user_id === currentUser?.id
+      ? list.description || "Deine konfigurierbare Liste."
+      : `${list.description || "Konfigurierbare Liste."} · Geteilt`;
     card.append(image, body); host.appendChild(card);
   });
   applyOverviewImages();
 }
 async function loadCustomLists() {
   if (!currentUser) return;
-  const { data, error } = await supabaseClient.from("custom_lists").select("*").eq("user_id", currentUser.id).order("created_at", { ascending: false });
+  const { data, error } = await supabaseClient.from("custom_lists").select("*").order("created_at", { ascending: false });
   if (error) { console.warn("Eigene Listen sind noch nicht verfügbar:", error.message); return; }
   customLists = data || [];
   renderCustomListCards();
@@ -7353,8 +7347,15 @@ function openCustomList(id) {
 }
 function renderCustomListPanel() {
   if (!activeCustomList) return;
+  const ownsList = activeCustomList.user_id === currentUser?.id;
   customListTitle.textContent = activeCustomList.name;
-  customListDescription.textContent = activeCustomList.description || "Deine persönliche Sammlung mit Suche, Filtern und Zufallsauswahl.";
+  customListDescription.textContent = ownsList
+    ? activeCustomList.description || "Deine Sammlung mit Suche, Filtern und Zufallsauswahl."
+    : `${activeCustomList.description || "Gemeinsame Sammlung mit Suche, Filtern und Zufallsauswahl."} · Geteilte Liste`;
+  const addForm = document.querySelector("#customListApp .custom-list-add-form");
+  if (addForm) addForm.hidden = !ownsList;
+  const settingsButton = document.querySelector("#customListApp .list-settings-button");
+  if (settingsButton) settingsButton.hidden = !ownsList;
   customListSort.value = activeCustomList.sort_mode || "created_desc";
   customListFilter.value = activeCustomList.filter_mode || "all";
   renderCustomListItems();
@@ -7409,6 +7410,7 @@ function renderCustomListItems() {
     const checkbox = document.createElement("input");
     checkbox.type = "checkbox";
     checkbox.checked = checked;
+    checkbox.disabled = activeCustomList.user_id !== currentUser?.id;
     checkbox.setAttribute("aria-label", `${item.name || "Eintrag"} als ${checked ? "offen" : "erledigt"} markieren`);
     const checkmark = document.createElement("span");
     checkmark.className = "custom-item-checkmark";
@@ -7453,16 +7455,32 @@ function renderCustomListItems() {
       main.appendChild(linkHint);
     }
 
-    const rating = Number(item.rating || 0);
-    const ratingBadge = document.createElement("span");
-    ratingBadge.className = "custom-item-rating";
-    ratingBadge.textContent = rating ? `★ ${rating}/5` : "Unbewertet";
-    ratingBadge.setAttribute("aria-label", rating ? `Bewertung ${rating} von 5` : "Unbewertet");
+    const ratings = document.createElement("div");
+    ratings.className = "custom-item-ratings";
+    ratings.setAttribute("role", "group");
+    ratings.setAttribute("aria-label", `Bewertung für ${name}`);
+    for (let score = 1; score <= 5; score++) {
+      const star = document.createElement("button");
+      star.type = "button";
+      star.className = "star" + (Number(item.myRating || 0) >= score ? " active" : "");
+      star.textContent = "⭐";
+      star.setAttribute("aria-label", `Deine Bewertung: ${score} ${score === 1 ? "Stern" : "Sterne"}`);
+      star.title = `Mit ${score} ${score === 1 ? "Stern" : "Sternen"} bewerten`;
+      star.onclick = async () => {
+        await saveItemRating("custom_list", item.id, Number(item.myRating) === score ? null : score);
+      };
+      ratings.appendChild(star);
+    }
+    const ratingAverage = document.createElement("span");
+    ratingAverage.className = "custom-item-rating";
+    ratingAverage.textContent = itemRatingLabel(item, 5);
+    ratings.appendChild(ratingAverage);
 
     const deleteButton = document.createElement("button");
     deleteButton.type = "button";
     deleteButton.className = "custom-delete-item danger-button";
     deleteButton.textContent = "Löschen";
+    deleteButton.hidden = activeCustomList.user_id !== currentUser?.id;
     deleteButton.setAttribute("aria-label", `${name} löschen`);
     deleteButton.onclick = async () => {
       if (!confirm(`"${name}" wirklich löschen?`)) return;
@@ -7482,7 +7500,7 @@ function renderCustomListItems() {
 
     const actions = document.createElement("div");
     actions.className = "custom-item-actions";
-    actions.append(ratingBadge, deleteButton);
+    actions.append(ratings, deleteButton);
     row.append(label, main, actions);
     customListItemsElement.appendChild(row);
   });
@@ -7490,15 +7508,24 @@ function renderCustomListItems() {
 async function loadCustomListItems() {
   const {data,error}=await supabaseClient.from("custom_list_items").select("*").eq("list_id",activeCustomList.id).order("created_at",{ascending:false});
   if(error){showSupabaseError("Supabase-Tabelle für Listeneinträge fehlt oder ist nicht freigegeben",error);return;}
-  activeCustomListItems=data||[];renderCustomListPanel();
+  activeCustomListItems=data||[];
+  if (!await loadItemRatings("custom_list", activeCustomListItems)) return;
+  renderCustomListPanel();
 }
 async function addCustomListItem() {
-  if(!activeCustomList||!currentUser)return;
+  if(!activeCustomList||!currentUser||activeCustomList.user_id!==currentUser.id)return;
   const name=document.getElementById("newCustomItemName").value.trim(); if(!name){alert("Bitte einen Namen eingeben.");return;}
-  const payload={list_id:activeCustomList.id,name,url:normalize(document.getElementById("newCustomItemUrl").value.trim()),rating:Number(document.getElementById("newCustomItemRating").value||0),checked:false,user_id:currentUser.id};
+  const initialRating=Number(document.getElementById("newCustomItemRating").value||0);
+  if(!Number.isInteger(initialRating)||initialRating<0||initialRating>5){alert("Bitte eine Bewertung zwischen 0 und 5 eingeben.");return;}
+  const payload={list_id:activeCustomList.id,name,url:normalize(document.getElementById("newCustomItemUrl").value.trim()),rating:0,checked:false,user_id:currentUser.id};
   const {data,error}=await supabaseClient.from("custom_list_items").insert(payload).select().single();
   if(error){showSupabaseError("Fehler beim Hinzufügen des Listeneintrags",error);return;}
-  activeCustomListItems.unshift(data);document.getElementById("newCustomItemName").value="";document.getElementById("newCustomItemUrl").value="";document.getElementById("newCustomItemRating").value="";renderCustomListItems();
+  activeCustomListItems.unshift(data);
+  document.getElementById("newCustomItemName").value="";
+  document.getElementById("newCustomItemUrl").value="";
+  document.getElementById("newCustomItemRating").value="";
+  if(initialRating>0&&!await saveItemRating("custom_list",data.id,initialRating))return;
+  if(initialRating===0)renderCustomListItems();
 }
 function openRandomCustomItem() {
   let candidates=getVisibleCustomListItems();
@@ -10475,6 +10502,11 @@ async function loadCardItems(type) {
 
   config.items = data || [];
 
+  if (!await loadItemRatings(type, config.items)) {
+    setStatus("Gemeinsame Bewertungen konnten nicht geladen werden.", true);
+    return;
+  }
+
   if (type === "feast") {
     await loadFeastPinned();
     startFeastPicksRealtime();
@@ -10482,6 +10514,68 @@ async function loadCardItems(type) {
 
   setStatus("");
   renderCardItems(type);
+}
+
+function itemRatingLabel(item, maximum) {
+  const average = Number(item.rating || 0);
+  if (!Number(item.ratingCount || 0)) return "Noch keine Stimmen";
+  const formatted = average.toLocaleString("de-DE", { maximumFractionDigits: 1 });
+  const count = Number(item.ratingCount);
+  return `Ø ${formatted}/${maximum} · ${count} ${count === 1 ? "Stimme" : "Stimmen"}`;
+}
+
+async function loadItemRatings(type, items) {
+  items.forEach(item => {
+    item.rating = 0;
+    item.myRating = 0;
+    item.ratingCount = 0;
+  });
+  if (!items.length) return true;
+
+  const { data, error } = await supabaseClient.rpc("get_item_rating_summaries", {
+    p_item_type: type,
+    p_item_ids: items.map(item => String(item.id))
+  });
+
+  if (error) {
+    showSupabaseError("Fehler beim Laden der gemeinsamen Bewertungen", error);
+    return false;
+  }
+
+  const byId = new Map(items.map(item => [String(item.id), item]));
+  (data || []).forEach(summary => {
+    const item = byId.get(String(summary.item_id));
+    if (!item) return;
+    item.rating = Number(summary.average_rating || 0);
+    item.myRating = Number(summary.my_rating || 0);
+    item.ratingCount = Number(summary.rating_count || 0);
+  });
+  return true;
+}
+
+async function saveItemRating(type, itemId, rating) {
+  if (!currentUser || !supabaseClient) return false;
+  const query = supabaseClient.from("item_ratings");
+  const result = rating == null || Number(rating) === 0
+    ? await query.delete().eq("item_type", type).eq("item_id", String(itemId)).eq("user_id", currentUser.id)
+    : await query.upsert({
+        item_type: type,
+        item_id: String(itemId),
+        user_id: currentUser.id,
+        rating: Number(rating),
+        updated_at: new Date().toISOString()
+      }, { onConflict: "item_type,item_id,user_id" });
+
+  if (result.error) {
+    showSupabaseError("Fehler beim Speichern der Bewertung", result.error);
+    return false;
+  }
+
+  const items = type === "custom_list" ? activeCustomListItems : cardLists[type]?.items;
+  if (!items || !await loadItemRatings(type, items)) return false;
+  if (type === "custom_list") renderCustomListItems();
+  else renderCardItems(type);
+  return true;
 }
 
 async function updateCardItem(type, id, changes, errorTitle = "Fehler beim Speichern") {
@@ -10911,47 +11005,32 @@ function renderCardItems(type) {
       const stars = document.createElement("div");
       stars.className = "card-stars";
       stars.setAttribute("role", "group");
-      stars.setAttribute("aria-label", "Bewertung");
-      if (!(item.rating || 0)) stars.dataset.unrated = "1";
+      stars.setAttribute("aria-label", "Deine Bewertung");
+      if (!(item.ratingCount || 0)) stars.dataset.unrated = "1";
 
       for (let s = 1; s <= 5; s++) {
-        const star = document.createElement("span");
+        const star = document.createElement("button");
+        star.type = "button";
         star.textContent = "⭐";
         star.className = "star";
-        star.setAttribute("role", "button");
-        star.setAttribute("tabindex", "0");
-        star.setAttribute("aria-label", s + (s === 1 ? " Stern" : " Sterne"));
-        star.onkeydown = event => {
-          if (event.key === "Enter" || event.key === " ") {
-            event.preventDefault();
-            star.click();
-          }
-        };
+        star.setAttribute("aria-label", `Deine Bewertung: ${s} ${s === 1 ? "Stern" : "Sterne"}`);
+        star.title = `Mit ${s} ${s === 1 ? "Stern" : "Sternen"} bewerten`;
 
-        if ((item.rating || 0) >= s) {
+        if ((item.myRating || 0) >= s) {
           star.classList.add("active");
         }
 
         star.onclick = async () => {
-          /* Erneuter Klick auf die aktuelle Sternzahl setzt die Bewertung zurück */
-          const newRating = (item.rating || 0) === s ? 0 : s;
-          item.rating = newRating;
-
-          const success = await updateCardItem(
-            type,
-            item.id,
-            { rating: newRating },
-            "Fehler beim Speichern der Bewertung"
-          );
-
-          if (success) {
-            renderCardItems(type);
-          }
+          await saveItemRating(type, item.id, Number(item.myRating) === s ? null : s);
         };
 
         stars.appendChild(star);
       }
 
+      const average = document.createElement("span");
+      average.className = "rating-average";
+      average.textContent = itemRatingLabel(item, 5);
+      stars.appendChild(average);
       content.appendChild(stars);
     }
 
@@ -11021,6 +11100,9 @@ function createBeerGradeSlider(item, type) {
   const label = document.createElement("div");
   label.className = "beer-grade-label";
 
+  const average = document.createElement("div");
+  average.className = "rating-average beer-grade-average";
+
   const inputs = document.createElement("div");
   inputs.className = "beer-grade-inputs";
 
@@ -11036,6 +11118,18 @@ function createBeerGradeSlider(item, type) {
   numberInput.inputMode = "decimal";
   numberInput.className = "beer-grade-number";
   numberInput.placeholder = "Note";
+
+  const clearButton = document.createElement("button");
+  clearButton.type = "button";
+  clearButton.className = "beer-grade-clear";
+  clearButton.textContent = "Eigene Note entfernen";
+  clearButton.hidden = !item.myRating;
+  clearButton.onclick = async () => {
+    saveGradeDebounced.cancel();
+    clearButton.disabled = true;
+    await saveItemRating(type, item.id, null);
+    clearButton.disabled = false;
+  };
 
   const scale = document.createElement("div");
   scale.className = "beer-grade-scale-labels";
@@ -11053,7 +11147,7 @@ function createBeerGradeSlider(item, type) {
 
     if (rating > 0) {
       label.textContent =
-        "Bewertung: " +
+        "Deine Note: " +
         formatBeerGrade(rating) +
         " – " +
         getBeerGradeText(rating);
@@ -11061,19 +11155,23 @@ function createBeerGradeSlider(item, type) {
       numberInput.value = formatBeerGrade(rating);
       slider.value = rating;
     } else {
-      label.textContent = "Noch nicht bewertet";
+      label.textContent = "Deine Note: noch nicht abgegeben";
       numberInput.value = "";
       slider.value = "3";
     }
+    average.textContent = itemRatingLabel(item, 6);
+    clearButton.hidden = !item.myRating;
   }
 
+  let persistedRating = Number(item.myRating || 0);
   const saveGradeDebounced = debounce(async value => {
-    await updateCardItem(
-      type,
-      item.id,
-      { rating: value },
-      "Fehler beim Speichern der Bier-Bewertung"
-    );
+    const success = await saveItemRating(type, item.id, value);
+    if (success) {
+      persistedRating = value;
+    } else {
+      item.myRating = persistedRating;
+      updateDisplay(persistedRating);
+    }
   }, 500);
 
   function setRating(rawValue, shouldSave = true) {
@@ -11083,7 +11181,7 @@ function createBeerGradeSlider(item, type) {
       return;
     }
 
-    item.rating = rating;
+    item.myRating = rating;
     updateDisplay(rating);
 
     if (shouldSave) {
@@ -11099,15 +11197,17 @@ function createBeerGradeSlider(item, type) {
     setRating(numberInput.value);
   });
 
-  const currentRating = Number(item.rating || 0);
+  const currentRating = Number(item.myRating || 0);
   updateDisplay(currentRating);
 
   inputs.appendChild(slider);
   inputs.appendChild(numberInput);
 
   wrapper.appendChild(label);
+  wrapper.appendChild(average);
   wrapper.appendChild(inputs);
   wrapper.appendChild(scale);
+  wrapper.appendChild(clearButton);
 
   return wrapper;
 }
@@ -11590,7 +11690,7 @@ async function addCardItem(type) {
   const newItem = {
     name,
     url,
-    rating,
+    rating: 0,
     image: "",
     comment: "",
     user_id: currentUser.id
@@ -11617,7 +11717,11 @@ async function addCardItem(type) {
 
   if (data) {
     config.items.unshift(data);
-    renderCardItems(type);
+    if (type === "beer" && rating > 0) {
+      await saveItemRating("beer", data.id, rating);
+    } else {
+      renderCardItems(type);
+    }
 
     if (url) {
       autoImage(type, url, data.id);
