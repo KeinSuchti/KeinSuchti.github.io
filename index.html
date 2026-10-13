@@ -562,6 +562,14 @@ input[type="checkbox"] {
 
 .card-stars .star,
 .custom-item-ratings .star {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  min-width: 32px;
+  min-height: 32px;
+  margin: 0;
   padding: 4px;
   border: 0;
   background: transparent;
@@ -569,12 +577,168 @@ input[type="checkbox"] {
   font: inherit;
   font-size: 18px;
   line-height: 1;
+  box-shadow: none;
+}
+
+.card-stars,
+.custom-item-ratings {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.rating-summary {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  min-width: 0;
+}
+
+.rating-display-stars {
+  display: inline-flex;
+  align-items: center;
+  gap: 1px;
+  color: transparent;
+  font-size: 17px;
+  line-height: 1;
+}
+
+.rating-display-star {
+  color: transparent;
+  background: linear-gradient(90deg, var(--star) var(--star-fill), rgba(173,188,208,.24) var(--star-fill));
+  background-clip: text;
+  -webkit-background-clip: text;
 }
 
 .rating-average {
   color: var(--text-muted);
   font-size: 12px;
   font-weight: 700;
+}
+
+.rating-vote {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 9px;
+  min-width: 0;
+}
+
+.rating-vote-label {
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.rating-vote-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 1px;
+}
+
+.rating-vote-star {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  min-width: 34px;
+  min-height: 34px;
+  margin: 0;
+  padding: 3px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent !important;
+  box-shadow: none;
+  color: var(--star);
+  font: inherit;
+  font-size: 19px;
+  line-height: 1;
+  opacity: .38;
+}
+
+.rating-vote-star:hover,
+.rating-vote-star:focus-visible {
+  border-color: rgba(255,208,102,.4);
+  background: rgba(255,208,102,.08) !important;
+  opacity: 1;
+}
+
+.rating-vote-star.active {
+  opacity: 1;
+}
+
+.rating-clear,
+.beer-grade-clear {
+  width: auto;
+  min-height: 32px;
+  margin: 0;
+  padding: 5px 9px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: transparent !important;
+  box-shadow: none;
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.rating-clear:hover,
+.beer-grade-clear:hover {
+  border-color: var(--border-strong);
+  color: var(--text);
+}
+
+.rating-vote[aria-busy="true"] {
+  opacity: .65;
+  pointer-events: none;
+}
+
+.beer-grade-average {
+  display: grid;
+  gap: 8px;
+}
+
+.beer-grade-average-title {
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+
+.beer-average-track {
+  position: relative;
+  height: 7px;
+  margin: 0 2px;
+  border-radius: 999px;
+  background: linear-gradient(90deg,#54c6a8,#b6ca63,#e8ad54,#d86c68);
+}
+
+.beer-average-track:not(.has-ratings) {
+  background: rgba(173,188,208,.2);
+}
+
+.beer-average-marker {
+  position: absolute;
+  top: 50%;
+  left: var(--average-position,0%);
+  width: 13px;
+  height: 13px;
+  border: 2px solid #f8fbff;
+  border-radius: 50%;
+  background: #172338;
+  box-shadow: 0 1px 5px rgba(0,0,0,.5);
+  transform: translate(-50%,-50%);
+}
+
+.beer-average-track:not(.has-ratings) .beer-average-marker {
+  display: none;
+}
+
+.rating-average {
+  font-variant-numeric: tabular-nums;
 }
 
 .card-add-form {
@@ -5220,9 +5384,8 @@ a.feast-tile-media:hover img{transform:scale(1.06)}
 #feastApp .card-title.has-link{cursor:pointer}
 #feastApp .card-title.has-link:hover{text-decoration:underline;text-underline-offset:3px}
 #feastApp .card-actions{grid-area:actions;margin:0;gap:6px;flex-wrap:nowrap;justify-content:flex-end}
-#feastApp .card-stars{grid-area:stars;display:flex;align-items:center;flex-wrap:wrap}
-#feastApp .card-stars[data-unrated]::after{content:"Unbewertet";margin-left:8px;padding:2px 9px;border-radius:999px;border:1px dashed rgba(255,255,255,.28);color:var(--text-muted);font-size:12px;font-weight:700}
-#feastApp .star{padding:5px 3px;font-size:22px;line-height:1;user-select:none}
+#feastApp .card-stars{grid-area:stars;display:grid;align-items:start}
+#feastApp .rating-vote-star{width:34px;min-width:34px;min-height:34px;padding:3px;font-size:19px}
 #feastApp .card-url-input{grid-area:link;margin:0}
 #feastApp .card-comment{grid-area:comment;margin:0}
 #feastApp .btn{position:relative;flex:0 0 auto;width:38px;min-width:38px;height:38px;min-height:38px;padding:0;font-size:16px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1)}
@@ -5461,8 +5624,7 @@ body.color-vision-mode #gamesApp .game-icon-btn-del:hover{background:#2a3b4c!imp
 #beerApp .beer-grade-wrapper{margin-top:12px;padding:11px 12px;border:1px solid var(--border);border-radius:12px;background:var(--surface)}
 #beerApp .beer-grade-label{font-size:13px;font-weight:800}
 #beerApp .beer-grade-slider{min-height:32px}
-#cocktailApp .card-stars{display:flex;align-items:center;flex-wrap:wrap;margin-top:8px}
-#cocktailApp .card-stars .star{min-width:36px;min-height:40px;display:inline-flex;align-items:center;justify-content:center}
+#cocktailApp .card-stars{display:grid;align-items:start;margin-top:8px}
 #yugiohDeckList{display:grid;gap:12px}
 #yugiohApp .yugioh-filter-dropdown-toggle{min-height:44px}
 #yugiohApp .yugioh-add-form input,#yugiohApp .yugioh-add-form select{min-height:44px}
@@ -5490,9 +5652,9 @@ body.color-vision-mode #gamesApp .game-icon-btn-del:hover{background:#2a3b4c!imp
 #customListApp .custom-item-title{min-width:0;color:var(--text);font-size:15px;font-weight:800;line-height:1.35;overflow-wrap:anywhere;text-decoration:none}
 #customListApp a.custom-item-title:hover{text-decoration:underline;text-underline-offset:3px}
 #customListApp .custom-item-link-hint{color:var(--text-faint);font-size:11px}
-#customListApp .custom-item-actions{display:flex;align-items:center;gap:8px}
-#customListApp .custom-item-rating{color:var(--text-muted);font-size:12px;font-weight:800;white-space:nowrap}
-#customListApp .custom-item-ratings{display:flex;align-items:center;flex-wrap:wrap;gap:2px}
+#customListApp .custom-item-actions{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:start;gap:8px;min-width:0}
+#customListApp .custom-item-ratings{display:grid;align-items:start;gap:4px;min-width:0}
+#customListApp .custom-item-ratings .rating-average{white-space:normal}
 #customListApp .custom-delete-item{width:auto;min-height:40px;margin:0;padding:7px 11px;font-size:12px}
 #customListApp .custom-delete-item[hidden]{display:none}
 #customListApp .custom-list-add-form[hidden]{display:none}
@@ -5516,7 +5678,7 @@ body.color-vision-mode #gamesApp .game-icon-btn-del:hover{background:#2a3b4c!imp
   #customListApp .custom-list-add-form{grid-template-columns:repeat(2,minmax(0,1fr))}
   #customListApp .custom-list-add-form button{grid-column:1/-1;width:100%;min-height:48px}
   #customListApp .custom-item-row{grid-template-columns:44px minmax(0,1fr);gap:8px 10px;padding:10px}
-  #customListApp .custom-item-actions{grid-column:2;justify-content:space-between}
+  #customListApp .custom-item-actions{grid-column:2}
   #customListApp .custom-delete-item{min-height:44px}
   .admin-user-actions{justify-content:flex-start}
   .admin-user-actions button{flex:1 1 145px;min-height:44px}
@@ -5530,6 +5692,9 @@ body.color-vision-mode #gamesApp .game-icon-btn-del:hover{background:#2a3b4c!imp
   #beerApp .card-item-header,#cocktailApp .card-item-header{align-items:flex-start}
   #customListApp .custom-item-row{grid-template-columns:40px minmax(0,1fr);padding:9px}
   #customListApp .custom-item-check{width:40px;height:44px}
+  #customListApp .custom-item-actions{grid-template-columns:minmax(0,1fr)}
+  #customListApp .custom-delete-item{justify-self:end}
+  #customListApp .rating-vote-controls{flex-wrap:wrap}
 }
 /* ===== Mobile breakpoint audit: prevent clipped controls and overflow ===== */
 @media(max-width:900px){
@@ -5550,7 +5715,8 @@ body.color-vision-mode #gamesApp .game-icon-btn-del:hover{background:#2a3b4c!imp
   #beerApp .card-actions,#cocktailApp .card-actions{flex-wrap:wrap;gap:7px}
   #beerApp .card-actions .btn,#cocktailApp .card-actions .btn{flex:0 0 44px;width:44px;min-width:44px;height:44px}
   #beerApp .card-actions .btn-del,#cocktailApp .card-actions .btn-del{margin-left:auto}
-  #cocktailApp .card-stars .star{min-height:44px}
+  #feastApp .rating-vote-star,#cocktailApp .rating-vote-star,#customListApp .rating-vote-star{width:44px;min-width:44px;min-height:44px}
+  #customListApp .rating-clear{min-height:44px}
   #yugiohApp .yugioh-actions button{min-height:44px}
   #appointmentsApp .appointment-tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
   #appointmentsApp .appointment-tab{min-width:0;min-height:46px;padding:8px 10px;white-space:normal}
@@ -7455,26 +7621,7 @@ function renderCustomListItems() {
       main.appendChild(linkHint);
     }
 
-    const ratings = document.createElement("div");
-    ratings.className = "custom-item-ratings";
-    ratings.setAttribute("role", "group");
-    ratings.setAttribute("aria-label", `Bewertung für ${name}`);
-    for (let score = 1; score <= 5; score++) {
-      const star = document.createElement("button");
-      star.type = "button";
-      star.className = "star" + (Number(item.myRating || 0) >= score ? " active" : "");
-      star.textContent = "⭐";
-      star.setAttribute("aria-label", `Deine Bewertung: ${score} ${score === 1 ? "Stern" : "Sterne"}`);
-      star.title = `Mit ${score} ${score === 1 ? "Stern" : "Sternen"} bewerten`;
-      star.onclick = async () => {
-        await saveItemRating("custom_list", item.id, Number(item.myRating) === score ? null : score);
-      };
-      ratings.appendChild(star);
-    }
-    const ratingAverage = document.createElement("span");
-    ratingAverage.className = "custom-item-rating";
-    ratingAverage.textContent = itemRatingLabel(item, 5);
-    ratings.appendChild(ratingAverage);
+    const ratings = createSharedStarRating(item, "custom_list", "custom-item-ratings");
 
     const deleteButton = document.createElement("button");
     deleteButton.type = "button";
@@ -10524,6 +10671,83 @@ function itemRatingLabel(item, maximum) {
   return `Ø ${formatted}/${maximum} · ${count} ${count === 1 ? "Stimme" : "Stimmen"}`;
 }
 
+function createSharedStarRating(item, type, className = "card-stars") {
+  const wrapper = document.createElement("div");
+  wrapper.className = className;
+
+  const average = Number(item.rating || 0);
+  const summary = document.createElement("div");
+  summary.className = "rating-summary";
+
+  const displayStars = document.createElement("span");
+  displayStars.className = "rating-display-stars";
+  displayStars.setAttribute("role", "img");
+  displayStars.setAttribute("aria-label", itemRatingLabel(item, 5));
+  for (let score = 1; score <= 5; score++) {
+    const star = document.createElement("span");
+    const fill = Math.max(0, Math.min(1, average - score + 1));
+    star.className = "rating-display-star";
+    star.textContent = "★";
+    star.style.setProperty("--star-fill", `${fill * 100}%`);
+    star.setAttribute("aria-hidden", "true");
+    displayStars.appendChild(star);
+  }
+
+  const averageLabel = document.createElement("span");
+  averageLabel.className = "rating-average";
+  averageLabel.textContent = itemRatingLabel(item, 5);
+  summary.append(displayStars, averageLabel);
+
+  const vote = document.createElement("div");
+  vote.className = "rating-vote";
+  const voteLabel = document.createElement("span");
+  voteLabel.className = "rating-vote-label";
+  voteLabel.textContent = item.myRating
+    ? `Deine Bewertung: ${item.myRating}/5`
+    : "Deine Bewertung";
+  vote.appendChild(voteLabel);
+
+  const controls = document.createElement("span");
+  controls.className = "rating-vote-controls";
+  controls.setAttribute("role", "group");
+  controls.setAttribute("aria-label", `Deine Bewertung für ${item.name || "Eintrag"}`);
+  for (let score = 1; score <= 5; score++) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "rating-vote-star" + (Number(item.myRating || 0) >= score ? " active" : "");
+    button.textContent = "★";
+    button.setAttribute("aria-label", `Mit ${score} ${score === 1 ? "Stern" : "Sternen"} bewerten`);
+    button.setAttribute("aria-pressed", String(Number(item.myRating || 0) === score));
+    button.title = `Mit ${score} ${score === 1 ? "Stern" : "Sternen"} bewerten`;
+    button.onclick = async () => {
+      vote.setAttribute("aria-busy", "true");
+      const success = await saveItemRating(type, item.id, score);
+      vote.removeAttribute("aria-busy");
+      if (!success) button.focus();
+    };
+    controls.appendChild(button);
+  }
+  vote.appendChild(controls);
+
+  if (item.myRating) {
+    const clearButton = document.createElement("button");
+    clearButton.type = "button";
+    clearButton.className = "rating-clear";
+    clearButton.textContent = "Entfernen";
+    clearButton.setAttribute("aria-label", "Deine Bewertung entfernen");
+    clearButton.onclick = async () => {
+      vote.setAttribute("aria-busy", "true");
+      const success = await saveItemRating(type, item.id, null);
+      vote.removeAttribute("aria-busy");
+      if (!success) clearButton.focus();
+    };
+    vote.appendChild(clearButton);
+  }
+
+  wrapper.append(summary, vote);
+  return wrapper;
+}
+
 async function loadItemRatings(type, items) {
   items.forEach(item => {
     item.rating = 0;
@@ -11002,36 +11226,7 @@ function renderCardItems(type) {
     if (type === "beer") {
       content.appendChild(createBeerGradeSlider(item, type));
     } else {
-      const stars = document.createElement("div");
-      stars.className = "card-stars";
-      stars.setAttribute("role", "group");
-      stars.setAttribute("aria-label", "Deine Bewertung");
-      if (!(item.ratingCount || 0)) stars.dataset.unrated = "1";
-
-      for (let s = 1; s <= 5; s++) {
-        const star = document.createElement("button");
-        star.type = "button";
-        star.textContent = "⭐";
-        star.className = "star";
-        star.setAttribute("aria-label", `Deine Bewertung: ${s} ${s === 1 ? "Stern" : "Sterne"}`);
-        star.title = `Mit ${s} ${s === 1 ? "Stern" : "Sternen"} bewerten`;
-
-        if ((item.myRating || 0) >= s) {
-          star.classList.add("active");
-        }
-
-        star.onclick = async () => {
-          await saveItemRating(type, item.id, Number(item.myRating) === s ? null : s);
-        };
-
-        stars.appendChild(star);
-      }
-
-      const average = document.createElement("span");
-      average.className = "rating-average";
-      average.textContent = itemRatingLabel(item, 5);
-      stars.appendChild(average);
-      content.appendChild(stars);
+      content.appendChild(createSharedStarRating(item, type));
     }
 
     if (type !== "beer") {
@@ -11101,7 +11296,19 @@ function createBeerGradeSlider(item, type) {
   label.className = "beer-grade-label";
 
   const average = document.createElement("div");
-  average.className = "rating-average beer-grade-average";
+  average.className = "beer-grade-average";
+  const averageTitle = document.createElement("span");
+  averageTitle.className = "beer-grade-average-title";
+  averageTitle.textContent = "Gemeinsamer Durchschnitt";
+  const averageValue = document.createElement("span");
+  averageValue.className = "rating-average";
+  const averageTrack = document.createElement("div");
+  averageTrack.className = "beer-average-track";
+  averageTrack.setAttribute("role", "img");
+  const averageMarker = document.createElement("span");
+  averageMarker.className = "beer-average-marker";
+  averageTrack.appendChild(averageMarker);
+  average.append(averageTitle, averageValue, averageTrack);
 
   const inputs = document.createElement("div");
   inputs.className = "beer-grade-inputs";
@@ -11159,7 +11366,18 @@ function createBeerGradeSlider(item, type) {
       numberInput.value = "";
       slider.value = "3";
     }
-    average.textContent = itemRatingLabel(item, 6);
+    const averageRating = Number(item.rating || 0);
+    averageValue.textContent = item.ratingCount
+      ? `${itemRatingLabel(item, 6)} · ${getBeerGradeText(averageRating)}`
+      : itemRatingLabel(item, 6);
+    averageTrack.classList.toggle("has-ratings", Number(item.ratingCount || 0) > 0);
+    averageTrack.style.setProperty(
+      "--average-position",
+      `${Math.max(0, Math.min(100, ((averageRating - 1) / 5) * 100))}%`
+    );
+    averageTrack.setAttribute("aria-label", item.ratingCount
+      ? `Gemeinsamer Durchschnitt: Note ${formatBeerGrade(averageRating)} von 1 bis 6`
+      : "Noch keine gemeinsamen Bewertungen");
     clearButton.hidden = !item.myRating;
   }
 
