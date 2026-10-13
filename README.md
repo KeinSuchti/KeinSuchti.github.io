@@ -7,6 +7,16 @@ sind und live synchronisiert werden, führe
 [`supabase/migrations/20261010000000_add_shared_feast_selection.sql`](supabase/migrations/20261010000000_add_shared_feast_selection.sql)
 im Supabase SQL Editor aus.
 
+## Gemeinsame Bewertungen
+
+Damit angemeldete Nutzer Feast-, Bier-, Cocktail- und Einträge eigener Listen persönlich bewerten
+können und gemeinsame Durchschnitte angezeigt werden, führe
+[`supabase/migrations/20261013000000_add_shared_item_ratings.sql`](supabase/migrations/20261013000000_add_shared_item_ratings.sql)
+im Supabase SQL Editor aus. Vorhandene Bewertungen werden als erste Stimme des Eintragserstellers
+übernommen, da das bisherige Schema keine bewertende Person speichert. Eigene Listen und ihre
+Einträge sind danach für angemeldete Nutzer sichtbar; bearbeiten und löschen kann sie weiterhin
+nur der jeweilige Besitzer.
+
 ## Desktop-App und Android-APK
 
 Die Apps laden die veröffentlichte Webseite `https://keinsuchti.github.io/` in einer
