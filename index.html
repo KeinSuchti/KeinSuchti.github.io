@@ -560,26 +560,6 @@ input[type="checkbox"] {
   opacity: 1;
 }
 
-.card-stars .star,
-.custom-item-ratings .star {
-  display: inline-flex;
-  flex: 0 0 auto;
-  align-items: center;
-  justify-content: center;
-  width: auto;
-  min-width: 32px;
-  min-height: 32px;
-  margin: 0;
-  padding: 4px;
-  border: 0;
-  background: transparent;
-  color: var(--star);
-  font: inherit;
-  font-size: 18px;
-  line-height: 1;
-  box-shadow: none;
-}
-
 .card-stars,
 .custom-item-ratings {
   display: grid;
@@ -591,7 +571,7 @@ input[type="checkbox"] {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 4px 10px;
+  gap: 6px 10px;
   min-width: 0;
 }
 
@@ -615,14 +595,7 @@ input[type="checkbox"] {
   color: var(--text-muted);
   font-size: 12px;
   font-weight: 700;
-}
-
-.rating-vote {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 4px 9px;
-  min-width: 0;
+  font-variant-numeric: tabular-nums;
 }
 
 .rating-vote-label {
@@ -635,6 +608,26 @@ input[type="checkbox"] {
   display: inline-flex;
   align-items: center;
   gap: 1px;
+}
+
+.rating-toggle {
+  width: auto;
+  min-height: 34px;
+  margin: 0 0 0 auto;
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--surface-2);
+  box-shadow: none;
+  color: var(--text);
+  font-size: 11px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.rating-toggle:hover {
+  border-color: var(--border-strong);
+  background: var(--surface-3);
 }
 
 .rating-vote-star {
@@ -669,52 +662,133 @@ input[type="checkbox"] {
   opacity: 1;
 }
 
-.rating-clear,
-.beer-grade-clear {
-  width: auto;
-  min-height: 32px;
-  margin: 0;
-  padding: 5px 9px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: transparent !important;
-  box-shadow: none;
-  color: var(--text-muted);
-  font-size: 11px;
-  font-weight: 700;
+.rating-dialog-stars {
+  display: grid;
+  justify-items: start;
+  gap: 10px;
 }
 
-.rating-clear:hover,
-.beer-grade-clear:hover {
-  border-color: var(--border-strong);
-  color: var(--text);
-}
-
-.rating-vote[aria-busy="true"] {
-  opacity: .65;
-  pointer-events: none;
+.rating-dialog .rating-vote-star {
+  width: 48px;
+  min-width: 48px;
+  min-height: 48px;
+  font-size: 27px;
 }
 
 .beer-grade-average {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  min-width: 0;
+}
+
+.beer-grade-header {
   display: grid;
+  grid-template-columns: minmax(0,1fr) auto;
+  align-items: center;
+  gap: 10px;
+}
+
+.rating-dialog {
+  width: min(440px, calc(100vw - 28px));
+  max-width: none;
+  max-height: min(90dvh, 720px);
+  margin: auto;
+  padding: 0;
+  overflow: auto;
+  border: 1px solid var(--border-strong);
+  border-radius: 18px;
+  background: var(--surface-2);
+  color: var(--text);
+  box-shadow: 0 24px 80px rgba(0,0,0,.55);
+}
+
+.rating-dialog::backdrop {
+  background: rgba(3,8,18,.72);
+  backdrop-filter: blur(4px);
+}
+
+.rating-dialog-content {
+  display: grid;
+  gap: 16px;
+  padding: 20px;
+}
+
+.rating-dialog-heading {
+  display: grid;
+  gap: 5px;
+}
+
+.rating-dialog-title {
+  margin: 0;
+  color: var(--text);
+  font-size: 19px;
+  line-height: 1.3;
+}
+
+.rating-dialog-subtitle {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.rating-dialog-editor {
+  min-width: 0;
+}
+
+.rating-dialog-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
   gap: 8px;
 }
 
+.rating-dialog-actions button {
+  width: auto;
+  min-width: 88px;
+  min-height: 42px;
+  margin: 0;
+  padding: 9px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface-3);
+  color: var(--text);
+  font-size: 13px;
+}
+
+.rating-dialog-actions .rating-dialog-save {
+  border-color: transparent;
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+.rating-dialog-actions .rating-dialog-save:disabled {
+  opacity: .48;
+  cursor: not-allowed;
+}
+
+.rating-dialog.is-saving {
+  pointer-events: none;
+}
+
 .beer-grade-average-title {
-  color: var(--text-muted);
-  font-size: 11px;
+  color: var(--accent-2);
+  font-size: 14px;
   font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: .04em;
 }
 
 .beer-average-track {
   position: relative;
-  height: 7px;
-  margin: 0 2px;
+  flex: 1 1 100%;
+  height: 5px;
+  margin: 2px 2px 0;
   border-radius: 999px;
   background: linear-gradient(90deg,#54c6a8,#b6ca63,#e8ad54,#d86c68);
 }
+
+
 
 .beer-average-track:not(.has-ratings) {
   background: rgba(173,188,208,.2);
@@ -5694,7 +5768,6 @@ body.color-vision-mode #gamesApp .game-icon-btn-del:hover{background:#2a3b4c!imp
   #customListApp .custom-item-check{width:40px;height:44px}
   #customListApp .custom-item-actions{grid-template-columns:minmax(0,1fr)}
   #customListApp .custom-delete-item{justify-self:end}
-  #customListApp .rating-vote-controls{flex-wrap:wrap}
 }
 /* ===== Mobile breakpoint audit: prevent clipped controls and overflow ===== */
 @media(max-width:900px){
@@ -5716,7 +5789,8 @@ body.color-vision-mode #gamesApp .game-icon-btn-del:hover{background:#2a3b4c!imp
   #beerApp .card-actions .btn,#cocktailApp .card-actions .btn{flex:0 0 44px;width:44px;min-width:44px;height:44px}
   #beerApp .card-actions .btn-del,#cocktailApp .card-actions .btn-del{margin-left:auto}
   #feastApp .rating-vote-star,#cocktailApp .rating-vote-star,#customListApp .rating-vote-star{width:44px;min-width:44px;min-height:44px}
-  #customListApp .rating-clear{min-height:44px}
+  .rating-dialog-actions button{min-height:44px}
+  .rating-dialog .rating-vote-star{width:48px;min-width:48px;min-height:48px}
   #yugiohApp .yugioh-actions button{min-height:44px}
   #appointmentsApp .appointment-tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
   #appointmentsApp .appointment-tab{min-width:0;min-height:46px;padding:8px 10px;white-space:normal}
@@ -10671,6 +10745,82 @@ function itemRatingLabel(item, maximum) {
   return `Ø ${formatted}/${maximum} · ${count} ${count === 1 ? "Stimme" : "Stimmen"}`;
 }
 
+function openRatingDialog({ title, subtitle, currentRating, editor, saveRating, removeLabel }) {
+  const dialog = document.createElement("dialog");
+  dialog.className = "rating-dialog";
+  dialog.setAttribute("aria-labelledby", "rating-dialog-title");
+
+  const form = document.createElement("form");
+  form.className = "rating-dialog-content";
+  form.addEventListener("submit", async event => {
+    event.preventDefault();
+    const value = editor.getValue();
+    if (value == null) return;
+    await persist(value);
+  });
+
+  const heading = document.createElement("div");
+  heading.className = "rating-dialog-heading";
+  const titleElement = document.createElement("h2");
+  titleElement.className = "rating-dialog-title";
+  titleElement.id = "rating-dialog-title";
+  titleElement.textContent = title;
+  const subtitleElement = document.createElement("p");
+  subtitleElement.className = "rating-dialog-subtitle";
+  subtitleElement.textContent = subtitle;
+  heading.append(titleElement, subtitleElement);
+
+  const editorHost = document.createElement("div");
+  editorHost.className = "rating-dialog-editor";
+  editorHost.appendChild(editor.element);
+
+  const actions = document.createElement("div");
+  actions.className = "rating-dialog-actions";
+  const cancelButton = document.createElement("button");
+  cancelButton.type = "button";
+  cancelButton.textContent = "Abbrechen";
+  cancelButton.onclick = () => dialog.close();
+  const removeButton = document.createElement("button");
+  removeButton.type = "button";
+  removeButton.textContent = removeLabel || "Bewertung entfernen";
+  removeButton.hidden = !currentRating;
+  removeButton.onclick = () => persist(null);
+  const saveButton = document.createElement("button");
+  saveButton.type = "submit";
+  saveButton.className = "rating-dialog-save";
+  saveButton.textContent = "Speichern";
+  saveButton.disabled = editor.getValue() == null;
+  if (editor.onChange) editor.onChange(() => {
+    saveButton.disabled = editor.getValue() == null;
+  });
+  actions.append(cancelButton, removeButton, saveButton);
+  form.append(heading, editorHost, actions);
+  dialog.appendChild(form);
+
+  async function persist(value) {
+    dialog.classList.add("is-saving");
+    actions.querySelectorAll("button").forEach(button => {
+      button.disabled = true;
+    });
+    const success = await saveRating(value);
+    if (success) {
+      dialog.close();
+      return;
+    }
+    dialog.classList.remove("is-saving");
+    actions.querySelectorAll("button").forEach(button => {
+      button.disabled = false;
+    });
+    saveButton.disabled = editor.getValue() == null;
+  }
+
+  dialog.addEventListener("close", () => dialog.remove(), { once: true });
+  document.body.appendChild(dialog);
+  dialog.showModal();
+  editor.focus();
+  return dialog;
+}
+
 function createSharedStarRating(item, type, className = "card-stars") {
   const wrapper = document.createElement("div");
   wrapper.className = className;
@@ -10698,53 +10848,65 @@ function createSharedStarRating(item, type, className = "card-stars") {
   averageLabel.textContent = itemRatingLabel(item, 5);
   summary.append(displayStars, averageLabel);
 
-  const vote = document.createElement("div");
-  vote.className = "rating-vote";
-  const voteLabel = document.createElement("span");
-  voteLabel.className = "rating-vote-label";
-  voteLabel.textContent = item.myRating
-    ? `Deine Bewertung: ${item.myRating}/5`
-    : "Deine Bewertung";
-  vote.appendChild(voteLabel);
-
-  const controls = document.createElement("span");
-  controls.className = "rating-vote-controls";
-  controls.setAttribute("role", "group");
-  controls.setAttribute("aria-label", `Deine Bewertung für ${item.name || "Eintrag"}`);
-  for (let score = 1; score <= 5; score++) {
-    const button = document.createElement("button");
-    button.type = "button";
-    button.className = "rating-vote-star" + (Number(item.myRating || 0) >= score ? " active" : "");
-    button.textContent = "★";
-    button.setAttribute("aria-label", `Mit ${score} ${score === 1 ? "Stern" : "Sternen"} bewerten`);
-    button.setAttribute("aria-pressed", String(Number(item.myRating || 0) === score));
-    button.title = `Mit ${score} ${score === 1 ? "Stern" : "Sternen"} bewerten`;
-    button.onclick = async () => {
-      vote.setAttribute("aria-busy", "true");
-      const success = await saveItemRating(type, item.id, score);
-      vote.removeAttribute("aria-busy");
-      if (!success) button.focus();
+  const toggle = document.createElement("button");
+  toggle.type = "button";
+  toggle.className = "rating-toggle";
+  toggle.onclick = () => {
+    let selectedRating = Number(item.myRating || 0);
+    const editorElement = document.createElement("div");
+    editorElement.className = "rating-dialog-stars";
+    const prompt = document.createElement("span");
+    prompt.className = "rating-vote-label";
+    prompt.textContent = "Wie hat dir der Eintrag gefallen?";
+    const controls = document.createElement("div");
+    controls.className = "rating-vote-controls";
+    controls.setAttribute("role", "group");
+    controls.setAttribute("aria-label", `Deine Bewertung für ${item.name || "Eintrag"}`);
+    const voteButtons = [];
+    let notifyEditorChange = () => {};
+    const updateSelection = () => {
+      voteButtons.forEach((button, index) => {
+        button.classList.toggle("active", selectedRating >= index + 1);
+        button.setAttribute("aria-pressed", String(selectedRating === index + 1));
+      });
+      notifyEditorChange();
     };
-    controls.appendChild(button);
-  }
-  vote.appendChild(controls);
+    for (let score = 1; score <= 5; score++) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "rating-vote-star";
+      button.textContent = "★";
+      button.setAttribute("aria-label", `${score} ${score === 1 ? "Stern" : "Sterne"}`);
+      button.setAttribute("aria-pressed", String(selectedRating === score));
+      button.title = `${score} ${score === 1 ? "Stern" : "Sterne"}`;
+      button.onclick = () => {
+        selectedRating = score;
+        updateSelection();
+      };
+      voteButtons.push(button);
+      controls.appendChild(button);
+    }
+    editorElement.append(prompt, controls);
+    openRatingDialog({
+      title: item.name || "Eintrag bewerten",
+      subtitle: item.myRating ? `Deine aktuelle Bewertung: ${item.myRating} von 5 Sternen.` : "Deine Bewertung fließt in den gemeinsamen Durchschnitt ein.",
+      currentRating: item.myRating,
+      editor: {
+        element: editorElement,
+        getValue: () => selectedRating || null,
+        onChange: callback => { notifyEditorChange = callback; },
+        focus: () => voteButtons[0].focus()
+      },
+      saveRating: rating => saveItemRating(type, item.id, rating)
+    });
+  };
+  toggle.textContent = item.myRating ? `Deine: ${item.myRating}/5 ★` : "Bewerten";
+  toggle.setAttribute("aria-label", item.myRating
+    ? `Deine Bewertung ${item.myRating} von 5 Sternen bearbeiten`
+    : "Eigene Bewertung abgeben");
+  summary.appendChild(toggle);
 
-  if (item.myRating) {
-    const clearButton = document.createElement("button");
-    clearButton.type = "button";
-    clearButton.className = "rating-clear";
-    clearButton.textContent = "Entfernen";
-    clearButton.setAttribute("aria-label", "Deine Bewertung entfernen");
-    clearButton.onclick = async () => {
-      vote.setAttribute("aria-busy", "true");
-      const success = await saveItemRating(type, item.id, null);
-      vote.removeAttribute("aria-busy");
-      if (!success) clearButton.focus();
-    };
-    vote.appendChild(clearButton);
-  }
-
-  wrapper.append(summary, vote);
+  wrapper.appendChild(summary);
   return wrapper;
 }
 
@@ -11292,6 +11454,9 @@ function createBeerGradeSlider(item, type) {
   const wrapper = document.createElement("div");
   wrapper.className = "beer-grade-wrapper";
 
+  const header = document.createElement("div");
+  header.className = "beer-grade-header";
+
   const label = document.createElement("div");
   label.className = "beer-grade-label";
 
@@ -11299,7 +11464,6 @@ function createBeerGradeSlider(item, type) {
   average.className = "beer-grade-average";
   const averageTitle = document.createElement("span");
   averageTitle.className = "beer-grade-average-title";
-  averageTitle.textContent = "Gemeinsamer Durchschnitt";
   const averageValue = document.createElement("span");
   averageValue.className = "rating-average";
   const averageTrack = document.createElement("div");
@@ -11310,122 +11474,117 @@ function createBeerGradeSlider(item, type) {
   averageTrack.appendChild(averageMarker);
   average.append(averageTitle, averageValue, averageTrack);
 
-  const inputs = document.createElement("div");
-  inputs.className = "beer-grade-inputs";
+  const toggle = document.createElement("button");
+  toggle.type = "button";
+  toggle.className = "rating-toggle beer-grade-toggle";
+  toggle.onclick = () => {
+    const currentRating = Number(item.myRating || 0);
+    let selectedRating = currentRating;
+    let notifyEditorChange = () => {};
 
-  const slider = document.createElement("input");
-  slider.type = "range";
-  slider.min = "1";
-  slider.max = "6";
-  slider.step = "0.1";
-  slider.className = "beer-grade-slider";
+    const editorElement = document.createElement("div");
+    editorElement.className = "beer-grade-editor";
+    const label = document.createElement("div");
+    label.className = "beer-grade-label";
+    const inputs = document.createElement("div");
+    inputs.className = "beer-grade-inputs";
+    const slider = document.createElement("input");
+    slider.type = "range";
+    slider.min = "1";
+    slider.max = "6";
+    slider.step = "0.1";
+    slider.className = "beer-grade-slider";
+    slider.value = currentRating ? String(currentRating) : "3";
+    slider.setAttribute("aria-label", "Eigene Biernote zwischen 1,0 und 6,0 wählen");
 
-  const numberInput = document.createElement("input");
-  numberInput.type = "text";
-  numberInput.inputMode = "decimal";
-  numberInput.className = "beer-grade-number";
-  numberInput.placeholder = "Note";
+    const numberInput = document.createElement("input");
+    numberInput.type = "text";
+    numberInput.inputMode = "decimal";
+    numberInput.className = "beer-grade-number";
+    numberInput.placeholder = "Note";
+    numberInput.value = currentRating ? formatBeerGrade(currentRating) : "";
+    numberInput.setAttribute("aria-label", "Eigene Biernote eingeben");
 
-  const clearButton = document.createElement("button");
-  clearButton.type = "button";
-  clearButton.className = "beer-grade-clear";
-  clearButton.textContent = "Eigene Note entfernen";
-  clearButton.hidden = !item.myRating;
-  clearButton.onclick = async () => {
-    saveGradeDebounced.cancel();
-    clearButton.disabled = true;
-    await saveItemRating(type, item.id, null);
-    clearButton.disabled = false;
+    const scale = document.createElement("div");
+    scale.className = "beer-grade-scale-labels";
+    scale.innerHTML = `
+      <span>1,0<br>Sehr gut</span>
+      <span>2,0<br>Gut</span>
+      <span>3,0<br>Befr.</span>
+      <span>4,0<br>Ausreich.</span>
+      <span>5,0<br>Mangelh.</span>
+      <span>6,0<br>Nein</span>
+    `;
+
+    const updateSelection = value => {
+      selectedRating = value;
+      label.textContent = value
+        ? `Deine Note: ${formatBeerGrade(value)} – ${getBeerGradeText(value)}`
+        : "Wähle deine Note aus.";
+      notifyEditorChange();
+    };
+    slider.addEventListener("input", () => {
+      const value = parseBeerRatingInput(slider.value);
+      numberInput.value = value ? formatBeerGrade(value) : "";
+      numberInput.removeAttribute("aria-invalid");
+      updateSelection(value);
+    });
+    numberInput.addEventListener("input", () => {
+      const value = parseBeerRatingInput(numberInput.value);
+      if (value) {
+        slider.value = String(value);
+        numberInput.removeAttribute("aria-invalid");
+      } else {
+        numberInput.setAttribute("aria-invalid", "true");
+      }
+      updateSelection(value);
+    });
+
+    updateSelection(selectedRating || null);
+    inputs.append(slider, numberInput);
+    editorElement.append(label, inputs, scale);
+    openRatingDialog({
+      title: `Bier bewerten: ${item.name || "Eintrag"}`,
+      subtitle: item.myRating
+        ? `Deine aktuelle Note: ${formatBeerGrade(item.myRating)}. Du kannst sie hier ändern.`
+        : "Wähle eine Schulnote von 1,0 (sehr gut) bis 6,0 (ungenießbar).",
+      currentRating,
+      removeLabel: "Note entfernen",
+      editor: {
+        element: editorElement,
+        getValue: () => selectedRating || null,
+        onChange: callback => { notifyEditorChange = callback; },
+        focus: () => slider.focus()
+      },
+      saveRating: rating => saveItemRating(type, item.id, rating)
+    });
   };
-
-  const scale = document.createElement("div");
-  scale.className = "beer-grade-scale-labels";
-  scale.innerHTML = `
-    <span>1,0<br>Sehr gut</span>
-    <span>2,0<br>Gut</span>
-    <span>3,0<br>Befr.</span>
-    <span>4,0<br>Ausreich.</span>
-    <span>5,0<br>Mangelh.</span>
-    <span>6,0<br>Nein</span>
-  `;
-
-  function updateDisplay(value) {
-    const rating = Number(value || 0);
-
-    if (rating > 0) {
-      label.textContent =
-        "Deine Note: " +
-        formatBeerGrade(rating) +
-        " – " +
-        getBeerGradeText(rating);
-
-      numberInput.value = formatBeerGrade(rating);
-      slider.value = rating;
-    } else {
-      label.textContent = "Deine Note: noch nicht abgegeben";
-      numberInput.value = "";
-      slider.value = "3";
-    }
-    const averageRating = Number(item.rating || 0);
-    averageValue.textContent = item.ratingCount
-      ? `${itemRatingLabel(item, 6)} · ${getBeerGradeText(averageRating)}`
-      : itemRatingLabel(item, 6);
-    averageTrack.classList.toggle("has-ratings", Number(item.ratingCount || 0) > 0);
-    averageTrack.style.setProperty(
-      "--average-position",
-      `${Math.max(0, Math.min(100, ((averageRating - 1) / 5) * 100))}%`
-    );
-    averageTrack.setAttribute("aria-label", item.ratingCount
-      ? `Gemeinsamer Durchschnitt: Note ${formatBeerGrade(averageRating)} von 1 bis 6`
-      : "Noch keine gemeinsamen Bewertungen");
-    clearButton.hidden = !item.myRating;
-  }
-
-  let persistedRating = Number(item.myRating || 0);
-  const saveGradeDebounced = debounce(async value => {
-    const success = await saveItemRating(type, item.id, value);
-    if (success) {
-      persistedRating = value;
-    } else {
-      item.myRating = persistedRating;
-      updateDisplay(persistedRating);
-    }
-  }, 500);
-
-  function setRating(rawValue, shouldSave = true) {
-    const rating = parseBeerRatingInput(rawValue);
-
-    if (rating === null || rating === 0) {
-      return;
-    }
-
-    item.myRating = rating;
-    updateDisplay(rating);
-
-    if (shouldSave) {
-      saveGradeDebounced(rating);
-    }
-  }
-
-  slider.addEventListener("input", () => {
-    setRating(slider.value);
-  });
-
-  numberInput.addEventListener("change", () => {
-    setRating(numberInput.value);
-  });
-
   const currentRating = Number(item.myRating || 0);
-  updateDisplay(currentRating);
+  toggle.textContent = currentRating
+    ? `Deine Note: ${formatBeerGrade(currentRating)}`
+    : "Note abgeben";
+  toggle.setAttribute("aria-label", currentRating
+    ? `Deine Note ${formatBeerGrade(currentRating)} bearbeiten`
+    : "Eigene Note abgeben");
 
-  inputs.appendChild(slider);
-  inputs.appendChild(numberInput);
+  const averageRating = Number(item.rating || 0);
+  averageTitle.textContent = item.ratingCount
+    ? `Ø ${formatBeerGrade(averageRating)}`
+    : "Ø –";
+  averageValue.textContent = item.ratingCount
+    ? `${getBeerGradeText(averageRating)} · ${item.ratingCount} ${item.ratingCount === 1 ? "Stimme" : "Stimmen"}`
+    : "Noch keine Bewertungen";
+  averageTrack.classList.toggle("has-ratings", Number(item.ratingCount || 0) > 0);
+  averageTrack.style.setProperty(
+    "--average-position",
+    `${Math.max(0, Math.min(100, ((averageRating - 1) / 5) * 100))}%`
+  );
+  averageTrack.setAttribute("aria-label", item.ratingCount
+    ? `Gemeinsamer Durchschnitt: Note ${formatBeerGrade(averageRating)} von 1 bis 6`
+    : "Noch keine gemeinsamen Bewertungen");
 
-  wrapper.appendChild(label);
-  wrapper.appendChild(average);
-  wrapper.appendChild(inputs);
-  wrapper.appendChild(scale);
-  wrapper.appendChild(clearButton);
+  header.append(average, toggle);
+  wrapper.appendChild(header);
 
   return wrapper;
 }
