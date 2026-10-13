@@ -571,8 +571,12 @@ input[type="checkbox"] {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 6px 10px;
+  gap: 8px 12px;
   min-width: 0;
+  padding: 9px 11px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: linear-gradient(110deg,rgba(255,255,255,.045),rgba(255,255,255,.015));
 }
 
 .rating-display-stars {
@@ -580,7 +584,7 @@ input[type="checkbox"] {
   align-items: center;
   gap: 1px;
   color: transparent;
-  font-size: 17px;
+  font-size: 23px;
   line-height: 1;
 }
 
@@ -611,23 +615,37 @@ input[type="checkbox"] {
 }
 
 .rating-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
   width: auto;
-  min-height: 34px;
+  min-height: 38px;
   margin: 0 0 0 auto;
-  padding: 6px 10px;
-  border: 1px solid var(--border);
-  border-radius: 9px;
-  background: var(--surface-2);
+  padding: 7px 12px;
+  border: 1px solid rgba(255,208,102,.34);
+  border-radius: 999px;
+  background: rgba(255,208,102,.1);
   box-shadow: none;
-  color: var(--text);
-  font-size: 11px;
+  color: #ffe19b;
+  font-size: 12px;
   font-weight: 800;
   white-space: nowrap;
 }
 
 .rating-toggle:hover {
-  border-color: var(--border-strong);
-  background: var(--surface-3);
+  border-color: rgba(255,208,102,.65);
+  background: rgba(255,208,102,.18);
+}
+
+.rating-toggle::before {
+  content: "★";
+  font-size: 15px;
+  line-height: 1;
+}
+
+.beer-grade-toggle::before {
+  content: "✎";
 }
 
 .rating-vote-star {
@@ -664,15 +682,49 @@ input[type="checkbox"] {
 
 .rating-dialog-stars {
   display: grid;
-  justify-items: start;
-  gap: 10px;
+  justify-items: center;
+  gap: 14px;
+  padding: 18px 14px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: rgba(7,18,34,.3);
 }
 
 .rating-dialog .rating-vote-star {
-  width: 48px;
-  min-width: 48px;
-  min-height: 48px;
-  font-size: 27px;
+  width: 64px;
+  min-width: 64px;
+  min-height: 64px;
+  padding: 4px;
+  border: 1px solid rgba(255,208,102,.2);
+  border-radius: 14px;
+  background: rgba(255,255,255,.045) !important;
+  font-size: 40px;
+  opacity: .5;
+  transition: transform .16s ease, background .16s ease, opacity .16s ease, box-shadow .16s ease;
+}
+
+.rating-dialog .rating-vote-controls {
+  justify-content: center;
+  gap: 8px;
+}
+
+.rating-dialog .rating-vote-star:hover,
+.rating-dialog .rating-vote-star:focus-visible {
+  transform: translateY(-2px) scale(1.06);
+}
+
+.rating-dialog .rating-vote-star.active {
+  border-color: rgba(255,208,102,.55);
+  background: rgba(255,208,102,.14) !important;
+  box-shadow: 0 5px 16px rgba(255,190,74,.12);
+}
+
+.rating-selection-value {
+  min-height: 22px;
+  color: var(--accent-2);
+  font-size: 15px;
+  font-weight: 800;
+  text-align: center;
 }
 
 .beer-grade-average {
@@ -687,7 +739,11 @@ input[type="checkbox"] {
   display: grid;
   grid-template-columns: minmax(0,1fr) auto;
   align-items: center;
-  gap: 10px;
+  gap: 0;
+  padding: 9px 11px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: linear-gradient(110deg,rgba(255,255,255,.045),rgba(255,255,255,.015));
 }
 
 .rating-dialog {
@@ -5768,6 +5824,8 @@ body.color-vision-mode #gamesApp .game-icon-btn-del:hover{background:#2a3b4c!imp
   #customListApp .custom-item-check{width:40px;height:44px}
   #customListApp .custom-item-actions{grid-template-columns:minmax(0,1fr)}
   #customListApp .custom-delete-item{justify-self:end}
+  .rating-dialog .rating-vote-controls{flex-wrap:wrap}
+  .rating-dialog .rating-vote-star{width:48px;min-width:48px;min-height:48px;font-size:30px}
 }
 /* ===== Mobile breakpoint audit: prevent clipped controls and overflow ===== */
 @media(max-width:900px){
@@ -5790,7 +5848,6 @@ body.color-vision-mode #gamesApp .game-icon-btn-del:hover{background:#2a3b4c!imp
   #beerApp .card-actions .btn-del,#cocktailApp .card-actions .btn-del{margin-left:auto}
   #feastApp .rating-vote-star,#cocktailApp .rating-vote-star,#customListApp .rating-vote-star{width:44px;min-width:44px;min-height:44px}
   .rating-dialog-actions button{min-height:44px}
-  .rating-dialog .rating-vote-star{width:48px;min-width:48px;min-height:48px}
   #yugiohApp .yugioh-actions button{min-height:44px}
   #appointmentsApp .appointment-tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
   #appointmentsApp .appointment-tab{min-width:0;min-height:46px;padding:8px 10px;white-space:normal}
@@ -10855,9 +10912,8 @@ function createSharedStarRating(item, type, className = "card-stars") {
     let selectedRating = Number(item.myRating || 0);
     const editorElement = document.createElement("div");
     editorElement.className = "rating-dialog-stars";
-    const prompt = document.createElement("span");
-    prompt.className = "rating-vote-label";
-    prompt.textContent = "Wie hat dir der Eintrag gefallen?";
+    const selectionValue = document.createElement("span");
+    selectionValue.className = "rating-selection-value";
     const controls = document.createElement("div");
     controls.className = "rating-vote-controls";
     controls.setAttribute("role", "group");
@@ -10869,6 +10925,9 @@ function createSharedStarRating(item, type, className = "card-stars") {
         button.classList.toggle("active", selectedRating >= index + 1);
         button.setAttribute("aria-pressed", String(selectedRating === index + 1));
       });
+      selectionValue.textContent = selectedRating
+        ? `${selectedRating} von 5 Sternen`
+        : "Wähle deine Bewertung";
       notifyEditorChange();
     };
     for (let score = 1; score <= 5; score++) {
@@ -10886,7 +10945,8 @@ function createSharedStarRating(item, type, className = "card-stars") {
       voteButtons.push(button);
       controls.appendChild(button);
     }
-    editorElement.append(prompt, controls);
+    updateSelection();
+    editorElement.append(selectionValue, controls);
     openRatingDialog({
       title: item.name || "Eintrag bewerten",
       subtitle: item.myRating ? `Deine aktuelle Bewertung: ${item.myRating} von 5 Sternen.` : "Deine Bewertung fließt in den gemeinsamen Durchschnitt ein.",
@@ -10900,7 +10960,7 @@ function createSharedStarRating(item, type, className = "card-stars") {
       saveRating: rating => saveItemRating(type, item.id, rating)
     });
   };
-  toggle.textContent = item.myRating ? `Deine: ${item.myRating}/5 ★` : "Bewerten";
+  toggle.textContent = item.myRating ? `Deine Bewertung · ${item.myRating}/5` : "Bewerten";
   toggle.setAttribute("aria-label", item.myRating
     ? `Deine Bewertung ${item.myRating} von 5 Sternen bearbeiten`
     : "Eigene Bewertung abgeben");
@@ -11561,7 +11621,7 @@ function createBeerGradeSlider(item, type) {
   };
   const currentRating = Number(item.myRating || 0);
   toggle.textContent = currentRating
-    ? `Deine Note: ${formatBeerGrade(currentRating)}`
+    ? `Note ändern · ${formatBeerGrade(currentRating)}`
     : "Note abgeben";
   toggle.setAttribute("aria-label", currentRating
     ? `Deine Note ${formatBeerGrade(currentRating)} bearbeiten`
