@@ -5342,9 +5342,9 @@ button.yugioh-image-placeholder:hover{border-color:rgba(101,226,215,.7);color:#d
 .ds-rows{display:grid;gap:6px}
 .ds-row{display:grid;grid-template-columns:minmax(0,1fr) 130px;gap:10px;align-items:center;padding:6px 8px 6px 12px;border:1px solid rgba(125,158,224,.2);border-radius:12px;background:rgba(19,43,86,.42)}
 .ds-name{font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.ds-team-select{height:44px;margin:0;font-size:16px!important;font-weight:800;border-left:6px solid var(--tc,#4c8dff)!important}
-.ds-team-select[data-team="0"]{--tc:#4c8dff}.ds-team-select[data-team="1"]{--tc:#ff6b6b}.ds-team-select[data-team="2"]{--tc:#4ad08a}.ds-team-select[data-team="3"]{--tc:#ffc44d}
-.ds-error{margin:8px 0 0;color:#ffb0aa;font-size:13px;font-weight:700}
+.ds-team-badge{display:flex;align-items:center;justify-content:center;min-height:40px;padding:0 10px;border-radius:9px;border-left:6px solid var(--tc,#4c8dff);background:rgba(19,43,86,.7);font-size:14px;font-weight:800}
+.ds-team-badge[data-team="0"]{--tc:#4c8dff}.ds-team-badge[data-team="1"]{--tc:#ff6b6b}.ds-team-badge[data-team="2"]{--tc:#4ad08a}.ds-team-badge[data-team="3"]{--tc:#ffc44d}
+.duel-setup-box .ds-randomize{width:100%!important;min-height:44px;margin-top:8px!important;border:1px solid rgba(125,158,224,.3);border-radius:12px;background:rgba(19,43,86,.7)!important;color:#dbe7ff;font-weight:800}
 .ds-actions{display:flex;gap:8px;margin-top:18px;position:sticky;bottom:-18px;padding:10px 0 0;background:linear-gradient(180deg,transparent,#0e1c34 30%)}
 .ds-actions button{flex:1;min-height:50px;margin:0;font-weight:800}
 .ds-actions .ds-cancel{flex:0 0 auto;padding:0 18px;background:rgba(19,43,86,.7)!important;border:1px solid rgba(125,158,224,.3)!important;color:#dbe7ff!important}
@@ -5394,7 +5394,6 @@ button.yugioh-image-placeholder:hover{border-color:rgba(101,226,215,.7);color:#d
 .ds-actions .ds-start{background:linear-gradient(135deg,#2f6fdd,#22a7a0)!important;color:#fff!important;border:0!important}
 .ds-actions .ds-start:disabled{opacity:.45}
 .ds-seg button{width:auto!important;flex:1 1 130px}
-.ds-team-select{width:100%!important;box-sizing:border-box}
 @media(max-width:600px){.duel-setup-overlay{align-items:flex-end!important;padding:0!important}.duel-setup-box{width:100%!important;max-height:92dvh;border-radius:20px 20px 0 0!important;border-bottom:0!important}.ds-head,.ds-body{padding-left:16px;padding-right:16px}.ds-actions{padding-left:16px!important;padding-right:16px!important}}
 /* ===== Farbenfreundlicher Modus (Rot-Grün-Schwäche): Blau / Orange / Gelb, kein Rot, kein Grün ===== */
 body.color-vision-mode{--accent:#56B4E9;--accent-2:#E69F00;--accent-ink:#071722;--danger:#E69F00;--danger-hover:#FFC94D;--success:#56B4E9;--info:#56B4E9;--note:#E69F00;--star:#F0E442;--cv-p:#56B4E9;--cv-s:#E69F00;--cv-w:#E69F00;--cv-h:#F0E442;--cv-r1:#16425b;--cv-r2:#1b5f86;--cv-r3:#2378a8;--cv-r4:#56B4E9;--cv-all:#F0E442;--cv-t0:#56B4E9;--cv-t1:#E69F00;--cv-t2:#CC79A7;--cv-t3:#F0E442;}
@@ -5418,7 +5417,7 @@ body.color-vision-mode .best-day-bar span{background:var(--cv-p)}body.color-visi
 body.color-vision-mode .best-day-badge{background:var(--cv-all);color:#0b1420;border-color:#fff}
 /* Battle Arena */
 body.color-vision-mode .duel-player-card[data-team="0"]{--team:var(--cv-t0)}body.color-vision-mode .duel-player-card[data-team="1"]{--team:var(--cv-t1)}body.color-vision-mode .duel-player-card[data-team="2"]{--team:var(--cv-t2)}body.color-vision-mode .duel-player-card[data-team="3"]{--team:var(--cv-t3)}
-body.color-vision-mode .ds-team-select[data-team="0"]{--tc:var(--cv-t0)}body.color-vision-mode .ds-team-select[data-team="1"]{--tc:var(--cv-t1)}body.color-vision-mode .ds-team-select[data-team="2"]{--tc:var(--cv-t2)}body.color-vision-mode .ds-team-select[data-team="3"]{--tc:var(--cv-t3)}
+body.color-vision-mode .ds-team-badge[data-team="0"]{--tc:var(--cv-t0)}body.color-vision-mode .ds-team-badge[data-team="1"]{--tc:var(--cv-t1)}body.color-vision-mode .ds-team-badge[data-team="2"]{--tc:var(--cv-t2)}body.color-vision-mode .ds-team-badge[data-team="3"]{--tc:var(--cv-t3)}
 body.color-vision-mode .duel-player-card[data-team="0"] .duel-deck-name::before{content:"● "}body.color-vision-mode .duel-player-card[data-team="1"] .duel-deck-name::before{content:"■ "}body.color-vision-mode .duel-player-card[data-team="2"] .duel-deck-name::before{content:"▲ "}body.color-vision-mode .duel-player-card[data-team="3"] .duel-deck-name::before{content:"◆ "}
 body.color-vision-mode .duel-player-card.is-low .duel-life-number{color:var(--cv-h)}
 body.color-vision-mode .duel-player-card.is-low .duel-status::after{content:" ⚠ wenig LP";font-weight:900}
@@ -5444,7 +5443,7 @@ body.color-vision-mode .account-danger-zone h3{color:#FFC94D!important}
 body.color-vision-mode .auth-error{color:#FFC94D!important}
 body.color-vision-mode .availability-day-details .day-ok{color:#8fd0f5}
 body.color-vision-mode .beer-grade-slider::-webkit-slider-runnable-track,body.color-vision-mode .beer-grade-slider::-moz-range-track{background:#56B4E9}
-body.color-vision-mode .ds-team-select[data-team="2"]{--tc:var(--cv-t2)}
+body.color-vision-mode .ds-team-badge[data-team="2"]{--tc:var(--cv-t2)}
 /* ===== Yu-Gi-Oh!: Löschen nur in der Bearbeitungsansicht ===== */
 .edit-box .edit-delete-button{display:block;width:100%;margin:10px 0 0;min-height:46px;border:1px solid #ff7b7b;border-radius:12px;background:#d62f2f;color:#fff;font-weight:800;cursor:pointer;box-shadow:0 6px 16px rgba(214,47,47,.28)}
 .edit-box .edit-delete-button:hover{background:#e63b3b}
@@ -8257,6 +8256,16 @@ function duelRematch() {
 /* ===== Battle Arena: Teams (4 / 6 / 8 Spieler) ===== */
 let duelTeamMode = false, duelTeamShared = false, duelSetup = null;
 const DUEL_TEAM_OPTIONS = { 4: [2], 6: [2, 3], 8: [2, 4] };
+function createRandomDuelTeams(playerCount, teamCount) {
+  const playerOrder = Array.from({ length: playerCount }, (_, index) => index);
+  for (let index = playerOrder.length - 1; index > 0; index--) {
+    const randomIndex = Math.floor(Math.random() * (index + 1));
+    [playerOrder[index], playerOrder[randomIndex]] = [playerOrder[randomIndex], playerOrder[index]];
+  }
+  const teams = Array(playerCount);
+  playerOrder.forEach((playerIndex, index) => { teams[playerIndex] = index % teamCount; });
+  return teams;
+}
 function applyDuelTeams(cfg) {
   duelTeamMode = cfg.mode === "teams"; duelTeamShared = duelTeamMode && !!cfg.shared;
   if (!duelTeamMode) return;
@@ -8272,7 +8281,7 @@ function applyDuelTeams(cfg) {
 }
 function openDuelSetup() {
   const n = activeYugiohAssignments.length, count = DUEL_TEAM_OPTIONS[n][0];
-  duelSetup = { n, mode: "solo", teamCount: count, shared: true, teams: activeYugiohAssignments.map((_, i) => i % count) };
+  duelSetup = { n, mode: "solo", teamCount: count, shared: true, teams: createRandomDuelTeams(n, count) };
   renderDuelSetup();
   document.getElementById("duelSetupOverlay").style.display = "flex";
 }
@@ -8282,10 +8291,13 @@ function duelSetupCancel() {
 }
 function duelSetupSet(key, value) {
   duelSetup[key] = value;
-  if (key === "teamCount") duelSetup.teams = duelSetup.teams.map((_, i) => i % value);
+  if (key === "teamCount") duelSetup.teams = createRandomDuelTeams(duelSetup.n, value);
   renderDuelSetup();
 }
-function duelSetupTeam(i, value) { duelSetup.teams[i] = Number(value); renderDuelSetup(); }
+function duelSetupRandomizeTeams() {
+  duelSetup.teams = createRandomDuelTeams(duelSetup.n, duelSetup.teamCount);
+  renderDuelSetup();
+}
 function duelSetupStart() {
   const st = duelSetup;
   document.getElementById("duelSetupOverlay").style.display = "none";
@@ -8294,19 +8306,18 @@ function duelSetupStart() {
 function renderDuelSetup() {
   const st = duelSetup, box = document.getElementById("duelSetupBox"), teams = st.mode === "teams";
   const seg = (key, opts) => `<div class="ds-seg" role="group">${opts.map(([v, l]) => `<button type="button" class="${st[key] === v ? "is-active" : ""}" aria-pressed="${st[key] === v}" onclick="duelSetupSet('${key}',${typeof v === "string" ? `'${v}'` : v})">${l}</button>`).join("")}</div>`;
-  const used = new Set(st.teams), valid = Array.from({ length: st.teamCount }, (_, i) => used.has(i)).every(Boolean);
   let body = `<div class="ds-group"><div class="ds-label">Spielmodus</div>${seg("mode", [["solo", "Jeder für sich"], ["teams", "Teams"]])}</div>`;
   if (teams) {
     body += `<div class="ds-group"><div class="ds-label">Anzahl Teams</div>${seg("teamCount", DUEL_TEAM_OPTIONS[st.n].map(c => [c, `${c} Teams`]))}</div>
     <div class="ds-group"><div class="ds-label">Lebenspunkte</div>${seg("shared", [[true, "Gemeinsam pro Team"], [false, "Pro Spieler einzeln"]])}
       <p class="ds-hint">${st.shared ? "Jedes Team hat zusammen 8000 LP." : "Jeder Spieler hat 8000 LP. Ein Team gewinnt, wenn alle Gegner besiegt sind."}</p></div>
-    <div class="ds-group"><div class="ds-label">Team-Zuordnung</div><div class="ds-rows">${activeYugiohAssignments.map((a, i) => `<label class="ds-row"><span class="ds-name">${escapeHtml(a.playerName)}</span>
-      <select class="ds-team-select" data-team="${st.teams[i] % 4}" onchange="duelSetupTeam(${i},this.value)" aria-label="Team für ${escapeHtml(a.playerName)}">${Array.from({ length: st.teamCount }, (_, t) => `<option value="${t}" ${st.teams[i] === t ? "selected" : ""}>Team ${t + 1}</option>`).join("")}</select></label>`).join("")}</div>
-      ${valid ? "" : '<p class="ds-error">Jedes Team braucht mindestens einen Spieler.</p>'}</div>`;
+    <div class="ds-group"><div class="ds-label">Zufällige Team-Zuordnung</div><div class="ds-rows">${activeYugiohAssignments.map((a, i) => `<div class="ds-row"><span class="ds-name">${escapeHtml(a.playerName)}</span>
+      <span class="ds-team-badge" data-team="${st.teams[i] % 4}">Team ${st.teams[i] + 1}</span></div>`).join("")}</div>
+      <button type="button" class="ds-randomize" onclick="duelSetupRandomizeTeams()">🎲 Teams neu zufällig zuteilen</button></div>`;
   }
   box.innerHTML = `<div class="ds-head"><h3 id="duelSetupTitle">⚔️ Duell einrichten</h3><p class="ds-hint">${st.n} Spieler – wie soll gespielt werden?</p></div>
     <div class="ds-body">${body}</div>
-    <div class="ds-actions"><button type="button" class="ds-cancel" onclick="duelSetupCancel()">Zurück</button><button type="button" class="ds-start" onclick="duelSetupStart()" ${teams && !valid ? "disabled" : ""}>⚔️ Duell starten</button></div>`;
+    <div class="ds-actions"><button type="button" class="ds-cancel" onclick="duelSetupCancel()">Zurück</button><button type="button" class="ds-start" onclick="duelSetupStart()">⚔️ Duell starten</button></div>`;
 }
 
 /* Auth */
