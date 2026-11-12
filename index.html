@@ -6721,6 +6721,7 @@ body.app-scene .skip-link:focus{left:12px}
     <div class="duel-topbar">
       <h3 id="yugiohDuelTitle">⚔️ Battle Arena</h3>
       <div class="duel-tools" role="toolbar" aria-label="Arena-Werkzeuge">
+        <button type="button" id="duelMusicToggle" onclick="toggleDuelBackgroundMusic()" aria-label="Battle-Arena-Musik ausschalten" aria-pressed="true" title="Musik ausschalten">🔊</button>
         <button type="button" onclick="duelUndo()" aria-label="Letzte Änderung rückgängig" title="Rückgängig">↶</button>
         <button type="button" onclick="duelCoin()" aria-label="Münzwurf" title="Münzwurf">🪙</button>
         <button type="button" onclick="duelDice()" aria-label="Würfeln" title="Würfel">🎲</button>
@@ -8051,8 +8052,33 @@ function applyYugiohCalculator() {
 
 /* ===== Battle Arena: Zusatzfunktionen ===== */
 let duelUndoStack = [], duelWakeLock = null, duelBannerTimer = null, duelLifePointSoundRun = 0;
-let duelMusicResumeAfterSound = false;
+let duelMusicResumeAfterSound = false, duelMusicEnabled = true;
 const duelRnd = n => { const a = new Uint32Array(1); crypto.getRandomValues(a); return a[0] % n; };
+function updateDuelMusicToggle() {
+  const button = document.getElementById("duelMusicToggle");
+  button.textContent = duelMusicEnabled ? "🔊" : "🔇";
+  button.setAttribute("aria-label", duelMusicEnabled ? "Battle-Arena-Musik ausschalten" : "Battle-Arena-Musik einschalten");
+  button.setAttribute("title", duelMusicEnabled ? "Musik ausschalten" : "Musik einschalten");
+  button.setAttribute("aria-pressed", String(duelMusicEnabled));
+}
+function toggleDuelBackgroundMusic() {
+  duelMusicEnabled = !duelMusicEnabled;
+  const music = document.getElementById("duelBackgroundAudio");
+  if (!duelMusicEnabled) {
+    duelMusicResumeAfterSound = false;
+    music.pause();
+  } else if (yugiohDuelOverlay.style.display === "flex") {
+    const anotherSoundIsPlaying = [...document.querySelectorAll("audio")].some(audio =>
+      audio.id !== "duelBackgroundAudio" && !audio.paused && !audio.ended
+    );
+    duelMusicResumeAfterSound = anotherSoundIsPlaying;
+    if (!anotherSoundIsPlaying) {
+      music.volume = 0.3;
+      void music.play().catch(error => console.warn("Battle-Arena-Hintergrundmusik konnte nicht abgespielt werden:", error));
+    }
+  }
+  updateDuelMusicToggle();
+}
 function pauseDuelBackgroundMusicForSound() {
   const music = document.getElementById("duelBackgroundAudio");
   if (!music.paused) {
@@ -8061,8 +8087,9 @@ function pauseDuelBackgroundMusicForSound() {
   }
 }
 function resumeDuelBackgroundMusicAfterSound() {
-  if (!duelMusicResumeAfterSound) return;
+  if (!duelMusicEnabled || !duelMusicResumeAfterSound) return;
   setTimeout(() => {
+    if (!duelMusicEnabled || !duelMusicResumeAfterSound) return;
     const anotherSoundIsPlaying = [...document.querySelectorAll("audio")].some(audio =>
       audio.id !== "duelBackgroundAudio" && !audio.paused && !audio.ended
     );
@@ -8076,6 +8103,7 @@ function resumeDuelBackgroundMusicAfterSound() {
 }
 function startDuelBackgroundMusic() {
   duelMusicResumeAfterSound = false;
+  if (!duelMusicEnabled) return;
   const music = document.getElementById("duelBackgroundAudio");
   music.volume = 0.3;
   music.currentTime = 0;
