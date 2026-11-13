@@ -8046,15 +8046,15 @@ async function recordYugiohDuelResult() {
     ? players.filter(player => key(player) !== winnerKey).flatMap(flatten)
     : players.filter(player => player !== alive[0]);
   const winnerDeckIds = [...new Set(winningPlayers.map(player => player.deck?.id).filter(Boolean))];
-  const opponentDeckIds = [...new Set(defeatedPlayers.map(player => player.deck?.id).filter(Boolean))]
+  const loserDeckIds = [...new Set(defeatedPlayers.map(player => player.deck?.id).filter(Boolean))]
     .filter(deckId => !winnerDeckIds.includes(deckId));
-  if (!winnerDeckIds.length || !opponentDeckIds.length) return true;
+  if (!winnerDeckIds.length || !loserDeckIds.length) return true;
 
   yugiohDuelResultSavePromise = (async () => {
     try {
-      const { error } = await supabaseClient.rpc("record_yugioh_battle_wins", {
+      const { error } = await supabaseClient.rpc("record_yugioh_battle_result", {
         p_winner_deck_ids: winnerDeckIds,
-        p_opponent_deck_ids: opponentDeckIds
+        p_loser_deck_ids: loserDeckIds
       });
       if (error) {
         showSupabaseError("Fehler beim Speichern der Battle-Arena-Statistik", error);
@@ -13527,22 +13527,10 @@ function renderYugiohDecks() {
     theme.textContent = name;
     const battleStats = deck.battle_stats && typeof deck.battle_stats === "object" ? deck.battle_stats : {};
     const battleWins = Math.max(0, Number(battleStats.wins) || 0);
-    const opponents = battleStats.wins_against && typeof battleStats.wins_against === "object"
-      ? Object.values(battleStats.wins_against).filter(opponent => opponent && Number(opponent.wins) > 0)
-      : [];
+    const battleLosses = Math.max(0, Number(battleStats.losses) || 0);
     const battleStatsElement = document.createElement("div");
     battleStatsElement.className = "yugioh-battle-stats";
-    const winsLabel = document.createElement("strong");
-    winsLabel.textContent = `⚔️ Battle-Arena-Siege: ${battleWins}`;
-    battleStatsElement.appendChild(winsLabel);
-    if (opponents.length) {
-      const opponentDetails = document.createElement("span");
-      opponentDetails.textContent = "Gewonnen gegen: " + opponents
-        .sort((a, b) => Number(b.wins) - Number(a.wins) || String(a.name || "").localeCompare(String(b.name || ""), "de"))
-        .map(opponent => `${opponent.name || "Unbekanntes Deck"} (${opponent.wins})`)
-        .join(", ");
-      battleStatsElement.appendChild(opponentDetails);
-    }
+    battleStatsElement.textContent = `⚔️ Gewonnen: ${battleWins} · Verloren: ${battleLosses}`;
 
     const chips = document.createElement("div");
     chips.className = "yugioh-chips";
