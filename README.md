@@ -46,6 +46,11 @@ Für Yu-Gi-Oh!-Deckkategorien zuerst
 [`supabase/migrations/20261003000000_add_yugioh_deck_category.sql`](supabase/migrations/20261003000000_add_yugioh_deck_category.sql)
 im Supabase SQL Editor ausführen. Dadurch wird die Kategorie-Spalte für bestehende Decks ergänzt. Jedes Deck erhält genau eine der Kategorien „Sonntagsdeck“, „Kartenstapel“ oder „Spielbar“; im Filter können mehrere Kategorien gleichzeitig ausgewählt werden.
 
+Für die Battle-Arena-Statistik pro Deck
+[`supabase/migrations/20261113000000_add_yugioh_battle_stats.sql`](supabase/migrations/20261113000000_add_yugioh_battle_stats.sql)
+im Supabase SQL Editor ausführen. Eindeutige Siege werden beim Schließen des Duells gespeichert;
+bei Team-Siegen zählt jedes Deck des Siegerteams einen Sieg gegen jedes Deck des gegnerischen Teams.
+
 Für Registrierungslinks, Nutzernamen-Login, Kontoverwaltung und Rollenverwaltung zuerst
 [`supabase-account-setup.sql`](supabase-account-setup.sql) vollständig im Supabase SQL Editor ausführen.
 Falls das Kontoschema bereits eingerichtet wurde, führe das aktualisierte SQL-Script erneut aus,
