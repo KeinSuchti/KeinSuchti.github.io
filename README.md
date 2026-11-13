@@ -48,8 +48,11 @@ im Supabase SQL Editor ausführen. Dadurch wird die Kategorie-Spalte für besteh
 
 Für die Battle-Arena-Statistik pro Deck
 [`supabase/migrations/20261113000000_add_yugioh_battle_stats.sql`](supabase/migrations/20261113000000_add_yugioh_battle_stats.sql)
-im Supabase SQL Editor ausführen. Eindeutige Siege werden beim Schließen des Duells gespeichert;
-bei Team-Siegen zählt jedes Deck des Siegerteams einen Sieg gegen jedes Deck des gegnerischen Teams.
+und anschließend
+[`supabase/migrations/20261113134000_add_yugioh_battle_losses.sql`](supabase/migrations/20261113134000_add_yugioh_battle_losses.sql)
+im Supabase SQL Editor ausführen. Eindeutige Siege und Niederlagen werden beim Schließen des Duells
+gespeichert; bei Team-Duellen erhält jedes Deck auf der Siegerseite einen Sieg und jedes Deck auf
+der Verliererseite eine Niederlage.
 
 Für Registrierungslinks, Nutzernamen-Login, Kontoverwaltung und Rollenverwaltung zuerst
 [`supabase-account-setup.sql`](supabase-account-setup.sql) vollständig im Supabase SQL Editor ausführen.
