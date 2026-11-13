@@ -5254,6 +5254,9 @@ button:not(:disabled):active{transform:scale(.98)}
 .yugioh-count{color:#9db1cd;font-size:13px;font-weight:700;white-space:nowrap}
 .yugioh-deck-card{display:block}
 .yugioh-deck-card .yugioh-theme{font-size:19px;margin-bottom:10px;line-height:1.25}
+.yugioh-battle-stats{display:grid;gap:3px;margin:-3px 0 10px;color:var(--text-muted);font-size:12px;line-height:1.4}
+.yugioh-battle-stats strong{color:var(--text);font-size:13px}
+.yugioh-battle-stats span{overflow-wrap:anywhere}
 .yugioh-chips{display:flex;flex-wrap:wrap;gap:7px}
 .yugioh-chip{display:inline-flex;align-items:center;gap:7px;padding:4px 10px;border-radius:999px;border:1px solid rgba(101,141,207,.26);background:rgba(28,46,69,.62);color:#d4e0f0;font-size:13px;font-weight:600;max-width:100%}
 .yugioh-chip.is-empty{opacity:.6;font-style:italic}
@@ -5304,6 +5307,7 @@ button.yugioh-image-placeholder:hover{border-color:rgba(101,226,215,.7);color:#d
   .yugioh-image-wrapper .yugioh-image{width:100%!important;height:100%!important;object-fit:cover}
   button.yugioh-image-placeholder{font-size:22px}button.yugioh-image-placeholder small{font-size:9px;text-align:center}
   .yugioh-deck-card .yugioh-theme{grid-column:2;grid-row:1;margin:0!important;font-size:17px!important;align-self:end;overflow-wrap:anywhere;min-width:0}
+  .yugioh-battle-stats{grid-column:2;grid-row:2;margin:0 0 6px;min-width:0}
   .yugioh-chips{grid-column:1/-1;grid-row:3;align-self:start;min-width:0}
   .yugioh-chip{min-width:0;max-width:100%;overflow-wrap:anywhere}
   .yugioh-category-chip{flex:1 1 100%;flex-wrap:wrap}
@@ -6892,6 +6896,8 @@ let yugiohDecks = [];
 let yugiohPlayerNames = [];
 let activeYugiohAssignments = [];
 let activeYugiohDuelPlayers = [];
+let yugiohDuelResultSaved = false;
+let yugiohDuelResultSavePromise = null;
 let activeYugiohCalculatorIndex = -1;
 let activeYugiohCalculatorExpression = "";
 let selectedYugiohOwnerValues = new Set();
@@ -7943,6 +7949,7 @@ function startYugiohDuel(cfg = { mode: "solo" }) {
     lifePoints: 8000,
     lifeHistory: [{ type: "initial", label: "Startwert", from: null, to: 8000, expression: "8000", timestamp: Date.now() }]
   }));
+  yugiohDuelResultSaved = false;
   applyDuelTeams(cfg);
   duelUndoStack = [];
   renderYugiohDuelArena({ animateLifePoints: false });
@@ -8008,8 +8015,61 @@ function renderYugiohDuelArena({ animateLifePoints = true } = {}) {
   updateDuelBanner();
 }
 
-function closeYugiohDuel() { stopDuelBackgroundMusic(); duelReleaseWakeLock(); yugiohDuelOverlay.style.display = "none"; document.documentElement.classList.remove("duel-open"); closeYugiohCalculator(); }
+async function closeYugiohDuel() {
+  if (!await recordYugiohDuelResult()) return;
+  stopDuelBackgroundMusic();
+  duelReleaseWakeLock();
+  yugiohDuelOverlay.style.display = "none";
+  document.documentElement.classList.remove("duel-open");
+  closeYugiohCalculator();
+}
 function closeYugiohDuelOnOverlay(event) { if (event.target === yugiohDuelOverlay) closeYugiohDuel(); }
+async function recordYugiohDuelResult() {
+  if (yugiohDuelResultSaved) return true;
+  if (yugiohDuelResultSavePromise) return yugiohDuelResultSavePromise;
+  const players = activeYugiohDuelPlayers;
+  const alive = players.filter(player => player.lifePoints > 0);
+  const key = player => player.teamId !== undefined ? "t" + player.teamId : "p" + players.indexOf(player);
+  if (players.length < 2 || new Set(alive.map(key)).size !== 1 || alive.length === 0) return true;
+
+  const winnerKey = key(alive[0]);
+  const flatten = player => player.isTeam ? player.members : [player];
+  const winningPlayers = duelTeamMode
+    ? players.filter(player => key(player) === winnerKey).flatMap(flatten)
+    : [alive[0]];
+  const defeatedPlayers = duelTeamMode
+    ? players.filter(player => key(player) !== winnerKey).flatMap(flatten)
+    : players.filter(player => player !== alive[0]);
+  const winnerDeckIds = [...new Set(winningPlayers.map(player => player.deck?.id).filter(Boolean))];
+  const opponentDeckIds = [...new Set(defeatedPlayers.map(player => player.deck?.id).filter(Boolean))]
+    .filter(deckId => !winnerDeckIds.includes(deckId));
+  if (!winnerDeckIds.length || !opponentDeckIds.length) return true;
+
+  yugiohDuelResultSavePromise = (async () => {
+    try {
+      const { error } = await supabaseClient.rpc("record_yugioh_battle_wins", {
+        p_winner_deck_ids: winnerDeckIds,
+        p_opponent_deck_ids: opponentDeckIds
+      });
+      if (error) {
+        showSupabaseError("Fehler beim Speichern der Battle-Arena-Statistik", error);
+        return false;
+      }
+    } catch (error) {
+      showSupabaseError("Fehler beim Speichern der Battle-Arena-Statistik", error);
+      return false;
+    }
+
+    yugiohDuelResultSaved = true;
+    await loadYugiohDecks();
+    return true;
+  })();
+  try {
+    return await yugiohDuelResultSavePromise;
+  } finally {
+    yugiohDuelResultSavePromise = null;
+  }
+}
 function openYugiohCalculator(index) {
   activeYugiohCalculatorIndex = index;
   activeYugiohCalculatorExpression = String(activeYugiohDuelPlayers[index]?.lifePoints ?? 0);
@@ -13364,7 +13424,7 @@ async function loadYugiohDecks() {
 
   const { data, error } = await supabaseClient
     .from("yugioh_decks")
-    .select("id, theme, sleeve_color, owner, category, image, user_id, created_at")
+    .select("id, theme, sleeve_color, owner, category, image, battle_stats, user_id, created_at")
     .order("theme", { ascending: true });
 
   if (error) {
@@ -13460,6 +13520,24 @@ function renderYugiohDecks() {
     const theme = document.createElement("div");
     theme.className = "yugioh-theme";
     theme.textContent = name;
+    const battleStats = deck.battle_stats && typeof deck.battle_stats === "object" ? deck.battle_stats : {};
+    const battleWins = Math.max(0, Number(battleStats.wins) || 0);
+    const opponents = battleStats.wins_against && typeof battleStats.wins_against === "object"
+      ? Object.values(battleStats.wins_against).filter(opponent => opponent && Number(opponent.wins) > 0)
+      : [];
+    const battleStatsElement = document.createElement("div");
+    battleStatsElement.className = "yugioh-battle-stats";
+    const winsLabel = document.createElement("strong");
+    winsLabel.textContent = `⚔️ Battle-Arena-Siege: ${battleWins}`;
+    battleStatsElement.appendChild(winsLabel);
+    if (opponents.length) {
+      const opponentDetails = document.createElement("span");
+      opponentDetails.textContent = "Gewonnen gegen: " + opponents
+        .sort((a, b) => Number(b.wins) - Number(a.wins) || String(a.name || "").localeCompare(String(b.name || ""), "de"))
+        .map(opponent => `${opponent.name || "Unbekanntes Deck"} (${opponent.wins})`)
+        .join(", ");
+      battleStatsElement.appendChild(opponentDetails);
+    }
 
     const chips = document.createElement("div");
     chips.className = "yugioh-chips";
@@ -13506,7 +13584,7 @@ function renderYugiohDecks() {
     actions.appendChild(mk("yugioh-edit-button","✏️ Bearbeiten","Deck "+name+" bearbeiten",()=>openYugiohEdit(deck.id)));
     actions.appendChild(mk("yugioh-image-button",deck.image?"🖼️ Bild ändern":"🖼️ Bild hochladen","Bild für "+name+(deck.image?" ändern":" hochladen"),()=>uploadYugiohImage(deck.id)));
 
-    info.appendChild(theme); info.appendChild(chips); info.appendChild(actions);
+    info.appendChild(theme); info.appendChild(battleStatsElement); info.appendChild(chips); info.appendChild(actions);
     addDblClickEdit(card, () => openYugiohEdit(deck.id));
     main.appendChild(imageWrapper); main.appendChild(info);
     card.appendChild(main);
@@ -13805,7 +13883,7 @@ async function addYugiohDeck() {
   const { data, error } = await supabaseClient
     .from("yugioh_decks")
     .insert(newDeck)
-    .select("id, theme, sleeve_color, owner, category, image, user_id, created_at")
+    .select("id, theme, sleeve_color, owner, category, image, battle_stats, user_id, created_at")
     .single();
 
   if (addBtn) { addBtn.disabled = false; addBtn.textContent = "➕ Deck hinzufügen"; }
