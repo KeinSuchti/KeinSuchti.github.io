@@ -48,11 +48,14 @@ im Supabase SQL Editor ausführen. Dadurch wird die Kategorie-Spalte für besteh
 
 Für die Battle-Arena-Statistik pro Deck
 [`supabase/migrations/20261113000000_add_yugioh_battle_stats.sql`](supabase/migrations/20261113000000_add_yugioh_battle_stats.sql)
-und anschließend
+und danach
 [`supabase/migrations/20261113134000_add_yugioh_battle_losses.sql`](supabase/migrations/20261113134000_add_yugioh_battle_losses.sql)
-im Supabase SQL Editor ausführen. Eindeutige Siege und Niederlagen werden beim Schließen des Duells
-gespeichert; bei Team-Duellen erhält jedes Deck auf der Siegerseite einen Sieg und jedes Deck auf
-der Verliererseite eine Niederlage.
+ausführen. Um bestehende Siege und Niederlagen zurückzusetzen, anschließend einmalig
+[`supabase/migrations/20261113145500_reset_yugioh_battle_stats.sql`](supabase/migrations/20261113145500_reset_yugioh_battle_stats.sql)
+im Supabase SQL Editor ausführen. Diese Migration setzt alle bisherigen Siege und Niederlagen auf
+null zurück. Danach werden eindeutige Siege und Niederlagen beim Schließen des Duells gespeichert; bei
+Team-Duellen erhält jedes Deck auf der Siegerseite einen Sieg und jedes Deck auf der Verliererseite eine
+Niederlage.
 
 Für Registrierungslinks, Nutzernamen-Login, Kontoverwaltung und Rollenverwaltung zuerst
 [`supabase-account-setup.sql`](supabase-account-setup.sql) vollständig im Supabase SQL Editor ausführen.

@@ -8021,12 +8021,17 @@ function renderYugiohDuelArena({ animateLifePoints = true } = {}) {
 }
 
 async function closeYugiohDuel() {
-  if (!await recordYugiohDuelResult()) return;
-  stopDuelBackgroundMusic();
-  duelReleaseWakeLock();
-  yugiohDuelOverlay.style.display = "none";
-  document.documentElement.classList.remove("duel-open");
-  closeYugiohCalculator();
+  try {
+    await recordYugiohDuelResult();
+  } catch (error) {
+    showSupabaseError("Fehler beim Speichern der Battle-Arena-Statistik", error);
+  } finally {
+    stopDuelBackgroundMusic();
+    duelReleaseWakeLock();
+    yugiohDuelOverlay.style.display = "none";
+    document.documentElement.classList.remove("duel-open");
+    closeYugiohCalculator();
+  }
 }
 function closeYugiohDuelOnOverlay(event) { if (event.target === yugiohDuelOverlay) closeYugiohDuel(); }
 async function recordYugiohDuelResult() {
