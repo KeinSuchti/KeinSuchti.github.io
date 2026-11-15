@@ -7890,6 +7890,11 @@ function showYugiohAssignmentPopup(assignments) {
     theme.className = "assignment-deck-theme";
     theme.textContent = deck.theme || "Unbenanntes Deck";
 
+    const battleStats = deck.battle_stats && typeof deck.battle_stats === "object" ? deck.battle_stats : {};
+    const battleStatsElement = document.createElement("div");
+    battleStatsElement.className = "assignment-deck-meta";
+    battleStatsElement.textContent = `⚔️ Gewonnen: ${Math.max(0, Number(battleStats.wins) || 0)} · Verloren: ${Math.max(0, Number(battleStats.losses) || 0)}`;
+
     const sleeve = document.createElement("div");
     sleeve.className = "assignment-deck-meta";
     sleeve.textContent = "Hüllenfarbe: " + (deck.sleeve_color || "nicht angegeben");
@@ -7905,6 +7910,7 @@ function showYugiohAssignmentPopup(assignments) {
     card.appendChild(player);
     card.appendChild(imageWrapper);
     card.appendChild(theme);
+    card.appendChild(battleStatsElement);
     card.appendChild(category);
     card.appendChild(sleeve);
     card.appendChild(owner);
