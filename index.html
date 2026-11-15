@@ -6304,7 +6304,7 @@ body.app-scene .skip-link:focus{left:12px}
           <div id="yugiohCategoryFilter" class="yugioh-owner-filter-select yugioh-filter-dropdown-menu" role="group" aria-label="Mehrere Kategorien auswählen" hidden></div>
         </div>
         <input type="search" id="yugiohSearch" class="yugioh-search" placeholder="🔍 Decks suchen …" aria-label="Decks durchsuchen" oninput="renderYugiohDecks()">
-        <select id="yugiohSort" class="yugioh-sort" aria-label="Sortierung" onchange="renderYugiohDecks()"><option value="theme">A–Z</option><option value="owner">Nach Besitzer</option><option value="new">Neueste zuerst</option></select>
+        <select id="yugiohSort" class="yugioh-sort" aria-label="Sortierung" onchange="renderYugiohDecks()"><option value="theme">A–Z</option><option value="owner">Nach Besitzer</option><option value="new">Neueste zuerst</option><option value="wins">Meiste Siege</option><option value="losses">Meiste Niederlagen</option></select>
         <span id="yugiohCount" class="yugioh-count" aria-live="polite"></span>
       </div>
 
@@ -8388,12 +8388,13 @@ function shuffleYugiohItems(items) {
   }
   return items;
 }
-function getYugiohDeckPlayCount(deck) {
+function getYugiohBattleStatCount(deck, key) {
   const stats = deck.battle_stats && typeof deck.battle_stats === "object" ? deck.battle_stats : {};
-  return ["wins", "losses"].reduce((total, key) => {
-    const count = Number(stats[key]);
-    return total + (Number.isFinite(count) ? Math.max(0, count) : 0);
-  }, 0);
+  const count = Number(stats[key]);
+  return Number.isFinite(count) ? Math.max(0, count) : 0;
+}
+function getYugiohDeckPlayCount(deck) {
+  return getYugiohBattleStatCount(deck, "wins") + getYugiohBattleStatCount(deck, "losses");
 }
 function drawWeightedYugiohDecks(decks, count) {
   const pool = [...decks];
@@ -13840,6 +13841,8 @@ function getFilteredYugiohDecks() {
   const mode = document.getElementById("yugiohSort")?.value || "theme";
   list.sort(mode === "owner" ? (a, b) => cmp(a.owner, b.owner) || cmp(a.theme, b.theme)
     : mode === "new" ? (a, b) => String(b.created_at || "").localeCompare(String(a.created_at || ""))
+    : mode === "wins" ? (a, b) => getYugiohBattleStatCount(b, "wins") - getYugiohBattleStatCount(a, "wins") || cmp(a.theme, b.theme)
+    : mode === "losses" ? (a, b) => getYugiohBattleStatCount(b, "losses") - getYugiohBattleStatCount(a, "losses") || cmp(a.theme, b.theme)
     : (a, b) => cmp(a.theme, b.theme));
   return list;
 }
