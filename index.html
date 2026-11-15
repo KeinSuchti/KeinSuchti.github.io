@@ -8354,12 +8354,15 @@ function duelRematch() {
 /* ===== Battle Arena: Teams (4 / 6 / 8 Spieler) ===== */
 let duelTeamMode = false, duelTeamShared = false, duelSetup = null;
 const DUEL_TEAM_OPTIONS = { 4: [2], 6: [2, 3], 8: [2, 4] };
-function createRandomDuelTeams(playerCount, teamCount) {
-  const playerOrder = Array.from({ length: playerCount }, (_, index) => index);
-  for (let index = playerOrder.length - 1; index > 0; index--) {
+function shuffleYugiohItems(items) {
+  for (let index = items.length - 1; index > 0; index--) {
     const randomIndex = Math.floor(Math.random() * (index + 1));
-    [playerOrder[index], playerOrder[randomIndex]] = [playerOrder[randomIndex], playerOrder[index]];
+    [items[index], items[randomIndex]] = [items[randomIndex], items[index]];
   }
+  return items;
+}
+function createRandomDuelTeams(playerCount, teamCount) {
+  const playerOrder = shuffleYugiohItems(Array.from({ length: playerCount }, (_, index) => index));
   const teams = Array(playerCount);
   playerOrder.forEach((playerIndex, index) => { teams[playerIndex] = index % teamCount; });
   return teams;
@@ -13864,8 +13867,7 @@ function assignRandomYugiohDecks() {
     return;
   }
 
-  const shuffledDecks = [...availableDecks]
-    .sort(() => Math.random() - 0.5);
+  const shuffledDecks = shuffleYugiohItems([...availableDecks]);
 
   const assignments = players.map((playerName, index) => {
     return {
