@@ -44,7 +44,11 @@ Den Android-Build anschließend im erzeugten `android`-Projekt mit Android Studi
 
 Für Yu-Gi-Oh!-Deckkategorien zuerst
 [`supabase/migrations/20261003000000_add_yugioh_deck_category.sql`](supabase/migrations/20261003000000_add_yugioh_deck_category.sql)
-im Supabase SQL Editor ausführen. Dadurch wird die Kategorie-Spalte für bestehende Decks ergänzt. Jedes Deck erhält genau eine der Kategorien „Sonntagsdeck“, „Kartenstapel“ oder „Spielbar“; im Filter können mehrere Kategorien gleichzeitig ausgewählt werden.
+im Supabase SQL Editor ausführen. Dadurch wird die Kategorie-Spalte für bestehende Decks ergänzt. Jedes Deck erhält genau eine der Kategorien „Sonntagsdeck“, „Kartenstapel“, „Spielbar“ oder „Starterdecks“; im Filter können mehrere Kategorien gleichzeitig ausgewählt werden.
+
+Für die numerische Position eines Decks im Deckkoffer
+[`supabase/migrations/20261115122600_add_yugioh_deck_box_position.sql`](supabase/migrations/20261115122600_add_yugioh_deck_box_position.sql)
+im Supabase SQL Editor ausführen.
 
 Für die Battle-Arena-Statistik pro Deck
 [`supabase/migrations/20261113000000_add_yugioh_battle_stats.sql`](supabase/migrations/20261113000000_add_yugioh_battle_stats.sql)
@@ -55,7 +59,9 @@ ausführen. Um bestehende Siege und Niederlagen zurückzusetzen, anschließend e
 im Supabase SQL Editor ausführen. Diese Migration setzt alle bisherigen Siege und Niederlagen auf
 null zurück. Danach werden eindeutige Siege und Niederlagen beim Schließen des Duells gespeichert; bei
 Team-Duellen erhält jedes Deck auf der Siegerseite einen Sieg und jedes Deck auf der Verliererseite eine
-Niederlage.
+Niederlage. Bei der zufälligen Deck-Zuteilung sinkt die Ziehungswahrscheinlichkeit mit der Zahl der
+gespeicherten Siege und Niederlagen (Gewicht: `1 / (1 + Duelle)`); innerhalb einer Zuteilung wird kein
+Deck doppelt gezogen.
 
 Für Registrierungslinks, Nutzernamen-Login, Kontoverwaltung und Rollenverwaltung zuerst
 [`supabase-account-setup.sql`](supabase-account-setup.sql) vollständig im Supabase SQL Editor ausführen.
