@@ -5507,7 +5507,7 @@ a.feast-tile-media:hover img{transform:scale(1.06)}
 .card-empty{padding:26px 16px;border:1px dashed var(--border-strong);border-radius:14px;color:var(--text-muted);text-align:center;font-size:14px;font-weight:600}
 #feastApp .random-card-button{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:52px;margin:0 0 16px;font-size:16px;font-weight:800;border-radius:14px}
 #feastApp #feastPinned{margin:0 0 20px}
-#feastApp .card-controls{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr) minmax(0,1fr) auto;gap:10px;align-items:center;margin:0 0 14px}
+#feastApp .card-controls{display:grid;grid-template-columns:minmax(0,1.6fr) repeat(3,minmax(0,1fr)) auto;gap:10px;align-items:center;margin:0 0 14px}
 #feastApp .card-controls > *{margin:0;min-width:0;width:100%;min-height:44px}
 #feastApp .card-controls .card-count{width:auto;display:inline-flex;align-items:center;white-space:nowrap;color:var(--text-muted);font-size:13px;font-weight:700;padding:0 4px}
 #feastApp .card-add-form{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr) minmax(150px,.8fr) auto;align-items:center;gap:10px;margin:0 0 18px;padding:12px}
@@ -6517,6 +6517,12 @@ body.app-scene .skip-link:focus{left:12px}
           <option value="3">⭐ 3+</option>
           <option value="4">⭐ 4+</option>
           <option value="5">⭐ 5</option>
+        </select>
+
+        <select id="feastCategoryFilter" aria-label="Nach Kategorie filtern" onchange="renderCardItems('feast')">
+          <option value="all">Alle Kategorien</option>
+          <option value="Snack">Snack</option>
+          <option value="Abendessen">Abendessen</option>
         </select>
 
         <span id="feastCount" class="card-count" aria-live="polite"></span>
@@ -11396,6 +11402,13 @@ function renderCardItems(type) {
       data.sort((a, b) => (b.rating || 0) - (a.rating || 0));
     } else if (sort === "low") {
       data.sort((a, b) => (a.rating || 0) - (b.rating || 0));
+    }
+  }
+
+  if (type === "feast") {
+    const categoryFilter = document.getElementById("feastCategoryFilter");
+    if (categoryFilter && categoryFilter.value !== "all") {
+      data = data.filter(item => item.category === categoryFilter.value);
     }
   }
 
