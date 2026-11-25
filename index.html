@@ -5510,12 +5510,12 @@ a.feast-tile-media:hover img{transform:scale(1.06)}
 #feastApp .card-controls{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr) minmax(0,1fr) auto;gap:10px;align-items:center;margin:0 0 14px}
 #feastApp .card-controls > *{margin:0;min-width:0;width:100%;min-height:44px}
 #feastApp .card-controls .card-count{width:auto;display:inline-flex;align-items:center;white-space:nowrap;color:var(--text-muted);font-size:13px;font-weight:700;padding:0 4px}
-#feastApp .card-add-form{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr) auto;align-items:center;gap:10px;margin:0 0 18px;padding:12px}
+#feastApp .card-add-form{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr) minmax(150px,.8fr) auto;align-items:center;gap:10px;margin:0 0 18px;padding:12px}
 #feastApp .card-add-form > *{margin:0;min-width:0;min-height:44px}
 #feastApp .card-add-form button{width:auto;white-space:nowrap;padding:0 18px}
 #feastApp #feastList{display:grid;gap:12px}
 #feastApp .card-item{margin:0;padding:14px;border-radius:16px}
-#feastApp .card-item-header{display:grid;grid-template-columns:132px minmax(0,1fr) auto;grid-template-areas:"img title actions" "img stars stars" "img link link" "img comment comment";column-gap:16px;row-gap:8px;align-items:start;align-content:start}
+#feastApp .card-item-header{display:grid;grid-template-columns:132px minmax(0,1fr) auto;grid-template-areas:"img title actions" "img category category" "img stars stars" "img link link" "img comment comment";column-gap:16px;row-gap:8px;align-items:start;align-content:start}
 #feastApp .card-content{display:contents}
 #feastApp .image-wrapper{grid-area:img;width:132px;aspect-ratio:4/3;border-radius:12px}
 #feastApp .image-wrapper.is-placeholder{display:flex;align-items:center;justify-content:center;font-size:30px;border-style:dashed;opacity:.8;cursor:pointer;user-select:none;transition:opacity .2s,border-color .2s}
@@ -5523,6 +5523,8 @@ a.feast-tile-media:hover img{transform:scale(1.06)}
 #feastApp .card-title{grid-area:title;align-self:center;margin:0;font-size:18px;line-height:1.3;cursor:default;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 #feastApp .card-title.has-link{cursor:pointer}
 #feastApp .card-title.has-link:hover{text-decoration:underline;text-underline-offset:3px}
+#feastApp .feast-category-control{grid-area:category;display:flex;align-items:center;gap:8px;color:var(--text-muted);font-size:13px;font-weight:700}
+#feastApp .feast-category-control select{width:auto;min-width:145px;min-height:36px;margin:0;padding:6px 30px 6px 10px}
 #feastApp .card-actions{grid-area:actions;margin:0;gap:6px;flex-wrap:nowrap;justify-content:flex-end}
 #feastApp .card-stars{grid-area:stars;display:grid;align-items:start}
 #feastApp .rating-vote-star{width:34px;min-width:34px;min-height:34px;padding:3px;font-size:19px}
@@ -5541,7 +5543,7 @@ a.feast-tile-media:hover img{transform:scale(1.06)}
   #feastApp .card-add-form{grid-template-columns:minmax(0,1fr)}
   #feastApp .card-add-form button{width:100%;min-height:48px}
   #feastApp .card-item{padding:12px}
-  #feastApp .card-item-header{grid-template-columns:84px minmax(0,1fr);grid-template-areas:"img title" "img stars" "actions actions" "link link" "comment comment";column-gap:12px}
+  #feastApp .card-item-header{grid-template-columns:84px minmax(0,1fr);grid-template-areas:"img title" "img category" "img stars" "actions actions" "link link" "comment comment";column-gap:12px}
   #feastApp .image-wrapper{width:84px;aspect-ratio:1/1}
   #feastApp .card-title{font-size:16px;align-self:start}
   #feastApp .card-actions{justify-content:flex-start}
@@ -6523,6 +6525,10 @@ body.app-scene .skip-link:focus{left:12px}
       <div class="card-add-form">
         <input id="newFeastName" placeholder="Name" aria-label="Name" autocomplete="off" enterkeyhint="next">
         <input id="newFeastUrl" placeholder="Link (für die Zufallsauswahl nötig)" aria-label="Link" inputmode="url" autocomplete="off" enterkeyhint="done">
+        <select id="newFeastCategory" aria-label="Kategorie für den neuen Eintrag">
+          <option value="Snack">Snack</option>
+          <option value="Abendessen" selected>Abendessen</option>
+        </select>
 
         <button onclick="addCardItem('feast')">➕ Hinzufügen</button>
       </div>
@@ -6915,6 +6921,7 @@ let activeYugiohCalculatorExpression = "";
 let selectedYugiohOwnerValues = new Set();
 let selectedYugiohCategoryValues = new Set();
 const YUGIOH_CATEGORIES = ["Sonntagsdeck", "Kartenstapel", "Spielbar", "Starterdecks"];
+const FEAST_CATEGORIES = ["Snack", "Abendessen"];
 
 const cardLists = {
   feast: {
@@ -10930,9 +10937,12 @@ async function loadCardItems(type) {
 
   setStatus("Lade " + config.title + "...");
 
+  const columns = type === "feast"
+    ? "id, name, url, rating, image, comment, category, user_id, created_at"
+    : "id, name, url, rating, image, comment, user_id, created_at";
   const { data, error } = await supabaseClient
     .from(config.table)
-    .select("id, name, url, rating, image, comment, user_id, created_at")
+    .select(columns)
     .order("created_at", { ascending: false });
 
   if (error) {
@@ -11473,6 +11483,45 @@ function renderCardItems(type) {
       }
     };
 
+    if (type === "feast") {
+      const categoryControl = document.createElement("label");
+      categoryControl.className = "feast-category-control";
+      categoryControl.appendChild(document.createTextNode("Kategorie"));
+
+      const categorySelect = document.createElement("select");
+      categorySelect.setAttribute("aria-label", `Kategorie für ${item.name || "Eintrag"}`);
+      FEAST_CATEGORIES.forEach(category => {
+        const option = document.createElement("option");
+        option.value = category;
+        option.textContent = category;
+        categorySelect.appendChild(option);
+      });
+      categorySelect.value = FEAST_CATEGORIES.includes(item.category) ? item.category : "Abendessen";
+      categorySelect.onchange = async () => {
+        const category = categorySelect.value;
+        if (!FEAST_CATEGORIES.includes(category)) {
+          categorySelect.value = item.category || "Abendessen";
+          return;
+        }
+        categorySelect.disabled = true;
+        const success = await updateCardItem(
+          "feast",
+          item.id,
+          { category },
+          "Fehler beim Speichern der Kategorie"
+        );
+        if (!success) {
+          categorySelect.value = FEAST_CATEGORIES.includes(item.category) ? item.category : "Abendessen";
+          categorySelect.disabled = false;
+          return;
+        }
+        item.category = category;
+        renderCardItems("feast");
+      };
+      categoryControl.appendChild(categorySelect);
+      header.appendChild(categoryControl);
+    }
+
     const linkInput = document.createElement("input");
     linkInput.className = "card-url-input";
     linkInput.value = item.url || "";
@@ -11987,10 +12036,10 @@ function findFeastItem(id) {
   }) || null;
 }
 
-function pickFeastItem(excludeIds) {
+function pickFeastItem(excludeIds, category) {
   const excluded = excludeIds.filter(function(id) { return id != null; }).map(String);
   const pool = getUnratedCardCandidates("feast").filter(function(item) {
-    return !excluded.includes(String(item.id));
+    return item.category === category && !excluded.includes(String(item.id));
   });
 
   if (pool.length === 0) return null;
@@ -12023,22 +12072,25 @@ async function pinFeastPicks() {
     }
   }
 
-  const first = pickFeastItem([]);
+  const snack = pickFeastItem([], "Snack");
+  const dinner = pickFeastItem(snack ? [snack.id] : [], "Abendessen");
 
-  if (!first) {
+  if (!snack && !dinner) {
     showRandomPopup("Es gibt keinen unbewerteten Eintrag mit hinterlegtem Link.");
     return;
   }
 
-  const second = pickFeastItem([first.id]);
-
-  const next = { snack: first.id, dinner: second ? second.id : null };
+  const next = {
+    snack: snack ? snack.id : null,
+    dinner: dinner ? dinner.id : null
+  };
   if (!await saveFeastPinned(next)) return;
   feastPinAnimate = { snack: true, dinner: true };
   renderFeastPinned();
 
-  if (!second) {
-    showFeastPinNote("Es gibt nur einen unbewerteten Eintrag mit Link – deshalb wurde nur der Snack ausgewählt.");
+  if (!snack || !dinner) {
+    const missingCategory = snack ? "Abendessen" : "Snack";
+    showFeastPinNote(`Es gibt keinen unbewerteten Eintrag mit Link in der Kategorie „${missingCategory}“.`);
   }
 
   const box = document.getElementById("feastPinned");
@@ -12049,7 +12101,10 @@ async function rerollFeastPin(slotKey) {
   if (!ensureFeastPinnedLoaded() || feastPinnedSaving) return;
 
   const otherKey = slotKey === "snack" ? "dinner" : "snack";
-  const next = pickFeastItem([feastPinned[otherKey], feastPinned[slotKey]]);
+  const slot = FEAST_PIN_SLOTS.find(function(entry) { return entry.key === slotKey; });
+  const next = slot
+    ? pickFeastItem([feastPinned[otherKey], feastPinned[slotKey]], slot.label)
+    : null;
 
   if (!next) {
     showFeastPinNote("Kein weiterer unbewerteter Eintrag mit Link verfügbar.");
@@ -12094,9 +12149,9 @@ function renderFeastPinned() {
 
     const item = findFeastItem(id);
 
-    if (item) {
+    if (item && item.category === slot.label) {
       resolved[slot.key] = item;
-    } else if (cardLists.feast.items.length) {
+    } else if (item || cardLists.feast.items.length) {
       feastPinned[slot.key] = null;
       changed = true;
     }
@@ -12129,7 +12184,7 @@ function renderFeastPinned() {
   FEAST_PIN_SLOTS.forEach(function(slot) {
     const item = resolved[slot.key] || null;
     const otherKey = slot.key === "snack" ? "dinner" : "snack";
-    const canReroll = pickFeastItem([feastPinned[otherKey], feastPinned[slot.key]]) !== null;
+    const canReroll = pickFeastItem([feastPinned[otherKey], feastPinned[slot.key]], slot.label) !== null;
 
     const hasUrl = !!(item && item.url && item.url.trim() !== "");
     const href = hasUrl ? normalize(item.url.trim()) : "";
@@ -12293,13 +12348,21 @@ async function addCardItem(type) {
     rating: 0,
     image: "",
     comment: "",
-    user_id: currentUser.id
+    user_id: currentUser.id,
+    ...(type === "feast" ? {
+      category: FEAST_CATEGORIES.includes(document.getElementById("newFeastCategory").value)
+        ? document.getElementById("newFeastCategory").value
+        : "Abendessen"
+    } : {})
   };
 
+  const columns = type === "feast"
+    ? "id, name, url, rating, image, comment, category, user_id, created_at"
+    : "id, name, url, rating, image, comment, user_id, created_at";
   const { data, error } = await supabaseClient
     .from(config.table)
     .insert(newItem)
-    .select("id, name, url, rating, image, comment, user_id, created_at")
+    .select(columns)
     .single();
 
   if (error) {
